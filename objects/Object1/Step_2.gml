@@ -1,0 +1,1 @@
+cc.end_step(cc.__user_input__);

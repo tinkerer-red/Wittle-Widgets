@@ -1,0 +1,1 @@
+cc.draw_gui_end(cc.__user_input__);

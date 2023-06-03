@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "Reds GUI",
-    "path": "folders/Libraries/Reds GUI.yy",
+    "path": "folders/_Libraries/Reds GUI.yy",
   },
 }

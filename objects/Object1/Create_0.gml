@@ -79,13 +79,8 @@ log(["b.get_real_name()", b.get_real_name()])
 //_thing.add_event_listener(_thing.events.value_incremented, function(){show_debug_message("3")})
 //_thing.add_event_listener(_thing.events.value_decremented, function(){show_debug_message("4")})
 
+
 show_debug_overlay(true);
-
-//inv = new GUICompRegion(256, 256)
-//	.set_region(0,0, 128, 128)
-
-
-	
 
 
 var _thing = new GUICompTextRegion(128, 128)

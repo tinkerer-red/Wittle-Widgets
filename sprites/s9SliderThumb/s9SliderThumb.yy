@@ -29,7 +29,7 @@
   "origin": 9,
   "parent": {
     "name": "Slider",
-    "path": "folders/Libraries/Reds GUI/Sprites/Slider.yy",
+    "path": "folders/_Libraries/Reds GUI/Sprites/Slider.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

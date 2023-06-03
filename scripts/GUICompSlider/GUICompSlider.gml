@@ -23,8 +23,7 @@ function GUICompSlider(_x, _y) : GUICompCore(_x, _y) constructor {//log(["GUICom
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region])log(["set_region", set_region])
-				static super = __CREATE_SUPER__
-				method(self, super.set_region)(_left, _top, _right, _bottom);
+				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				__find_slider_bounds__();
 				

@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Vert",
-    "path": "folders/Libraries/Reds GUI/Sprites/Scrollbar/Vert.yy",
+    "path": "folders/_Libraries/Reds GUI/Sprites/Scrollbar/Vert.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Horz",
-    "path": "folders/Libraries/Reds GUI/Sprites/Scrollbar/Horz.yy",
+    "path": "folders/_Libraries/Reds GUI/Sprites/Scrollbar/Horz.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

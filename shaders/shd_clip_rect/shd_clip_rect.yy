@@ -4,7 +4,7 @@
   "name": "shd_clip_rect",
   "parent": {
     "name": "Shaders",
-    "path": "folders/Libraries/Reds GUI/Shaders.yy",
+    "path": "folders/_Libraries/Reds GUI/Shaders.yy",
   },
   "type": 1,
 }

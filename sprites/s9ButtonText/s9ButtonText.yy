@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Buttons",
-    "path": "folders/Libraries/Reds GUI/Sprites/Buttons.yy",
+    "path": "folders/_Libraries/Reds GUI/Sprites/Buttons.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

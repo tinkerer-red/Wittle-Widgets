@@ -26,10 +26,7 @@ function GUICompButtonSprite(_x, _y) : GUICompCore(_x, _y) constructor {
 				/// image.index[2] = mouse down; actively being pressed;
 				/// image.index[3] = disabled; not allowed to interact with;
 				
-				//__SUPER__.set_sprite(_sprite);
-				log("about to set sprite")
-				static super = __CREATE_SUPER__
-				method(self, super.set_sprite)(_sprite);
+				__SUPER__.set_sprite(_sprite);
 				
 				log(["set_region", set_region])
 				

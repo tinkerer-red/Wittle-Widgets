@@ -22,8 +22,8 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region]);
-				static super = __CREATE_SUPER__
-				method(self, super.set_region)(_left, _top, _right, _bottom);
+				log(" = = = set_region 1 = = = ")
+				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				return self;
 			}
@@ -1002,8 +1002,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					
 				}
 				
-				static super = __CREATE_SUPER__
-				method(self, super.__step__)(_input);
+				__SUPER__.__step__(_input);
 				
 				if (_mouse_on_comp) {
 					capture_input();
@@ -1597,8 +1596,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				if (!_texfilter_previous) gpu_set_texfilter(_texfilter_previous);
 				
 				
-				static super = __CREATE_SUPER__
-				method(self, super.__draw_gui__)(_input);
+				__SUPER__.__draw_gui__(_input);
 				
 				draw_debug();
 			}
@@ -1646,21 +1644,21 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				#region Format wrapping
 					
 					/// @param string
-					static __textbox_format_nowrap__ = function(s) {//log(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
-						var r = string_replace_all(s, "\n", "");
-							r = string_replace_all(r, "\r", "");
-							r = string_replace_all(r, "\t", "");
-
-						return r;
+					static __textbox_format_nowrap__ = function(_str) {//log(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
+						var _return = string_replace_all(_str, "\n", "");
+						_return = string_replace_all(_return, "\r", "");
+						_return = string_replace_all(_return, "\t", "");
+						
+						return _return;
 
 					}
 					
 					/// @param string
-					static __textbox_format_newline__ = function(s) {//log(["__textbox_format_newline__", __textbox_format_newline__]);
-						var r = string_replace_all(s, "\r", "");
-						r = string_replace_all(r, "\t", "");
-		
-						return r;
+					static __textbox_format_newline__ = function(_str) {//log(["__textbox_format_newline__", __textbox_format_newline__]);
+						var _return = string_replace_all(_str, "\r", "");
+						_return = string_replace_all(_return, "\t", "");
+						
+						return _return;
 
 					}
 					
@@ -1883,21 +1881,21 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					if ((_max_length != infinity)) {
 		
 						var _lines = __array_clone__(curt.lines);
-						var ct = __textbox_lines_to_text__(_lines);
+						var _current_text = __textbox_lines_to_text__(_lines);
 		
-						if (string_length(ct) - string_count("\n", ct) > _max_length) {
+						if (string_length(_current_text) - string_count("\n", _current_text) > _max_length) {
 							var _width_breakpoints = curt.width_breakpoints;
 							var _current_line = curt.current_line;
 							var _i = 0;
 							var _length = curt.length;
 							
 							repeat (_length) {
-								ct = _lines[_i];
-								var _str_length = string_length(ct);
+								_current_text = _lines[_i];
+								var _str_length = string_length(_current_text);
 								if (_str_length >= _max_length) {
 									array_delete(_lines, _i + 1, _length - _i - 1);
 									array_delete(_width_breakpoints, _i + 1, _length - _i - 1);
-									_lines[_i] = string_copy(ct, 1, _max_length);
+									_lines[_i] = string_copy(_current_text, 1, _max_length);
 									break;
 								}
 								else {
@@ -1954,14 +1952,14 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 						var _current_text_length = string_length(_current_text);
 						var _arr_additional_lines = __textbox_text_to_lines__(_no_wrap);
 						var _additional_lines_count = array_length(_arr_additional_lines) - 1;
-						var _line_ndex = _additional_lines_count;
+						var _line_index = _additional_lines_count;
 						
 						_current_line = _current_line_offset + _additional_lines_count;
 						
 						repeat (_additional_lines_count) {
-							array_insert(curt.lines, _current_line_offset + 1, _arr_additional_lines[_line_ndex]);
+							array_insert(curt.lines, _current_line_offset + 1, _arr_additional_lines[_line_index]);
 							array_insert(curt.width_breakpoints, _current_line_offset + 1, true);
-							_line_ndex --;
+							_line_index --;
 						}
 			
 						if (_current_text_length == 0) {
@@ -2013,38 +2011,42 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					
 					if (_select_cursor > -1) {
 						if (_select_line == _current_line) {
-							var co = abs(_cursor - _select_cursor);
+							var _count = abs(_cursor - _select_cursor);
 							_cursor = min(_cursor, _select_cursor);
-							curt.lines[_current_line] = string_delete(curt.lines[_current_line], _cursor + 1, co);
+							curt.lines[_current_line] = string_delete(curt.lines[_current_line], _cursor + 1, _count);
 						}
 						else {
-							var l0 = min(_current_line, _select_line);
-							var c0 = _select_cursor;
-							var c1 = _cursor;
+							var _select_line_start = min(_current_line, _select_line);
+							var _select_char_start = _select_cursor;
+							var _select_char_end = _cursor;
 							
-							if (_select_line > _current_line) { c0 = _cursor; c1 = _select_cursor; }
-							var le = abs(_current_line - _select_line);
-							var ct = string_delete(curt.lines[l0 + le], 1, c1);
+							if (_select_line > _current_line) {
+								_select_char_start = _cursor;
+								_select_char_end = _select_cursor;
+							}
 							
-							curt.lines[l0] = string_copy(curt.lines[l0], 1, c0) + ct;
-							array_delete(curt.lines, l0 + 1, le);
-							array_delete(curt.width_breakpoints, l0 + 1, le);
-							_current_line = l0;
-							_cursor = c0;
+							var _select_line_length = abs(_current_line - _select_line);
+							var _current_text = string_delete(curt.lines[_select_line_start + _select_line_length], 1, _select_char_end);
+							
+							curt.lines[_select_line_start] = string_copy(curt.lines[_select_line_start], 1, _select_char_start) + _current_text;
+							array_delete(curt.lines, _select_line_start + 1, _select_line_length);
+							array_delete(curt.width_breakpoints, _select_line_start + 1, _select_line_length);
+							_current_line = _select_line_start;
+							_cursor = _select_char_start;
 						}
 						curt.select = -1;
 					}
 					else {
-						var ct = curt.lines[_current_line];
+						var _current_text = curt.lines[_current_line];
 						if (_delete_key) {
-							if (_cursor == string_length(ct)) {
+							if (_cursor == string_length(_current_text)) {
 								if (_current_line == curt.length - 1) return;
-								curt.lines[_current_line] = ct + curt.lines[_current_line + 1];
+								curt.lines[_current_line] = _current_text + curt.lines[_current_line + 1];
 								array_delete(curt.lines, _current_line + 1, 1);
 								array_delete(curt.width_breakpoints, _current_line + 1, 1);
 							}
 							else {
-								curt.lines[_current_line] = string_delete(ct, _cursor + 1, 1);
+								curt.lines[_current_line] = string_delete(_current_text, _cursor + 1, 1);
 							}
 						}
 						else {
@@ -2053,12 +2055,12 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 								array_delete(curt.lines, _current_line, 1);
 								array_delete(curt.width_breakpoints, _current_line, 1);
 								_current_line -= 1;
-								var nt = curt.lines[_current_line];
-								_cursor = string_length(nt);
-								curt.lines[_current_line] = nt + ct;
+								var _next_text = curt.lines[_current_line];
+								_cursor = string_length(_next_text);
+								curt.lines[_current_line] = _next_text + _current_text;
 							}
 							else {
-								curt.lines[_current_line] = string_delete(ct, _cursor, 1);
+								curt.lines[_current_line] = string_delete(_current_text, _cursor, 1);
 								_cursor -= 1;
 							}
 						}
@@ -2076,29 +2078,33 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				
 				static __textbox_copy_string__ = function() {//log(["__textbox_copy_string__", __textbox_copy_string__]);
 	
-					var se = curt.select;
-					if (se < 0) return;
+					var _select = curt.select;
+					if (_select < 0) return;
 	
-					var li = __array_clone__(curt.lines);
+					var _lines = __array_clone__(curt.lines);
 					var _current_line = curt.current_line;
-					var cu = curt.cursor;
+					var _cursor = curt.cursor;
 					var _select_line = curt.select_line;
 					var _text = "";
 	
 					if (_current_line == _select_line) {
-						_text = string_copy(li[_current_line], min(cu, se) + 1, abs(cu - se));
+						_text = string_copy(_lines[_current_line], min(_cursor, _select) + 1, abs(_cursor - _select));
 					}
 					else {
 						var _arr = [];
-						var l0 = min(_current_line, _select_line);
-						var c0 = se, c1 = cu;
-						if (_select_line > _current_line) { c0 = cu; c1 = se; }
-						var le = abs(_current_line - _select_line);
-						array_copy(_arr, 0, li, l0, le + 1);
-						_arr[0] = string_delete(_arr[0], 1, c0);
-						_arr[le] = string_copy(_arr[le], 1, c1);		
+						var _select_start = min(_current_line, _select_line);
+						var _char_start = _select;
+						var _char_end = _cursor;
+						if (_select_line > _current_line) {
+							_char_start = _cursor;
+							_char_end = _select;
+						}
+						var _line_length = abs(_current_line - _select_line);
+						array_copy(_arr, 0, _lines, _select_start, _line_length + 1);
+						_arr[0] = string_delete(_arr[0], 1, _char_start);
+						_arr[_line_length] = string_copy(_arr[_line_length], 1, _char_end);		
 						_text = __textbox_lines_to_text__(_arr);
-						if (curt.adaptive_width) _text = __textbox_close_lines__(_text, l0);
+						if (curt.adaptive_width) _text = __textbox_close_lines__(_text, _select_start);
 					}
 	
 					global.clipboard = _text;
@@ -2126,16 +2132,16 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					
 					var _current_line = curt.current_line;
 					var _text = curt.lines[_current_line];
-					var le = string_length(_text);
-					var cu = curt.cursor;
+					var _length = string_length(_text);
+					var _cursor = curt.cursor;
 					
 					_current_line += 1;
-					if (cu < le) {
-						var be = cu + 1;
-						var co = le - cu;
+					if (_cursor < _length) {
+						var _begin = _cursor + 1;
+						var _count = _length - _cursor;
 						
-						curt.lines[_current_line - 1] = string_delete(_text, be, co);
-						array_insert(curt.lines, _current_line, string_copy(_text, be, co));
+						curt.lines[_current_line - 1] = string_delete(_text, _begin, _count);
+						array_insert(curt.lines, _current_line, string_copy(_text, _begin, _count));
 					}
 					else {
 						array_insert(curt.lines, _current_line, "");
@@ -2165,91 +2171,89 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					var _draw_width = get_coverage_width() - draw.scroll_width;
 					//var _arr_lines = __array_clone__(curt.lines);
 					var _arr_line_break_widths = curt.width_breakpoints;
-					var le = _length;
-					var i0 = _start_line;
-					var l0 = (_start_line+_count);
+					var _end_line = (_start_line+_count);
 					var _breaker_pos = 0;
 					var _char = "";
 					
-					while (_start_line < l0) {
-						var ct = curt.lines[_start_line];
-						var cw = string_width(ct);
+					while (_start_line < _end_line) {
+						var _current_text = curt.lines[_start_line];
+						var _current_width = string_width(_current_text);
 						
-						if (cw > _draw_width) {
-							var i1 = 0;
-							var l1 = string_length(ct);
+						if (_current_width > _draw_width) {
+							var _current_text_iterator = 0;
+							var _current_text_length = string_length(_current_text);
 							
-							repeat (l1) {
+							repeat (_current_text_length) {
 								
 								//find how far forward we can go before triggering a line break
-								if (string_width(string_copy(ct, 1, i1+1)) > _draw_width) {
+								if (string_width(string_copy(_current_text, 1, _current_text_iterator+1)) > _draw_width) {
 									
 									//loop backwards to find the first thing which breaks a connected word like .,/
-									_breaker_pos = i1;
-									repeat(i1) {
-										_char = string_char_at(ct, _breaker_pos)
+									_breaker_pos = _current_text_iterator;
+									repeat(_current_text_iterator) {
+										_char = string_char_at(_current_text, _breaker_pos)
 										if (string_pos(_char, _word_breakers)) {
-											i1 = _breaker_pos;
+											_current_text_iterator = _breaker_pos;
 											break;
 										}
 									_breaker_pos--;}//end repeat loop
 									
 									//apply the line
-									array_insert(curt.lines, _start_line + 1, string_delete(ct, 1, i1 - 1));
+									array_insert(curt.lines, _start_line + 1, string_delete(_current_text, 1, _current_text_iterator - 1));
 									array_insert(curt.width_breakpoints, _start_line + 1, false);
-									curt.lines[_start_line] = string_copy(ct, 1, i1 - 1);
+									curt.lines[_start_line] = string_copy(_current_text, 1, _current_text_iterator - 1);
 									break;
 								}
-								i1 ++;
+								_current_text_iterator ++;
 							}
-							l0 += 1;
+							_end_line += 1;
 						}
 						else {
 							
-							var nl = _start_line + 1;
-							if (nl < array_length(curt.width_breakpoints) && !curt.width_breakpoints[nl]) {
-								var nt = curt.lines[nl];
-								var nw = string_width(nt);
+							var _new_line_index = _start_line + 1;
+							if (_new_line_index < array_length(curt.width_breakpoints) && !curt.width_breakpoints[_new_line_index]) {
+								var _next_text = curt.lines[_new_line_index];
+								var _next_text_width = string_width(_next_text);
 								
-								if (cw + nw <= _draw_width) {
-									curt.lines[_start_line] = ct + nt;
-									array_delete(curt.lines, nl, 1);
-									array_delete(curt.width_breakpoints, nl, 1);
-									l0 -= 1;
+								if (_current_width + _next_text_width <= _draw_width) {
+									curt.lines[_start_line] = _current_text + _next_text;
+									array_delete(curt.lines, _new_line_index, 1);
+									array_delete(curt.width_breakpoints, _new_line_index, 1);
+									_end_line -= 1;
 								}
 								else {
-									var i1 = 1;
-									var l1 = string_length(nt);
+									var _current_text_iterator = 1;
+									var _current_text_length = string_length(_next_text);
 									
-									repeat (l1) {
-										if (cw + string_width(string_copy(nt, 1, i1)) > _draw_width) {
+									repeat (_current_text_length) {
+										if (_current_width + string_width(string_copy(_next_text, 1, _current_text_iterator)) > _draw_width) {
 											
 											//loop backwards to find the first thing which breaks a connected word like .,/
-											_breaker_pos = i1;
-											repeat(i1) {
-												_char = string_char_at(nt, _breaker_pos)
+											_breaker_pos = _current_text_iterator;
+											repeat(_current_text_iterator) {
+												_char = string_char_at(_next_text, _breaker_pos)
 												if (string_pos(_char, _word_breakers)) {
-													i1 = _breaker_pos;
+													_current_text_iterator = _breaker_pos;
 													break;
 												}
 											_breaker_pos--;}//end repeat loop
 											
 											//break the line
-											curt.lines[_start_line] = ct + string_copy(nt, 1, i1 - 1);
-											curt.lines[nl] = string_delete(nt, 1, i1 - 1);
+											curt.lines[_start_line] = _current_text + string_copy(_next_text, 1, _current_text_iterator - 1);
+											curt.lines[_new_line_index] = string_delete(_next_text, 1, _current_text_iterator - 1);
 											break;
 										}
-										i1 ++;
+										_current_text_iterator ++;
 									}
 									
-									l0 += 1;
+									_end_line += 1;
 								}
 							}
 						}
 						if (_length > 0) {
-							ct = curt.lines[_start_line];
-							var sl = string_length(ct);
-							if (sl >= _length) {
+							_current_text = curt.lines[_start_line];
+							var _string_length = string_length(_current_text);
+							if (_string_length >= _length) {
 								set_cursor_y_pos(_start_line + _nl_length);
 								
 								if (_nl_length > 0) {
@@ -2262,7 +2266,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 								_length = 0;
 							}
 							else {
-								_length -= sl;
+								_length -= _string_length;
 							}
 						}
 						_start_line ++;
@@ -2278,19 +2282,19 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					var _breakpoints = curt.width_breakpoints;
 					var _text = _string;
 					var _copied_text = _string;
-					var po = string_pos("\n", _copied_text);
-					var le = po;
+					var _new_line_pos = string_pos("\n", _copied_text);
+					var _line_end_pos = _new_line_pos;
 	
 					_start_line = _start_line + 1;
 					
-					while (po > 0) {
+					while (_new_line_pos > 0) {
 						if (!_breakpoints[_start_line]) {
-							_text = string_delete(_text, le, 1);
-							le--;
+							_text = string_delete(_text, _line_end_pos, 1);
+							_line_end_pos--;
 						}
-						_copied_text = string_delete(_copied_text, 1, po);
-						po = string_pos("\n", _copied_text);
-						le += po;
+						_copied_text = string_delete(_copied_text, 1, _new_line_pos);
+						_new_line_pos = string_pos("\n", _copied_text);
+						_line_end_pos += _new_line_pos;
 						_start_line++;
 					}
 	
@@ -2443,12 +2447,11 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				}
 				
 				static __array_clone__ = function(_arr) {//log(["__array_clone__", __array_clone__]);
-					var _length = array_length(_arr);
-					var _new_arr = array_create(_length);
-					array_copy(_new_arr, 0, _arr, 0, _length);
-					
-					return _new_arr;
-					
+					static _struct = {};
+					_struct.arr = _arr;
+					var _json = json_stringify(_struct)
+					var _new_struct = json_parse(_json);
+					return _new_struct.arr;
 				}
 				
 			#endregion
@@ -2462,3 +2465,5 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 	__allowed_char__ = __build_allowed_char__(fGUIDefault);
 	__textbox_insert_string__("");
 }
+
+

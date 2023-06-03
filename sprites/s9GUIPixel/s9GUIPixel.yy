@@ -49,7 +49,7 @@
   "origin": 0,
   "parent": {
     "name": "_Other",
-    "path": "folders/Libraries/Reds GUI/Sprites/_Other.yy",
+    "path": "folders/_Libraries/Reds GUI/Sprites/_Other.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

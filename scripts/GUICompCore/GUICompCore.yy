@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "_Components",
-    "path": "folders/Libraries/Reds GUI/_Components.yy",
+    "path": "folders/_Libraries/Reds GUI/_Components.yy",
   },
 }

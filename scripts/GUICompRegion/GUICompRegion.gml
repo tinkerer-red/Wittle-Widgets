@@ -16,8 +16,8 @@ function GUICompRegion(_x, _y) : GUICompController(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {
-				static super = __CREATE_SUPER__
-				method(self, super.set_region)(_left, _top, _right, _bottom);
+				log(" = = = set_region 2 = = = ")
+				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				__scroll_horz__.set_coverage_size(get_coverage_width());
 				__scroll_vert__.set_coverage_size(get_coverage_height());

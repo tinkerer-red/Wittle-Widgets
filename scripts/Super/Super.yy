@@ -5,7 +5,7 @@
   "isCompatibility": false,
   "isDnD": false,
   "parent": {
-    "name": "Libraries",
-    "path": "folders/Libraries.yy",
+    "name": "_Libraries",
+    "path": "folders/_Libraries.yy",
   },
 }

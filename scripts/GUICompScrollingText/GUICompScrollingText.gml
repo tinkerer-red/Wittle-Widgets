@@ -29,7 +29,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_scroll_looping()
 			/// @desc    Sets if the x and/or y directions should loop around the canvas, setting one to false will cause the scrolling text to bounce back and forth.
@@ -44,7 +43,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_scroll_pause()
 			/// @desc    Sets the text's scrolling to either be paused or unpaused. true = paused, false = unpaused.
@@ -57,7 +55,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_scroll_offsets()
 			/// @desc    Sets the current position of the scrolling text.
@@ -75,7 +72,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text()
 			/// @desc    Sets the variables for text drawing
@@ -93,7 +89,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_font()
 			/// @desc    Sets the font which will be used for drawing the text
@@ -111,7 +106,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_color()
 			/// @desc    Sets the colors for the text.
@@ -124,7 +118,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_alpha()
 			/// @desc    Sets the alpha for the text.
@@ -137,7 +130,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_alignment()
 			/// @desc    Sets how the text is aligned when drawing
@@ -152,7 +144,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 		
 				return self;
 			};
-			
 			#region jsDoc
 			/// @func    set_text_offsets()
 			/// @desc    Sets the Text's offsets
@@ -201,17 +192,21 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 		
 		#region Functions
 			
-			static draw_gui = function(_input) {
-				draw_set_font(text.font);
-				draw_set_alpha(text.alpha);
-				draw_set_color(text.color);
+			#region GML Events
 				
-				draw_text(
-						x+scroll.x_off,
-						y+scroll.y_off,
-						text.text
-				)
-			}
+				static draw_gui = function(_input) {
+					draw_set_font(text.font);
+					draw_set_alpha(text.alpha);
+					draw_set_color(text.color);
+				
+					draw_text(
+							x+scroll.x_off,
+							y+scroll.y_off,
+							text.text
+					)
+				}
+				
+			#endregion
 			
 			#region jsDoc
 			/// @func    reset_scrolling()
@@ -225,7 +220,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				scroll.y_speed = scroll.orig_y_speed;
 				scroll.x_speed = scroll.orig_x_speed;
 			}
-			
 			#region jsDoc
 			/// @func    scroll_pause()
 			/// @desc    Pauses the scrolling. Commonly used when no longer mousing over a component.
@@ -235,7 +229,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			static scroll_pause = function(){
 				set_scroll_pause(true)
 			};
-			
 			#region jsDoc
 			/// @func    scroll_unpause()
 			/// @desc    Unpauses the scrolling. Commonly used when mousing over a component.
@@ -245,7 +238,6 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			static scroll_unpause = function(){
 				set_scroll_pause(false)
 			};
-			
 			
 			static draw_debug = function(_input) {
 				

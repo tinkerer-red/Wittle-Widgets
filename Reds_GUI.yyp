@@ -24,6 +24,7 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Horz","folderPath":"folders/_Libraries/Reds GUI/Sprites/Scrollbar/Horz.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Vert","folderPath":"folders/_Libraries/Reds GUI/Sprites/Scrollbar/Vert.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Slider","folderPath":"folders/_Libraries/Reds GUI/Sprites/Slider.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_system","folderPath":"folders/_Libraries/Reds GUI/_Components/_system.yy",},
   ],
   "IncludedFiles": [
     {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"RedsFont.ttf","CopyToMask":-1,"filePath":"datafiles",},
@@ -62,7 +63,7 @@
     {"id":{"name":"GUICompRegion","path":"scripts/GUICompRegion/GUICompRegion.yy",},},
     {"id":{"name":"s9ScrollbarVertButtonDown","path":"sprites/s9ScrollbarVertButtonDown/s9ScrollbarVertButtonDown.yy",},},
     {"id":{"name":"s9ScrollbarHorzButtonRight","path":"sprites/s9ScrollbarHorzButtonRight/s9ScrollbarHorzButtonRight.yy",},},
-    {"id":{"name":"___GUICompScrollingText","path":"scripts/___GUICompScrollingText/___GUICompScrollingText.yy",},},
+    {"id":{"name":"GUICompScrollingText","path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},},
     {"id":{"name":"GUICompSlider","path":"scripts/GUICompSlider/GUICompSlider.yy",},},
     {"id":{"name":"GUICompCore","path":"scripts/GUICompCore/GUICompCore.yy",},},
     {"id":{"name":"s9CheckBoxUnchecked","path":"sprites/s9CheckBoxUnchecked/s9CheckBoxUnchecked.yy",},},

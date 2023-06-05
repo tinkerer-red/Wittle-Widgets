@@ -437,6 +437,13 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 			
 		#endregion
 		
+		#region Events
+			
+			self.events.change     = "change";
+			self.events.submit     = "submit";
+			
+		#endregion
+		
 		#region Variables
 			
 			draw_set_font(fGUIDefault)
@@ -524,9 +531,6 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 			
 			//font = fGUIDefault;
 			is_disabled = false;
-			
-			static callback = function(){log("replace this with a event")}; // the callback to trigger
-			callback_every_change = false; // if the callback should trigger on every single char change, false will only callback when the user drops focus (or pressed enter on single line input boxes)
 			
 		#endregion
 		
@@ -698,280 +702,232 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 		
 		#region Functions
 			
-			static __cleanup__ = function() {//log(["__cleanup__", __cleanup__]);
+			#region GML Events
 				
-				cleanup();
+				static __cleanup__ = function() {//log(["__cleanup__", __cleanup__]);
 				
-				if (__component_surface__ != undefined) {
-					surface_free(__component_surface__);
-				}
+					cleanup();
 				
-				if (os_browser = browser_not_a_browser) {
-					if (os_type = os_windows) {
-						if (window_get_cursor() != cr_default) {
-							window_set_cursor(cr_default);
-						}
+					if (__component_surface__ != undefined) {
+						surface_free(__component_surface__);
 					}
-				}
-				else {
-					html_set_cursor(cr_default);
-				}
 				
-			}
-			
-			static __step__ = function(_input) {//log(["__step__", __step__]);
-				step(_input);
-				
-				if (is_disabled) return;
-				
-				var _mouse_x_gui = device_mouse_x_to_gui(0);
-				var _mouse_y_gui = device_mouse_y_to_gui(0);
-				
-				var _draw_width = get_coverage_width();
-				var _draw_height = get_coverage_height();
-				var _start_x = x;
-				var _start_y = y;
-				var _scroll_width = (curt.multiline) ? draw.scroll_width : 0;
-				var _mouse_on_comp = !_input.consumed && mouse_on_comp();
-				
-				if (_mouse_on_comp != curt.view) {
-					var _cursor = (_mouse_on_comp) ? cr_beam : cr_default
 					if (os_browser = browser_not_a_browser) {
 						if (os_type = os_windows) {
-							if (window_get_cursor() != _cursor) {
-								window_set_cursor(_cursor);
+							if (window_get_cursor() != cr_default) {
+								window_set_cursor(cr_default);
 							}
 						}
 					}
 					else {
-						html_set_cursor(_cursor);
+						html_set_cursor(cr_default);
 					}
-					curt.view = _mouse_on_comp;
+				
 				}
 				
-				var _display_cursor = draw.display_cursor - 1;
-				if (_display_cursor < -30) {
-					_display_cursor = 30;
-					draw.refresh_surf = true;
-				}
-				else if (_display_cursor == 0) {
-					draw.refresh_surf = true;
-				}
+				static __step__ = function(_input) {//log(["__step__", __step__]);
+					step(_input);
 				
-				draw.display_cursor = _display_cursor;
+					if (is_disabled) return;
 				
-				//allow early outs with breaks;
-				repeat (1) {
-					
-					#region update cursor (with mouse)
-					
-						if (mouse_check_button_pressed(keys.mouse_left)) {
-							if (!_mouse_on_comp) {
-								if (__is_on_focus__) {
-									var _text = __textbox_lines_to_text__(curt.lines);
-									/////callback(_text);
-								}
-								curt.focus = false;
-							}
-					
-							if (curt.accepting_inputs) {
-								__is_on_focus__ = _mouse_on_comp;
-								draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
-							}
-							curt.focus = _mouse_on_comp;
-							curt.select = -1;
-					
-							draw.refresh_surf = true;
-					
-							//if we clicked on the box
-							if (_mouse_on_comp) {
-								keyboard_string = "";
-								__textbox_check_minput__(keyboard_check(keys.shift));
-								curt.button_repeat = 5;
-							}
-							else {
-								var _total_height = curt.length * draw.line_height;
-								if (_total_height > _draw_height) {
-									var _right_boundary = _start_x + _draw_width;
-								
-									if (!point_in_rectangle(
-											_mouse_x_gui,
-											_mouse_y_gui,
-											_right_boundary - _scroll_width,
-											_start_y,
-											_right_boundary,
-											_start_y + _draw_height
-									)) {
-										break;
-									};
-								
-									var _derivative_y = draw.scrollbar_y;
-									var _scroll_height = draw.scroll_height;
-									var _text_y = _start_y + _derivative_y;
-								
-									if (_mouse_y_gui >= _text_y)
-									&& (_mouse_y_gui <= _text_y + _scroll_height) {
-										draw.mouse_loc_y = _mouse_y_gui;
-									}
-									else {
-										var _cursor_height = _draw_height - _scroll_height;
-										_derivative_y = _mouse_y_gui - _start_y;
-										
-										_derivative_y = (_derivative_y < _scroll_height) ? 0 : _cursor_height;
-										
-										set_vert_scroll(-(_derivative_y / _cursor_height * (_total_height - _draw_height)));
-										draw.mouse_loc_y = _mouse_y_gui;
-										draw.refresh_surf = true;
-									}
-								}
-								break;
-							}
-							break;
-						}
-					
-						if (draw.mouse_loc_y > 0) {
-							if (mouse_check_button_released(keys.mouse_left)) {
-								draw.mouse_loc_y = 0;
-							}
-							else if (mouse_check_button(keys.mouse_left)) {
-								curt.button_repeat --;
-								if (curt.button_repeat < 0) {
-									var _derivative_y = draw.scrollbar_y;
-									var _cursor_height = _draw_height - draw.scroll_height;
-								
-									_derivative_y = clamp(_derivative_y + _mouse_y_gui - draw.mouse_loc_y, 0, _cursor_height);
-									set_vert_scroll(-(_derivative_y / _cursor_height * (curt.length * draw.line_height - _draw_height)));
-									
-									draw.mouse_loc_y = _mouse_y_gui;
-									draw.refresh_surf = true;
-									curt.button_repeat = 1;
+					var _mouse_x_gui = device_mouse_x_to_gui(0);
+					var _mouse_y_gui = device_mouse_y_to_gui(0);
+				
+					var _draw_width = get_coverage_width();
+					var _draw_height = get_coverage_height();
+					var _start_x = x;
+					var _start_y = y;
+					var _scroll_width = (curt.multiline) ? draw.scroll_width : 0;
+					var _mouse_on_comp = !_input.consumed && mouse_on_comp();
+				
+					if (_mouse_on_comp != curt.view) {
+						var _cursor = (_mouse_on_comp) ? cr_beam : cr_default
+						if (os_browser = browser_not_a_browser) {
+							if (os_type = os_windows) {
+								if (window_get_cursor() != _cursor) {
+									window_set_cursor(_cursor);
 								}
 							}
 						}
-
-					#endregion
-					
-					#region update mouse selector
-						
-						//allow highlighting if the region is not an input region and it's just displaying copy-able text
-						if (curt.focus) {
-							if (mouse_check_button(keys.mouse_left)) {
-								curt.button_repeat --;
-								if (curt.button_repeat < 0) {
-									__textbox_check_minput__(true);
-									curt.button_repeat = 3;
-								}
-								break;
-							}
+						else {
+							html_set_cursor(_cursor);
 						}
-						
-					#endregion
+						curt.view = _mouse_on_comp;
+					}
+				
+					var _display_cursor = draw.display_cursor - 1;
+					if (_display_cursor < -30) {
+						_display_cursor = 30;
+						draw.refresh_surf = true;
+					}
+					else if (_display_cursor == 0) {
+						draw.refresh_surf = true;
+					}
+				
+					draw.display_cursor = _display_cursor;
+				
+					//allow early outs with breaks;
+					repeat (1) {
 					
-					#region Copy
-						
-						if (curt.focus)
-						&& (keyboard_check(keys.control)) {
-							if (keyboard_check(keys.c)) {
-								if (keyboard_check_pressed(keys.c)) {
-									var _text = copy_function();
-									if (os_browser == browser_not_a_browser) {
-										clipboard_set_text(_text);
-									}
-									else {
-										clipboard_set_text_html(_text);
-									}
-								}
+						#region update cursor (with mouse)
 					
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.c;
-					
-								break;
-							}
-						}
-						
-					#endregion
-					
-					#region PageUp PageDown
-						
-						if (curt.focus) {
-							if (keyboard_check_pressed(keys.page_up)) {
-								if (keyboard_check(keys.shift)) {
-									if (curt.select == -1) {
-										curt.select_line = curt.current_line;
-										curt.select = curt.cursor;
-									}
-								}
-								else {
-									curt.select = -1;
-								}
-								
-								var _height = get_coverage_height();
-								var _lines_shown = floor(_height/draw.line_height)
-								set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
-								
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.page_up;
-								
-								curt.button_repeat = 40;
-								
-								break;
-							}
-							else if (keyboard_check_pressed(keys.page_down)) {
-								if (keyboard_check(keys.shift)) {
-									if (curt.select == -1) {
-										curt.select_line = curt.current_line;
-										curt.select = curt.cursor;
-									}
-								}
-								else {
-									curt.select = -1;
-								}
-									
-								var _height = get_coverage_height();
-								var _lines_shown = floor(_height/draw.line_height)
-								set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
-									
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.page_down;
-								
-								curt.button_repeat = 40;
-								
-								break;
-							}
-							
-							if (keyboard_check(keys.page_up)) {
-								curt.button_repeat --;
-								if (curt.button_repeat < 0) {
-									if (keyboard_check(keys.shift)) {
-										if (curt.select == -1) {
-											curt.select_line = curt.current_line;
-											curt.select = curt.cursor;
+							if (mouse_check_button_pressed(keys.mouse_left)) {
+								if (!_mouse_on_comp) {
+									if (__is_on_focus__) {
+										if (__event_exists__(self.events.submit)) {
+											var _text = __textbox_lines_to_text__(curt.lines);
+											__trigger_event__(self.events.submit, _text);
 										}
 									}
-									else {
-										curt.select = -1;
-									}
-									
-									var _height = get_coverage_height();
-									var _lines_shown = _height/draw.line_height
-									set_vert_scroll(scroll.y_off + _height)
-									set_cursor_y_pos(curt.current_line - _lines_shown)
-									
-									//need to do this because html5
+									curt.focus = false;
+								}
+					
+								if (curt.accepting_inputs) {
+									__is_on_focus__ = _mouse_on_comp;
+									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
+								}
+								
+								curt.focus = _mouse_on_comp;
+								curt.select = -1;
+					
+								draw.refresh_surf = true;
+					
+								//if we clicked on the box
+								if (_mouse_on_comp) {
 									keyboard_string = "";
-									keys.last_key = keys.page_up;
+									__textbox_check_minput__(keyboard_check(keys.shift));
+									curt.button_repeat = 5;
+								}
+								else {
+									var _total_height = curt.length * draw.line_height;
+									if (_total_height > _draw_height) {
+										var _right_boundary = _start_x + _draw_width;
+								
+										if (!point_in_rectangle(
+												_mouse_x_gui,
+												_mouse_y_gui,
+												_right_boundary - _scroll_width,
+												_start_y,
+												_right_boundary,
+												_start_y + _draw_height
+										)) {
+											break;
+										};
+								
+										var _derivative_y = draw.scrollbar_y;
+										var _scroll_height = draw.scroll_height;
+										var _text_y = _start_y + _derivative_y;
+								
+										if (_mouse_y_gui >= _text_y)
+										&& (_mouse_y_gui <= _text_y + _scroll_height) {
+											draw.mouse_loc_y = _mouse_y_gui;
+										}
+										else {
+											var _cursor_height = _draw_height - _scroll_height;
+											_derivative_y = _mouse_y_gui - _start_y;
+										
+											_derivative_y = (_derivative_y < _scroll_height) ? 0 : _cursor_height;
+										
+											set_vert_scroll(-(_derivative_y / _cursor_height * (_total_height - _draw_height)));
+											draw.mouse_loc_y = _mouse_y_gui;
+											draw.refresh_surf = true;
+										}
+									}
+									break;
+								}
+								break;
+							}
+					
+							if (draw.mouse_loc_y > 0) {
+								if (mouse_check_button_released(keys.mouse_left)) {
+									draw.mouse_loc_y = 0;
+								}
+								else if (mouse_check_button(keys.mouse_left)) {
+									curt.button_repeat --;
+									if (curt.button_repeat < 0) {
+										var _derivative_y = draw.scrollbar_y;
+										var _cursor_height = _draw_height - draw.scroll_height;
+								
+										_derivative_y = clamp(_derivative_y + _mouse_y_gui - draw.mouse_loc_y, 0, _cursor_height);
+										set_vert_scroll(-(_derivative_y / _cursor_height * (curt.length * draw.line_height - _draw_height)));
 									
-									curt.button_repeat = 3;
-									
+										draw.mouse_loc_y = _mouse_y_gui;
+										draw.refresh_surf = true;
+										curt.button_repeat = 1;
+									}
+								}
+							}
+
+						#endregion
+					
+						#region update mouse selector
+						
+							//allow highlighting if the region is not an input region and it's just displaying copy-able text
+							if (curt.focus) {
+								if (mouse_check_button(keys.mouse_left)) {
+									curt.button_repeat --;
+									if (curt.button_repeat < 0) {
+										__textbox_check_minput__(true);
+										curt.button_repeat = 3;
+									}
 									break;
 								}
 							}
-							else if (keyboard_check(keys.page_down)) {
-								curt.button_repeat --;
-								if (curt.button_repeat < 0) {
+						
+						#endregion
+					
+						#region Copy
+						
+							if (curt.focus)
+							&& (keyboard_check(keys.control)) {
+								if (keyboard_check(keys.c)) {
+									if (keyboard_check_pressed(keys.c)) {
+										var _text = copy_function();
+										if (os_browser == browser_not_a_browser) {
+											clipboard_set_text(_text);
+										}
+										else {
+											clipboard_set_text_html(_text);
+										}
+									}
+					
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.c;
+					
+									break;
+								}
+							}
+						
+						#endregion
+					
+						#region PageUp PageDown
+						
+							if (curt.focus) {
+								if (keyboard_check_pressed(keys.page_up)) {
+									if (keyboard_check(keys.shift)) {
+										if (curt.select == -1) {
+											curt.select_line = curt.current_line;
+											curt.select = curt.cursor;
+										}
+									}
+									else {
+										curt.select = -1;
+									}
+								
+									var _height = get_coverage_height();
+									var _lines_shown = floor(_height/draw.line_height)
+									set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
+								
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.page_up;
+								
+									curt.button_repeat = 40;
+								
+									break;
+								}
+								else if (keyboard_check_pressed(keys.page_down)) {
 									if (keyboard_check(keys.shift)) {
 										if (curt.select == -1) {
 											curt.select_line = curt.current_line;
@@ -983,623 +939,716 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 									}
 									
 									var _height = get_coverage_height();
-									var _lines_shown = _height/draw.line_height
-									set_vert_scroll(scroll.y_off - _height)
-									set_cursor_y_pos(curt.current_line + _lines_shown)
+									var _lines_shown = floor(_height/draw.line_height)
+									set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
 									
 									//need to do this because html5
 									keyboard_string = "";
 									keys.last_key = keys.page_down;
-									
-									curt.button_repeat = 3;
-									
+								
+									curt.button_repeat = 40;
+								
 									break;
 								}
+							
+								if (keyboard_check(keys.page_up)) {
+									curt.button_repeat --;
+									if (curt.button_repeat < 0) {
+										if (keyboard_check(keys.shift)) {
+											if (curt.select == -1) {
+												curt.select_line = curt.current_line;
+												curt.select = curt.cursor;
+											}
+										}
+										else {
+											curt.select = -1;
+										}
+									
+										var _height = get_coverage_height();
+										var _lines_shown = _height/draw.line_height
+										set_vert_scroll(scroll.y_off + _height)
+										set_cursor_y_pos(curt.current_line - _lines_shown)
+									
+										//need to do this because html5
+										keyboard_string = "";
+										keys.last_key = keys.page_up;
+									
+										curt.button_repeat = 3;
+									
+										break;
+									}
+								}
+								else if (keyboard_check(keys.page_down)) {
+									curt.button_repeat --;
+									if (curt.button_repeat < 0) {
+										if (keyboard_check(keys.shift)) {
+											if (curt.select == -1) {
+												curt.select_line = curt.current_line;
+												curt.select = curt.cursor;
+											}
+										}
+										else {
+											curt.select = -1;
+										}
+									
+										var _height = get_coverage_height();
+										var _lines_shown = _height/draw.line_height
+										set_vert_scroll(scroll.y_off - _height)
+										set_cursor_y_pos(curt.current_line + _lines_shown)
+									
+										//need to do this because html5
+										keyboard_string = "";
+										keys.last_key = keys.page_down;
+									
+										curt.button_repeat = 3;
+									
+										break;
+									}
+								}
 							}
-						}
 						
-					#endregion
+						#endregion
 					
-				}
+					}
 				
-				__SUPER__.__step__(_input);
+					__SUPER__.__step__(_input);
 				
-				if (_mouse_on_comp) {
-					capture_input();
-				}
+					if (_mouse_on_comp) {
+						capture_input();
+					}
 				
-				if (!__is_on_focus__) return;
+					if (!__is_on_focus__) return;
 				
-				//allow early outs with breaks;
-				repeat (1) {
+					//allow early outs with breaks;
+					repeat (1) {
 					
-					#region escape
+						#region escape
 				
-						if (keyboard_check_pressed(keys.escape))
-						|| (!curt.shift_only_new_line && curt.no_wrap && keyboard_check_pressed(keys.enter))
-						|| (curt.shift_only_new_line && keyboard_check_pressed(keys.enter) && !keyboard_check(keys.shift)) {
-							var _text = __textbox_lines_to_text__(curt.lines);
-							if (curt.adaptive_width) {
-								_text = __textbox_close_lines__(_text, 0);
+							if (keyboard_check_pressed(keys.escape))
+							|| (!curt.shift_only_new_line && curt.no_wrap && keyboard_check_pressed(keys.enter))
+							|| (curt.shift_only_new_line && keyboard_check_pressed(keys.enter) && !keyboard_check(keys.shift)) {
+								var _text = __textbox_lines_to_text__(curt.lines);
+								if (curt.adaptive_width) {
+									_text = __textbox_close_lines__(_text, 0);
+								}
+								__is_on_focus__ = false;
+								curt.focus = false;
+								__trigger_event__(self.events.submit, _text);
+								break;
 							}
-							__is_on_focus__ = false;
-							curt.focus = false;
-							//////callback(_text);
-							break;
-						}
 
-					#endregion
+						#endregion
 					
-					#region break line
+						#region break line
 	
-						if (keyboard_check_pressed(keys.enter)) {
-							curt.select = -1;
-							__textbox_break_line__();
-							//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-							break;
-						}
-
-					#endregion
-					
-					#region update cursor
-	
-						static _control_skip_word = function(_horz_input_vector) {
-							static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
-							
-							//find our position on the line
-							var _current_line = curt.current_line;
-							var _cursor_pos_on_line = curt.cursor;
-							
-							//loop backwards to find the first thing which breaks a connected word like .,/
-							var _current_line_text = curt.lines[_current_line];
-							var _dir = _horz_input_vector;
-							var _breaker_pos = (_dir > 0) ? _cursor_pos_on_line+_dir : _cursor_pos_on_line;
-							var _prev_char;
-							var _char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
-							var _loop = (_dir) ? string_length(curt.lines[_current_line])-_cursor_pos_on_line : _cursor_pos_on_line;
-							
-							//skip to the next word breaker, this will skip double spaces
-							repeat(_loop) {
-								_prev_char = _char;
-								_char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
+							if (keyboard_check_pressed(keys.enter)) {
+								curt.select = -1;
+								__textbox_break_line__();
 								
-								_horz_input_vector = _breaker_pos - _cursor_pos_on_line;
-								
-								if (_breaker_pos == 0) {
-									return _horz_input_vector-1;
+								if (__event_exists__(self.events.change)) {
+									var _text = __textbox_lines_to_text__(curt.lines)
+									__trigger_event__(self.events.change, _text);
 								}
 								
+								break;
+							}
+
+						#endregion
+					
+						#region update cursor
+	
+							static _control_skip_word = function(_horz_input_vector) {
+								static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
+							
+								//find our position on the line
+								var _current_line = curt.current_line;
+								var _cursor_pos_on_line = curt.cursor;
+							
+								//loop backwards to find the first thing which breaks a connected word like .,/
+								var _current_line_text = curt.lines[_current_line];
+								var _dir = _horz_input_vector;
+								var _breaker_pos = (_dir > 0) ? _cursor_pos_on_line+_dir : _cursor_pos_on_line;
+								var _prev_char;
+								var _char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
+								var _loop = (_dir) ? string_length(curt.lines[_current_line])-_cursor_pos_on_line : _cursor_pos_on_line;
+							
+								//skip to the next word breaker, this will skip double spaces
+								repeat(_loop) {
+									_prev_char = _char;
+									_char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
 								
-								if (_dir > 0) {
-									if (string_pos(_prev_char, _word_breakers))
-									&& (!string_pos(_char, _word_breakers)) {
+									_horz_input_vector = _breaker_pos - _cursor_pos_on_line;
+								
+									if (_breaker_pos == 0) {
 										return _horz_input_vector-1;
 									}
-								}
-								else {
-									if (!string_pos(_prev_char, _word_breakers))
-									&& (string_pos(_char, _word_breakers)) {
-										return _horz_input_vector;
-									}
-								}
 								
-							_breaker_pos += _dir;}//end repeat loop
+								
+									if (_dir > 0) {
+										if (string_pos(_prev_char, _word_breakers))
+										&& (!string_pos(_char, _word_breakers)) {
+											return _horz_input_vector-1;
+										}
+									}
+									else {
+										if (!string_pos(_prev_char, _word_breakers))
+										&& (string_pos(_char, _word_breakers)) {
+											return _horz_input_vector;
+										}
+									}
+								
+								_breaker_pos += _dir;}//end repeat loop
 							
 							
-							return _horz_input_vector+_dir;
-						}
-						
-						//the initial press
-						var _horz_input_vector = keyboard_check_pressed(keys.right) - keyboard_check_pressed(keys.left);
-						if (_horz_input_vector != 0) {
-							if (keyboard_check(keys.control)) {
-								_horz_input_vector = _control_skip_word(_horz_input_vector)
+								return _horz_input_vector+_dir;
 							}
-							
-							curt.button_repeat = 40;
-							__textbox_update_cursor__(_horz_input_vector, keyboard_check(keys.shift), false);
-							break;
-						}
 						
-						//the held press
-						_horz_input_vector = keyboard_check(keys.right) - keyboard_check(keys.left);
-						if (_horz_input_vector != 0) {
-							
-							curt.button_repeat --;
-							if (curt.button_repeat < 0) {
+							//the initial press
+							var _horz_input_vector = keyboard_check_pressed(keys.right) - keyboard_check_pressed(keys.left);
+							if (_horz_input_vector != 0) {
 								if (keyboard_check(keys.control)) {
 									_horz_input_vector = _control_skip_word(_horz_input_vector)
 								}
+							
+								curt.button_repeat = 40;
 								__textbox_update_cursor__(_horz_input_vector, keyboard_check(keys.shift), false);
-								curt.button_repeat = 3;
-							}
-							break;
-						}
-						
-						
-						
-						var _vert_input_vector = keyboard_check_pressed(keys.down) - keyboard_check_pressed(keys.up);
-						
-						#region Top Bottom Lines
-							
-							//full left if on top line
-							if (_vert_input_vector < 0)
-							&& (curt.current_line == 0) {
-								if (keyboard_check(keys.shift)) {
-									if (curt.select == -1) {
-										curt.select_line = curt.current_line;
-										curt.select = curt.cursor;
-									}
-								}
-								else {
-									curt.select = -1;
-								}
-								set_cursor_x_pos(0);
 								break;
 							}
-							
-							//full right if on bottom line
-							if (_vert_input_vector > 0)
-							&& (curt.current_line == curt.length-1) {
-								if (keyboard_check(keys.shift)) {
-									if (curt.select == -1) {
-										curt.select_line = curt.current_line;
-										curt.select = curt.cursor;
-									}
-								}
-								else {
-									curt.select = -1;
-								}
-								set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
-								break;
-							}
-							
-						#endregion
 						
-						if (curt.multiline)
-						&& (curt.length != 1) {
+							//the held press
+							_horz_input_vector = keyboard_check(keys.right) - keyboard_check(keys.left);
+							if (_horz_input_vector != 0) {
 							
-							if (_vert_input_vector != 0) {
-								__textbox_update_cursor__(_vert_input_vector, keyboard_check(keys.shift), true);
-								
-								if (keyboard_check(keys.control)) {
-									//control + arrow scrolling
-									// Update y-offset.
-									var _line_height = draw.line_height;
-									var _y_off = -scroll.y_off + _line_height * _vert_input_vector;
-									var _max_height = curt.length * _line_height - get_coverage_height();
-									
-									_y_off = (_max_height < 0) ? 0 : clamp(_y_off, 0, _max_height)
-									
-									set_vert_scroll(-_y_off);
-									
-									draw.refresh_surf = true;
-								}
-								
 								curt.button_repeat --;
 								if (curt.button_repeat < 0) {
-									__textbox_update_cursor__(_vert_input_vector, keyboard_check(keys.shift), true);
+									if (keyboard_check(keys.control)) {
+										_horz_input_vector = _control_skip_word(_horz_input_vector)
+									}
+									__textbox_update_cursor__(_horz_input_vector, keyboard_check(keys.shift), false);
 									curt.button_repeat = 3;
 								}
 								break;
 							}
+						
+						
+						
+							var _vert_input_vector = keyboard_check_pressed(keys.down) - keyboard_check_pressed(keys.up);
+						
+							#region Top Bottom Lines
 							
-						}
-						else { //full left or right if only one line exists.
-							if (_vert_input_vector < 0) {
-								set_cursor_x_pos(0);
-								break;
-							}
-							else if (_vert_input_vector > 0) {
-								set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
-								break;
-							}
-						}
-	
-					#endregion
-					
-					#region delete string
-					
-						var _delete = keyboard_check_pressed(keys.delete_key);
-						if (keyboard_check_pressed(keys.backspace) || _delete) {
-							curt.button_repeat = 40;
-							__textbox_delete_string__(_delete);
-							//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-						}
-	
-						_delete = keyboard_check(keys.delete_key);
-						if (keyboard_check(keys.backspace) || _delete) {
-							curt.button_repeat --;
-							if (curt.button_repeat < 0) {
-								__textbox_delete_string__(_delete);
-								curt.button_repeat = 3;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-							}
-							break;
-						}
-
-					#endregion
-					
-					#region edit string
-	
-						if (keyboard_check(keys.control)) {
-		
-							// Keyboard repeat stuff
-							if(keys.last_key != undefined) {
-								if(keyboard_check(keys.last_key)) {
-									keys.last_key_time += 1;
+								//full left if on top line
+								if (_vert_input_vector < 0)
+								&& (curt.current_line == 0) {
+									if (keyboard_check(keys.shift)) {
+										if (curt.select == -1) {
+											curt.select_line = curt.current_line;
+											curt.select = curt.cursor;
+										}
+									}
+									else {
+										curt.select = -1;
+									}
+									set_cursor_x_pos(0);
+									break;
+								}
+							
+								//full right if on bottom line
+								if (_vert_input_vector > 0)
+								&& (curt.current_line == curt.length-1) {
+									if (keyboard_check(keys.shift)) {
+										if (curt.select == -1) {
+											curt.select_line = curt.current_line;
+											curt.select = curt.cursor;
+										}
+									}
+									else {
+										curt.select = -1;
+									}
+									set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
+									break;
+								}
+							
+							#endregion
+						
+							if (curt.multiline)
+							&& (curt.length != 1) {
+							
+								if (_vert_input_vector != 0) {
+									__textbox_update_cursor__(_vert_input_vector, keyboard_check(keys.shift), true);
+								
+									if (keyboard_check(keys.control)) {
+										//control + arrow scrolling
+										// Update y-offset.
+										var _line_height = draw.line_height;
+										var _y_off = -scroll.y_off + _line_height * _vert_input_vector;
+										var _max_height = curt.length * _line_height - get_coverage_height();
 									
-									if (keys.last_key_time > game_get_speed(gamespeed_fps)/3)
-									&& (keys.last_key_time % floor(game_get_speed(gamespeed_fps)/30) == 0) { // simulate another keypress to do key repeat
-										keyboard_key_release(keys.last_key);
-										keyboard_key_press(keys.last_key);
+										_y_off = (_max_height < 0) ? 0 : clamp(_y_off, 0, _max_height)
+									
+										set_vert_scroll(-_y_off);
+									
+										draw.refresh_surf = true;
+									}
+								
+									curt.button_repeat --;
+									if (curt.button_repeat < 0) {
+										__textbox_update_cursor__(_vert_input_vector, keyboard_check(keys.shift), true);
+										curt.button_repeat = 3;
+									}
+									break;
+								}
+							
+							}
+							else { //full left or right if only one line exists.
+								if (_vert_input_vector < 0) {
+									set_cursor_x_pos(0);
+									break;
+								}
+								else if (_vert_input_vector > 0) {
+									set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
+									break;
+								}
+							}
+	
+						#endregion
+					
+						#region delete string
+					
+							var _delete = keyboard_check_pressed(keys.delete_key);
+							if (keyboard_check_pressed(keys.backspace) || _delete) {
+								curt.button_repeat = 40;
+								__textbox_delete_string__(_delete);
+								
+								if (__event_exists__(self.events.change)) {
+									var _text = __textbox_lines_to_text__(curt.lines)
+									__trigger_event__(self.events.change, _text);
+								}
+							}
+	
+							_delete = keyboard_check(keys.delete_key);
+							if (keyboard_check(keys.backspace) || _delete) {
+								curt.button_repeat --;
+								if (curt.button_repeat < 0) {
+									__textbox_delete_string__(_delete);
+									curt.button_repeat = 3;
+									
+									if (__event_exists__(self.events.change)) {
+										var _text = __textbox_lines_to_text__(curt.lines)
+										__trigger_event__(self.events.change, _text);
+									}
+								}
+								break;
+							}
+
+						#endregion
+					
+						#region edit string
+	
+							if (keyboard_check(keys.control)) {
+		
+								// Keyboard repeat stuff
+								if(keys.last_key != undefined) {
+									if(keyboard_check(keys.last_key)) {
+										keys.last_key_time += 1;
+									
+										if (keys.last_key_time > game_get_speed(gamespeed_fps)/3)
+										&& (keys.last_key_time % floor(game_get_speed(gamespeed_fps)/30) == 0) { // simulate another keypress to do key repeat
+											keyboard_key_release(keys.last_key);
+											keyboard_key_press(keys.last_key);
+										}
+									}
+									else {
+										keys.last_key_time = 0;	
+										keys.last_key = undefined;
+										keyboard_string = "";
+									}
+								}
+		
+								// Select all string.
+								if (keyboard_check(keys.a)) {
+									if (keyboard_check_pressed(keys.a)) {
+										var _line_last = curt.length - 1;
+										var _line_last_length = string_length(curt.lines[_line_last]);
+										if (_line_last < 1 && _line_last_length < 1) break;
+										curt.select_line = 0;
+										curt.select = 0;
+										set_cursor_y_pos(_line_last);
+										set_cursor_x_pos(_line_last_length);
+									}
+							
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.a;
+									
+									break;
+								}
+		
+								// Copy string.
+								if (keyboard_check(keys.c)) {
+									if (keyboard_check_pressed(keys.c)) {
+										var _text = copy_function();
+										if (os_browser == browser_not_a_browser) {
+											clipboard_set_text(_text);
+										}
+										else {
+											clipboard_set_text_html(_text);
+										}
+									}
+			
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.c;
+									
+									break;
+								}
+		
+								// Cut string.
+								if (keyboard_check(keys.x)) {
+									if (keyboard_check_pressed(keys.x)) {
+										var _text = copy_function();
+										if (os_browser == browser_not_a_browser) {
+											clipboard_set_text(_text);
+										}
+										else {
+											clipboard_set_text_html(_text);
+										}
+							
+										__textbox_delete_string__(false);
+										__update_scroll__();
+									}
+			
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.x;
+									
+									if (__event_exists__(self.events.change)) {
+										var _text = __textbox_lines_to_text__(curt.lines)
+										__trigger_event__(self.events.change, _text);
+									}
+									
+									break;
+								}
+		
+								// Paste string.
+								if (keyboard_check(keys.v)) {
+									if (keyboard_check_pressed(keys.v)) {
+										var _pasted_text = paste_function()
+										if (_pasted_text != "") __textbox_insert_string__(_pasted_text);
+									}
+			
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.v;
+									
+									if (__event_exists__(self.events.change)) {
+										var _text = __textbox_lines_to_text__(curt.lines)
+										__trigger_event__(self.events.change, _text);
+									}
+									
+									break;
+								}
+		
+								// Undo.
+								if (keyboard_check(keys.z)) {
+									if (keyboard_check_pressed(keys.z)) {
+										__textbox_records_set__(-1);
+										__update_scroll__();
+									}
+			
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.z;
+									
+									if (__event_exists__(self.events.change)) {
+										var _text = __textbox_lines_to_text__(curt.lines)
+										__trigger_event__(self.events.change, _text);
+									}
+									
+									break;
+								}
+		
+								// Redo.
+								if (keyboard_check(keys.y)) {
+									if (keyboard_check_pressed(keys.y)) {
+										__textbox_records_set__(1);
+										__update_scroll__();
+									}
+			
+									//need to do this because html5
+									keyboard_string = "";
+									keys.last_key = keys.y;
+									
+									if (__event_exists__(self.events.change)) {
+										var _text = __textbox_lines_to_text__(curt.lines)
+										__trigger_event__(self.events.change, _text);
+									}
+									
+									break;
+								}
+		
+							}
+	
+						#endregion
+					
+						#region others
+	
+							// Go to the beginning.
+							if (keyboard_check_pressed(keys.home)) {
+								if (keyboard_check(keys.shift)) {
+									if (curt.select == -1) {
+										curt.select_line = curt.current_line;
+										curt.select = curt.cursor;
 									}
 								}
 								else {
-									keys.last_key_time = 0;	
-									keys.last_key = undefined;
-									keyboard_string = "";
+									curt.select = -1;
 								}
-							}
-		
-							// Select all string.
-							if (keyboard_check(keys.a)) {
-								if (keyboard_check_pressed(keys.a)) {
-									var _line_last = curt.length - 1;
-									var _line_last_length = string_length(curt.lines[_line_last]);
-									if (_line_last < 1 && _line_last_length < 1) break;
-									curt.select_line = 0;
-									curt.select = 0;
-									set_cursor_y_pos(_line_last);
-									set_cursor_x_pos(_line_last_length);
+								if (keyboard_check(keys.control)) {
+									set_cursor_y_pos(0);
 								}
-							
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.a;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
+								set_cursor_x_pos(0);
 								break;
 							}
-		
-							// Copy string.
-							if (keyboard_check(keys.c)) {
-								if (keyboard_check_pressed(keys.c)) {
-									var _text = copy_function();
-									if (os_browser == browser_not_a_browser) {
-										clipboard_set_text(_text);
-									}
-									else {
-										clipboard_set_text_html(_text);
+			
+							// Go to the end.
+							if (keyboard_check_pressed(keys.end_key)) {
+								if (keyboard_check(keys.shift)) {
+									if (curt.select == -1) {
+										curt.select_line = curt.current_line;
+										curt.select = curt.cursor;
 									}
 								}
-			
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.c;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-								break;
-							}
-		
-							// Cut string.
-							if (keyboard_check(keys.x)) {
-								if (keyboard_check_pressed(keys.x)) {
-									var _text = copy_function();
-									if (os_browser == browser_not_a_browser) {
-										clipboard_set_text(_text);
-									}
-									else {
-										clipboard_set_text_html(_text);
-									}
-							
-									__textbox_delete_string__(false);
-									__update_scroll__();
+								else {
+									curt.select = -1;
 								}
-			
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.x;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-								break;
-							}
-		
-							// Paste string.
-							if (keyboard_check(keys.v)) {
-								if (keyboard_check_pressed(keys.v)) {
-									var _pasted_text = paste_function()
-									if (_pasted_text != "") __textbox_insert_string__(_pasted_text);
+								if (keyboard_check(keys.control)) {
+									set_cursor_y_pos(curt.length - 1);
 								}
-			
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.v;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
+								set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
 								break;
 							}
-		
-							// Undo.
-							if (keyboard_check(keys.z)) {
-								if (keyboard_check_pressed(keys.z)) {
-									__textbox_records_set__(-1);
-									__update_scroll__();
-								}
-			
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.z;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-								break;
-							}
-		
-							// Redo.
-							if (keyboard_check(keys.y)) {
-								if (keyboard_check_pressed(keys.y)) {
-									__textbox_records_set__(1);
-									__update_scroll__();
-								}
-			
-								//need to do this because html5
-								keyboard_string = "";
-								keys.last_key = keys.y;
-								//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-								break;
-							}
-		
-						}
 	
-					#endregion
+						#endregion
 					
-					#region others
-	
-						// Go to the beginning.
-						if (keyboard_check_pressed(keys.home)) {
-							if (keyboard_check(keys.shift)) {
-								if (curt.select == -1) {
-									curt.select_line = curt.current_line;
-									curt.select = curt.cursor;
+						#region get string
+					
+							var _keyboard_string = keyboard_string;
+							if (_keyboard_string != "") {
+								keyboard_string = "";
+					
+								__textbox_insert_string__(_keyboard_string);
+								
+								if (__event_exists__(self.events.change)) {
+									var _text = __textbox_lines_to_text__(curt.lines)
+									__trigger_event__(self.events.change, _text);
 								}
+								
+								break;
 							}
-							else {
-								curt.select = -1;
-							}
-							if (keyboard_check(keys.control)) {
-								set_cursor_y_pos(0);
-							}
-							set_cursor_x_pos(0);
-							break;
-						}
-			
-						// Go to the end.
-						if (keyboard_check_pressed(keys.end_key)) {
-							if (keyboard_check(keys.shift)) {
-								if (curt.select == -1) {
-									curt.select_line = curt.current_line;
-									curt.select = curt.cursor;
-								}
-							}
-							else {
-								curt.select = -1;
-							}
-							if (keyboard_check(keys.control)) {
-								set_cursor_y_pos(curt.length - 1);
-							}
-							set_cursor_x_pos(string_length(curt.lines[curt.current_line]));
-							break;
-						}
 	
-					#endregion
+						#endregion
 					
-					#region get string
-					
-						var _keyboard_string = keyboard_string;
-						if (_keyboard_string != "") {
-							keyboard_string = "";
-					
-							__textbox_insert_string__(_keyboard_string);
-							//////if (callback_every_change) { callback(__textbox_lines_to_text__(curt.lines)) };
-							break;
-						}
-	
-					#endregion
-					
+					}
+				
 				}
 				
-			}
-			
-			static __draw_gui__ = function(_input) {//log(["__draw_gui__", __draw_gui__]);
+				static __draw_gui__ = function(_input) {//log(["__draw_gui__", __draw_gui__]);
 				
-				draw_gui(_input);
+					draw_gui(_input);
 				
-				draw_sprite_stretched_ext(
-						s9GUIPixel,
-						0,
-						x+region.left,
-						y+region.top,
-						region.get_width(),
-						region.get_height(),
-						draw.text_background_color,
-						draw.text_background_alpha
-				);
+					draw_sprite_stretched_ext(
+							s9GUIPixel,
+							0,
+							x+region.left,
+							y+region.top,
+							region.get_width(),
+							region.get_height(),
+							draw.text_background_color,
+							draw.text_background_alpha
+					);
 				
 				
-				// Updates surfaces. (Surfaces are needed to allow for custom text selection coloring, and to only show certain parts of the whole text when it's too long. Might in some cases be faster as well.)
-				var _texfilter_previous = gpu_get_texfilter();
-				gpu_set_texfilter(true);
+					// Updates surfaces. (Surfaces are needed to allow for custom text selection coloring, and to only show certain parts of the whole text when it's too long. Might in some cases be faster as well.)
+					var _texfilter_previous = gpu_get_texfilter();
+					gpu_set_texfilter(true);
 				
-				var _start_x = x;
-				var _start_y = y;
-				var _draw_width = get_coverage_width();
-				var _draw_height = get_coverage_height();
+					var _start_x = x;
+					var _start_y = y;
+					var _draw_width = get_coverage_width();
+					var _draw_height = get_coverage_height();
 				
-				draw_set_color(draw.font_color);
-				draw_set_alpha(1);
-				
-				//pre draw cached surf
-				if (__using_cached_drawing__)
-				&& (draw.refresh_surf) {
-					//set the surface
-					__surface_set_target__();
-				}
-				
-				//draw the component it's self, either on a cached surf or directly.
-				if (!__using_cached_drawing__) 
-				|| (draw.refresh_surf) {
-					var _draw_x = (__using_cached_drawing__) ? 0 : x;
-					var _draw_y = (__using_cached_drawing__) ? 0 : y;
-					
-					var _font_color = draw.font_color;
-					var _x_off = -scroll.x_off;
-					var _y_off = -scroll.y_off;
-					var _line_height = draw.line_height;
-					var _arr_lines = __array_clone__(curt.lines);
-					var _line_count = curt.length;
-					var _current_line = curt.current_line;
-					var _cursor_update = curt.cursor;
-					var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
-					
-					draw_set_font(draw.font);
 					draw_set_color(draw.font_color);
 					draw_set_alpha(1);
-					draw_set_valign(fa_top);
-					draw_set_halign(fa_left);
-					
-					#region draw text
-						
-						if (_line_count == 1 && _arr_lines[0] == "") {
-							//draw the place holder text
-							draw_set_alpha(0.6);
-							draw_text(_draw_x-_x_off, _draw_y+_center_y, curt.placeholder);
-							draw_set_alpha(1);
-						}
-						else {
-							var _select_line_start, _select_line_end, _cursor_start, _cursor_end;
-							
-							var _select_line = curt.select_line;
-							var _select = curt.select;
-							var _displayed_lines_index = floor(-scroll.y_off / draw.line_height);
-							var _displayed_lines_length = min(_line_count - _displayed_lines_index, ceil(get_coverage_height() / draw.line_height));
-							
-							if (_select > -1) {
-								_select_line_start = _select_line;
-								_select_line_end = _current_line;
-								_cursor_start = _select;
-								_cursor_end = _cursor_update;
-								
-								if (_select_line > _current_line) {
-									_select_line_start = _current_line;
-									_select_line_end = _select_line;
-									_cursor_start = _cursor_update;
-									_cursor_end = _select;
-								}
-							}
-							
-							//prep the drawing of text, this wont effect the drawing of the selection box.
-							draw_set_color(draw.font_color);
-							
-							//an optimizer for empty line selection and /n selection
-							// this is used any time the line's string is empty, or when wrapping the selection to the next line
-							var _selection_end_cap_width = string_width(" ");
-							
-							var _selection_x1 = 0;
-							var _selection_x2 = 0;
-							var _text, _derivative_y;
-							
-							repeat (_displayed_lines_length) {
-								_text = _arr_lines[_displayed_lines_index];
-								_derivative_y = _displayed_lines_index * _line_height - _y_off + _center_y;
-								
-								if (_select > -1)
-								&& (_displayed_lines_index >= _select_line_start)
-								&& (_displayed_lines_index <= _select_line_end) {
-									
-									if (_select_line_start == _displayed_lines_index)
-									&& (_select_line_end == _displayed_lines_index) {
-										_selection_x1 = string_width(string_copy(_text, 1, _cursor_start)) - _x_off;
-										_selection_x2 = string_width(string_copy(_text, 1, _cursor_end)) - _x_off
-									}
-									else if (_select_line_start == _displayed_lines_index) {
-										_selection_x1 = string_width(string_copy(_text, 1, _cursor_start)) - _x_off;
-										_selection_x2 = string_width(_text) - _x_off
-										if (_select_line > _displayed_lines_index) {
-											_selection_x2 += _selection_end_cap_width
-										}
-									}
-									else if (_select_line_end == _displayed_lines_index) {
-										_selection_x1 = 0;
-										_selection_x2 = string_width(string_copy(_text, 1, _cursor_end)) - _x_off;
-										if (_select_line > _displayed_lines_index) {
-											_selection_x2 += _selection_end_cap_width
-										}
-									}
-									else {
-										_selection_x1 = 0;
-										_selection_x2 = string_width(_text) - _x_off + _selection_end_cap_width;
-									}
-									
-									//draw the selection box
-									draw_sprite_stretched_ext(
-											s9GUIPixel,
-											0,
-											_draw_x+min(_selection_x1, _selection_x2),
-											_draw_y+_derivative_y,
-											abs(_selection_x2-_selection_x1),
-											_line_height,
-											draw.highlight_region_color,
-											1
-									);
-									
-								}
-								
-								draw_text(_draw_x-_x_off, _draw_y+_derivative_y, _text);
-								
-								_displayed_lines_index++;
-							}
-						}
-						
-					#endregion
-					
-					#region draw cursor
-						
-						if (__is_on_focus__)
-						&& (draw.display_cursor > 0)
-						&& (is_enabled) {
-							var _cursor_xoff = (__using_cached_drawing__) ? -x : 0
-							var _cursor_yoff = (__using_cached_drawing__) ? -y : 0
-							
-							draw_sprite_stretched_ext(
-									s9GUIPixel,
-									0,
-									_cursor_xoff + get_cursor_x_pos(),
-									_cursor_yoff + get_cursor_y_pos(),
-									get_cursor_width(),
-									get_cursor_height(),
-									draw.highlight_region_color,
-									1
-							);
-							
-						}
-						
-					#endregion
-					
-				}
 				
-				//post draw cached surf
-				if (__using_cached_drawing__) {
-					if (draw.refresh_surf) {
-						draw.refresh_surf = false;
-						__surface_reset_target__();
+					//pre draw cached surf
+					if (__using_cached_drawing__)
+					&& (draw.refresh_surf) {
+						//set the surface
+						__surface_set_target__();
 					}
+				
+					//draw the component it's self, either on a cached surf or directly.
+					if (!__using_cached_drawing__) 
+					|| (draw.refresh_surf) {
+						var _draw_x = (__using_cached_drawing__) ? 0 : x;
+						var _draw_y = (__using_cached_drawing__) ? 0 : y;
 					
-					__draw_component_surface__();
+						var _font_color = draw.font_color;
+						var _x_off = -scroll.x_off;
+						var _y_off = -scroll.y_off;
+						var _line_height = draw.line_height;
+						var _arr_lines = __array_clone__(curt.lines);
+						var _line_count = curt.length;
+						var _current_line = curt.current_line;
+						var _cursor_update = curt.cursor;
+						var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
+					
+						draw_set_font(draw.font);
+						draw_set_color(draw.font_color);
+						draw_set_alpha(1);
+						draw_set_valign(fa_top);
+						draw_set_halign(fa_left);
+					
+						#region draw text
+						
+							if (_line_count == 1 && _arr_lines[0] == "") {
+								//draw the place holder text
+								draw_set_alpha(0.6);
+								draw_text(_draw_x-_x_off, _draw_y+_center_y, curt.placeholder);
+								draw_set_alpha(1);
+							}
+							else {
+								var _select_line_start, _select_line_end, _cursor_start, _cursor_end;
+							
+								var _select_line = curt.select_line;
+								var _select = curt.select;
+								var _displayed_lines_index = floor(-scroll.y_off / draw.line_height);
+								var _displayed_lines_length = min(_line_count - _displayed_lines_index, ceil(get_coverage_height() / draw.line_height));
+							
+								if (_select > -1) {
+									_select_line_start = _select_line;
+									_select_line_end = _current_line;
+									_cursor_start = _select;
+									_cursor_end = _cursor_update;
+								
+									if (_select_line > _current_line) {
+										_select_line_start = _current_line;
+										_select_line_end = _select_line;
+										_cursor_start = _cursor_update;
+										_cursor_end = _select;
+									}
+								}
+							
+								//prep the drawing of text, this wont effect the drawing of the selection box.
+								draw_set_color(draw.font_color);
+							
+								//an optimizer for empty line selection and /n selection
+								// this is used any time the line's string is empty, or when wrapping the selection to the next line
+								var _selection_end_cap_width = string_width(" ");
+							
+								var _selection_x1 = 0;
+								var _selection_x2 = 0;
+								var _text, _derivative_y;
+							
+								repeat (_displayed_lines_length) {
+									_text = _arr_lines[_displayed_lines_index];
+									_derivative_y = _displayed_lines_index * _line_height - _y_off + _center_y;
+								
+									if (_select > -1)
+									&& (_displayed_lines_index >= _select_line_start)
+									&& (_displayed_lines_index <= _select_line_end) {
+									
+										if (_select_line_start == _displayed_lines_index)
+										&& (_select_line_end == _displayed_lines_index) {
+											_selection_x1 = string_width(string_copy(_text, 1, _cursor_start)) - _x_off;
+											_selection_x2 = string_width(string_copy(_text, 1, _cursor_end)) - _x_off
+										}
+										else if (_select_line_start == _displayed_lines_index) {
+											_selection_x1 = string_width(string_copy(_text, 1, _cursor_start)) - _x_off;
+											_selection_x2 = string_width(_text) - _x_off
+											if (_select_line > _displayed_lines_index) {
+												_selection_x2 += _selection_end_cap_width
+											}
+										}
+										else if (_select_line_end == _displayed_lines_index) {
+											_selection_x1 = 0;
+											_selection_x2 = string_width(string_copy(_text, 1, _cursor_end)) - _x_off;
+											if (_select_line > _displayed_lines_index) {
+												_selection_x2 += _selection_end_cap_width
+											}
+										}
+										else {
+											_selection_x1 = 0;
+											_selection_x2 = string_width(_text) - _x_off + _selection_end_cap_width;
+										}
+									
+										//draw the selection box
+										draw_sprite_stretched_ext(
+												s9GUIPixel,
+												0,
+												_draw_x+min(_selection_x1, _selection_x2),
+												_draw_y+_derivative_y,
+												abs(_selection_x2-_selection_x1),
+												_line_height,
+												draw.highlight_region_color,
+												1
+										);
+									
+									}
+								
+									draw_text(_draw_x-_x_off, _draw_y+_derivative_y, _text);
+								
+									_displayed_lines_index++;
+								}
+							}
+						
+						#endregion
+					
+						#region draw cursor
+						
+							if (__is_on_focus__)
+							&& (draw.display_cursor > 0)
+							&& (is_enabled) {
+								var _cursor_xoff = (__using_cached_drawing__) ? -x : 0
+								var _cursor_yoff = (__using_cached_drawing__) ? -y : 0
+							
+								draw_sprite_stretched_ext(
+										s9GUIPixel,
+										0,
+										_cursor_xoff + get_cursor_x_pos(),
+										_cursor_yoff + get_cursor_y_pos(),
+										get_cursor_width(),
+										get_cursor_height(),
+										draw.highlight_region_color,
+										1
+								);
+							
+							}
+						
+						#endregion
+					
+					}
+				
+					//post draw cached surf
+					if (__using_cached_drawing__) {
+						if (draw.refresh_surf) {
+							draw.refresh_surf = false;
+							__surface_reset_target__();
+						}
+					
+						__draw_component_surface__();
+					}
+				
+				
+					if (!_texfilter_previous) gpu_set_texfilter(_texfilter_previous);
+				
+				
+					__SUPER__.__draw_gui__(_input);
+				
+					draw_debug();
 				}
 				
-				
-				if (!_texfilter_previous) gpu_set_texfilter(_texfilter_previous);
-				
-				
-				__SUPER__.__draw_gui__(_input);
-				
-				draw_debug();
-			}
+			#endregion
 			
 			#region helper functions
 				
@@ -1695,7 +1744,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					
 					#region jsDoc
 					/// @func    __textbox_lines_to_text__()
-					/// @desc    Converts the Text array into a single string with linebreaks when specified.
+					/// @desc    Converts the Text array into a single string. This does not account for addaptive width! See `__textbox_return__()` if you wish for adaptive width to be accounted.
 					/// @self    GUICompTextRegion
 					/// @param   {Array<String>} arr : The array of strings
 					/// @returns {String}
@@ -1741,26 +1790,26 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 
 					}
 					
+					#region jsDoc
+					/// @func    __textbox_return__()
+					/// @desc    Returns the textboxes Text as a string. This will also adjust the linebreaks accordingly with the use of adaptive width
+					/// @self    GUICompTextRegion
+					/// @returns {String}
+					#endregion
+					static __textbox_return__ = function() {//log(["__textbox_return__", __textbox_return__]);
+						var _text = "";
+						
+						_text = __textbox_lines_to_text__(curt.lines);
+						if (curt.adaptive_width) {
+							_text = __textbox_close_lines__(_text, 0);
+						}
+						
+						return _text;
+						
+					}
+					
 				#endregion
 				
-				/// @param instance
-				#region jsDoc
-				/// @func    __textbox_return__()
-				/// @desc    Returns the textboxes Text as a string.
-				/// @self    GUICompTextRegion
-				/// @returns {String}
-				#endregion
-				static __textbox_return__ = function() {//log(["__textbox_return__", __textbox_return__]);
-					var _text = "";
-		
-					_text = __textbox_lines_to_text__(curt.lines);
-					if (curt.adaptive_width) {
-						_text = __textbox_close_lines__(_text, 0);
-					}
-		
-					return _text;
-
-				}
 				
 				#region Undo / Redo
 					

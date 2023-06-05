@@ -1,7 +1,7 @@
 {
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
-  "name": "___GUICompScrollingText",
+  "name": "GUICompScrollingText",
   "isCompatibility": false,
   "isDnD": false,
   "parent": {

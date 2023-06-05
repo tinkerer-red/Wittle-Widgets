@@ -554,6 +554,28 @@ function GUICompCore(_x, _y) constructor {
 			}
 			
 			#region jsDoc
+			/// @func    __event_exists__()
+			/// @desc    Lightweight check to see if an event exists.
+			/// @self    GUICompCore
+			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
+			/// @returns {undefined}
+			/// @ignore
+			#endregion
+			static __event_exists__ = function(_event_id) {
+				
+				if (variable_struct_exists(self.__event_listeners__, _event_id)) {
+					return true
+				}
+				
+				if (variable_struct_exists(self.__priv_event_listeners__, _event_id)) {
+					return true
+				}
+				
+				return false;
+			}
+			
+			
+			#region jsDoc
 			/// @func    __trigger_event__()
 			/// @desc    Run the callbacks for the given event lister id. 
 			/// @self    GUICompCore
@@ -959,5 +981,5 @@ function GUICompCore(_x, _y) constructor {
 		#endregion
 		
 	#endregion
-
+	
 }

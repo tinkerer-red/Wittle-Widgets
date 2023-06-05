@@ -690,6 +690,8 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 			});
 			
 			static __begin_step__ = function(_input) {
+				__trigger_event__(self.events.pre_update);
+				
 				begin_step(_input);
 				
 				var _mX = device_mouse_x_to_gui(0);

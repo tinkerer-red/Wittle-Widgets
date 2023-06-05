@@ -34,6 +34,7 @@ log(["b.get_real_name()", b.get_real_name()])
 #endregion
 
 
+
 //var _controller = new GUICompController(0,0);
 //_controller.draw_gui = function(_input){ draw_circle(x,y, 9, true)}
 //cc.add(_controller);

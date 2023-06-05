@@ -73,38 +73,38 @@ function log_func() {
 	_i+=1;}//end repeat loop
 	
 }
+debug_event()
 /*
 function A() constructor {
-	static get_real_name = function() {
-		return "A";
+	static print_name = function() {
+		show_debug_message("A")
 	}
 }
 
 function B() : A() constructor {
-	static get_real_name = function() {
-		return "B";
+	static print_name = function() {
+		__SUPER__.print_name()
+		show_debug_message("B")
 	}
 }
 
 function C() : B() constructor {
-	name = self.get_real_name
-	static get_real_name = function() {
-		return "C";
+	static print_name = function() {
+		__SUPER__.print_name()
+		show_debug_message("C")
 	}
 }
 
 function D() : C() constructor {
-	static name = "D"
-	static get_real_name = function() {
-		log(__SUPER__.get_real_name())
-		return "D";
+	static print_name = function() {
+		__SUPER__.print_name()
+		show_debug_message("D")
 	}
 }
 
 function E() : D() constructor {
-	static name = "E"
-	static get_real_name = function() {
-		log(__SUPER__.get_real_name())
-		return "E";
+	static print_name = function() {
+		__SUPER__.print_name()
+		show_debug_message("E")
 	}
 }

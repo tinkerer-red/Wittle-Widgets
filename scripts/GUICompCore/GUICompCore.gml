@@ -67,8 +67,6 @@ function GUICompCore(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {
-				log(" = = = set_region 4 = = = ")
-				
 				region.left   = _left;
 				region.top    = _top;
 				region.right  = _right;

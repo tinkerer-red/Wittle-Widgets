@@ -439,10 +439,6 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 		
 		#region Variables
 			
-			if (!variable_global_exists("clipboard")) {
-				global.clipboard = "";
-			}
-			
 			draw_set_font(fGUIDefault)
 			
 			owner = other;
@@ -735,11 +731,11 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				var _draw_height = get_coverage_height();
 				var _start_x = x;
 				var _start_y = y;
-				var _scroll_width = curt.multiline ? draw.scroll_width : 0;
+				var _scroll_width = (curt.multiline) ? draw.scroll_width : 0;
 				var _mouse_on_comp = !_input.consumed && mouse_on_comp();
 				
 				if (_mouse_on_comp != curt.view) {
-					var _cursor = _mouse_on_comp ? cr_beam : cr_default
+					var _cursor = (_mouse_on_comp) ? cr_beam : cr_default
 					if (os_browser = browser_not_a_browser) {
 						if (os_type = os_windows) {
 							if (window_get_cursor() != _cursor) {
@@ -780,7 +776,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					
 							if (curt.accepting_inputs) {
 								__is_on_focus__ = _mouse_on_comp;
-								draw.display_cursor = _mouse_on_comp ? 30 : 0;
+								draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
 							}
 							curt.focus = _mouse_on_comp;
 							curt.select = -1;
@@ -856,40 +852,44 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					#endregion
 					
 					#region update mouse selector
-					//allow highlighting if the region is not an input region and it's just displaying copy-able text
-					if (curt.focus) {
-						if (mouse_check_button(keys.mouse_left)) {
-							curt.button_repeat --;
-							if (curt.button_repeat < 0) {
-								__textbox_check_minput__(true);
-								curt.button_repeat = 3;
+						
+						//allow highlighting if the region is not an input region and it's just displaying copy-able text
+						if (curt.focus) {
+							if (mouse_check_button(keys.mouse_left)) {
+								curt.button_repeat --;
+								if (curt.button_repeat < 0) {
+									__textbox_check_minput__(true);
+									curt.button_repeat = 3;
+								}
+								break;
 							}
-							break;
 						}
-					}
+						
 					#endregion
 					
 					#region Copy
-					if (curt.focus)
-					&& (keyboard_check(keys.control)) {
-						if (keyboard_check(keys.c)) {
-							if (keyboard_check_pressed(keys.c)) {
-								var _text = copy_function();
-								if (os_browser == browser_not_a_browser) {
-									clipboard_set_text(_text);
+						
+						if (curt.focus)
+						&& (keyboard_check(keys.control)) {
+							if (keyboard_check(keys.c)) {
+								if (keyboard_check_pressed(keys.c)) {
+									var _text = copy_function();
+									if (os_browser == browser_not_a_browser) {
+										clipboard_set_text(_text);
+									}
+									else {
+										clipboard_set_text_html(_text);
+									}
 								}
-								else {
-									clipboard_set_text_html(_text);
-								}
+					
+								//need to do this because html5
+								keyboard_string = "";
+								keys.last_key = keys.c;
+					
+								break;
 							}
-					
-							//need to do this because html5
-							keyboard_string = "";
-							keys.last_key = keys.c;
-					
-							break;
 						}
-					}
+						
 					#endregion
 					
 					#region PageUp PageDown
@@ -1454,7 +1454,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					var _line_count = curt.length;
 					var _current_line = curt.current_line;
 					var _cursor_update = curt.cursor;
-					var _center_y = curt.multiline ? 0 : ceil((draw.line_height-get_coverage_height())/2);
+					var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
 					
 					draw_set_font(draw.font);
 					draw_set_color(draw.font_color);
@@ -1605,25 +1605,40 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				
 				#region Allowing Char
 					
+					#region jsDoc
+					/// @func    __build_allowed_char__()
+					/// @desc    Returns a struct of allowed charactors from the supplied font.
+					/// @self    GUICompTextRegion
+					/// @param   {Asset.GMFont} font : The font to build the allowed charactor list.
+					/// @returns {Struct} Allowed Charactors Struct
+					#endregion
 					static __build_allowed_char__ = function(_font) {//log(["__build_allowed_char__", __build_allowed_char__]);
 						var _info = font_get_info(_font);
 						var _struct_keys = variable_struct_get_names(_info.glyphs)
-						__allowed_char__ = {}
+						var _struct = {}
 						
 						var _i=0; repeat(array_length(_struct_keys)) {
-							__allowed_char__[$ _struct_keys[_i]] = true
+							_struct[$ _struct_keys[_i]] = true
 						_i++;}//end repeat loop
 						
-						return __allowed_char__;
+						return _struct;
 					}
 					
-					static __clip_allowed_char__ = function(_text) {
+					#region jsDoc
+					/// @func    __string_keep_allowed_char__()
+					/// @desc    Removes all charactor from a string except for the specified struct of allowed characters. This acts as whitelisting charactors
+					/// @self    GUICompTextRegion
+					/// @param   {String} text : The string to parse
+					/// @param   {Struct} allowed_char : The font to build the allowed charactor list.
+					/// @returns {String}
+					#endregion
+					static __string_keep_allowed_char__ = function(_text, _allowed_char) {
 						var _buff = buffer_create(1, buffer_grow, 1);
 						var _struct = {
-							allowed_char : __allowed_char__,
+							allowed_char : _allowed_char,
 							buff : _buff
 						};
-					
+						
 						string_foreach(_text, method(_struct, function(_char) {
 							if (variable_struct_exists(allowed_char, _char))
 							|| (_char == "\n") {
@@ -1643,7 +1658,13 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				
 				#region Format wrapping
 					
-					/// @param string
+					#region jsDoc
+					/// @func    __textbox_format_nowrap__()
+					/// @desc    Removes all line break, and tab charactor from a string.
+					/// @self    GUICompTextRegion
+					/// @param   {String} str : The string to edit
+					/// @returns {String}
+					#endregion
 					static __textbox_format_nowrap__ = function(_str) {//log(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
 						var _return = string_replace_all(_str, "\n", "");
 						_return = string_replace_all(_return, "\r", "");
@@ -1653,7 +1674,13 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 
 					}
 					
-					/// @param string
+					#region jsDoc
+					/// @func    __textbox_format_newline__()
+					/// @desc    Removes all tab charactors from a string.
+					/// @self    GUICompTextRegion
+					/// @param   {String} str : The string to edit
+					/// @returns {String}
+					#endregion
 					static __textbox_format_newline__ = function(_str) {//log(["__textbox_format_newline__", __textbox_format_newline__]);
 						var _return = string_replace_all(_str, "\r", "");
 						_return = string_replace_all(_return, "\t", "");
@@ -1666,9 +1693,15 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				
 				#region Converters
 					
-					/// @param array
+					#region jsDoc
+					/// @func    __textbox_lines_to_text__()
+					/// @desc    Converts the Text array into a single string with linebreaks when specified.
+					/// @self    GUICompTextRegion
+					/// @param   {Array<String>} arr : The array of strings
+					/// @returns {String}
+					#endregion
 					static __textbox_lines_to_text__ = function(_arr) {//log(["__textbox_lines_to_text__", __textbox_lines_to_text__]);
-	
+						
 						var _str = _arr[0];
 						var _i = 1;
 						var _length = array_length(_arr) - 1;
@@ -1682,7 +1715,13 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 
 					}
 					
-					/// @param string
+					#region jsDoc
+					/// @func    __textbox_text_to_lines__()
+					/// @desc    Converts the a string into the Text array format.
+					/// @self    GUICompTextRegion
+					/// @param   {String} str : The string to convert to an array
+					/// @returns {String}
+					#endregion
 					static __textbox_text_to_lines__ = function(_str) {//log(["__textbox_text_to_lines__", __textbox_text_to_lines__]);
 					
 						var _total_line_breaks = string_count("\n", _str)
@@ -1705,6 +1744,12 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				#endregion
 				
 				/// @param instance
+				#region jsDoc
+				/// @func    __textbox_return__()
+				/// @desc    Returns the textboxes Text as a string.
+				/// @self    GUICompTextRegion
+				/// @returns {String}
+				#endregion
 				static __textbox_return__ = function() {//log(["__textbox_return__", __textbox_return__]);
 					var _text = "";
 		
@@ -1923,7 +1968,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				/// @param string
 				static __textbox_insert_string__ = function(_str) {//log(["__textbox_insert_string__", __textbox_insert_string__]);
 					
-					_str = __clip_allowed_char__(_str)
+					_str = __string_keep_allowed_char__(_str, __allowed_char__)
 					
 					
 					if (curt.select > -1) __textbox_delete_string__(false);
@@ -1931,7 +1976,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 					var _current_line = curt.current_line;
 					var _cursor = curt.cursor;
 					var _adaptive_width = curt.adaptive_width;
-					var _no_wrap = curt.no_wrap ? __textbox_format_nowrap__(_str) : __textbox_format_newline__(_str);
+					var _no_wrap = (curt.no_wrap) ? __textbox_format_nowrap__(_str) : __textbox_format_newline__(_str);
 					var _line_length = string_length(_no_wrap);
 					
 					if (curt.no_wrap)
@@ -2107,7 +2152,6 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 						if (curt.adaptive_width) _text = __textbox_close_lines__(_text, _select_start);
 					}
 	
-					global.clipboard = _text;
 					return _text;
 				}
 				
@@ -2417,7 +2461,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 							_select = _cursor;
 						}
 						
-						_cursor = _vertical ? __textbox_check_vinput__(_change) : __textbox_check_hinput__(_change);
+						_cursor = (_vertical) ? __textbox_check_vinput__(_change) : __textbox_check_hinput__(_change);
 						
 						if (curt.current_line == _select_line)
 						&& (_cursor == _select) {
@@ -2447,11 +2491,9 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				}
 				
 				static __array_clone__ = function(_arr) {//log(["__array_clone__", __array_clone__]);
-					static _struct = {};
-					_struct.arr = _arr;
-					var _json = json_stringify(_struct)
-					var _new_struct = json_parse(_json);
-					return _new_struct.arr;
+					var _new_arr = array_create(0,0);
+					array_copy(_new_arr, 0, _arr, 0, array_length(_arr));
+					return _new_arr;
 				}
 				
 			#endregion

@@ -25,6 +25,8 @@ function GUICompHandler(_x=0, _y=0) : GUICompController(_x, _y) constructor {
 				/// @ignore
 				#endregion
 				static begin_step = function(_input) {
+					__trigger_event__(self.events.pre_update);
+					
 					set_region(0,0,display_get_gui_width(), display_get_gui_height());
 					__update_controller_region__();
 					update_component_positions();
@@ -79,7 +81,8 @@ function GUICompHandler(_x=0, _y=0) : GUICompController(_x, _y) constructor {
 						//yy = _component.y - (y-_y);
 						_component.__end_step__(_input);
 					}//end repeat loop
-		
+					
+					__trigger_event__(self.events.post_update);
 				}
 				
 				#region jsDoc

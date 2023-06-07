@@ -12,7 +12,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 	#region Public
 		
 		#region Builder Functions
-			
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets the sprite of the button.
@@ -33,7 +32,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text()
 			/// @desc    Sets the variables for text drawing
@@ -46,7 +44,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_font()
 			/// @desc    Sets the font which will be used for drawing the text
@@ -59,7 +56,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_colors()
 			/// @desc    Sets the colors for the text of the button.
@@ -76,7 +72,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_text_alignment()
 			/// @desc    Sets how the text is aligned when drawing
@@ -91,7 +86,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 		
 				return self;
 			};
-			
 			#region jsDoc
 			/// @func    set_text_offsets()
 			/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
@@ -108,7 +102,6 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			};
-			
 			#region jsDoc
 			/// @func    set_sprite_to_auto_wrap()
 			/// @desc    Automatically wrap the sprite around the suplied text. This will change the click region for you. Note: This should be called after calling the sprite and text builder functions.
@@ -163,12 +156,13 @@ function GUICompButtonText(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				static draw_gui = function() {
 					var _image_index = (is_enabled) ? image.index : GUI_IMAGE_DISABLED;
-					if (self.image_alpha != 0)
+					
+					if (self.image.alpha != 0)
 					&& (self.visible) {
 					
 						//draw the nineslice
-						if (self.image_alpha == 1)
-						&& (self.image_blend == c_white) {
+						if (self.image.alpha == 1)
+						&& (self.image.blend == c_white) {
 							draw_sprite_stretched(
 									self.sprite.index,
 									_image_index,

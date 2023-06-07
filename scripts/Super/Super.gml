@@ -15,6 +15,7 @@
 function __super(_super) constructor {
 	
 	#region grab the callstack
+		
 		var _str;
 		var _callback = debug_get_callstack(2)[1];
 		var _pos = string_pos(":", _callback);
@@ -28,7 +29,8 @@ function __super(_super) constructor {
 		
 	#endregion
 	
-	#region find the owner struct
+	#region Find the original parent struct
+		
 		//it may already be the owner struct, but it could be a function inside the struct's function
 		
 		//if it's a function
@@ -54,46 +56,49 @@ function __super(_super) constructor {
 		
 		//there are probably a lot more i could add but they are either really bad practice or not currently possible
 		
+		_parent_struct_name = _str;
+		
 	#endregion
 	
-	var _methodID = asset_get_index(_str);
-	var _parent_statics = static_get(static_get(_methodID))
+	var _parent_methodID = asset_get_index(_parent_struct_name);
+	var _parent_statics = static_get(_parent_methodID)
+	var _parent_struct_name = instanceof(_parent_statics)
 	
-	var _key, _val;
-	var _names = variable_struct_get_names(_parent_statics);
-	var _size = array_length(_names);
-	var _i=0; repeat(_size) {
-		_key = _names[_i]
+	#region Find all parent structs
 		
-		if (_key == "<unknown built-in variable>") {
-			_i+=1;
-			continue;
+		while (_parent_struct_name != "Object") {
+			
+			var _parent_methodID = asset_get_index(_parent_struct_name);
+			var _parent_statics = static_get(_parent_methodID)
+			
+			
+			
+			var _key, _val;
+			var _names = variable_struct_get_names(_parent_statics);
+			var _size = array_length(_names);
+			var _i=0; repeat(_size) {
+				_key = _names[_i]
+				
+				//skip internal keys and already included keys
+				if (_key == "<unknown built-in variable>")
+				|| (variable_struct_exists(self, _key)) {
+					_i+=1;
+					continue;
+				}
+				
+				_val = _parent_statics[$ _key]
+				
+				self[$ _key] = method({func: _val}, function(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15) {
+					return method(global.__super_self__, func)(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14, a15)
+				})
+				
+			_i+=1;}//end repeat loop
+			
+			
+			//continue to the next struct
+			var _parent_struct_name = instanceof(_parent_statics)
 		}
 		
-		_val = _parent_statics[$ _key]
-		
-		//scope the function to the calling instance using a wrapper method which runs the function on the last assigned __super_self__
-		self[$ _key] = method({func: _val}, function() {
-			switch(argument_count) {
-				case  0: return method(global.__super_self__, func)(); break;
-				case  1: return method(global.__super_self__, func)(argument[0]); break;
-				case  2: return method(global.__super_self__, func)(argument[0], argument[1]); break;
-				case  3: return method(global.__super_self__, func)(argument[0], argument[1], argument[2]); break;
-				case  4: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3]); break;
-				case  5: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4]); break;
-				case  6: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5]); break;
-				case  7: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6]); break;
-				case  8: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7]); break;
-				case  9: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8]); break;
-				case 10: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9]); break;
-				case 11: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10]); break;
-				case 12: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10], argument[11]); break;
-				case 13: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10], argument[11], argument[12]); break;
-				case 14: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10], argument[11], argument[12], argument[13]); break;
-				case 15: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10], argument[11], argument[12], argument[13], argument[14]); break;
-				case 16: return method(global.__super_self__, func)(argument[0], argument[1], argument[2], argument[3], argument[4], argument[5], argument[6], argument[7], argument[8], argument[9], argument[10], argument[11], argument[12], argument[13], argument[14], argument[15]); break;
-			}
-		})
-		
-	_i+=1;}//end repeat loop
+	#endregion
+	
 }

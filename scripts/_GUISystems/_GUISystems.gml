@@ -56,13 +56,13 @@ function __get_controller_archor_x__(_halign=fa_center) {
 		switch (_halign) {
 			default:
 			case fa_left:{
-				 return __controller_region__.left;
+				 return region.left;
 			}
 			case fa_center:{
-				 return floor((__controller_region__.right + __controller_region__.left)/2 + 0.5);
+				 return floor(region.get_width()/2 + 0.5);
 			}
 			case fa_right:{
-				 return __controller_region__.right;
+				 return region.right;
 			}
 		}
 	//}
@@ -80,13 +80,13 @@ function __get_controller_archor_y__(_valign=fa_middle) {
 		switch (_valign) {
 			default:
 			case fa_top:{
-				 return __controller_region__.top;
+				 return region.top;
 			}
 			case fa_middle:{
-				 return floor((__controller_region__.bottom + __controller_region__.top)/2 + 0.5);
+				 return floor((region.get_height())/2 + 0.5);
 			}
 			case fa_bottom:{
-				 return __controller_region__.bottom;
+				 return region.bottom;
 			}
 		}
 	//}

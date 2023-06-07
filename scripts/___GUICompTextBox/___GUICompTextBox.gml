@@ -466,7 +466,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				y_start : _y,					// y start
 				width : 0,			// draw width
 				height : 0,			// draw height
-				line_height : string_height("[{|\/?!`JQWTLPZXYqypgj"),			// line height
+				line_height : font_get_info(fGUIDefault).size,			// line height
 				scroll_width : 4,			// scrollbar width
 				scroll_height : 0,		// scrollbar height
 				scrollbar_y : 0,			// scrollbar y
@@ -643,11 +643,11 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 			}
 			#region jsDoc
 			/// @func    get_cursor_width()
-			/// @desc    Get cursor's height. This is directly related to the line height.
+			/// @desc    Get cursor's width. This is directly related to the line width.
 			/// @self    GUICompTextRegion
 			/// @returns {Real}
 			#endregion
-			static get_cursor_width = function() {//log(["get_cursor_height", get_cursor_height]);
+			static get_cursor_width = function() {//log(["get_cursor_width", get_cursor_width]);
 				return draw.cursor_width;
 			}
 			#region jsDoc
@@ -669,6 +669,16 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
+						return false;
+					}
+				}
+				
+				//check to see if the mouse is out of the window it's self
+				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
+				if (is_desktop) {
+					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+						__mouse_on_cc__ = false;
 						return false;
 					}
 				}
@@ -1510,7 +1520,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 						draw_set_halign(fa_left);
 					
 						#region draw text
-						
+							
 							if (_line_count == 1 && _arr_lines[0] == "") {
 								//draw the place holder text
 								draw_set_alpha(0.6);
@@ -1601,7 +1611,7 @@ function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
 									_displayed_lines_index++;
 								}
 							}
-						
+							
 						#endregion
 					
 						#region draw cursor

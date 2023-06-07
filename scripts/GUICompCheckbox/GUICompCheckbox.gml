@@ -35,7 +35,6 @@ function GUICompCheckbox(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_value()
 			/// @desc    Sets the checkbox to checked or unchecked
@@ -93,11 +92,11 @@ function GUICompCheckbox(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
 		#endregion
 		
 		#region Functions
+			
 			__add_event_listener_priv__(self.events.released, function(){
 				is_checked = !is_checked;
 				sprite.index = (is_checked) ? sprite_checked : sprite_unchecked;
 			})
-			
 			
 		#endregion
 		

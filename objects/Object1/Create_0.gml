@@ -1,4 +1,4 @@
-cc = new GUICompHandler();
+event_inherited();
 
 #region super test
 /*

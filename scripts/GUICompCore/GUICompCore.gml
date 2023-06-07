@@ -11,7 +11,6 @@ function GUICompCore(_x, _y) constructor {
 	#region Public
 		
 		#region Builder Functions
-			
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets all default GML object's sprite variables with a given sprite.
@@ -22,7 +21,6 @@ function GUICompCore(_x, _y) constructor {
 			static set_sprite = function(_sprite) {
 				__set_sprite__(_sprite);
 			}
-			
 			#region jsDoc
 			/// @func    set_sprite_angle()
 			/// @desc    Sets the angle of the sprite to be drawn.
@@ -33,7 +31,6 @@ function GUICompCore(_x, _y) constructor {
 			static set_sprite_angle = function(_angle) {
 				image_angle = _angle;
 			}
-			
 			#region jsDoc
 			/// @func    set_sprite_color()
 			/// @desc    Sets the color of the sprite to be drawn.
@@ -44,7 +41,6 @@ function GUICompCore(_x, _y) constructor {
 			static set_sprite_color = function(_col) {
 				image_blend = _col;
 			}
-			
 			#region jsDoc
 			/// @func    set_sprite_alpha()
 			/// @desc    Sets the alpha of the sprite to be drawn.
@@ -55,7 +51,6 @@ function GUICompCore(_x, _y) constructor {
 			static set_sprite_alpha = function(_alpha) {
 				image_alpha = _alpha;
 			}
-			
 			#region jsDoc
 			/// @func    set_region()
 			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
@@ -84,7 +79,6 @@ function GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_enabled()
 			/// @desc    Enable or Disable the Component, This usually effects how some components are handled
@@ -104,7 +98,6 @@ function GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_alignment()
 			/// @desc    Sets how the component will anchor to it's parent. Note: Some parent controllers will ignore this value if they see fit.
@@ -120,6 +113,31 @@ function GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
+			#region jsDoc
+			/// @func    set_width()
+			/// @desc    Sets the width of the component, this is just a short cut for doing `set_region(0, 0, _width, region.get_height())`
+			/// @self    GUICompCore
+			/// @param   {Real} width : The width of the component.
+			/// @returns {Struct.GUICompCore}
+			#endregion
+			static set_width = function(_width) {
+				set_region(0, 0, _width, region.get_height())
+				
+				return self;
+			}
+			#region jsDoc
+			/// @func    set_height()
+			/// @desc    Sets the height of the component, this is just a short cut for doing `set_region(0, 0, region.get_width(), _height)`
+			/// @self    GUICompCore
+			/// @param   {Real} height : The height of the component.
+			/// @returns {Struct.GUICompCore}
+			#endregion
+			static set_height = function(_height) {
+				set_region(0, 0, region.get_width(), _height)
+				
+				return self;
+			}
+			
 			
 		#endregion
 		
@@ -127,10 +145,10 @@ function GUICompCore(_x, _y) constructor {
 			
 			events = {};
 			
-			events.pre_update   = "pre_update"; //triggered every frame before the begin step event is activated
-			events.post_update   = "post_update"; //triggered every frame after the end step event is activated
-			events.enabled  = "enabled"; //triggered when the component is enabled (this is done by the developer)
-			events.disabled = "disabled"; //triggered when the component is disabled (this is done by the developer)
+			events.pre_update  = "pre_update"; //triggered every frame before the begin step event is activated
+			events.post_update = "post_update"; //triggered every frame after the end step event is activated
+			events.enabled     = "enabled"; //triggered when the component is enabled (this is done by the developer)
+			events.disabled    = "disabled"; //triggered when the component is disabled (this is done by the developer)
 			
 		#endregion
 		
@@ -288,6 +306,16 @@ function GUICompCore(_x, _y) constructor {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
+						return false;
+					}
+				}
+				
+				//check to see if the mouse is out of the window it's self
+				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
+				if (is_desktop) {
+					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+						__mouse_on_cc__ = false;
 						return false;
 					}
 				}
@@ -809,13 +837,13 @@ function GUICompCore(_x, _y) constructor {
 				static __shader_set__ = function(_custom_region = undefined) {
 					//this function is only intended for the component systems internal clipping handling.
 					if (is_undefined(_custom_region)) {
-						clip_region = (__is_controller__) ? __controller_region__ : region;
+						__clip_region__ = (__is_controller__) ? __controller_region__ : region;
 					}
 					else {
-						clip_region = _custom_region;
+						__clip_region__ = _custom_region;
 					}
-		
-		
+					
+					
 					//remember the shader to return to
 					__parent_shader_target__ = shader_current();
 					
@@ -825,22 +853,22 @@ function GUICompCore(_x, _y) constructor {
 						shader_reset();
 						if (__is_child__) {
 							var _par = __parent__;
-							var _par_clip = _par.clip_region;
-							clip_region.left = x - min(x-clip_region.left, _par.x-_par_clip.left);
-							clip_region.right = x - max(x+clip_region.right, _par.x+_par_clip.right);
-							clip_region.top = y - min(y-clip_region.top, _par.y-_par_clip.top);
-							clip_region.bottom = y - max(y+clip_region.bottom, _par.y+_par_clip.bottom);
+							var _par_clip = _par.__clip_region__;
+							__clip_region__.left = x - min(x-__clip_region__.left, _par.x-_par_clip.left);
+							__clip_region__.right = x - max(x+__clip_region__.right, _par.x+_par_clip.right);
+							__clip_region__.top = y - min(y-__clip_region__.top, _par.y-_par_clip.top);
+							__clip_region__.bottom = y - max(y+__clip_region__.bottom, _par.y+_par_clip.bottom);
 						}
 					}
-		
+					
 					//set our Shader and uniform
 					shader_set(shd_clip_rect);
 					shader_set_uniform_f(
 						__shader_u_clips__,
-						x-clip_region.left,
-						y-clip_region.top,
-						x+clip_region.right,
-						y+clip_region.bottom
+						x + __clip_region__.left,
+						y + __clip_region__.top,
+						x + __clip_region__.right,
+						y + __clip_region__.bottom
 					);
 				}
 				
@@ -868,10 +896,10 @@ function GUICompCore(_x, _y) constructor {
 							with (__parent__) {
 								shader_set_uniform_f(
 									__shader_u_clips__,
-									x-clip_region.left,
-									y-clip_region.top,
-									x+clip_region.right,
-									y+clip_region.bottom
+									x-__clip_region__.left,
+									y-__clip_region__.top,
+									x+__clip_region__.right,
+									y+__clip_region__.bottom
 								);
 							}
 						}

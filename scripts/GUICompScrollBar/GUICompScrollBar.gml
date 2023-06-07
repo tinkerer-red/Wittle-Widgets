@@ -339,6 +339,16 @@ function GUICompScrollBar(_x, _y) : GUICompController(_x, _y) constructor {
 					}
 				}
 				
+				//check to see if the mouse is out of the window it's self
+				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
+				if (is_desktop) {
+					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+						__mouse_on_cc__ = false;
+						return false;
+					}
+				}
+				
 				__mouse_on_cc__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),

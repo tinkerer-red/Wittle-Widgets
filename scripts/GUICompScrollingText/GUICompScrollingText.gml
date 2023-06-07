@@ -7,11 +7,19 @@
 /// @return {Struct.GUICompScrollingText}
 #endregion
 function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
+	debug_name = "GUICompScrollingText"
 	
 	#region Public
 		
 		#region Builder functions
 			
+			static set_region = function(_left, _top, _right, _bottom) {
+				__SUPER__.set_region(_left, _top, _right, _bottom)
+				
+				__update_clip_region__()
+				
+				return self;
+			}
 			#region jsDoc
 			/// @func    set_scroll_speeds()
 			/// @desc    Sets the current speed of the scrolling text. These speeds act like velocity and will imply moving left or right depending on if it's positive or negative.
@@ -51,7 +59,7 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
 			static set_scroll_pause = function(_paused=true){
-				scrolling.pasued = _paused;
+				scroll.paused = _paused;
 				
 				return self;
 			}
@@ -90,13 +98,13 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func    set_font()
+			/// @func    set_text_font()
 			/// @desc    Sets the font which will be used for drawing the text
 			/// @self    GUICompScrollingText
 			/// @param   {Asset.GMFont} font : The font to use when drawing the text
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
-			static set_font = function(_font=fGUIDefault) {
+			static set_text_font = function(_font=fGUIDefault) {
 				text.font = _font;								// font
 				
 				draw_set_font(text.font);
@@ -141,7 +149,9 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			static set_text_alignment = function(_h=fa_left, _v=fa_top) {
 				text.halign = _h;
 				text.valign = _v;
-		
+				
+				__update_clip_region__()
+				
 				return self;
 			};
 			#region jsDoc
@@ -155,6 +165,8 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			static set_text_offsets = function(_x=0, _y=0) {
 				text.x_off = _x;
 				text.y_off = _y;
+				
+				__update_clip_region__()
 				
 				return self;
 			};
@@ -172,6 +184,8 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			text.height = 0;
 			text.color = c_white;
 			text.alpha = 1;
+			text.x_off = 0;
+			text.y_off = 0;
 			
 			scroll = {};
 			scroll.y_off = 0;
@@ -187,7 +201,7 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			scroll.orig_x_speed = scroll.x_speed;
 			
 			scroll.paused = false;
-		
+			
 		#endregion
 		
 		#region Functions
@@ -198,10 +212,12 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 					draw_set_font(text.font);
 					draw_set_alpha(text.alpha);
 					draw_set_color(text.color);
-				
+					draw_set_halign(text.halign);
+					draw_set_valign(text.valign);
+					
 					draw_text(
-							x+scroll.x_off,
-							y+scroll.y_off,
+							x + scroll.x_off + text.x_off,
+							y + scroll.y_off + text.y_off,
 							text.text
 					)
 				}
@@ -241,6 +257,8 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 			
 			static draw_debug = function(_input) {
 				
+				
+				
 				draw_line(x, y, x+scroll.x_off, y+scroll.y_off);
 				draw_text(x,y,string(scroll.x_off)+"\n"+string(scroll.y_off));
 				draw_rectangle(x, y, x+region.get_width(), y+region.get_height(), true);
@@ -249,6 +267,15 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 						y+scroll.y_off,
 						x+scroll.x_off+text.width,
 						y+scroll.y_off+text.height,
+						true
+				);
+				
+				draw_set_color(c_yellow)
+				draw_rectangle(
+						x+clip_region.left,
+						y+clip_region.top,
+						x+clip_region.right,
+						y+clip_region.bottom,
 						true
 				);
 				
@@ -261,12 +288,15 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 	#region Private Library
 		
 		#region Variables
-		
+			
+			//used as a custom clipping tool for the shader
+			clip_region = new __region__(0,0,0,0);
+			
 		#endregion
 		
 		#region Functions
 			
-			__draw_gui_begin__ = function(_input) {
+			static __draw_gui_begin__ = function(_input) {
 				
 				#region jsDoc
 				/// @func    _wrap()
@@ -284,7 +314,8 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 					if ( _mod < 0 ) return _mod + _max else return _mod + _min;
 				}
 				
-				if (text.width > region.get_width()) {
+				if (text.width > region.get_width())
+				&& (!scroll.paused) {
 					scroll.x_off += scroll.x_speed;
 					//if x looping
 					if (scroll.x_looping) {
@@ -309,7 +340,8 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 					}
 				}
 				
-				if (text.height > region.get_height()) {
+				if (text.height > region.get_height())
+				&& (!scroll.paused) {
 					scroll.y_off += scroll.y_speed;
 					// if y looping
 					if (scroll.y_looping) {
@@ -334,26 +366,79 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 					}
 				}
 				
-				__shader_set__();
+				__shader_set__(clip_region);
 				draw_gui_begin(_input)
 				__shader_reset__();
 				//__draw_component_surface__(_x, _y);
 				
 			}
-			__draw_gui__ = function(_input) {
-				__shader_set__();
+			static __draw_gui__ = function(_input) {
+				__shader_set__(clip_region);
 				draw_gui(_input)
 				__shader_reset__();
 				//__draw_component_surface__(_x, _y);
 			}
-			__draw_gui_end__ = function(_input) {
-				__shader_set__();
+			static __draw_gui_end__ = function(_input) {
+				__shader_set__(clip_region);
 				draw_gui_end(_input);
 				__shader_reset__();
-				draw_debug(_input);
+				
+				if (GUI_GLOBAL_DEBUG) {
+					draw_debug(_input);
+				}
+				
 				//__draw_component_surface__(_x, _y);
 			}
 			
+			#region jsDoc
+			/// @func    __update_clip_region__()
+			/// @desc    Update the shader's bounding box for clipping
+			/// @self    GUICompScrollingText
+			/// @returns {Undefined}
+			#endregion
+			static __update_clip_region__ = function() {
+				var _left   = 0;
+				var _right  = 0;
+				var _top    = 0;
+				var _bottom = 0;
+				
+				switch (text.halign) {
+					default:
+					case fa_left:{
+						_left   = min(_left,   text.x_off);
+						_right  = max(_right,  text.x_off + region.get_width());
+					break;}
+					case fa_center:{
+						_left   = min(_left,   text.x_off - region.get_width()*0.5);
+						_right  = max(_right,  text.x_off + region.get_width()*0.5);
+					break;}
+					case fa_right:{
+						_left   = min(_left,   text.x_off - region.get_width());
+						_right  = max(_right,  text.x_off);
+					break;}
+				}
+				
+				switch (text.valign) {
+					default:
+					case fa_top:{
+						_top    = min(_top,    text.y_off);
+						_bottom = max(_bottom, text.y_off + region.get_height());
+					break;}
+					case fa_middle:{
+						_top    = min(_top,    text.y_off - region.get_height()*0.5);
+						_bottom = max(_bottom, text.y_off + region.get_height()*0.5);
+					break;}
+					case fa_bottom:{
+						_top    = min(_top,    text.y_off - region.get_height());
+						_bottom = max(_bottom, text.y_off);
+					break;}
+				}
+				
+				clip_region.left   = _left;
+				clip_region.right  = _right;
+				clip_region.top    = _top;
+				clip_region.bottom = _bottom;
+			}
 		#endregion
 		
 	#endregion

@@ -11,7 +11,6 @@ function GUICompButtonSprite(_x, _y) : GUICompCore(_x, _y) constructor {
 	#region Public
 		
 		#region Builder Functions
-			
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets the sprite of the component.
@@ -27,8 +26,6 @@ function GUICompButtonSprite(_x, _y) : GUICompCore(_x, _y) constructor {
 				/// image.index[3] = disabled; not allowed to interact with;
 				
 				__SUPER__.set_sprite(_sprite);
-				
-				log(["set_region", set_region])
 				
 				image.speed = 0;
 				set_region(

@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompController}
 #endregion
-function GUICompController(_x, _y) : GUICompCore(_x, _y) constructor {
+function GUICompController() : GUICompCore() constructor {
 	debug_name = "GUICompController";
 	
 	static draw_debug = function() {
@@ -181,21 +181,17 @@ function GUICompController(_x, _y) : GUICompCore(_x, _y) constructor {
 					
 					//move the children
 					var _i=0; repeat(__children_count__) {
-						_anchor_point = __anchors__[_i];
 						_comp = __children__[_i];
 						
-						//the location we wish to stay attached to
 						_xx = __get_controller_archor_x__(_comp.halign);
 						_yy = __get_controller_archor_y__(_comp.valign);
 						
-						//anchor point difference
-						_comp.x = (self.x + _anchor_point.x) + _xx;
-						_comp.y = (self.y + _anchor_point.y) + _yy;
+						_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__;
+						_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__;
 						
 						//if the component is a controller it's self have it update it's children
 						if (_comp.__is_controller__) {
 							_comp.update_component_positions();
-							//_component.__update_controller_region__();
 						}
 					_i+=1;}//end repeat loop
 					
@@ -309,7 +305,6 @@ function GUICompController(_x, _y) : GUICompCore(_x, _y) constructor {
 			__children__ = [];
 			__children_count__ = 0;
 			__is_empty__ = true;
-			__anchors__ = [];
 			
 			__is_controller__ = true;
 			__parent__ = noone;
@@ -470,7 +465,6 @@ function GUICompController(_x, _y) : GUICompCore(_x, _y) constructor {
 				delete __children__[_index];
 				
 				//remove the component
-				array_delete(__anchors__, _index, 1);
 				array_delete(__children__, _index, 1);
 				__children_count__--;
 				
@@ -894,13 +888,18 @@ function GUICompController(_x, _y) : GUICompCore(_x, _y) constructor {
 					_comp.__is_child__ = true;
 					_comp.__parent__ = self;
 					
+					if (!_comp.__position_set__) {
+						_comp.__internal_x__ = _comp.x;
+						_comp.__internal_y__ = _comp.y;
+					}
+					
+					
+					
 					if (_index < 0) {
 						array_push(__children__, _comp);
-						array_push(__anchors__, new __anchor__(_comp.x, _comp.y, _comp.halign, _comp.valign));
 					}
 					else {
 						array_insert(__children__, _index, _comp);
-						array_insert(__anchors__, _index, new __anchor__(_comp.x, _comp.y, _comp.halign, _comp.valign));
 					}
 					
 				_i+=1;}//end repeat loop

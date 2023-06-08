@@ -1,4 +1,8 @@
-function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
+function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GUICompController(0, 0) constructor {
+	
+	draw_debug = function(){
+		draw_text(x,y,string(["is_open", is_open, "__dropdown__.is_open", __dropdown__.is_open]))
+	}
 	
 	#region Public
 		
@@ -9,17 +13,24 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = max(__checkbox__.sprite.height, font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
-				//__checkbox__.x = -_info.right;
-				//__checkbox__.y = _info.top;
+				var _width = floor((_right  - _info.left - _info.right)*0.5);
+				if (__dropdown__.region.get_width() > _width) {
+					__dropdown__.set_sprite_to_auto_wrap()
+				}
+				else {
+					__dropdown__.set_width(_width)
+				}
+				
+				__dropdown__.set_position(-__dropdown__.region.get_width(), 0)
 				
 				__scrolling_text__.set_region(
 						0,
 						0,
-						_right  - _info.left - _info.right - __checkbox__.sprite.width,
+						_right  - _info.left - _info.right - __dropdown__.region.get_width(),
 						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				)
 				
@@ -73,6 +84,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			halign = fa_left
 			valign = fa_top;
 			callback = _func;
+			is_open = false;
 			
 		#endregion
 		
@@ -98,14 +110,15 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
-			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
+			__dropdown__ = new GUICompDropdown() //the x/y doesnt matter as the set region will move this
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
-			
-			__checkbox__.x -= __checkbox__.sprite.width
+				.set_dropdown_array(_arr_of_str)
+				.set_sprite_to_auto_wrap()
+			__dropdown__.set_position(-__dropdown__.region.get_width(), 0)
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_position(_info.left, 0)
+				.set_anchor(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -113,26 +126,27 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			
 			add(__button__);
-			add(__checkbox__);
+			add(__dropdown__);
 			add(__scrolling_text__);
 			
+			
 			//set the default size of the component
+			//get the label width
 			var _prev_font = draw_get_font();
 			draw_set_font(__scrolling_text__.text.font);
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
-				
+			
 			var _info = sprite_get_nineslice(__button__.sprite.index)
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
 			var _bottom = max(
 												font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off,
-												__checkbox__.sprite.height + _info.top + _info.bottom + __button__.text_click_y_off,
+												__dropdown__.region.get_height() + _info.top + _info.bottom + __button__.text_click_y_off,
 										);
-				
+			
 			set_region(_left, _top, _right, _bottom);
 			
 		#endregion
@@ -148,9 +162,9 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width());
+						var _width = floor(window_get_width()/4);
 						if (region.get_width() != _width) {
-							set_width(floor(_width))
+							set_width(_width)
 						}
 					});
 				}
@@ -158,10 +172,10 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				//adjust the visuals so all components are simillar
 				__add_event_listener_priv__(self.events.post_update, function(_data) {
 					
-					var _image_index = (is_enabled) ? max(__checkbox__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
+					var _image_index = (is_enabled) ? max(__dropdown__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
 					
 					__button__.image.index   = _image_index;
-					__checkbox__.image.index = _image_index;
+					__dropdown__.image.index = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
@@ -191,15 +205,34 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 					
 				});
 				
-				//callback
+				//update open state from button click
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
-					__checkbox__.set_value(!__checkbox__.is_checked)
-					callback(__checkbox__.is_checked);
+					is_open = !is_open
+					__dropdown__.is_open = is_open
+					with (__dropdown__){
+						if (is_open) {
+							__trigger_event__(self.events.opened, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+						}
+						else {
+							__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+						}
+					}
+					
+					//callback(__dropdown__.is_checked);
 				});
 				
 				//callback
-				__checkbox__.__add_event_listener_priv__(__checkbox__.events.released, function(_data) {
-					callback(__checkbox__.is_checked);
+				__dropdown__.__add_event_listener_priv__(__dropdown__.events.changed, function(_data) {
+					callback(_data.index); //for use with the index as input
+					//callback(_data.element); //for use with the string as input
+				});
+				
+				__dropdown__.__add_event_listener_priv__(__dropdown__.events.released, function(_data) {
+					is_open = __dropdown__.is_open;
+				});
+				
+				__dropdown__.__add_event_listener_priv__(__dropdown__.events.selected, function(_data) {
+					is_open = __dropdown__.is_open;
 				});
 				
 			#endregion

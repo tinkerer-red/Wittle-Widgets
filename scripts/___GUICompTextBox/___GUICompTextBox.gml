@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y position of the component on screen.
 /// @return {Struct.GUICompTextRegion}
 #endregion
-function GUICompTextRegion(_x, _y) : GUICompRegion(_x, _y) constructor {
+function GUICompTextRegion() : GUICompRegion() constructor {
 	
 	#region Public
 		

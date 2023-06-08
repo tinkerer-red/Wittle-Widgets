@@ -6,19 +6,20 @@ event_user(15);
 //var _button = new ControlPanelButton("Button 1", function(){log("Working")})
 //cc.add(_button)
 
-var _checkbox = new ControlPanelCheckbox("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(){log("Working")})
-_checkbox.x = 0
-_checkbox.y = 0
-_checkbox.xstart = 0
-_checkbox.ystart = 0
-_checkbox.xprevious = 0
-_checkbox.yprevious = 0
+//var _checkbox = new ControlPanelCheckbox("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(_bool){log(["Working", _bool])})
+//cc.add(_checkbox)
 
-log(["_checkbox.__button__.x", _checkbox.__button__.x])
-log(["_checkbox.__checkbox__.x", _checkbox.__checkbox__.x])
-log("\n")
-cc.add(_checkbox)
-log("\n")
-log(["_checkbox.__anchors__", _checkbox.__anchors__])
-log(["_checkbox.__button__.x", _checkbox.__button__.x])
-log(["_checkbox.__checkbox__.x", _checkbox.__checkbox__.x])
+//var _checkbox = new ControlPanelCheckbox("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(_bool){log(["Working", _bool])})
+//cc.add(_checkbox)
+
+var _dropdown = new ControlPanelDropdown("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", ["Option 1", "Option 2", "Option 3"], function(_bool){log(["Working", _bool])})
+	.set_anchor(100, 100)
+	.set_position(100, 100)
+	.set_alignment(fa_left, fa_top)
+cc.add(_dropdown)
+
+//var __dropdown__ = new GUICompDropdown() //the x/y doesnt matter as the set region will move this
+//	.set_position(100, 100)
+//	.set_alignment(fa_right, fa_top)
+//	.set_dropdown_array(["Option 1", "Option 2", "Option 3"])
+//cc.add(__dropdown__)

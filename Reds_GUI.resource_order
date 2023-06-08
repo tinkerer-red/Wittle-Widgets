@@ -37,6 +37,7 @@
     {"name":"s9DropDownTop","order":3,"path":"sprites/s9DropDownTop/s9DropDownTop.yy",},
     {"name":"GUICompButtonSprite","order":4,"path":"scripts/GUICompButtonSprite/GUICompButtonSprite.yy",},
     {"name":"Script12","order":7,"path":"scripts/Script12/Script12.yy",},
+    {"name":"ControlPanelDropdown","order":2,"path":"scripts/ControlPanelDropdown/ControlPanelDropdown.yy",},
     {"name":"s9SliderBar","order":1,"path":"sprites/s9SliderBar/s9SliderBar.yy",},
     {"name":"s9DropDownBottom","order":1,"path":"sprites/s9DropDownBottom/s9DropDownBottom.yy",},
     {"name":"ControlPanelCheckbox","order":1,"path":"scripts/ControlPanelCheckbox/ControlPanelCheckbox.yy",},

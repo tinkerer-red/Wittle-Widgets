@@ -6,7 +6,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @return {Struct.GUICompScrollingText}
 #endregion
-function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
+function GUICompScrollingText() : GUICompCore() constructor {
 	debug_name = "GUICompScrollingText"
 	
 	#region Public
@@ -382,6 +382,9 @@ function GUICompScrollingText(_x, _y) : GUICompCore(_x, _y) constructor {
 				__shader_set__(clip_region);
 				draw_gui_end(_input);
 				__shader_reset__();
+				
+				xprevious = x;
+				yprevious = y;
 				
 				if (GUI_GLOBAL_DEBUG) {
 					draw_debug(_input);

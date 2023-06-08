@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompCheckbox}
 #endregion
-function GUICompCheckbox(_x, _y) : GUICompButtonSprite(_x, _y) constructor {
+function GUICompCheckbox() : GUICompButtonSprite() constructor {
 	debug_name = "GUICompCheckbox";
 	
 	#region Public

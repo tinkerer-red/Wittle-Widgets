@@ -6,12 +6,12 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @return {Struct.GUICompFolder}
 #endregion
-function GUICompFolder(_x, _y) : GUICompController(_x, _y) constructor {
+function GUICompFolder() : GUICompController() constructor {
 	debug_name = "GUICompFolder";
 	
 	#region Inherited Parents
 		
-		var _btn = new GUICompButtonText(_x, _y);
+		var _btn = new GUICompButtonText()
 		variable_struct_inherite(_btn);
 		delete _btn;
 		

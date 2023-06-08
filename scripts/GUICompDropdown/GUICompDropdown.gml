@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompDropdown}
 #endregion
-function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
+function GUICompDropdown() : GUICompCore() constructor {
 	debug_name = "GUICompDropdown";
 	
 	#region Public
@@ -229,7 +229,7 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 				//update internal variables
 				set_region(0, 0, _width, _height);
 				set_text_offsets(_slice.left, _slice.top, text_click_y_off);
-				set_text_alignment(fa_left, fa_top);
+				//set_text_alignment(fa_left, fa_top);
 				
 				
 				return self;
@@ -537,7 +537,7 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 					draw_set_font(font);
 					draw_set_halign(text_halign);
 					draw_set_valign(text_valign);
-					draw_set_alpha(image_alpha);
+					draw_set_alpha(image.alpha);
 					
 					//set font color
 					switch (image.index) {
@@ -655,6 +655,22 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 						_draw(_posX, _posY, sprite.bottom, elements[_i]);
 						
 					}
+					
+					if (GUI_GLOBAL_DEBUG) {
+						draw_debug(_input);
+					}
+				}
+				
+				static draw_debug = function() {
+					draw_set_color(c_yellow)
+					draw_rectangle(
+							x+region.left,
+							y+region.top,
+							x+region.right,
+							y+region.bottom,
+							true
+					);
+					
 				}
 				
 			#endregion
@@ -678,7 +694,7 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 			__add_event_listener_priv__(self.events.released, function() {
 				if (!__is_empty__) {
 					is_open = !is_open;
-									
+					
 					//trigger events
 					if (is_open) {
 						__trigger_event__(self.events.opened, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
@@ -739,16 +755,20 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 									
 								}
 								else if (mouse_check_button_released(mb_left)) {
-									//trigger events
-									__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
-									__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
-									if (get_value() != _i) {
-										__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
-									}
+									var _changed = get_value() != _i
 									
 									elements[_i].image.index = GUI_IMAGE_HOVER;
 									set_value(_i);
 									is_open = false;
+									
+									//trigger events
+									__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									if (_changed) {
+										__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									}
+									__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									
 								}
 								
 							}
@@ -784,10 +804,10 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 				
 			}
 			
-			static __reset_focus__ = function() {
-				is_open = false;
-				__is_on_focus__ = false;
-			}
+			//static __reset_focus__ = function() {
+			//	is_open = false;
+			//	__is_on_focus__ = false;
+			//}
 			
 			#region jsDoc
 			/// @func    __new_element__()
@@ -799,7 +819,9 @@ function GUICompDropdown(_x, _y) : GUICompCore(_x, _y) constructor {
 			static __new_element__ = function(_string) constructor {
 				text = _string;
 				font = -1;
-				image.index = 0;
+				image = {
+					index : 0,
+				}
 				is_enabled = true;
 				color = {
 					idle     : -1,

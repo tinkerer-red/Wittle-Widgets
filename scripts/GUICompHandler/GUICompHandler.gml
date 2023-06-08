@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompHandler}
 #endregion
-function GUICompHandler(_x=0, _y=0) : GUICompController(_x, _y) constructor {
+function GUICompHandler() : GUICompController() constructor {
 	debug_name = "GUICompHandler";
 	
 	#region Init

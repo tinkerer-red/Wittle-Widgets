@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @return {Struct.GUICompButtonSprite}
 #endregion
-function GUICompButtonSprite(_x, _y) : GUICompCore(_x, _y) constructor {
+function GUICompButtonSprite() : GUICompCore() constructor {
 	debug_name = "GUICompButtonSprite";
 	
 	#region Public

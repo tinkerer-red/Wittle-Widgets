@@ -1,4 +1,4 @@
-function GUICompRegion(_x, _y) : GUICompController(_x, _y) constructor {
+function GUICompRegion() : GUICompController() constructor {
 	debug_name = "GUICompRegion";
 	
 	#region Public
@@ -371,30 +371,7 @@ function GUICompRegion(_x, _y) : GUICompController(_x, _y) constructor {
 				//move the scroll bars
 				__update_scrollbar_positions__();
 				
-				if (!__is_empty__)
-				&& (is_open) {
-					var _anchor_point, _component, _xx, _yy;
-					
-					//move the children
-					var _i=0; repeat(__children_count__) {
-						_anchor_point = __anchors__[_i];
-						_component = __children__[_i];
-						
-						//the location we wish to stay attached to
-						_xx = __get_controller_archor_x__(_component.halign)
-						_yy = __get_controller_archor_y__(_component.valign)
-						
-						//anchor point difference
-						_component.x = (self.x + scroll.x_off + _anchor_point.x) + _xx;
-						_component.y = (self.y + scroll.y_off + _anchor_point.y) + _yy;
-						
-						//if the component is a controller it's self have it update it's children
-						if (_component.__is_controller__) {
-							_component.update_component_positions();
-							//_component.__update_controller_region__();
-						}
-					_i++;}//end repeat loop
-				}
+				__SUPER__.update_component_positions()
 			}
 			
 		#endregion
@@ -419,8 +396,10 @@ function GUICompRegion(_x, _y) : GUICompController(_x, _y) constructor {
 				
 				//init both before we start building as they are codependant
 				log("about to spawn scrolls")
-				__scroll_vert__ = new GUICompScrollBar(0,0);
-				__scroll_horz__ = new GUICompScrollBar(0,0);
+				__scroll_vert__ = new GUICompScrollBar()
+					.set_position(0,0)
+				__scroll_horz__ = new GUICompScrollBar()
+					.set_position(0,0)
 				log("spawned scrolls")
 				
 				//vertical
@@ -609,6 +588,13 @@ function GUICompRegion(_x, _y) : GUICompController(_x, _y) constructor {
 				__scroll_horz__.__draw_gui_end__(__user_input__);
 				
 				if (__user_input__.consumed) { capture_input(); };
+				
+				xprevious = x;
+				yprevious = y;
+				
+				if (GUI_GLOBAL_DEBUG) {
+					draw_debug();
+				}
 				
 			}
 			

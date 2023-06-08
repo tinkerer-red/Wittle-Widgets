@@ -1,4 +1,4 @@
-function GUICompScrollBar(_x, _y) : GUICompController(_x, _y) constructor {
+function GUICompScrollBar() : GUICompController() constructor {
 	debug_name = "GUICompScrollBar";
 	
 	#region Public
@@ -311,17 +311,20 @@ function GUICompScrollBar(_x, _y) : GUICompController(_x, _y) constructor {
 			__button_held_time__ = 0;
 			
 			//pieces of the scrollbar
-			__scrollbar__ = new GUICompSlider(_x,_y);
-			__scrollbar__.set_clamp_values(0, 1)
-			         .set_thumb_enabled(true)
-							 .set_thumb_sprite(s9ScrollbarThumb)
-							 .set_thumb_clamped_in_bounds(true)
-							 .set_bar_enabled(false)
-							 .set_background_sprite(s9ScrollbarVertBackground)
-							 .set_thumb_only_input(true)
+			__scrollbar__ = new GUICompSlider();
+			__scrollbar__.set_position(0,0)
+				.set_clamp_values(0, 1)
+				.set_thumb_enabled(true)
+				.set_thumb_sprite(s9ScrollbarThumb)
+				.set_thumb_clamped_in_bounds(true)
+				.set_bar_enabled(false)
+				.set_background_sprite(s9ScrollbarVertBackground)
+				.set_thumb_only_input(true)
 							 
-			__button_inc__ = new GUICompButtonSprite(_x,_y);
-			__button_dec__ = new GUICompButtonSprite(_x,_y);
+			__button_inc__ = new GUICompButtonSprite()
+				.set_position(0,0)
+			__button_dec__ = new GUICompButtonSprite()
+				.set_position(0,0)
 			__button_inc__.set_sprite(s9ScrollbarVertButtonDown);
 			__button_dec__.set_sprite(s9ScrollbarVertButtonUp);
 			
@@ -390,34 +393,6 @@ function GUICompScrollBar(_x, _y) : GUICompController(_x, _y) constructor {
 					
 					__prev_using_buttons__ = __using_buttons__;
 				}
-				
-				#region Regenerate Anchors
-					
-					//var _comp, _index, _old_anchor;
-					
-					//_comp = __scrollbar__;
-					//_index = find(_comp);
-					//_old_anchor = __anchors__[_index];
-					//__anchors__[_index] = new __anchor__(_comp.x+x, _comp.y+y, _comp.halign, _comp.valign);
-					//delete _old_anchor;
-					
-					//_comp = __button_inc__;
-					//_index = find(_comp);
-					//_old_anchor = __anchors__[_index];
-					//__anchors__[_index] = new __anchor__(_comp.x+x, _comp.y+y, _comp.halign, _comp.valign);
-					//delete _old_anchor;
-					
-					//_comp = __button_dec__;
-					//_index = find(_comp);
-					//_old_anchor = __anchors__[_index];
-					//__anchors__[_index] = new __anchor__(_comp.x+x, _comp.y+y, _comp.halign, _comp.valign);
-					//delete _old_anchor;
-					
-				#endregion
-				
-				//__adjust_scrollbar_thumb_size__();
-				
-				//__update_controller_region__();
 			}
 			
 			static __update_scrollbar__ = function() {//log(["__update_scrollbar__", __update_scrollbar__])

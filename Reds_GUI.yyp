@@ -63,6 +63,7 @@
     {"id":{"name":"s9DropDownTop","path":"sprites/s9DropDownTop/s9DropDownTop.yy",},},
     {"id":{"name":"GUICompButtonSprite","path":"scripts/GUICompButtonSprite/GUICompButtonSprite.yy",},},
     {"id":{"name":"Script12","path":"scripts/Script12/Script12.yy",},},
+    {"id":{"name":"ControlPanelDropdown","path":"scripts/ControlPanelDropdown/ControlPanelDropdown.yy",},},
     {"id":{"name":"s9SliderBar","path":"sprites/s9SliderBar/s9SliderBar.yy",},},
     {"id":{"name":"s9DropDownBottom","path":"sprites/s9DropDownBottom/s9DropDownBottom.yy",},},
     {"id":{"name":"ControlPanelCheckbox","path":"scripts/ControlPanelCheckbox/ControlPanelCheckbox.yy",},},

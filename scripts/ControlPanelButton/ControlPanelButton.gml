@@ -88,7 +88,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText(0, 0)
+			__button__ = new GUICompButtonText()
+				.set_anchor(0,0)
 				.set_text("")
 				.set_text_alignment(fa_left, fa_top)
 				.set_text_offsets(0, 0, 1)
@@ -98,7 +99,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
-			__scrolling_text__ = new GUICompScrollingText(_info.left, _info.top - __button__.text_click_y_off)
+			__scrolling_text__ = new GUICompScrollingText()
+				.set_anchor(_info.left, _info.top - __button__.text_click_y_off)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -111,21 +113,19 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			add(__scrolling_text__);
 			
 			//set the default size of the component
-			if (!__CP_ADAPT_TO_WINDOW) {
-				//get the label width
-				var _prev_font = draw_get_font();
-				draw_set_font(__scrolling_text__.text.font);
-				var _width = string_width(_label);
-				draw_set_font(_prev_font);
-				
-				var _info = sprite_get_nineslice(__button__.sprite.index)
-				var _left   = 0;
-				var _top    = 0;
-				var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-				var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
-				
-				set_region(_left, _top, _right, _bottom);
-			}
+			//get the label width
+			var _prev_font = draw_get_font();
+			draw_set_font(__scrolling_text__.text.font);
+			var _width = string_width(_label);
+			draw_set_font(_prev_font);
+			
+			var _info = sprite_get_nineslice(__button__.sprite.index)
+			var _left   = 0;
+			var _top    = 0;
+			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
+			var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+			
+			set_region(_left, _top, _right, _bottom);
 			
 		#endregion
 		
@@ -140,16 +140,18 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = window_get_width();
+						var _width = floor(window_get_width());
 						if (region.get_width() != _width) {
-							set_region(0, 0, _width, 220)
+							set_width(_width)
 						}
 					});
 				}
 				
-				//adjust the scrolling text based on the buttons state
+				//adjust the visuals so all components are simillar
 				__add_event_listener_priv__(events.pre_update, function(_data) {
 					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
+					
+					__button__.image.index   = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {

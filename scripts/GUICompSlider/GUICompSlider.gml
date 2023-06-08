@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompSlider}
 #endregion
-function GUICompSlider(_x, _y) : GUICompCore(_x, _y) constructor {//log(["GUICompSlider", GUICompSlider])
+function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GUICompSlider])
 	debug_name = "GUICompSlider";
 	
 	#region Public

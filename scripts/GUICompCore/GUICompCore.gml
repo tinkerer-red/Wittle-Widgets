@@ -5,12 +5,66 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompCore}
 #endregion
-function GUICompCore(_x, _y) constructor {
+function GUICompCore() constructor {
 	debug_name = "GUICompCore";
 	
 	#region Public
 		
 		#region Builder Functions
+			
+			#region jsDoc
+			/// @func    set_anchor()
+			/// @desc    Sets the anchor of the component, This anchor will depict how the component is attached to the parent controller when resizing
+			/// @self    GUICompCore
+			/// @param   {Real} x : The x anchor of the component.
+			/// @param   {Real} y : The y anchor of the component.
+			/// @returns {Struct.GUICompCore}
+			#endregion
+			static set_anchor = function(_x, _y) {
+				self.x_anchor = _x;
+				self.y_anchor = _y;
+				
+				return self;
+			}
+			#region jsDoc
+			/// @func    set_alignment()
+			/// @desc    Sets how the component will anchor to it's parent. Note: Some parent controllers will ignore this value if they see fit.
+			/// @self    GUICompCore
+			/// @param   {Constant.HAlign} halign : Horizontal alignment.
+			/// @param   {Constant.VAlign} valign : Vertical alignment.
+			/// @returns {Struct.GUICompCore}
+			#endregion
+			static set_alignment = function(_halign=fa_center, _valign=fa_middle) {
+				
+				halign = _halign;
+				valign = _valign;
+				
+				return self;
+			}
+			#region jsDoc
+			/// @func    set_position()
+			/// @desc    Sets the position of the component, This position will be reletive to the parent controller and the anchor.
+			/// @self    GUICompCore
+			/// @param   {Real} x : The x of the component.
+			/// @param   {Real} y : The y of the component.
+			/// @returns {Struct.GUICompCore}
+			#endregion
+			static set_position = function(_x, _y) {
+				self.x = _x;
+				self.y = _y;
+				self.__internal_x__ = _x;
+				self.__internal_y__ = _y;
+				
+				if (__position_set__ == false) {
+					__position_set__ = true;
+					self.xprevious = self.x;
+					self.yprevious = self.y;
+					self.xstart = self.x;
+					self.ystart = self.y;
+				}
+				
+				return self;
+			}
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets all default GML object's sprite variables with a given sprite.
@@ -29,7 +83,7 @@ function GUICompCore(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite_angle = function(_angle) {
-				image_angle = _angle;
+				image.angle = _angle;
 			}
 			#region jsDoc
 			/// @func    set_sprite_color()
@@ -39,7 +93,7 @@ function GUICompCore(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite_color = function(_col) {
-				image_blend = _col;
+				image.blend = _col;
 			}
 			#region jsDoc
 			/// @func    set_sprite_alpha()
@@ -49,7 +103,7 @@ function GUICompCore(_x, _y) constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite_alpha = function(_alpha) {
-				image_alpha = _alpha;
+				image.alpha = _alpha;
 			}
 			#region jsDoc
 			/// @func    set_region()
@@ -99,21 +153,6 @@ function GUICompCore(_x, _y) constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func    set_alignment()
-			/// @desc    Sets how the component will anchor to it's parent. Note: Some parent controllers will ignore this value if they see fit.
-			/// @self    GUICompCore
-			/// @param   {Constant.HAlign} halign : Horizontal alignment.
-			/// @param   {Constant.VAlign} valign : Vertical alignment.
-			/// @returns {Struct.GUICompCore}
-			#endregion
-			static set_alignment = function(_halign=fa_center, _valign=fa_middle) {
-				
-				halign = _halign;
-				valign = _valign;
-				
-				return self;
-			}
-			#region jsDoc
 			/// @func    set_width()
 			/// @desc    Sets the width of the component, this is just a short cut for doing `set_region(0, 0, _width, region.get_height())`
 			/// @self    GUICompCore
@@ -137,7 +176,6 @@ function GUICompCore(_x, _y) constructor {
 				
 				return self;
 			}
-			
 			
 		#endregion
 		
@@ -166,14 +204,17 @@ function GUICompCore(_x, _y) constructor {
 			#region GML Variables
 				self.depth = 0;
 				
-				self.x = _x;
-				self.y = _y;
+				self.x = 0;
+				self.y = 0;
 				
-				self.xstart = _x;
-				self.ystart = _y;
+				self.xstart = 0;
+				self.ystart = 0;
 				
-				self.xprevious = _x;
-				self.yprevious = _y;
+				self.xprevious = 0;
+				self.yprevious = 0;
+				
+				self.x_anchor = 0;
+				self.y_anchor = 0;
 				
 				self.sprite = {};
 				self.sprite.index   = -1;
@@ -448,6 +489,11 @@ function GUICompCore(_x, _y) constructor {
 			
 			__priv_event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
 			__priv_event_listener_uid__ = 0 // a unique identifier for event listeners
+			
+			__position_set__ = false;
+			
+			__internal_x__ = 0;
+			__internal_y__ = 0;
 			
 		#endregion
 		

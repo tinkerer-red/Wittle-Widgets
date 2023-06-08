@@ -3,32 +3,6 @@
 #macro GUI_IMAGE_CLICKED 2
 #macro GUI_IMAGE_DISABLED 3
 
-#region jsDoc
-/// @func    __anchor__()
-/// @desc    Defines an anchor for Components to make use of when GUI or windows are resized. This will help ensure GUI elements in the top right stay in the top right.
-/// @param   {Real} x : The starting x position of the component
-/// @param   {Real} y : The starting y position of the component
-/// @param   {Constant.HAlign} halign : Horizontal alignment.
-/// @param   {Constant.VAlign} valign : Vertical alignment.
-#endregion
-function __anchor__(_x, _y, _halign=fa_center, _valign=fa_middle) constructor {
-	var _calling_inst = other;
-	var _vecx, _vecy;
-	
-	with (_calling_inst) {
-		_vecx = __get_controller_archor_x__(_halign)
-		_vecy = __get_controller_archor_y__(_valign)
-	}
-	
-	var _xx = _x - (_calling_inst.x+_vecx)
-	var _yy = _y - (_calling_inst.y+_vecy)
-	
-	x = _xx;
-	y = _yy;
-	halign = _halign;
-	valign = _valign;
-}
-
 function __surface_rebuild__(_surface, _w, _h) {
 	if (!is_undefined(_surface))
 	&& (surface_exists(_surface)) {

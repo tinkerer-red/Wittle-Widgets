@@ -29,7 +29,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_value()
 			/// @desc    Sets the value of the slider
@@ -38,13 +37,12 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 			/// @returns {Struct.GUICompSlider}
 			#endregion
 			static set_value = function(_value) {//log(["set_value", set_value])log(["set_value", set_value])
-				__set_value__(_value)
+				__set_value__(_value, true)
 				
 				target_value = value;
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_normalized_value()
 			/// @desc    Sets the value of the slider using a normalized input, The input must be a value between 0 and 1. This is similar to the lerp function.
@@ -59,7 +57,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_clamp_values()
 			/// @desc    Sets the slider's min and max bounds.
@@ -77,7 +74,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_rounding()
 			/// @desc    Sets the rounding of the slider. Good for gathering integers from sliders
@@ -92,7 +88,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_input_enabled()
 			/// @desc    Enable or disable the ability to adjust the slider, typically used for when you wish to make a progress bar so you can disable inputs.
@@ -106,7 +101,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 		
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_tracker()
 			/// @desc    Sets a tracker function. A tracker function is typically used when you wish to edit a slider based off another objects variables. This function should always return the value which the slider will set it's self to.
@@ -120,7 +114,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_vertical()
 			/// @desc    Sets the slider to be vertical, this does not rotate the slider, only how the inputs and drawing are calculated.
@@ -134,7 +127,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_thumb_only_input()
 			/// @desc    Sets the slider to only accept inputs from the thumb. Normally used for when you which to have a scroll bar or lever style input.
@@ -148,7 +140,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    set_target_value()
 			/// @desc    This function will smoothly set the slider's value to a target value.
@@ -183,7 +174,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_sprite()
 				/// @desc    Sets the thumb sprite to be used in the slider component.
@@ -200,7 +190,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_alpha()
 				/// @desc    Sets the alpha value of the thumb sprite in the slider component.
@@ -213,7 +202,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_min_colors()
 				/// @desc    Sets the colors of the thumb sprite when at minimum value in the slider component.
@@ -232,7 +220,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_max_colors()
 				/// @desc    Sets the colors of the thumb sprite when at maximum value in the slider component.
@@ -251,7 +238,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_scales()
 				/// @desc    Sets the scales of the thumb sprite in the slider component.
@@ -270,7 +256,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_thumb_clamped_in_bounds()
 				/// @desc    Sets whether the thumb sprite is clamped within the bounds of the slider component or not. This is usually only used if you are attempting to create a scroll bar
@@ -303,7 +288,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_sprite()
 				/// @desc    Sets the bar to be used in the slider component.
@@ -318,7 +302,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_alpha()
 				/// @desc    Sets the alpha value of the bar sprite in the slider component.
@@ -331,7 +314,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_min_colors()
 				/// @desc    Sets the colors of the bar sprite when at minimum value in the slider component.
@@ -350,7 +332,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_max_colors()
 				/// @desc    Sets the colors of the bar sprite when at maximum value in the slider component.
@@ -369,7 +350,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_margin()
 				/// @desc    Sets the border margins of the bar. This is the distance from the background's border the bar should stay away from.
@@ -385,7 +365,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_bar_auto_fill()
 				/// @desc    Sets whether the bar should automatically fill its background.
@@ -418,7 +397,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_background_sprite()
 				/// @desc    Sets the background to be used in the slider component.
@@ -436,7 +414,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_background_alpha()
 				/// @desc    Sets the alpha value of the background sprite in the slider component.
@@ -449,7 +426,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_background_min_colors()
 				/// @desc    Sets the colors of the background sprite when at minimum value in the slider component.
@@ -468,7 +444,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_background_max_colors()
 				/// @desc    Sets the colors of the background sprite when at maximum value in the slider component.
@@ -504,7 +479,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_alignment()
 				/// @desc    Sets how the text is aligned when drawing
@@ -518,7 +492,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_offsets()
 				/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
@@ -535,7 +508,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_min_colors()
 				/// @desc    Sets the colors of the text sprite when at minimum value in the slider component.
@@ -554,7 +526,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_max_colors()
 				/// @desc    Sets the colors of the text sprite when at maximum value in the slider component.
@@ -573,7 +544,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_font()
 				/// @desc    Sets the font which will be used for drawing the text
@@ -586,7 +556,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_alpha()
 				/// @desc    Sets the alpha for the text.
@@ -599,7 +568,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_to_string()
 				/// @desc    Sets the function which is used to convert the value to a string. The functions input variables are "(value, min, max)". An example function which shows a percentage looks like "function(value, min, max){ return string((value-min_value) / (max_value-min_value)) + "%" }"
@@ -613,7 +581,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_outline_min_colors()
 				/// @desc    Sets the colors of the text outline sprite when at minimum value in the slider component.
@@ -632,7 +599,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_outline_max_colors()
 				/// @desc    Sets the colors of the text outline sprite when at maximum value in the slider component.
@@ -651,7 +617,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_outline_thickness()
 				/// @desc    Sets the outline thickness for the text.
@@ -664,7 +629,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					return self;
 				}
-				
 				#region jsDoc
 				/// @func    set_text_outline_alpha()
 				/// @desc    Sets the alpha for the text outline.
@@ -965,6 +929,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 					//draw bar
 					if (bar.enabled) {
+						__find_slider_bounds__()
 						var _bar_w = (is_vertical)  ? _w : _w * normalized_value
 						var _bar_h = (!is_vertical) ? _h : _h * normalized_value
 					
@@ -1112,6 +1077,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 		
 		#region Functions
 			
+			
 			static __set_value__ = function(_value) {//log(["__set_value__", __set_value__])
 				__prev_value__ = value;
 				
@@ -1122,7 +1088,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				}
 				normalized_value = (value-min_value) / (max_value-min_value);
 				
-				__trigger_event__(self.events.value_input, self.value);
 			}
 			
 			static __set_normalized_value__ = function(_value) {//log(["__set_normalized_value__", __set_normalized_value__])
@@ -1204,9 +1169,11 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					if (target_value != value) {
 						if ( abs(target_value - value) < 0.0025 ) {
 						   __set_value__(target_value);
+							 __trigger_event__(self.events.value_input, self.value);
 						}
 						else {
 							 __set_value__(value + (target_value - value) * 0.175);
+							 __trigger_event__(self.events.value_input, self.value);
 						}
 					}
 					
@@ -1214,7 +1181,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					if (!is_undefined(tracker_func)) {
 						var _tracked_val = tracker_func();
 						//safety check
-						if (GUI_GLOBAL_DEBUG) {
+						if (GUI_GLOBAL_SAFETY) {
 							if (!is_real(_tracked_val)) {
 								show_error("The tracked value returned from the tracker function is not a valid {Real} variable.\nWhen using \"set_tracker\", the applied function must return a {Real}", true);
 							}
@@ -1222,6 +1189,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 						//apply new value
 						if (_tracked_val != value) {
 							set_value(_tracked_val);
+							__trigger_event__(self.events.value_input, self.value);
 						}
 					}
 					

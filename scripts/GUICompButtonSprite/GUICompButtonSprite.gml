@@ -11,6 +11,7 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 	#region Public
 		
 		#region Builder Functions
+			
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets the sprite of the component.
@@ -45,6 +46,7 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 			self.events.mouse_over = "mouse_over";
 			self.events.pressed    = "pressed";
 			self.events.held       = "held";
+			self.events.long_press = "long_press";
 			self.events.released   = "released";
 			
 		#endregion

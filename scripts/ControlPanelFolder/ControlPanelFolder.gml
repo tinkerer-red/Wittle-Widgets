@@ -1,4 +1,4 @@
-function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
+function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
 	
 	#region Public
 		
@@ -7,19 +7,18 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			static set_region = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = max(__checkbox__.sprite.height, font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
 				
 				__SUPER__.set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
-				//__checkbox__.x = -_info.right;
-				//__checkbox__.y = _info.top;
+				__folder__.set_anchor(0, __button__.region.get_height())
 				
 				__scrolling_text__.set_region(
 						0,
 						0,
-						_right  - _info.left - _info.right - __checkbox__.sprite.width,
+						_right  - _info.left - _info.right,
 						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				)
 				
@@ -82,6 +81,34 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 			#endregion
 			
+			#region jsDoc
+			/// @func    add()
+			/// @desc    Add a Component to the folder.
+			/// @self    GUICompFolder
+			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
+			/// @returns {Undefined}
+			#endregion
+			static add = function(_comp) {
+				__folder__.add(_comp)
+				
+				return self;
+			}
+			
+			#region jsDoc
+			/// @func    insert()
+			/// @desc    Inserts a Component into the folder's children array.
+			/// @self    GUICompFolder
+			/// @param   {Real} index : The index (possition) you wish to insert the component into the children array
+			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
+			/// @returns {Undefined}
+			#endregion
+			static insert = function(_comp, _index) {
+				__folder__.insert(_comp, _index)
+				
+				return self;
+			}
+			
+			
 		#endregion
 		
 	#endregion
@@ -94,45 +121,57 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				.set_anchor(0,0)
 				.set_text("")
 				.set_text_alignment(fa_left, fa_top)
-				.set_alignment(fa_left, fa_top)
+				.set_text_offsets(0, 0, 1)
+			
+			__button__.halign = fa_left;
+			__button__.valign = fa_top;
 			
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
-			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
-				.set_anchor(-_info.right, _info.top)
-				.set_alignment(fa_right, fa_top)
-			
-			__checkbox__.x -= __checkbox__.sprite.width
+			__folder__ = new GUICompFolder()
+				.set_anchor(0, __button__.region.get_height())
+				.set_text_alignment(fa_left, fa_top)
+				.set_header_shown(false)
+				.set_open(false)
+				.set_children_offsets(0, 0)
+			__folder__.should_draw_debug = true;
+			__folder__.draw_debug = method(__folder__, function() {
+				draw_set_color(c_yellow)
+				draw_rectangle(
+						x+region.left,
+						y+region.top,
+						x+region.right,
+						y+region.bottom,
+						true
+				);
+			});
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_position(_info.left, 0)
+				.set_anchor(_info.left, _info.top - __button__.text_click_y_off)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
 				.set_scroll_speeds(-2,0)
-				.set_text_alignment(fa_left, fa_middle)
-				.set_alignment(fa_left, fa_middle)
+				.set_text_alignment(fa_left, fa_top)
+				.set_alignment(fa_left, fa_top)
 			
-			
-			add(__button__);
-			add(__checkbox__);
-			add(__scrolling_text__);
+			__SUPER__.add(__button__);
+			__SUPER__.add(__folder__);
+			__SUPER__.add(__scrolling_text__);
 			
 			//set the default size of the component
+			//get the label width
 			var _prev_font = draw_get_font();
 			draw_set_font(__scrolling_text__.text.font);
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
-				
+			
 			var _info = sprite_get_nineslice(__button__.sprite.index)
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = max(
-												font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off,
-												__checkbox__.sprite.height + _info.top + _info.bottom + __button__.text_click_y_off,
-										);
-				
+			var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+			
 			set_region(_left, _top, _right, _bottom);
 			
 		#endregion
@@ -150,18 +189,16 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
 						var _width = floor(window_get_width());
 						if (region.get_width() != _width) {
-							set_width(floor(_width))
+							set_width(_width)
 						}
 					});
 				}
 				
 				//adjust the visuals so all components are simillar
-				__add_event_listener_priv__(self.events.post_update, function(_data) {
-					
-					var _image_index = (is_enabled) ? max(__checkbox__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
+				__add_event_listener_priv__(events.pre_update, function(_data) {
+					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
 					
 					__button__.image.index   = _image_index;
-					__checkbox__.image.index = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
@@ -193,13 +230,9 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				//callback
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
-					__checkbox__.set_value(!__checkbox__.is_checked)
-					callback(__checkbox__.is_checked);
-				});
-				
-				//callback
-				__checkbox__.__add_event_listener_priv__(__checkbox__.events.released, function(_data) {
-					callback(__checkbox__.is_checked);
+					__folder__.is_open = !__folder__.is_open;
+					
+					callback();
 				});
 				
 			#endregion

@@ -68,7 +68,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 			#endregion
 			static set_dropdown_array = function(_strings_array) {
 				//error handler
-				if (GUI_GLOBAL_DEBUG) {
+				if (should_draw_debug) {
 					if (!is_array(_strings_array)) {
 						show_error("Input is not an array.", true)
 					}
@@ -656,7 +656,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 						
 					}
 					
-					if (GUI_GLOBAL_DEBUG) {
+					if (should_draw_debug) {
 						draw_debug(_input);
 					}
 				}
@@ -697,10 +697,10 @@ function GUICompDropdown() : GUICompCore() constructor {
 					
 					//trigger events
 					if (is_open) {
-						__trigger_event__(self.events.opened, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+						__trigger_event__(self.events.opened, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 					}
 					else {
-						__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+						__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 					}
 				}
 			});
@@ -742,14 +742,14 @@ function GUICompDropdown() : GUICompCore() constructor {
 								
 								if (mouse_check_button_pressed(mb_left)) {
 									//trigger events
-									__trigger_event__(self.events.element_pressed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									__trigger_event__(self.events.element_pressed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									
 									elements[_i].image.index = GUI_IMAGE_CLICKED;
 									
 								}
 								else if (mouse_check_button(mb_left)) {
 									//trigger events
-									__trigger_event__(self.events.element_held, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									__trigger_event__(self.events.element_held, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									
 									elements[_i].image.index = GUI_IMAGE_CLICKED;
 									
@@ -762,12 +762,12 @@ function GUICompDropdown() : GUICompCore() constructor {
 									is_open = false;
 									
 									//trigger events
-									__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
-									__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+									__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									if (_changed) {
-										__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+										__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									}
-									__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+									__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									
 								}
 								

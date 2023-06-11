@@ -9,6 +9,7 @@
 function GUICompFolder() : GUICompController() constructor {
 	debug_name = "GUICompFolder";
 	
+	
 	#region Inherited Parents
 		
 		var _btn = new GUICompButtonText()
@@ -46,8 +47,12 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @returns {Struct.GUICompFolder}
 			#endregion
 			static set_open = function(_is_open=true){
-			
-				is_open = _is_open;
+				
+				is_open = !is_open;
+				
+				update_component_positions();
+				__update_controller_region__();
+				
 				
 				return self;
 			}
@@ -190,18 +195,14 @@ function GUICompFolder() : GUICompController() constructor {
 		#region Functions
 			
 			__add_event_listener_priv__(self.events.released, function() {
-				if(!__is_empty__) {
-					is_open = !is_open;
-					
-					if (is_open) {
-						update_component_positions();
-						__trigger_event__(self.events.opened);
-					}
-					else {
-						__trigger_event__(self.events.closed);
-					}
-					
-					__update_controller_region__();
+				set_open(is_open);
+				
+				if (is_open) {
+					update_component_positions();
+					__trigger_event__(self.events.opened);
+				}
+				else {
+					__trigger_event__(self.events.closed);
 				}
 			})
 			
@@ -306,7 +307,7 @@ function GUICompFolder() : GUICompController() constructor {
 						draw_gui(__user_input__);
 					}
 					
-					if (GUI_GLOBAL_DEBUG) {
+					if (should_draw_debug) {
 						draw_set_color(c_red)
 						draw_rectangle(
 							x+__controller_region__.left,
@@ -368,7 +369,7 @@ function GUICompFolder() : GUICompController() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (GUI_GLOBAL_DEBUG) {
+					if (should_draw_debug) {
 						draw_debug();
 					}
 				}

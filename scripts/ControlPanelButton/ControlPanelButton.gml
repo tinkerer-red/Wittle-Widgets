@@ -5,11 +5,11 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 		#region Builder functions
 			
 			static set_region = function(_left, _top, _right, _bottom) {
-				__SUPER__.set_region(_left, _top, _right, _bottom)
-				
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
 				_bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+				
+				__SUPER__.set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -105,9 +105,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
 				.set_scroll_speeds(-2,0)
-			
-			__scrolling_text__.halign = fa_left;
-			__scrolling_text__.valign = fa_top;
+				.set_text_alignment(fa_left, fa_top)
+				.set_alignment(fa_left, fa_top)
 			
 			add(__button__);
 			add(__scrolling_text__);

@@ -592,7 +592,7 @@ function GUICompRegion() : GUICompController() constructor {
 				xprevious = x;
 				yprevious = y;
 				
-				if (GUI_GLOBAL_DEBUG) {
+				if (should_draw_debug) {
 					draw_debug();
 				}
 				

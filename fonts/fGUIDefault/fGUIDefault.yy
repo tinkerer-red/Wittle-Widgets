@@ -112,15 +112,15 @@
     "9647": {"character":9647,"h":17,"offset":3,"shift":16,"w":9,"x":160,"y":59,},
   },
   "hinting": 0,
-  "includeTTF": false,
+  "includeTTF": true,
   "interpreter": 0,
   "italic": false,
   "kerningPairs": [],
   "last": 0,
   "maintainGms1Font": false,
   "parent": {
-    "name": "Reds GUI",
-    "path": "folders/_Libraries/Reds GUI.yy",
+    "name": "Assets",
+    "path": "folders/_Libraries/Reds GUI/Assets.yy",
   },
   "pointRounding": 0,
   "ranges": [
@@ -135,5 +135,5 @@
     "name": "Default",
     "path": "texturegroups/Default",
   },
-  "TTFName": "",
+  "TTFName": "${project_dir}\\fonts\\fGUIDefault\\RedsFont.ttf",
 }

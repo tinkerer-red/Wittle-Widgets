@@ -7,6 +7,7 @@
 #endregion
 function GUICompCore() constructor {
 	debug_name = "GUICompCore";
+	should_draw_debug = GUI_GLOBAL_DEBUG;
 	
 	#region Public
 		
@@ -495,6 +496,8 @@ function GUICompCore() constructor {
 			__internal_x__ = 0;
 			__internal_y__ = 0;
 			
+			__click_held_timer__ = 0;
+			
 		#endregion
 		
 		#region Functions
@@ -573,7 +576,7 @@ function GUICompCore() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (GUI_GLOBAL_DEBUG) {
+					if (should_draw_debug) {
 						draw_debug();
 					}
 				}
@@ -997,14 +1000,23 @@ function GUICompCore() constructor {
 					if (mouse_check_button_pressed(mb_left)) {
 						__is_on_focus__ = true;
 						image.index = GUI_IMAGE_CLICKED;
+						__click_held_timer__ = 0;
 						__trigger_event__(self.events.pressed);
 					}
 					else if (__is_on_focus__) && (mouse_check_button(mb_left)) {
 						image.index = GUI_IMAGE_CLICKED;
 						__trigger_event__(self.events.held);
+						
+						
+						__click_held_timer__ += 1;
+						if (__click_held_timer__ > game_get_speed(gamespeed_fps)/3)
+						&& (__click_held_timer__  % floor(game_get_speed(gamespeed_fps)/30) == 0) {
+							__trigger_event__(self.events.long_press);
+						}
 					}
 					else if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
 						__reset_focus__();
+						__click_held_timer__ = 0;
 						image.index = GUI_IMAGE_HOVER;
 						__trigger_event__(self.events.released);
 					}

@@ -9,11 +9,12 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 		#region Builder functions
 			
 			static set_region = function(_left, _top, _right, _bottom) {
-				__SUPER__.set_region(_left, _top, _right, _bottom)
-				
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
 				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
+				
+				__SUPER__.set_region(_left, _top, _right, _bottom)
+				
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -162,7 +163,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width()/4);
+						var _width = floor(window_get_width());
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}
@@ -218,13 +219,12 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 						}
 					}
 					
-					//callback(__dropdown__.is_checked);
 				});
 				
 				//callback
 				__dropdown__.__add_event_listener_priv__(__dropdown__.events.changed, function(_data) {
-					callback(_data.index); //for use with the index as input
-					//callback(_data.element); //for use with the string as input
+					//callback(_data.index); //for use with the index as input
+					callback(_data.index, _data.element); //for use with the string as input
 				});
 				
 				__dropdown__.__add_event_listener_priv__(__dropdown__.events.released, function(_data) {

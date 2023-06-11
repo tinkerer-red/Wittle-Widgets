@@ -217,10 +217,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 				else {
 					__allowed_char__ = {};
 					__char_enforcement_defined__ = true;
-					var _i=1; repeat(string_length(_allowed_char)) {
-						__allowed_char__[$ string_copy(_allowed_char, _i, 1)] = true;
-					_i+=1;}
-					
+					string_foreach(_allowed_char, function(_char, _pos) {
+						__allowed_char__[$ _char] = true;
+					})
 				}
 				
 				return self;
@@ -461,11 +460,11 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 				highlight_region_color: /*#*/0xD8680A, //the color of the selection box when highlighting
 				text_background_color: /*#*/0x3F3936, //the background rectangle
 				text_background_alpha : 1,
-				scrollbar_visible: true, //if the scrollbar should be drawn
-				x_start : _x,					// x start
-				y_start : _y,					// y start
-				width : 0,			// draw width
-				height : 0,			// draw height
+				//scrollbar_visible: true, //if the scrollbar should be drawn
+				//x_start : 0,					// x start
+				//y_start : 0,					// y start
+				//width : 0,			// draw width
+				//height : 0,			// draw height
 				line_height : font_get_info(fGUIDefault).size,			// line height
 				scroll_width : 4,			// scrollbar width
 				scroll_height : 0,		// scrollbar height
@@ -525,9 +524,6 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 				page_up : vk_pageup,
 				page_down : vk_pagedown,
 			}
-			
-			x = _x;
-			y = _y;
 			
 			//font = fGUIDefault;
 			is_disabled = false;
@@ -1020,9 +1016,11 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 						#endregion
 					
 					}
-				
-					__SUPER__.__step__(_input);
-				
+					
+					if (curt.multiline) {
+						__SUPER__.__step__(_input);
+					}
+					
 					if (_mouse_on_comp) {
 						capture_input();
 					}
@@ -1035,6 +1033,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 						#region escape
 				
 							if (keyboard_check_pressed(keys.escape))
+							|| (!curt.multiline && keyboard_check_pressed(keys.enter))
 							|| (!curt.shift_only_new_line && curt.no_wrap && keyboard_check_pressed(keys.enter))
 							|| (curt.shift_only_new_line && keyboard_check_pressed(keys.enter) && !keyboard_check(keys.shift)) {
 								var _text = __textbox_lines_to_text__(curt.lines);
@@ -1479,9 +1478,11 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 				
 				
 					// Updates surfaces. (Surfaces are needed to allow for custom text selection coloring, and to only show certain parts of the whole text when it's too long. Might in some cases be faster as well.)
-					var _texfilter_previous = gpu_get_texfilter();
-					gpu_set_texfilter(true);
-				
+					//var _texfilter_previous = gpu_get_texfilter();
+					//gpu_set_texfilter(true);
+					
+					__shader_set__();
+					
 					var _start_x = x;
 					var _start_y = y;
 					var _draw_width = get_coverage_width();
@@ -1524,7 +1525,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 							if (_line_count == 1 && _arr_lines[0] == "") {
 								//draw the place holder text
 								draw_set_alpha(0.6);
-								draw_text(_draw_x-_x_off, _draw_y+_center_y, curt.placeholder);
+								draw_text(_draw_x-_x_off, _draw_y-_center_y, curt.placeholder);
 								draw_set_alpha(1);
 							}
 							else {
@@ -1562,7 +1563,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 							
 								repeat (_displayed_lines_length) {
 									_text = _arr_lines[_displayed_lines_index];
-									_derivative_y = _displayed_lines_index * _line_height - _y_off + _center_y;
+									_derivative_y = _displayed_lines_index * _line_height - _y_off - _center_y;
 								
 									if (_select > -1)
 									&& (_displayed_lines_index >= _select_line_start)
@@ -1621,12 +1622,13 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 							&& (is_enabled) {
 								var _cursor_xoff = (__using_cached_drawing__) ? -x : 0
 								var _cursor_yoff = (__using_cached_drawing__) ? -y : 0
-							
+								var _y_offset = -(_center_y+_center_y);
+								
 								draw_sprite_stretched_ext(
 										s9GUIPixel,
 										0,
 										_cursor_xoff + get_cursor_x_pos(),
-										_cursor_yoff + get_cursor_y_pos(),
+										_cursor_yoff + get_cursor_y_pos() + _y_offset,
 										get_cursor_width(),
 										get_cursor_height(),
 										draw.highlight_region_color,
@@ -1648,14 +1650,20 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					
 						__draw_component_surface__();
 					}
-				
-				
-					if (!_texfilter_previous) gpu_set_texfilter(_texfilter_previous);
-				
-				
-					__SUPER__.__draw_gui__(_input);
-				
-					draw_debug();
+					
+					__shader_reset__();
+					
+					//if (!_texfilter_previous) {
+					//	gpu_set_texfilter(_texfilter_previous);
+					//}
+					
+					if (curt.multiline) {
+						__SUPER__.__draw_gui__(_input);
+					}
+					
+					if (should_draw_debug) {
+						draw_debug();
+					}
 				}
 				
 			#endregion

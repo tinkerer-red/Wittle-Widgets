@@ -186,6 +186,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			text.alpha = 1;
 			text.x_off = 0;
 			text.y_off = 0;
+			text.halign = fa_left;
+			text.valign = fa_top;
 			
 			scroll = {};
 			scroll.y_off = 0;
@@ -257,27 +259,36 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			
 			static draw_debug = function(_input) {
 				
+				draw_line(x-2,y,x+2,y)
+				draw_line(x,y-2,x,y+2)
 				
-				
-				draw_line(x, y, x+scroll.x_off, y+scroll.y_off);
-				draw_text(x,y,string(scroll.x_off)+"\n"+string(scroll.y_off));
-				draw_rectangle(x, y, x+region.get_width(), y+region.get_height(), true);
 				draw_rectangle(
-						x+scroll.x_off,
-						y+scroll.y_off,
-						x+scroll.x_off+text.width,
-						y+scroll.y_off+text.height,
+						x+region.left,
+						y+region.top,
+						x+region.right,
+						y+region.bottom,
 						true
 				);
 				
-				draw_set_color(c_yellow)
-				draw_rectangle(
-						x+clip_region.left,
-						y+clip_region.top,
-						x+clip_region.right,
-						y+clip_region.bottom,
-						true
-				);
+				//draw_line(x, y, x+scroll.x_off, y+scroll.y_off);
+				//draw_text(x,y,string(scroll.x_off)+"\n"+string(scroll.y_off));
+				//draw_rectangle(x, y, x+region.get_width(), y+region.get_height(), true);
+				//draw_rectangle(
+				//		x+scroll.x_off,
+				//		y+scroll.y_off,
+				//		x+scroll.x_off+text.width,
+				//		y+scroll.y_off+text.height,
+				//		true
+				//);
+				//
+				//draw_set_color(c_yellow)
+				//draw_rectangle(
+				//		x+clip_region.left,
+				//		y+clip_region.top,
+				//		x+clip_region.right,
+				//		y+clip_region.bottom,
+				//		true
+				//);
 				
 			}
 			
@@ -386,7 +397,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				xprevious = x;
 				yprevious = y;
 				
-				if (GUI_GLOBAL_DEBUG) {
+				if (should_draw_debug) {
 					draw_debug(_input);
 				}
 				

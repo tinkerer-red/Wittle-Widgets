@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Checkbox",
-    "path": "folders/_Libraries/Reds GUI/Sprites/Checkbox.yy",
+    "path": "folders/_Libraries/Reds GUI/Assets/Checkbox.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

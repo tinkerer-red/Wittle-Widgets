@@ -1,4 +1,8 @@
-function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
+function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompController(0, 0) constructor {
+	
+	draw_debug = function(){
+		
+	}
 	
 	#region Public
 		
@@ -7,19 +11,21 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			static set_region = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = max(__checkbox__.sprite.height, font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text_click_y_off;
 				
 				__SUPER__.set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
-				//__checkbox__.x = -_info.right;
-				//__checkbox__.y = _info.top;
+				var _width = _right - _info.left - _info.right;
+				
+				__textbox__.set_width(_width*0.5)
+				__textbox__.set_position(-_width*0.5, 0)
 				
 				__scrolling_text__.set_region(
 						0,
 						0,
-						_right  - _info.left - _info.right - __checkbox__.sprite.width,
+						_width*0.5 - _info.right,
 						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				)
 				
@@ -65,6 +71,15 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				return self;
 			}
+			static set_value = function(_str) {
+				_str = string_replace_all(_str, "\n", "\\n")
+				_str = string_replace_all(_str, "\t", "\\t")
+				_str = string_replace_all(_str, "\r", "\\r")
+				
+				__textbox__.set_text(_str)
+				
+				return self;
+			}
 			
 		#endregion
 		
@@ -73,6 +88,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			halign = fa_left
 			valign = fa_top;
 			callback = _func;
+			is_open = false;
 			
 		#endregion
 		
@@ -81,6 +97,17 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			#region GML Events
 				
 			#endregion
+			
+			static get_value = function() {
+				var _str = __textbox__.get_text()
+				_str = string_replace_all(_str, "\\\\", "<__DOUBLE_BACKSLASH__>")
+				_str = string_replace_all(_str, "\\n", "\n")
+				_str = string_replace_all(_str, "\\t", "\t")
+				_str = string_replace_all(_str, "\\r", "\r")
+				_str = string_replace_all(_str, "<__DOUBLE_BACKSLASH__>", "\\")
+				
+				return _str;
+			}
 			
 		#endregion
 		
@@ -98,14 +125,29 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
-			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
+			var _ideal_h = font_get_info(__CP_FONT).size + _info.top + _info.bottom;
+			
+			__button__.set_region(0,0,0,_ideal_h)
+			
+			__textbox__ = new GUICompTextRegion()
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
+				.set_text_placeholder("String...")
+				.set_region(0, 0, 0, _ideal_h)
+				.set_scrollbar_sizes(0, 0)
+				.set_text_font(__CP_FONT)
+				.set_text_color(c_white)
+				.set_background_color(#1E2F4A)
+				.set_max_length(20)
+				.set_char_enforcement()
+				.set_multiline(false)
+				.set_accepting_inputs(true)
 			
-			__checkbox__.x -= __checkbox__.sprite.width
+			set_value(string(_str))
+			__textbox__.set_position(0, 0)
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_position(_info.left, 0)
+				.set_anchor(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -113,26 +155,33 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			
 			add(__button__);
-			add(__checkbox__);
+			add(__textbox__);
 			add(__scrolling_text__);
 			
+			draw_debug = function() {
+				draw_rectangle(
+						x+region.left,
+						y+region.top,
+						x+region.right,
+						y+region.bottom,
+						true
+				);
+			}
+			
 			//set the default size of the component
+			//get the label width
 			var _prev_font = draw_get_font();
 			draw_set_font(__scrolling_text__.text.font);
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
-				
+			
 			var _info = sprite_get_nineslice(__button__.sprite.index)
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = max(
-												font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off,
-												__checkbox__.sprite.height + _info.top + _info.bottom + __button__.text_click_y_off,
-										);
-				
+			var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+			
 			set_region(_left, _top, _right, _bottom);
 			
 		#endregion
@@ -148,9 +197,9 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width());
+						var _width = floor(window_get_width()/4);
 						if (region.get_width() != _width) {
-							set_width(floor(_width))
+							set_width(_width)
 						}
 					});
 				}
@@ -158,10 +207,10 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				//adjust the visuals so all components are simillar
 				__add_event_listener_priv__(self.events.post_update, function(_data) {
 					
-					var _image_index = (is_enabled) ? max(__checkbox__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
+					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
+					_image_index = max(_image_index, __textbox__.__is_on_focus__)
 					
 					__button__.image.index   = _image_index;
-					__checkbox__.image.index = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
@@ -191,15 +240,28 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 					
 				});
 				
-				//callback
+				//set the focus to the textbox
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
-					__checkbox__.set_value(!__checkbox__.is_checked)
-					callback(__checkbox__.is_checked);
+					log("button pressed")
+					with (__textbox__) {
+						__is_on_focus__ = true;
+						
+						var _line_last = curt.length - 1;
+						var _line_last_length = string_length(curt.lines[_line_last]);
+						if (_line_last < 1 && _line_last_length < 1) break;
+						curt.select_line = 0;
+						curt.select = 0;
+						set_cursor_y_pos(_line_last);
+						set_cursor_x_pos(_line_last_length);
+					}
+					
+					//callback(__textbox__.is_checked);
 				});
 				
 				//callback
-				__checkbox__.__add_event_listener_priv__(__checkbox__.events.released, function(_data) {
-					callback(__checkbox__.is_checked);
+				__textbox__.__add_event_listener_priv__(__textbox__.events.submit, function(_str) {
+					callback(get_value(_str)); //for use with the index as input
+					//callback(_data.element); //for use with the string as input
 				});
 				
 			#endregion

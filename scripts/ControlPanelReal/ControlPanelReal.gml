@@ -19,11 +19,13 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				
 				var _width = _right  - _info.left - _info.right - __textbox__.region.get_width();
 				
+				
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
 						0,
-						0,
+						-_scroll_text_height*0.5,
 						_width - _info.right,
-						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
+						_scroll_text_height*0.5
 				)
 				
 				return self
@@ -186,7 +188,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width()/4);
+						var _width = floor(window_get_width());
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}

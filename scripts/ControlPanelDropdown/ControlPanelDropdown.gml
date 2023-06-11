@@ -28,11 +28,13 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				
 				__dropdown__.set_position(-__dropdown__.region.get_width(), 0)
 				
+				
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
 						0,
-						0,
+						-_scroll_text_height*0.5,
 						_right  - _info.left - _info.right - __dropdown__.region.get_width(),
-						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
+						_scroll_text_height*0.5
 				)
 				
 				return self

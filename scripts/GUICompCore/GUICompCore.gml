@@ -178,6 +178,12 @@ function GUICompCore() constructor {
 				return self;
 			}
 			
+			static set_debug_drawing = function(_bool) {
+				should_draw_debug = _bool;
+				
+				return self;
+			}
+			
 		#endregion
 		
 		#region Events

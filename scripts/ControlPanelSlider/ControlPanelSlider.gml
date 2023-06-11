@@ -21,11 +21,13 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
+				
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
 						0,
-						0,
+						-_scroll_text_height*0.5,
 						floor(_right*0.5) - _info.right,
-						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
+						_scroll_text_height*0.5
 				)
 				
 				var _width = floor(_right*0.5) - _info.left - _info.right - __button_inc__.region.get_width() - __button_dec__.region.get_width()

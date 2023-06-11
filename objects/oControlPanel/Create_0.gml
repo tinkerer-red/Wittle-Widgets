@@ -5,6 +5,7 @@ event_user(15);
 
 var _folder = new ControlPanelFolder("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(){log("Folder")})
 	var _folder2 = new ControlPanelFolder("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(){log("Folder")})
+		.set_debug_drawing(true)
 		var _button = new ControlPanelButton("Button", function(){log("Button")})
 		_folder2.add(_button)
 	_folder.add(_folder2)
@@ -14,6 +15,8 @@ var _button = new ControlPanelButton("Button", function(){log("Button")})
 _folder.add(_button)
 
 var _checkbox = new ControlPanelCheckbox("Checkbox", function(_bool){log(["Checkbox", _bool])})
+//	.set_debug_drawing(true)
+//_checkbox.should_draw_debug = true;
 _folder.add(_checkbox)
 
 var _dropdown = new ControlPanelDropdown("Dropdown", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
@@ -22,7 +25,7 @@ _folder.add(_dropdown)
 var _real = new ControlPanelReal("Real", 50, function(_real){log(["Real", _real])})
 _folder.add(_real)
 
-var _string = new ControlPanelString("String", "This is a \ntest", function(_bool){log(["String", _bool])})
+var _string = new ControlPanelString("String", "This is a test", function(_bool){log(["String", _bool])})
 _folder.add(_string)
 
 var _slider = new ControlPanelSlider("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", 0.25, -10, 10, function(_bool){log(["Working", _bool])})

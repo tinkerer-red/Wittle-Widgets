@@ -15,11 +15,12 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				
 				__folder__.set_anchor(0, __button__.region.get_height())
 				
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
 						0,
-						0,
+						-_scroll_text_height*0.5,
 						_right  - _info.left - _info.right,
-						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
+						_scroll_text_height*0.5
 				)
 				
 				return self
@@ -134,7 +135,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_header_shown(false)
 				.set_open(false)
 				.set_children_offsets(0, 0)
-			__folder__.should_draw_debug = true;
+			__folder__.should_draw_debug = false;
 			__folder__.draw_debug = method(__folder__, function() {
 				draw_set_color(c_yellow)
 				draw_rectangle(
@@ -230,7 +231,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				
 				//callback
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
-					__folder__.is_open = !__folder__.is_open;
+					__folder__.set_open(!__folder__.is_open)
 					
 					callback();
 				});

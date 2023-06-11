@@ -150,6 +150,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				text.halign = _h;
 				text.valign = _v;
 				
+				
+				
 				__update_clip_region__()
 				
 				return self;

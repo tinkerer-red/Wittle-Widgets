@@ -15,12 +15,12 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				//__checkbox__.x = -_info.right;
 				//__checkbox__.y = _info.top;
-				
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				__scrolling_text__.set_region(
 						0,
-						0,
+						-_scroll_text_height*0.5,
 						_right  - _info.left - _info.right - __checkbox__.sprite.width,
-						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
+						_scroll_text_height*0.5
 				)
 				
 				return self
@@ -62,6 +62,15 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			#endregion
 			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
 				__button__.set_text_colors(_idle_text_color, _hover_text_color, _disable_text_color)
+				
+				return self;
+			}
+			
+			static set_debug_drawing = function(_bool) {
+				should_draw_debug = _bool;
+				__button__.should_draw_debug = _bool;
+				__checkbox__.should_draw_debug = _bool;
+				__scrolling_text__.should_draw_debug = _bool;
 				
 				return self;
 			}

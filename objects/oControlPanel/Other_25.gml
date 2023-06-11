@@ -26,6 +26,11 @@ cc.__add_event_listener_priv__(cc.events.pre_update, function(_data) {
 	var _width = get_current_width();
 	var _height = get_current_height();
 	
+	if (_width <= 0)
+	|| (_height <= 0) {
+		return
+	}
+	
 	if (camera_get_view_width(0) != _width)
 	|| (camera_get_view_height(0) != _height) {
 		//resize the browser's window

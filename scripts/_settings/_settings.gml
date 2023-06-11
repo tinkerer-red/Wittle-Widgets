@@ -8,6 +8,11 @@ if (__SETTINGS_AUTO_SCALE) {
 		var _width = get_current_width();
 		var _height = get_current_height();
 		
+		if (_width <= 0)
+		|| (_height <= 0) {
+			return
+		}
+		
 		if (camera_get_view_width(0) != _width)
 		|| (camera_get_view_height(0) != _height) {
 			//resize the browser's window
@@ -16,6 +21,8 @@ if (__SETTINGS_AUTO_SCALE) {
 			}
 			
 			camera_set_view_size(view_camera[0], _width, _height);
+			log(["_width", _width])
+			log(["_height", _height])
 			surface_resize(application_surface, _width, _height);
 		}
 		

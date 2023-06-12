@@ -360,6 +360,11 @@ function GUICompScrollBar() : GUICompController() constructor {
 						x+region.right,
 						y+region.bottom
 				)
+				
+				if (__mouse_on_cc__) {
+					__trigger_event__(self.events.on_hover);
+				}
+				
 				return __mouse_on_cc__;
 			}
 			

@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "DropDown",
-    "path": "folders/_Libraries/Reds GUI/Assets/DropDown.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets/DropDown.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

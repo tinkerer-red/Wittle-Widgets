@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "_system",
-    "path": "folders/_Libraries/Reds GUI/_Components/_system.yy",
+    "path": "folders/_Libraries/Wittle Widgets/_Components/_system.yy",
   },
 }

@@ -178,7 +178,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_bar_min_colors(#4296FA, #4296FA, #4296FA, #4296FA)
 				.set_bar_max_colors(#4296FA, #4296FA, #4296FA, #4296FA)
 			
-			__textbox__ = new GUICompTextRegion()
+			__textbox__ = new GUICompTextbox()
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("Value...")
@@ -297,6 +297,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 					log("button pressed")
 					with (__textbox__) {
 						__is_on_focus__ = true;
+						__trigger_event__(self.events.on_focus);
 						
 						var _line_last = curt.length - 1;
 						var _line_last_length = string_length(curt.lines[_line_last]);

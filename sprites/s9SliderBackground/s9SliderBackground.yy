@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Slider",
-    "path": "folders/_Libraries/Reds GUI/Assets/Slider.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets/Slider.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

@@ -49,7 +49,7 @@
   "origin": 0,
   "parent": {
     "name": "_Other",
-    "path": "folders/_Libraries/Reds GUI/Assets/_Other.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets/_Other.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

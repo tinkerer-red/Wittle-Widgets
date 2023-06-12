@@ -5,7 +5,7 @@
   "isCompatibility": false,
   "isDnD": false,
   "parent": {
-    "name": "Reds GUI",
-    "path": "folders/_Libraries/Reds GUI.yy",
+    "name": "Wittle Widgets",
+    "path": "folders/_Libraries/Wittle Widgets.yy",
   },
 }

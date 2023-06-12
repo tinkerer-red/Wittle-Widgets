@@ -1,11 +1,12 @@
 #region jsDoc
-/// @func    GUICompTextRegion()
+/// @func    GUICompTextbox()
 /// @desc    Creates a text input component
 /// @param   {Real} x : The x position of the component on screen.
 /// @param   {Real} y : The y position of the component on screen.
-/// @return {Struct.GUICompTextRegion}
+/// @return {Struct.GUICompTextbox}
 #endregion
-function GUICompTextRegion() : GUICompRegion() constructor {
+function GUICompTextbox() : GUICompRegion() constructor {
+	debug_name = "GUICompTextbox";
 	
 	#region Public
 		
@@ -29,9 +30,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_enabled()
 			/// @desc    Enable or Disable the Component, This usually effects how some components are handled
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Bool} is_enabled : If the component should be enabled or not.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_enabled = function(_enabled) {//log(["set_enabled", set_enabled]);
 				if(_enabled) {
@@ -49,9 +50,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_text_placeholder()
 			/// @desc    Sets the display text to draw when no user input text has been entered. This text is not selectable, if you would like to have selectable text your self then use "set_text()".
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {String} str : The text to populate an empty text region
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_placeholder = function(_placeholder="Enter Text") {//log(["set_text_placeholder", set_text_placeholder]);
 				log_func();
@@ -62,9 +63,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_text()
 			/// @desc    Sets the string inside the text box. This text will be selectable by the user, if you wish to have not selectable text use "set_text_placeholder()".
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {String} str : The text to write on the button
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text = function(_text="") {//log(["set_text", set_text]);
 				clear_text();
@@ -75,9 +76,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_text_font()
 			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Asset.GMFont} font : The font to use when drawing the text
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_font = function(_font=fGUIDefault) {//log(["set_text_font", set_text_font]);
 				draw.font = _font;								// font
@@ -95,9 +96,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_font_color()
 			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Constant.Colour} font : The font to use when drawing the text
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_color = function(_color=#D9D9D9) {//log(["set_text_color", set_text_color]);
 				draw.font_color = _color;					// font color
@@ -107,9 +108,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_text_line_height()
 			/// @desc    Sets the height for lines of text. setting this to -1 will make the height auto addapt to the currently used font. So be sure to call this after you 
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} height : The height of the courser and line spaces, this included the font, usually best as font height.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_line_height = function(_height=-1) {//log(["set_text_line_height", set_text_line_height]);
 				__line_height_defined__ = true;
@@ -120,10 +121,10 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_text_offsets()
 			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} xoff : The x offset of the text from the start of a line.
 			/// @param   {Real} yoff : The y offset of the text from the start of a line.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_offsets = function(_x_off=0, _y_off=1) {//log(["set_text_offsets", set_text_offsets]);
 				scroll.x_off = _x_off;
@@ -134,9 +135,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_highlight_color()
 			/// @desc    Sets the colors of the box which surrounds the highlighted selection.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Constant.Colour} color : The highlight color
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_highlight_color = function(_color=#0A68D8) {//log(["set_highlight_color", set_highlight_color]);
 				draw.highlight_region_color = _color;
@@ -146,9 +147,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_background_color()
 			/// @desc    Sets the color of the background.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Constant.Colour} color : The highlight color
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_background_color = function(_color=#363F39) {//log(["set_background_color", set_background_color]);
 				draw.text_background_color = _color;
@@ -158,9 +159,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_background_alpha()
 			/// @desc    Sets the alpha of the background.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Constant.Colour} color : The highlight color
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_background_alpha = function(_color=#363F39) {//log(["set_background_alpha", set_background_alpha]);
 				draw.text_background_alpha = _color;
@@ -170,9 +171,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_max_length()
 			/// @desc    Sets the max character limit.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} max_length : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_max_length = function(_max_length=infinity) {//log(["set_max_length", set_max_length]);
 				if (should_safety_check) {
@@ -187,9 +188,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_records_limit()
 			/// @desc    Sets how many undo and redo the component will remember. This is really only used if you are having memory issues with your game.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_records_limit = function(_memory_limit=64) {//log(["set_records_limit", set_records_limit]);
 				if (should_safety_check) {
@@ -204,9 +205,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_char_enforcement()
 			/// @desc    Set what characters the textbox should allow. You can either input a string of allowed characters for input boxes like passwords, or leaving the argument empty will generage the characters from the current font.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_char_enforcement = function(_allowed_char=undefined) {//log(["set_char_enforcement", set_char_enforcement]);
 				
@@ -226,9 +227,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_multiline()
 			/// @desc    Set the textbox to accept line breaks from user input.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Bool} multiline : If the textbox allows the inputting of "\n"
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_multiline = function(_multiline=true) {//log(["set_multiline", set_multiline]);
 				curt.multiline = _multiline;
@@ -240,9 +241,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_force_wrapping()
 			/// @desc    Sets the textbox to break to a new line when reaching the width. This will still enforce new lines even for single line text boxes.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Bool} memory_limit : If the text box will break to a new line when reaching the width.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_force_wrapping = function(_force_wrapping=true) {//log(["set_force_wrapping", set_force_wrapping]);
 				curt.adaptive_width = _force_wrapping;
@@ -254,9 +255,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_shift_only_new_line()
 			/// @desc    Set the text box to only accept new line breaks when you press shift. This is commonly used for when you wish to take advantage of the "submit" event when hiting enter.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Bool} memory_limit : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_shift_only_new_line = function(_shift_only_nl=true) {//log(["set_shift_only_new_line", set_shift_only_new_line]);
 				curt.shift_only_new_line = _shift_only_nl;
@@ -268,9 +269,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_accepting_inputs()
 			/// @desc    Enables of disabled the ability for user input. Setting this to false will still allow highlighting, and copying of text, but will not allow text to be input from the user. Usually used for when we just want to draw selectable text.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Bool} accepting_inputs : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_accepting_inputs = function(_bool=true) {//log(["set_accepting_inputs", set_accepting_inputs]);
 				curt.accepting_inputs = _bool;
@@ -280,9 +281,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_copy_override()
 			/// @desc    Used to override what the default copy function will return.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Function} func : The return of this function will be what gets copied into the user's clipboard.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_copy_override = function(_func) {//log(["set_copy_override", set_copy_override]);
 				copy_function = _func;
@@ -292,9 +293,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_paste_override()
 			/// @desc    Used to override what the default paste function will return.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Function} func : The return of this function will be what gets pasted into the user's clipboard.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_paste_override = function(_func) {//log(["set_paste_override", set_paste_override]);
 				paste_function = _func;
@@ -304,9 +305,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_cursor_x_pos()
 			/// @desc    Sets the x position of the cursor on the current line, a value of `0` will indicate the furthest left, and a value of `1` will place the cursor on the right of the first letter in the line's string.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} xpos : The x position of the cursor
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_cursor_x_pos = function(_x_pos) {//log(["set_cursor_x_pos", set_cursor_x_pos]);
 				if (_x_pos == curt.cursor) {
@@ -327,9 +328,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			///          NOTE:
 			///
 			///          This value corrilates to the line the cursor will be on and not the y position in the world. If you wish to set the cursor's location with coordinates use 
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} ypos : The y position of the cursor.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_cursor_y_pos = function(_y_pos) {//log(["set_cursor_y_pos", set_cursor_y_pos]);
 				if (_y_pos == curt.current_line) {
@@ -346,10 +347,10 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_cursor_gui_loc()
 			/// @desc    Sets the cursor position of the cursor based on the GUI x/y position supplied.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} xpos : The x position of the cursor.
 			/// @param   {Real} ypos : The y position of the cursor.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_cursor_gui_loc = function(_x, _y) {//log(["set_cursor_gui_loc", set_cursor_gui_loc]);
 				draw_set_font(draw.font);
@@ -413,9 +414,9 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    set_cursor_width()
 			/// @desc    Sets the cursor's width. This is usually used if you're manipulating you're GUI resolution and would like to increase the visibility of the cursor.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @param   {Real} width : The width of the cursor.
-			/// @returns {Struct.GUICompTextRegion}
+			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_cursor_width = function(_width) {
 				draw.cursor_width = _width
@@ -534,7 +535,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_text()
 			/// @desc    Returns the text from the textbox
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {String}
 			#endregion
 			static get_text = function() {//log(["get_text", get_text]);
@@ -543,7 +544,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    clear_text()
 			/// @desc    Clear the text from the text box.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Undefined}
 			#endregion
 			static clear_text = function() {//log(["clear_text", clear_text]);
@@ -559,7 +560,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_coverage_width()
 			/// @desc    Get the coverage width of the textbox. This is the view width as displayed on the gui
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_coverage_width = function() {//log(["get_coverage_width", get_coverage_width]);
@@ -573,7 +574,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_coverage_height()
 			/// @desc    Get the coverage height of the textbox. This is the view height as displayed on the gui
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_coverage_height = function() {//log(["get_coverage_height", get_coverage_height]);
@@ -587,7 +588,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_canvas_width()
 			/// @desc    Get the canvas width of the textbox. This is the width of the underlying region where text can be drawn.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_canvas_width = function() {//log(["get_canvas_width", get_canvas_width]);
@@ -609,7 +610,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_canvas_height()
 			/// @desc    Get the canvas height of the textbox. This is the height of the underlying region where text can be drawn.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_canvas_height = function() {//log(["get_canvas_height", get_canvas_height]);
@@ -618,7 +619,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_cursor_x_pos()
 			/// @desc    Get cursor's x position in the GUI
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_cursor_x_pos = function() {//log(["get_cursor_x_pos", get_cursor_x_pos]);
@@ -628,7 +629,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_cursor_y_pos()
 			/// @desc    Get cursor's y position in the GUI
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_cursor_y_pos = function() {//log(["get_cursor_y_pos", get_cursor_y_pos]);
@@ -639,7 +640,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_cursor_width()
 			/// @desc    Get cursor's width. This is directly related to the line width.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_cursor_width = function() {//log(["get_cursor_width", get_cursor_width]);
@@ -648,7 +649,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			#region jsDoc
 			/// @func    get_cursor_height()
 			/// @desc    Get cursor's height. This is directly related to the line height.
-			/// @self    GUICompTextRegion
+			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
 			static get_cursor_height = function() {//log(["get_cursor_height", get_cursor_height]);
@@ -686,6 +687,11 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 						x+get_coverage_width(),
 						y+get_coverage_height()
 				)
+				
+				if (__mouse_on_cc__) {
+					__trigger_event__(self.events.on_hover);
+				}
+				
 				return __mouse_on_cc__;
 			}
 			
@@ -789,6 +795,13 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					
 								if (curt.accepting_inputs) {
 									__is_on_focus__ = _mouse_on_comp;
+									if (__is_on_focus__){
+										__trigger_event__(self.events.on_focus);
+									}
+									else{
+										__trigger_event__(self.events.on_blur);
+									}
+									
 									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
 								}
 								
@@ -1042,6 +1055,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 								__is_on_focus__ = false;
 								curt.focus = false;
 								__trigger_event__(self.events.submit, _text);
+								__trigger_event__(self.events.on_blur);
 								break;
 							}
 
@@ -1674,7 +1688,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __build_allowed_char__()
 					/// @desc    Returns a struct of allowed charactors from the supplied font.
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {Asset.GMFont} font : The font to build the allowed charactor list.
 					/// @returns {Struct} Allowed Charactors Struct
 					#endregion
@@ -1693,7 +1707,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __string_keep_allowed_char__()
 					/// @desc    Removes all charactor from a string except for the specified struct of allowed characters. This acts as whitelisting charactors
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {String} text : The string to parse
 					/// @param   {Struct} allowed_char : The font to build the allowed charactor list.
 					/// @returns {String}
@@ -1727,7 +1741,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __textbox_format_nowrap__()
 					/// @desc    Removes all line break, and tab charactor from a string.
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {String} str : The string to edit
 					/// @returns {String}
 					#endregion
@@ -1743,7 +1757,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __textbox_format_newline__()
 					/// @desc    Removes all tab charactors from a string.
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {String} str : The string to edit
 					/// @returns {String}
 					#endregion
@@ -1762,7 +1776,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __textbox_lines_to_text__()
 					/// @desc    Converts the Text array into a single string. This does not account for addaptive width! See `__textbox_return__()` if you wish for adaptive width to be accounted.
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {Array<String>} arr : The array of strings
 					/// @returns {String}
 					#endregion
@@ -1784,7 +1798,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __textbox_text_to_lines__()
 					/// @desc    Converts the a string into the Text array format.
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @param   {String} str : The string to convert to an array
 					/// @returns {String}
 					#endregion
@@ -1810,7 +1824,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 					#region jsDoc
 					/// @func    __textbox_return__()
 					/// @desc    Returns the textboxes Text as a string. This will also adjust the linebreaks accordingly with the use of adaptive width
-					/// @self    GUICompTextRegion
+					/// @self    GUICompTextbox
 					/// @returns {String}
 					#endregion
 					static __textbox_return__ = function() {//log(["__textbox_return__", __textbox_return__]);

@@ -959,9 +959,6 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 							);
 						}
 						
-						draw_set_color(c_dkgray);
-						draw_text(x, y, json_stringify(__slider_bounds__, true))
-						
 					}
 				
 					//draw thumb
@@ -1210,6 +1207,9 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					if (!is_enabled)
 					|| (!input_enabled) {
 						__reset_focus__();
+						
+						__trigger_event__(self.events.on_blur);
+						
 						if (!input_enabled) {
 							image.index = GUI_IMAGE_ENABLED;
 						}
@@ -1255,6 +1255,8 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 						//mouse button checks
 						if (mouse_check_button_pressed(mb_left)) {
 							__is_on_focus__ = true;
+							__trigger_event__(self.events.on_focus);
+							
 							image.index = GUI_IMAGE_CLICKED;
 							
 							if (thumb_only_input) {
@@ -1286,6 +1288,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 						}
 						else if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
 							__reset_focus__();
+							__trigger_event__(self.events.on_blur);
 							image.index = GUI_IMAGE_HOVER;
 							_apply_value();
 							__trigger_event__(self.events.released, self.value);
@@ -1299,6 +1302,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 							
 							if (mouse_check_button_released(mb_left)) {
 								__reset_focus__();
+								__trigger_event__(self.events.on_blur);
 								image.index = GUI_IMAGE_ENABLED;
 								__trigger_event__(self.events.released, self.value);
 							}

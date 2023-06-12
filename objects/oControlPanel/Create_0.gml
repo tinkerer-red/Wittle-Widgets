@@ -8,7 +8,7 @@ control_panel = new ControlPanelFolder(" > Control Panel", function(){
 	var _text = (control_panel.is_open) ? " V Control Panel" : " > Control Panel";
 	control_panel.set_text(_text)
 })
-.set_debug_drawing(true);
+
 cc.add(control_panel)
 
 #region Folder 1
@@ -20,7 +20,6 @@ var _folder = new ControlPanelFolder("Folder 1", function(){log("Folder 1")})
 		
 		#region Folder 3
 		var _folder3 = new ControlPanelFolder("Folder 3", function(){log("Folder 2")})
-			.set_debug_drawing(true);
 			var _button2 = new ControlPanelButton("Button 2", function(){log("Button")})
 			var _checkbox1 = new ControlPanelCheckbox("Checkbox 1", function(_bool){log(["Checkbox", _bool])})
 			var _dropdown1 = new ControlPanelDropdown("Dropdown 1", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
@@ -50,7 +49,6 @@ control_panel.add(_folder)
 #region Folder 4
 
 var _folder4 = new ControlPanelFolder("Folder 4", function(){log("Folder 1")})
-	.set_debug_drawing(true);
 	var _button4 = new ControlPanelButton("Button 3", function(){log("Button")})
 	var _checkbox3 = new ControlPanelCheckbox("Checkbox 2", function(_bool){log(["Checkbox", _bool])})
 	var _dropdown3 = new ControlPanelDropdown("Dropdown 2", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})

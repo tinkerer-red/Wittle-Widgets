@@ -80,6 +80,12 @@ function GUICompController() : GUICompCore() constructor {
 			
 		#endregion
 		
+		#region Events
+			
+			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			
+		#endregion
+		
 		#region Variables
 			__children__ = [];
 		#endregion
@@ -281,7 +287,7 @@ function GUICompController() : GUICompCore() constructor {
 				}
 				
 				if (__mouse_on_cc__) {
-					return point_in_rectangle(
+					var _r = point_in_rectangle(
 							device_mouse_x_to_gui(0),
 							device_mouse_y_to_gui(0),
 							x-region.left,
@@ -289,9 +295,38 @@ function GUICompController() : GUICompCore() constructor {
 							x+region.right,
 							y+region.bottom
 					);
+					
+					if (_r) {
+						__trigger_event__(self.events.on_hover);
+					}
+					
+					return _r;
 				}
 				
 				return false;
+			}
+			
+			#region jsDoc
+			/// @func    adopt_builder_functions()
+			/// @desc    Adopts a specific component's builder functions, This is primarily used when a conponent controller is basically a single component which happens to have children, For instance the Folder component is simply a button which has children.
+			/// @self    GUICompController
+			/// @param   {type} name : desc
+			/// @returns {type}
+			#endregion
+			static adopt_builder_functions = function(_comp) {
+				var _arr = _comp.get_builder_functions();
+				
+				var _key;
+				var _i=0; repeat(array_length(_arr)) {
+					_key = _arr[_i];
+					if (!variable_struct_exists(self, _key)) {
+						self[$ _key] = _comp[$ _key];
+					}
+					else {
+						show_debug_message(":: Wittle Widgets :: Component <"+debug_name+"> builder function <"+_key+"> replaced with adopted builder function from <"+_comp.debug_name+">.")
+						self[$ _key] = _comp[$ _key];
+					}
+				_i+=1;}//end repeat loop
 			}
 			
 		#endregion
@@ -506,6 +541,7 @@ function GUICompController() : GUICompCore() constructor {
 					_i+=1;}//end repeat loop
 				}
 				__is_on_focus__ = false;
+				__trigger_event__(self.events.on_blur);
 			}
 			
 			#region jsDoc
@@ -541,6 +577,10 @@ function GUICompController() : GUICompCore() constructor {
 						x+__controller_region__.right,
 						y+__controller_region__.bottom
 				);
+				
+				if (__mouse_on_cc__) {
+					__trigger_event__(self.events.on_hover_controller);
+				}
 				
 				return __mouse_on_cc__;
 			}

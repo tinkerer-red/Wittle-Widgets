@@ -740,6 +740,8 @@ function GUICompDropdown() : GUICompCore() constructor {
 								capture_input();
 								elements[_i].image.index = GUI_IMAGE_HOVER;
 								
+								__trigger_event__(self.events.on_hover);
+								
 								if (mouse_check_button_pressed(mb_left)) {
 									//trigger events
 									__trigger_event__(self.events.element_pressed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});

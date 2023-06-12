@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Vert",
-    "path": "folders/_Libraries/Reds GUI/Assets/Scrollbar/Vert.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets/Scrollbar/Vert.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

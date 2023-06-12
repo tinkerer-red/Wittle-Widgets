@@ -130,7 +130,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			
 			__button__.set_region(0,0,0,_ideal_h)
 			
-			__textbox__ = new GUICompTextRegion()
+			__textbox__ = new GUICompTextbox()
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
@@ -247,6 +247,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 					log("button pressed")
 					with (__textbox__) {
 						__is_on_focus__ = true;
+						__trigger_event__(self.events.on_focus);
 						
 						var _line_last = curt.length - 1;
 						var _line_last_length = string_length(curt.lines[_line_last]);

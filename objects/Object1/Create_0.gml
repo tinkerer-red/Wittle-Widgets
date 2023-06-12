@@ -84,7 +84,7 @@ log(["b.get_real_name()", b.get_real_name()])
 show_debug_overlay(true);
 
 
-var _thing = new GUICompTextRegion(128, 128)
+var _thing = new GUICompTextbox(128, 128)
 textbox = _thing;
 _thing//.set_enabled()
       .set_region(0, 0, 210, 256)

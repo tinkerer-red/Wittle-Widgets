@@ -52,7 +52,7 @@
   "origin": 0,
   "parent": {
     "name": "Buttons",
-    "path": "folders/_Libraries/Reds GUI/Assets/Buttons.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets/Buttons.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

@@ -120,7 +120,7 @@
   "maintainGms1Font": false,
   "parent": {
     "name": "Assets",
-    "path": "folders/_Libraries/Reds GUI/Assets.yy",
+    "path": "folders/_Libraries/Wittle Widgets/Assets.yy",
   },
   "pointRounding": 0,
   "ranges": [

@@ -195,10 +195,14 @@ function GUICompCore() constructor {
 			
 			events = {};
 			
+			events.on_focus    = "on_focus"; //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.on_blur     = "on_blur";  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
+			events.on_hover    = "on_hover"; //triggered every frame the mouse is over the regions bounding box
 			events.pre_update  = "pre_update"; //triggered every frame before the begin step event is activated
 			events.post_update = "post_update"; //triggered every frame after the end step event is activated
 			events.enabled     = "enabled"; //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = "disabled"; //triggered when the component is disabled (this is done by the developer)
+			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 		
@@ -381,6 +385,11 @@ function GUICompCore() constructor {
 						x+region.right,
 						y+region.bottom
 				)
+				
+				if (__mouse_on_cc__) {
+					__trigger_event__(self.events.on_hover);
+				}
+				
 				return __mouse_on_cc__;
 			}
 			#region jsDoc
@@ -602,6 +611,7 @@ function GUICompCore() constructor {
 				static __cleanup__ = function() {
 					cleanup();
 				}
+				
 			#endregion
 			
 			#region jsDoc
@@ -773,6 +783,7 @@ function GUICompCore() constructor {
 			#endregion
 			static __reset_focus__ = function() {
 				__is_on_focus__ = false;
+				__trigger_event__(self.events.on_blur);
 			}
 			
 			#region jsDoc
@@ -1013,6 +1024,7 @@ function GUICompCore() constructor {
 						image.index = GUI_IMAGE_CLICKED;
 						__click_held_timer__ = 0;
 						__trigger_event__(self.events.pressed);
+						__trigger_event__(self.events.on_focus);
 					}
 					else if (__is_on_focus__) && (mouse_check_button(mb_left)) {
 						image.index = GUI_IMAGE_CLICKED;
@@ -1030,6 +1042,7 @@ function GUICompCore() constructor {
 						__click_held_timer__ = 0;
 						image.index = GUI_IMAGE_HOVER;
 						__trigger_event__(self.events.released);
+						__trigger_event__(self.events.on_blur);
 					}
 					
 				}
@@ -1037,6 +1050,7 @@ function GUICompCore() constructor {
 					image.index = GUI_IMAGE_ENABLED;
 					if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
 						__reset_focus__();
+						__trigger_event__(self.events.on_blur);
 					}
 				}
 				

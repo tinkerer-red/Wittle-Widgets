@@ -9,15 +9,6 @@
 function GUICompFolder() : GUICompController() constructor {
 	debug_name = "GUICompFolder";
 	
-	
-	#region Inherited Parents
-		
-		var _btn = new GUICompButtonText()
-		variable_struct_inherite(_btn);
-		delete _btn;
-		
-	#endregion
-	
 	#region Public
 	
 		#region Builder Functions
@@ -76,13 +67,17 @@ function GUICompFolder() : GUICompController() constructor {
 			
 			}
 			
+			
+			
+			
 		#endregion
 	
 		#region Events
 		
 			self.events.opened = "opened";
 			self.events.closed = "closed";
-		
+			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			
 		#endregion
 	
 		#region Variables
@@ -209,11 +204,14 @@ function GUICompFolder() : GUICompController() constructor {
 			__children__ = [];
 			__children_count__ = 0;
 			
+			__button__ = new GUICompButtonText();
+			adopt_builder_functions(__button__);
+			
 		#endregion
 		
 		#region Functions
 			
-			__add_event_listener_priv__(self.events.released, function() {
+			__button__.__add_event_listener_priv__(__button__.events.released, function() {
 				set_open(is_open);
 				
 				if (is_open) {
@@ -236,6 +234,7 @@ function GUICompFolder() : GUICompController() constructor {
 					__trigger_event__(self.events.pre_update);
 					
 					begin_step(__user_input__);
+					__button__.__begin_step__(_input);
 					
 					//run the children
 					if(!__is_empty__ and is_open) {
@@ -255,6 +254,7 @@ function GUICompFolder() : GUICompController() constructor {
 					__user_input__ = _input;
 					
 					step(__user_input__);
+					__button__.__step__(_input);
 					
 					//run children
 					if(!__is_empty__ and is_open) {
@@ -269,17 +269,18 @@ function GUICompFolder() : GUICompController() constructor {
 						
 					}
 					
-					__handle_click__(_input);
+					//__handle_click__(_input);
 					
 					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __end_step__ = function(_input) {
 					__user_input__ = _input;
 					
+					
+					end_step(__user_input__);
+					__button__.__end_step__(_input);
+					
 					if(!__is_empty__ and is_open) {
-						
-						end_step(__user_input__);
-						
 						//run the children
 						var _component, xx, yy;
 						var _i=__children_count__; repeat(__children_count__) { _i--;
@@ -302,6 +303,9 @@ function GUICompFolder() : GUICompController() constructor {
 					__user_input__ = _input;
 					
 					draw_gui_begin(__user_input__);
+					if (header_shown) {
+						__button__.__draw_gui_begin__(_input);
+					}
 					
 					if(!__is_empty__ and is_open) {
 						
@@ -322,8 +326,9 @@ function GUICompFolder() : GUICompController() constructor {
 					__user_input__ = _input;
 					
 					//this is just imitating the inherited components draw_gui, in this case button
+					draw_gui(__user_input__);
 					if (header_shown) {
-						draw_gui(__user_input__);
+						__button__.__draw_gui__(_input);
 					}
 					
 					if (should_draw_debug) {
@@ -369,6 +374,9 @@ function GUICompFolder() : GUICompController() constructor {
 					__user_input__ = _input;
 					
 					draw_gui_end(__user_input__);
+					if (header_shown) {
+						__button__.__draw_gui_end__(_input);
+					}
 					
 					if(!__is_empty__ and is_open) {
 						
@@ -395,6 +403,7 @@ function GUICompFolder() : GUICompController() constructor {
 				
 				static __cleanup__ = function() {
 					cleanup();
+					__button__.__cleanup__();
 					
 					if(!__is_empty__) {
 						var _i=0; repeat(__children_count__) {

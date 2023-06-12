@@ -25,7 +25,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region])log(["set_region", set_region])
 				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
-				__find_slider_bounds__();
+				//__find_slider_bounds__();
 				
 				return self;
 			}
@@ -170,7 +170,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				static set_thumb_enabled = function(_enabled=true) {//log(["set_thumb_enabled", set_thumb_enabled])
 					thumb.enabled = _enabled
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -186,7 +186,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					set_thumb_min_colors(c_white, c_white, c_white, c_white)
 					set_thumb_max_colors(c_white, c_white, c_white, c_white)
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -252,7 +252,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					thumb.xscale = _xscale;
 					thumb.yscale = _yscale;
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -267,7 +267,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					thumb.clamped = _clamped;
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -361,7 +361,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					
 					bar.margin = _margin
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -393,7 +393,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				static set_background_enabled = function(_enabled=1) {//log(["set_background_enabled", set_background_enabled])
 					background.enabled = _enabled
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -410,7 +410,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					set_background_min_colors(c_white, c_white, c_white, c_white)
 					set_background_max_colors(c_white, c_white, c_white, c_white)
 					
-					__find_slider_bounds__();
+					//__find_slider_bounds__();
 					
 					return self;
 				}
@@ -920,6 +920,8 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 					//calculate the bar's data for use with the bar and the thumb
 					if (bar.enabled) || (thumb.enabled) {
+						__find_slider_bounds__()
+						
 						_x = __slider_bounds__.x;
 						_y = __slider_bounds__.y;
 						
@@ -929,10 +931,9 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 				
 					//draw bar
 					if (bar.enabled) {
-						__find_slider_bounds__()
 						var _bar_w = (is_vertical)  ? _w : _w * normalized_value
 						var _bar_h = (!is_vertical) ? _h : _h * normalized_value
-					
+						
 						if (sprite_exists(bar.sprite)) {
 							draw_sprite_stretched_ext(
 									bar.sprite,
@@ -957,6 +958,10 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 									bar.alpha
 							);
 						}
+						
+						draw_set_color(c_dkgray);
+						draw_text(x, y, json_stringify(__slider_bounds__, true))
+						
 					}
 				
 					//draw thumb
@@ -1181,7 +1186,7 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 					if (!is_undefined(tracker_func)) {
 						var _tracked_val = tracker_func();
 						//safety check
-						if (GUI_GLOBAL_SAFETY) {
+						if (should_safety_check) {
 							if (!is_real(_tracked_val)) {
 								show_error("The tracked value returned from the tracker function is not a valid {Real} variable.\nWhen using \"set_tracker\", the applied function must return a {Real}", true);
 							}

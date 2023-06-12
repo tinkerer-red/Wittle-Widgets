@@ -21,8 +21,6 @@ if (__SETTINGS_AUTO_SCALE) {
 			}
 			
 			camera_set_view_size(view_camera[0], _width, _height);
-			log(["_width", _width])
-			log(["_height", _height])
 			surface_resize(application_surface, _width, _height);
 		}
 		

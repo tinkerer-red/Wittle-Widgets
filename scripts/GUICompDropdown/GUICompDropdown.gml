@@ -343,7 +343,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 					//write the texts in
 					var _i=0; repeat(_length) {
 						//check to make sure it's a string
-						if (GUI_GLOBAL_SAFETY) {
+						if (should_safety_check) {
 							if (!is_string(_string[_i])) {
 								show_error("Trying to insert a value which is not a string", true)
 							}
@@ -355,7 +355,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				}
 				else {
 					//check to make sure it's a string
-					if (GUI_GLOBAL_SAFETY) {
+					if (should_safety_check) {
 						if (!is_string(_string)) {
 							show_error("Trying to insert a value which is not a string", true)
 						}
@@ -377,7 +377,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				}
 				
 				//safety checks
-				if (GUI_GLOBAL_SAFETY) {
+				if (should_safety_check) {
 					var _elm_str, _j, _found_count;
 					
 					var _i=0; repeat(_length) {
@@ -430,7 +430,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 					//write the texts in
 					var _i=0; repeat(_length) {
 						//check to make sure it's a string
-						if (GUI_GLOBAL_SAFETY) {
+						if (should_safety_check) {
 							if (!is_string(_string[_i])) {
 								show_error("Trying to insert a value which is not a string", true)
 							}
@@ -442,7 +442,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				}
 				else {
 					//check to make sure it's a string
-					if (GUI_GLOBAL_SAFETY) {
+					if (should_safety_check) {
 						if (!is_string(_string)) {
 							show_error("Trying to insert a value which is not a string", true)
 						}
@@ -464,7 +464,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				}
 				
 				//safety checks
-				if (GUI_GLOBAL_SAFETY) {
+				if (should_safety_check) {
 					var _elm_str, _j, _found_count;
 					
 					var _i=0; repeat(_length) {

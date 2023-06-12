@@ -1,56 +1,63 @@
 // Inherit the parent event
 event_inherited();
+show_debug_overlay(true)
 
 event_user(15);
 
-var _folder = new ControlPanelFolder("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(){log("Folder")})
-	var _folder2 = new ControlPanelFolder("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", function(){log("Folder")})
-		.set_debug_drawing(true)
-		var _button = new ControlPanelButton("Button", function(){log("Button")})
-		_folder2.add(_button)
-	_folder.add(_folder2)
-cc.add(_folder)
+control_panel = new ControlPanelFolder(" > Control Panel", function(){
+	var _text = (control_panel.is_open) ? " V Control Panel" : " > Control Panel";
+	control_panel.set_text(_text)
+})
+.set_debug_drawing(true);
+cc.add(control_panel)
 
-var _button = new ControlPanelButton("Button", function(){log("Button")})
-_folder.add(_button)
+#region Folder 1
+var _folder = new ControlPanelFolder("Folder 1", function(){log("Folder 1")})
+	
+	#region Folder 2
+	var _folder2 = new ControlPanelFolder("Folder 2", function(){log("Folder 2")})
+		var _button1 = new ControlPanelButton("Button 1", function(){log("Button")})
+		
+		#region Folder 3
+		var _folder3 = new ControlPanelFolder("Folder 3", function(){log("Folder 2")})
+			.set_debug_drawing(true);
+			var _button2 = new ControlPanelButton("Button 2", function(){log("Button")})
+			var _checkbox1 = new ControlPanelCheckbox("Checkbox 1", function(_bool){log(["Checkbox", _bool])})
+			var _dropdown1 = new ControlPanelDropdown("Dropdown 1", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
+			var _real1 = new ControlPanelReal("Real 1", 50, function(_real){log(["Real", _real])})
+			var _string1 = new ControlPanelString("String 1", "This is a test", function(_bool){log(["String", _bool])})
+			var _slider1 = new ControlPanelSlider("Slider 1", 0.25, -10, 10, function(_bool){log(["Slider", _bool])})
+			_folder3.add([_button2, _checkbox1, _dropdown1, _real1, _string1, _slider1])
+			
+		#endregion
+		_folder2.add([_button1, _folder3])
+		
+	#endregion
+	
+	var _button3 = new ControlPanelButton("Button 3", function(){log("Button")})
+	var _checkbox2 = new ControlPanelCheckbox("Checkbox 2", function(_bool){log(["Checkbox", _bool])})
+	var _dropdown2 = new ControlPanelDropdown("Dropdown 2", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
+	var _real2 = new ControlPanelReal("Real 2", 50, function(_real){log(["Real", _real])})
+	var _string2 = new ControlPanelString("String 2", "This is a test", function(_bool){log(["String", _bool])})
+	var _slider2 = new ControlPanelSlider("Slider 2", 0.25, -10, 10, function(_bool){log(["Slider", _bool])})
 
-var _checkbox = new ControlPanelCheckbox("Checkbox", function(_bool){log(["Checkbox", _bool])})
-//	.set_debug_drawing(true)
-//_checkbox.should_draw_debug = true;
-_folder.add(_checkbox)
+	_folder.add([_folder2, _button3, _checkbox2, _dropdown2, _real2, _string2, _slider2])
+	
+#endregion
+control_panel.add(_folder)
 
-var _dropdown = new ControlPanelDropdown("Dropdown", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
-_folder.add(_dropdown)
 
-var _real = new ControlPanelReal("Real", 50, function(_real){log(["Real", _real])})
-_folder.add(_real)
+#region Folder 4
 
-var _string = new ControlPanelString("String", "This is a test", function(_bool){log(["String", _bool])})
-_folder.add(_string)
+var _folder4 = new ControlPanelFolder("Folder 4", function(){log("Folder 1")})
+	.set_debug_drawing(true);
+	var _button4 = new ControlPanelButton("Button 3", function(){log("Button")})
+	var _checkbox3 = new ControlPanelCheckbox("Checkbox 2", function(_bool){log(["Checkbox", _bool])})
+	var _dropdown3 = new ControlPanelDropdown("Dropdown 2", ["Option 1", "Option 2", "Option 3"], function(_index, _element){log(["Dropdown", _index, _element])})
+	var _real3 = new ControlPanelReal("Real 2", 50, function(_real){log(["Real", _real])})
+	var _string3 = new ControlPanelString("String 2", "This is a test", function(_bool){log(["String", _bool])})
+	var _slider3 = new ControlPanelSlider("Slider 2", 0.25, -10, 10, function(_bool){log(["Slider", _bool])})
+	_folder4.add([_button4, _checkbox3, _dropdown3, _real3, _string3, _slider3]);
 
-var _slider = new ControlPanelSlider("This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789This is a test 0123456789", 0.25, -10, 10, function(_bool){log(["Working", _bool])})
-_folder.add(_slider)
-
-//var _button = new GUICompButtonSprite()
-//	.set_sprite(s9ScrollbarHorzButtonRight)
-//cc.add(_button)
-
-//var _test = new GUICompTextRegion()
-//	.set_text_placeholder("Enter value")
-//	.set_region(0, 0, 190, 30)
-//	.set_scrollbar_sizes(0, 0)
-//	.set_text("Default Value")
-//	.set_text_font(__CP_FONT)
-//	.set_text_color(c_white)
-//	.set_background_color(#1E2F4A)
-//	.set_max_length(20)
-//	.set_char_enforcement("0123456789")
-//	.set_multiline(false)
-//	.set_accepting_inputs(true)
-//	
-//cc.add(_test)
-//var __dropdown__ = new GUICompDropdown() //the x/y doesnt matter as the set region will move this
-//	.set_position(100, 100)
-//	.set_alignment(fa_right, fa_top)
-//	.set_dropdown_array(["Option 1", "Option 2", "Option 3"])
-//cc.add(__dropdown__)
+#endregion
+control_panel.add(_folder4)

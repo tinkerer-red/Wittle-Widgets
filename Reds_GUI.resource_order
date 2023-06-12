@@ -58,7 +58,7 @@
     {"name":"fGUIDefault","order":6,"path":"fonts/fGUIDefault/fGUIDefault.yy",},
     {"name":"s9DropDownMiddle","order":2,"path":"sprites/s9DropDownMiddle/s9DropDownMiddle.yy",},
     {"name":"sButton","order":1,"path":"sprites/sButton/sButton.yy",},
-    {"name":"Script8","order":6,"path":"scripts/Script8/Script8.yy",},
+    {"name":"Debug","order":6,"path":"scripts/Debug/Debug.yy",},
     {"name":"s9ScrollbarVertButtonUp","order":2,"path":"sprites/s9ScrollbarVertButtonUp/s9ScrollbarVertButtonUp.yy",},
     {"name":"Room1","order":1,"path":"rooms/Room1/Room1.yy",},
   ],

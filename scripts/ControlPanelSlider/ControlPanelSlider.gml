@@ -160,11 +160,13 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_sprite(_sprite_button_inc)
+			__button_inc__.set_position(-__button_inc__.region.get_width(), 0)
 			
 			__button_dec__ = new GUICompButtonSprite()
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_sprite(_sprite_button_dec)
+			__button_dec__.set_position(-__button_dec__.region.get_width(), 0)
 			
 			__slider__ = new GUICompSlider()
 				.set_anchor(-_info.right, _info.top)
@@ -247,7 +249,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width());
+						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}

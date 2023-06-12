@@ -91,7 +91,7 @@
     {"id":{"name":"s9DropDownMiddle","path":"sprites/s9DropDownMiddle/s9DropDownMiddle.yy",},},
     {"id":{"name":"sButton","path":"sprites/sButton/sButton.yy",},},
     {"id":{"name":"s9ButtonText","path":"sprites/s9ButtonText/s9ButtonText.yy",},},
-    {"id":{"name":"Script8","path":"scripts/Script8/Script8.yy",},},
+    {"id":{"name":"Debug","path":"scripts/Debug/Debug.yy",},},
     {"id":{"name":"s9ScrollbarVertButtonUp","path":"sprites/s9ScrollbarVertButtonUp/s9ScrollbarVertButtonUp.yy",},},
     {"id":{"name":"s9CheckBoxChecked","path":"sprites/s9CheckBoxChecked/s9CheckBoxChecked.yy",},},
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},

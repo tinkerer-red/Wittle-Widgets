@@ -32,13 +32,16 @@ function GUICompFolder() : GUICompController() constructor {
 			#endregion
 			static set_children_offsets = function(_xoff=0,_yoff=0){
 				//sets the indenting for sub components from the previous component
-		
+				
 				children_x_offset = _xoff;
 				children_y_offset = _yoff;
-		
+				
+				update_component_positions();
+				__update_controller_region__();
+				
 				return self;
 			}
-		
+			
 			#region jsDoc
 			/// @func    set_open()
 			/// @desc    Sets the folder's is_open state.
@@ -49,6 +52,7 @@ function GUICompFolder() : GUICompController() constructor {
 			static set_open = function(_is_open=true){
 				
 				is_open = !is_open;
+				
 				
 				update_component_positions();
 				__update_controller_region__();
@@ -117,6 +121,15 @@ function GUICompFolder() : GUICompController() constructor {
 					__update_controller_region__();
 				}
 				
+				//fixes a bug where when a folder is added at the end of another folder, both folder's regions is incorrect
+				var _i=0; repeat(array_length(_arr)) {
+					_comp = _arr[_i];
+					if (_comp.__is_controller__) {
+						_comp.__update_controller_region__();
+					}
+				_i+=1;}//end repeat loop
+				
+				
 			}
 			
 			#region jsDoc
@@ -175,6 +188,12 @@ function GUICompFolder() : GUICompController() constructor {
 					_i+=1;}//end repeat loop
 					
 				}
+				
+				if (__is_child__) {
+					//__parent__.update_component_positions();
+					__parent__.__update_controller_region__();
+				}
+				
 			}
 			
 		#endregion
@@ -409,12 +428,12 @@ function GUICompFolder() : GUICompController() constructor {
 							_right  = max(_right,  xoff+_component.__controller_region__.right);
 							_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
 						}
-						//else{
-							_left   = min(_left,   xoff+_component.region.left);
-							_top    = min(_top,    yoff+_component.region.top);
-							_right  = max(_right,  xoff+_component.region.right);
-							_bottom = max(_bottom, yoff+_component.region.bottom);
-						//}
+						
+						_left   = min(_left,   xoff+_component.region.left);
+						_top    = min(_top,    yoff+_component.region.top);
+						_right  = max(_right,  xoff+_component.region.right);
+						_bottom = max(_bottom, yoff+_component.region.bottom);
+						
 						_i++
 					}
 				}
@@ -429,7 +448,7 @@ function GUICompFolder() : GUICompController() constructor {
 		
 				//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 				if (__is_child__) {
-					__parent__.update_component_positions();
+					//__parent__.update_component_positions();
 					__parent__.__update_controller_region__();
 				}
 			}

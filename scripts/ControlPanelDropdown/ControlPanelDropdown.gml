@@ -165,7 +165,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width());
+						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}

@@ -737,14 +737,14 @@ function GUICompController() : GUICompCore() constructor {
 			
 			#region jsDoc
 			/// @func    __validate_component_additions__()
-			/// @desc    Validates that we are not adding existing components to our controller, or that a supplied array of components does not contain duplicates. This function will only throw errors and will only ever run if the config setting "GUI_GLOBAL_SAFETY" is true
+			/// @desc    Validates that we are not adding existing components to our controller, or that a supplied array of components does not contain duplicates. This function will only throw errors and will only ever run if the config setting "should_safety_check" is true
 			/// @self    GUICompController
 			/// @param   {Array<Struct>} arr : The array of structs to validate
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
 			static __validate_component_additions__ = function(_arr) {
-				if (GUI_GLOBAL_SAFETY) {
+				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
 					var _i=0; repeat(_size) {
@@ -771,6 +771,11 @@ function GUICompController() : GUICompCore() constructor {
 							}
 						_j+=1;}//end repeat loop
 						
+						//verify the component isn't already in another controller
+						if (_comp.__is_child__) {
+							show_error("Trying to add a new component which is alread inside another controller", true)
+						}
+						
 					_i+=1;}//end repeat loop
 				}
 			}
@@ -788,11 +793,17 @@ function GUICompController() : GUICompCore() constructor {
 			/// @ignore
 			#endregion
 			static __validate_component_positions__ = function(_arr) {
-				if (GUI_GLOBAL_SAFETY) {
+				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
 					var _i=0; repeat(_size) {
 						_comp = _arr[_i];
+						
+						//skip if ignore safety
+						if (!_comp.should_safety_check) {
+							_i+=1;
+							continue;
+						}
 						
 						//verify the component does not reach out of bounds of the controller
 						switch (_comp.halign) {

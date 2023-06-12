@@ -546,7 +546,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			#region GML Events
 				
 				static __begin_step__ = function(_input) {//log(["__begin_step__", __begin_step__])
-					if (GUI_GLOBAL_SAFETY) {
+					if (should_safety_check) {
 						if (is_nan(coverage_size / canvas_size)) {
 							show_error(string("Scroll bar is producing a NaN, make sure to set it's sizes with \"set_coverage_size()\" and \"set_canvas_size()\" \ncoverage_size : {0}\ncanvas_size : {1}", coverage_size, canvas_size), true);
 						}

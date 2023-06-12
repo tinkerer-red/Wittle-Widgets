@@ -8,6 +8,7 @@
 function GUICompCore() constructor {
 	debug_name = "GUICompCore";
 	should_draw_debug = GUI_GLOBAL_DEBUG;
+	should_safety_check = GUI_GLOBAL_SAFETY;
 	
 	#region Public
 		
@@ -178,12 +179,16 @@ function GUICompCore() constructor {
 				return self;
 			}
 			
-			static set_debug_drawing = function(_bool) {
+			static set_debug_drawing = function(_bool=false) {
 				should_draw_debug = _bool;
 				
 				return self;
 			}
-			
+			static set_do_safety_check = function(_bool=true) {
+				should_safety_check = _bool
+				
+				return self;
+			}
 		#endregion
 		
 		#region Events

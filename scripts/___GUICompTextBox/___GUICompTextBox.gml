@@ -22,7 +22,6 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region]);
-				log(" = = = set_region 1 = = = ")
 				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				return self;
@@ -176,8 +175,8 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			/// @returns {Struct.GUICompTextRegion}
 			#endregion
 			static set_max_length = function(_max_length=infinity) {//log(["set_max_length", set_max_length]);
-				if (GUI_GLOBAL_SAFETY) {
-					if (_memory_limit < 0) {
+				if (should_safety_check) {
+					if (_max_length < 0) {
 						show_error(string("Can not use a negative value for \"set_max_length()\" : {0}", _max_length), true);
 					}
 				}
@@ -193,7 +192,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 			/// @returns {Struct.GUICompTextRegion}
 			#endregion
 			static set_records_limit = function(_memory_limit=64) {//log(["set_records_limit", set_records_limit]);
-				if (GUI_GLOBAL_SAFETY) {
+				if (should_safety_check) {
 					if (_memory_limit < 0) {
 						show_error(string("Can not use a negative value for \"set_records_limit()\" : {0}", _memory_limit), true);
 					}
@@ -1985,7 +1984,7 @@ function GUICompTextRegion() : GUICompRegion() constructor {
 				
 				static __textbox_max_length__ = function() {//log(["__textbox_max_length__", __textbox_max_length__]);
 					var _max_length = curt.max_length;
-					if (GUI_GLOBAL_SAFETY) {
+					if (should_safety_check) {
 						if (_max_length < 0) {
 							show_error(string("The \"max_length\" for the character count is less than 0 : {0}\nPlease use \"set_max_length()\" with a positive integer.", _max_length), true);
 						}

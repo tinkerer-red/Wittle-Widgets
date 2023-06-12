@@ -14,6 +14,9 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				__button__.set_region(_left, _top, _right, _bottom)
 				
 				__folder__.set_anchor(0, __button__.region.get_height())
+				__folder__.update_component_positions();
+				__folder__.__update_controller_region__();
+				//__folder__.set_region(_left, _top, _right, _bottom)
 				
 				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
@@ -62,6 +65,19 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			#endregion
 			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
 				__button__.set_text_colors(_idle_text_color, _hover_text_color, _disable_text_color)
+				
+				return self;
+			}
+			#region jsDoc
+			/// @func    set_children_offsets()
+			/// @desc    Sets the indenting for sub components from the previous component. Good for making json style indenting.
+			/// @self    ControlPanelFolder
+			/// @param   {Real} xoff : The horizontal offset distance from the folder's x
+			/// @param   {Real} yoff : The vertical offset distance from the folder's y
+			/// @returns {Struct.GUICompFolder}
+			#endregion
+			static set_children_offsets = function(_xoff=0,_yoff=0){
+				__folder__.set_children_offsets(_xoff, _yoff)
 				
 				return self;
 			}
@@ -160,6 +176,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			__SUPER__.add(__folder__);
 			__SUPER__.add(__scrolling_text__);
 			
+			set_children_offsets(8, 0)
+			
 			//set the default size of the component
 			//get the label width
 			var _prev_font = draw_get_font();
@@ -188,7 +206,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
 					__add_event_listener_priv__(self.events.pre_update, function(_data) {
-						var _width = floor(window_get_width());
+						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}
@@ -232,6 +250,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				//callback
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
 					__folder__.set_open(!__folder__.is_open)
+					is_open = __folder__.is_open;
 					
 					callback();
 				});

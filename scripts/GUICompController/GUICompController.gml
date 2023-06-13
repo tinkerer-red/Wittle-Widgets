@@ -8,7 +8,7 @@
 function GUICompController() : GUICompCore() constructor {
 	debug_name = "GUICompController";
 	
-	static draw_debug = function() {
+	static draw_debug = function() { //log(["draw_debug", draw_debug]);
 				draw_set_color(c_orange)
 				draw_rectangle(
 						x+__controller_region__.left,
@@ -42,7 +42,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {
+			static set_region = function(_left, _top, _right, _bottom) { //log(["set_region", set_region]);
 				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				__update_controller_region__();
@@ -57,7 +57,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Bool} is_enabled : If the component and all sub components should be enabled or not.
 			/// @returns {Struct.GUICompController}
 			#endregion
-			static set_enabled = function(_is_enabled) {
+			static set_enabled = function(_is_enabled) { //log(["set_enabled", set_enabled]);
 				is_enabled = _is_enabled;
 				
 				if(!__is_empty__) {
@@ -99,7 +99,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
-			static add = function(_comp) {
+			static add = function(_comp) { //log(["add", add]);
 				__is_empty__ = false;
 				
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
@@ -124,7 +124,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
-			static insert = function(_index, _comp) {
+			static insert = function(_index, _comp) { //log(["insert", insert]);
 				__is_empty__ = false;
 				
 				var _count = __children_count__;
@@ -154,7 +154,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index of the component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
-			static remove = function(_index) {
+			static remove = function(_index) { //log(["remove", remove]);
 				array_push(__remove_requests__, _index);
 			}
 			
@@ -165,7 +165,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompController} component : The component you wish to find the index of.
 			/// @returns {Real}
 			#endregion
-			static find = function(_comp) {
+			static find = function(_comp) { //log(["find", find]);
 				//Find it in the list
 				var _i = 0; repeat(__children_count__) {
 					if (__children__[_i].__cid__ == _comp.__cid__) {
@@ -181,7 +181,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompHandler
 			/// @returns {Real}
 			#endregion
-			static update_component_positions = function() {
+			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
 				if(!__is_empty__) {
 					var _anchor_point, _comp, _xx, _yy;
 					
@@ -210,7 +210,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Real}
 			#endregion
-			static children_count = function() {
+			static children_count = function() { //log(["children_count", children_count]);
 				return __children_count__;
 			}
 			
@@ -220,7 +220,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Real}
 			#endregion
-			static children_count_all = function() {
+			static children_count_all = function() { //log(["children_count_all", children_count_all]);
 				var _comp;
 				var _children_count = 0;
 				
@@ -243,7 +243,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Undefined}
 			#endregion
-			static clear_children = function() {
+			static clear_children = function() { //log(["clear_children", clear_children]);
 				var _i=0; repeat(__children_count__) {
 					__children__[_i].__cleanup__();
 					delete __children__[_i]
@@ -259,7 +259,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Array<Struct>}
 			#endregion
-			static get_children = function() {
+			static get_children = function() { //log(["get_children", get_children]);
 				return __children__
 			}
 			
@@ -269,7 +269,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() {
+			static mouse_on_comp = function() { //log(["mouse_on_comp", mouse_on_comp]);
 				//check if parent even has a mouse over it
 				if (__is_child__)
 				&& (!__parent__.__mouse_on_cc__) {
@@ -277,14 +277,14 @@ function GUICompController() : GUICompCore() constructor {
 				}
 				
 				//check to see if the mouse is out of the window it's self
-				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
-				if (is_desktop) {
-					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
-					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-						__mouse_on_cc__ = false;
-						return false;
-					}
-				}
+				//static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
+				//if (is_desktop) {
+				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+				//	|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+				//		__mouse_on_cc__ = false;
+				//		return false;
+				//	}
+				//}
 				
 				if (__mouse_on_cc__) {
 					var _r = point_in_rectangle(
@@ -313,18 +313,18 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {type} name : desc
 			/// @returns {type}
 			#endregion
-			static adopt_builder_functions = function(_comp) {
+			static adopt_builder_functions = function(_comp) { //log(["adopt_builder_functions", adopt_builder_functions]);
 				var _arr = _comp.get_builder_functions();
 				
 				var _key;
 				var _i=0; repeat(array_length(_arr)) {
 					_key = _arr[_i];
 					if (!variable_struct_exists(self, _key)) {
-						self[$ _key] = _comp[$ _key];
+						self[$ _key] = method(self, _comp[$ _key]);
 					}
 					else {
 						show_debug_message(":: Wittle Widgets :: Component <"+debug_name+"> builder function <"+_key+"> replaced with adopted builder function from <"+_comp.debug_name+">.")
-						self[$ _key] = _comp[$ _key];
+						self[$ _key] = method(self, _comp[$ _key]);
 					}
 				_i+=1;}//end repeat loop
 			}
@@ -355,7 +355,7 @@ function GUICompController() : GUICompCore() constructor {
 			
 			#region GML Events
 				
-				static __begin_step__ = function(_input) {
+				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
 					__post_remove__();
 					
 					__user_input__ = _input;
@@ -369,15 +369,15 @@ function GUICompController() : GUICompCore() constructor {
 					var _comp, xx, yy;
 					var _i=__children_count__; repeat(__children_count__) { _i--;
 						_comp = __children__[_i];
-						xx = _comp.x - x;
-						yy = _comp.y - y;
+						//xx = _comp.x - x;
+						//yy = _comp.y - y;
 						_comp.__begin_step__(_input);
 					}//end repeat loop
 		
 					//return the consumed inputs
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 				}
-				static __step__ = function(_input) {
+				static __step__ = function(_input) { //log(["__step__", __step__]);
 					__user_input__ = _input;
 		
 					step(_input);
@@ -391,9 +391,9 @@ function GUICompController() : GUICompCore() constructor {
 						_comp.__step__(_input);
 					}//end repeat loop
 		
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 				}
-				static __end_step__ = function(_input) {
+				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
 					__user_input__ = _input;
 		
 					end_step(_input);
@@ -409,10 +409,10 @@ function GUICompController() : GUICompCore() constructor {
 					
 					__trigger_event__(self.events.post_update);
 					
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 				}
 				
-				static __draw_gui_begin__ = function(_input) {
+				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
 					__post_remove__();
 		
 					__user_input__ = _input;
@@ -428,9 +428,9 @@ function GUICompController() : GUICompCore() constructor {
 						_comp.__draw_gui_begin__(_input);
 					_i+=1;}//end repeat loop
 		
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 				}
-				static __draw_gui__ = function(_input) {
+				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
 					__user_input__ = _input;
 		
 					draw_gui(_input);
@@ -444,10 +444,10 @@ function GUICompController() : GUICompCore() constructor {
 						_comp.__draw_gui__(_input);
 					_i+=1;}//end repeat loop
 				
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 					
 				}
-				static __draw_gui_end__ = function(_input) {
+				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
 					__user_input__ = _input;
 		
 					draw_gui_end(_input);
@@ -461,7 +461,7 @@ function GUICompController() : GUICompCore() constructor {
 						_comp.__draw_gui_end__(_input);
 					_i+=1;}//end repeat loop
 		
-					if (__user_input__.consumed) { capture_input(); };
+					//if (__user_input__.consumed) { capture_input(); };
 		
 					xprevious = x;
 					yprevious = y;
@@ -471,7 +471,7 @@ function GUICompController() : GUICompCore() constructor {
 					}
 				}
 				
-				static __cleanup__ = function() {
+				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
 					cleanup();
 		
 					if(!__is_empty__) {
@@ -494,7 +494,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index of the component to remove.
 			/// @ignore
 			#endregion
-			static __remove__ = function(_index) {
+			static __remove__ = function(_index) { //log(["__remove__", __remove__]);
 				//clean up the component
 				__children__[_index].__cleanup__();
 				delete __children__[_index];
@@ -514,7 +514,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @ignore
 			#endregion
-			static __post_remove__ = function() {
+			static __post_remove__ = function() { //log(["__post_remove__", __post_remove__]);
 				//sort the array to contain the largest numbers first, as we will be cycling from back to front
 				array_sort(__remove_requests__, true)
 		
@@ -531,7 +531,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @ignore
 			#endregion
-			static __reset_focus_to_false__ = function() {
+			static __reset_focus_to_false__ = function() { //log(["__reset_focus_to_false__", __reset_focus_to_false__]);
 				//this function is used to unfocus all sub components
 				if(!__is_empty__) {
 					var _comp;
@@ -551,7 +551,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Bool}
 			/// @ignore
 			#endregion
-			static __mouse_on_controller__ = function() {
+			static __mouse_on_controller__ = function() { //log(["__mouse_on_controller__", __mouse_on_controller__]);
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
@@ -561,13 +561,13 @@ function GUICompController() : GUICompCore() constructor {
 				
 				//check to see if the mouse is out of the window it's self
 				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
-				if (is_desktop) {
-					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
-					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-						__mouse_on_cc__ = false;
-						return false;
-					}
-				}
+				//if (is_desktop) {
+				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+				//|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+				//	__mouse_on_cc__ = false;
+				//	return false;
+				//}
+				//}
 				
 				__mouse_on_cc__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
@@ -593,85 +593,20 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Struct.GUICompController}
 			/// @ignore
 			#endregion
-			static __update_controller_region__ = function() {
-				#region old
-					/*
-					var _left   = region.left;
-					var _top    = region.top;
-					var _right  = region.right;
-					var _bottom = region.bottom;
-				
-					log(["region", region])
-				
-					var _comp, xoff, yoff;
-					var i = 0; repeat(__children_count__) {
-						_comp = __children__[i];
-						xoff = _comp.x-x;
-						yoff = _comp.y-y;
-			
-				//-------------------------------------------------------------------------------------------------------\\
-				//     __     Refactor this function so that the approriate alignment only adds to the total size,
-				//    /  \  /   The current implimentation causes it where a right aligned element can add to the left
-				//    |  |
-				//    @  @
-				//    |  |
-				//    || |/
-				//    || ||
-				//    |\_/|
-				//    \___/
-				//
-				//-------------------------------------------------------------------------------------------------------//
-			
-			
-				log(["xoff", xoff])
-				log(["_comp.debug_name", _comp.debug_name])
-				log(["_comp.x", _comp.x])
-				log(["x", x])
-			
-			
-						if(_comp.__is_controller__) {
-							log(["xoff+_comp.__controller_region__.left", xoff+_comp.__controller_region__.left])
-							_left   = min(_left,   xoff+_comp.__controller_region__.left);
-							_top    = min(_top,    yoff+_comp.__controller_region__.top);
-							_right  = max(_right,  xoff+_comp.__controller_region__.right);
-							_bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
-						}
-						else{
-							_left   = min(_left,   xoff+_comp.region.left);
-							_top    = min(_top,    yoff+_comp.region.top);
-							_right  = max(_right,  xoff+_comp.region.right);
-							_bottom = max(_bottom, yoff+_comp.region.bottom);
-						}
-						i++
-					}
-				
-					//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
-					log(["__controller_region__ 2 ", __controller_region__])
-					__controller_region__ = new __region__(
-						_left,
-						_top,
-						_right,
-						_bottom
-					)
-				
-					log(["__controller_region__ 3 ", __controller_region__])
-				
-					//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
-					if (__is_child__) {
-						__parent__.__update_controller_region__();
-					}
-					
-					//*/
-					
-				#endregion
-				
+			static __update_controller_region__ = function() { //log(["__update_controller_region__", __update_controller_region__]);
 				#region new
 					
 					var _left   = region.left;
 					var _top    = region.top;
 					var _right  = region.right;
 					var _bottom = region.bottom;
-				
+					
+					var _prev_left   = __controller_region__.left;
+					var _prev_top    = __controller_region__.top;
+					var _prev_right  = __controller_region__.right;
+					var _prev_bottom = __controller_region__.bottom;
+					
+					
 					var _comp, xoff, yoff;
 					var i = 0; repeat(__children_count__) {
 						_comp = __children__[i];
@@ -743,33 +678,23 @@ function GUICompController() : GUICompCore() constructor {
 							break;}
 						}
 						
-						//if(_comp.__is_controller__) {
-						//	_left   = min(_left,   xoff+_comp.__controller_region__.left);
-						//	_top    = min(_top,    yoff+_comp.__controller_region__.top);
-						//	_right  = max(_right,  xoff+_comp.__controller_region__.right);
-						//	_bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
-						//}
-						//else{
-						//	_left   = min(_left,   xoff+_comp.region.left);
-						//	_top    = min(_top,    yoff+_comp.region.top);
-						//	_right  = max(_right,  xoff+_comp.region.right);
-						//	_bottom = max(_bottom, yoff+_comp.region.bottom);
-						//}
-						
-						i++
+						i+=1
 					}
 				
 					//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
-					__controller_region__ = new __region__(
-						_left,
-						_top,
-						_right,
-						_bottom
-					)
+					__controller_region__.left   = _left;
+					__controller_region__.top    = _top;
+					__controller_region__.right  = _right;
+					__controller_region__.bottom = _bottom;
 					
 					//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 					if (__is_child__) {
-						__parent__.__update_controller_region__();
+						if (_prev_left   != _left)
+						|| (_prev_top    != _top)
+						|| (_prev_right  != _right)
+						|| (_prev_bottom != _bottom) {
+							__parent__.__update_controller_region__();
+						}
 					}
 				#endregion
 				
@@ -783,7 +708,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
-			static __validate_component_additions__ = function(_arr) {
+			static __validate_component_additions__ = function(_arr) { //log(["__validate_component_additions__", __validate_component_additions__]);
 				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
@@ -832,7 +757,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
-			static __validate_component_positions__ = function(_arr) {
+			static __validate_component_positions__ = function(_arr) { //log(["__validate_component_positions__", __validate_component_positions__]);
 				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
@@ -930,7 +855,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index the array will be inserted into. Note: a value of -1 will push the array to the end.
 			/// @ignore
 			#endregion
-			static __include_children__ = function(_arr, _index) {
+			static __include_children__ = function(_arr, _index) { //log(["__include_children__", __include_children__]);
 				var _size, _i, _comp;
 				
 				_size = array_length(_arr);

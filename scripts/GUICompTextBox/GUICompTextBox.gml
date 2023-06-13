@@ -373,7 +373,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						repeat (_text_length) {
 							var _remaining_area = _cursor_width - string_width(string_copy(_text, _new_cursor + 1, 1)) / 2;
 							if (string_width(string_copy(_text, _cursor_x, _new_cursor - _cursor_x)) >= _remaining_area) break;
-							_new_cursor ++;
+							_new_cursor +=1;
 						}
 					}
 					else {
@@ -671,13 +671,13 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				
 				//check to see if the mouse is out of the window it's self
 				static is_desktop = (os_type == os_windows || os_type == os_macosx || os_type == os_linux)
-				if (is_desktop) {
-					if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
-					|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-						__mouse_on_cc__ = false;
-						return false;
-					}
-				}
+				//if (is_desktop) {
+				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
+				//	|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
+				//		__mouse_on_cc__ = false;
+				//		return false;
+				//	}
+				//}
 				
 				__mouse_on_cc__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
@@ -1622,7 +1622,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								
 									draw_text(_draw_x-_x_off, _draw_y+_derivative_y, _text);
 								
-									_displayed_lines_index++;
+									_displayed_lines_index+=1;
 								}
 							}
 							
@@ -1699,7 +1699,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						
 						var _i=0; repeat(array_length(_struct_keys)) {
 							_struct[$ _struct_keys[_i]] = true
-						_i++;}//end repeat loop
+						_i+=1;}//end repeat loop
 						
 						return _struct;
 					}
@@ -1788,7 +1788,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 
 						repeat (_length) {
 							_str += "\n" + _arr[_i];
-							_i ++;
+							_i +=1;
 						}
 	
 						return _str;
@@ -2026,7 +2026,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								else {
 									_max_length -= _str_length;
 								}
-								_i ++;
+								_i +=1;
 							}
 							if (_current_line > _i) {
 								set_cursor_y_pos(_i);
@@ -2328,7 +2328,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									curt.lines[_start_line] = string_copy(_current_text, 1, _current_text_iterator - 1);
 									break;
 								}
-								_current_text_iterator ++;
+								_current_text_iterator +=1;
 							}
 							_end_line += 1;
 						}
@@ -2367,7 +2367,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											curt.lines[_new_line_index] = string_delete(_next_text, 1, _current_text_iterator - 1);
 											break;
 										}
-										_current_text_iterator ++;
+										_current_text_iterator +=1;
 									}
 									
 									_end_line += 1;
@@ -2393,7 +2393,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								_length -= _string_length;
 							}
 						}
-						_start_line ++;
+						_start_line +=1;
 					}
 					
 					curt.length = array_length(curt.lines);
@@ -2419,7 +2419,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						_copied_text = string_delete(_copied_text, 1, _new_line_pos);
 						_new_line_pos = string_pos("\n", _copied_text);
 						_line_end_pos += _new_line_pos;
-						_start_line++;
+						_start_line+=1;
 					}
 	
 					return _text;

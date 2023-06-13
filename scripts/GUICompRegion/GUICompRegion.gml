@@ -148,7 +148,7 @@ function GUICompRegion() : GUICompController() constructor {
 						_bottom = max(_bottom, yoff+_component.region.bottom);
 					}
 					
-					_i++
+					_i+=1
 				}
 				
 				
@@ -514,7 +514,7 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				step(__user_input__);
 				
-				if (__user_input__.consumed) { capture_input(); };
+				//if (__user_input__.consumed) { capture_input(); };
 			}
 			
 			static __end_step__ = function(_input) {
@@ -544,7 +544,7 @@ function GUICompRegion() : GUICompController() constructor {
 					var _i=0; repeat(__children_count__) {
 						_component = __children__[_i];
 						_component.__draw_gui__(__user_input__);
-					_i++;}//end repeat loop
+					_i+=1;}//end repeat loop
 					
 				}
 				
@@ -555,7 +555,7 @@ function GUICompRegion() : GUICompController() constructor {
 				if (!__scroll_vert_hidden__) __scroll_vert__.__draw_gui__(__user_input__);
 				
 				
-				if (__user_input__.consumed) { capture_input(); };
+				//if (__user_input__.consumed) { capture_input(); };
 				
 			}
 			static __draw_gui_end__ = function(_input) {
@@ -577,7 +577,7 @@ function GUICompRegion() : GUICompController() constructor {
 					var _i=0; repeat(__children_count__) {
 						_component = __children__[_i];
 						_component.__draw_gui_end__(__user_input__);
-					_i++;}//end repeat loop
+					_i+=1;}//end repeat loop
 					
 				}
 				
@@ -587,7 +587,7 @@ function GUICompRegion() : GUICompController() constructor {
 				__scroll_vert__.__draw_gui_end__(__user_input__);
 				__scroll_horz__.__draw_gui_end__(__user_input__);
 				
-				if (__user_input__.consumed) { capture_input(); };
+				//if (__user_input__.consumed) { capture_input(); };
 				
 				xprevious = x;
 				yprevious = y;
@@ -603,6 +603,10 @@ function GUICompRegion() : GUICompController() constructor {
 				__controller_region__.top    = region.top;
 				__controller_region__.right  = region.right;
 				__controller_region__.bottom = region.bottom;
+				
+				if (__controller_region__.bottom == 21) {
+					log(debug_get_callstack(8))
+				}
 				
 				__update_scrollbar_thumbs__();
 				

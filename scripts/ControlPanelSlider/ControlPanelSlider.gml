@@ -63,6 +63,8 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				
 				__button_dec__.set_position(-_textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width() - _spacing - __button_dec__.region.get_width(), 0)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc

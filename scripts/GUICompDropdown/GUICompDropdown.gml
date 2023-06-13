@@ -219,7 +219,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				var _i=0; repeat(array_length(elements)) {
 					_largest_text_width  = max(_largest_text_width,  string_width(elements[_i].text) );
 					_largest_text_height = max(_largest_text_height, string_height(elements[_i].text) );
-				_i++;}//end repeat loop
+				_i+=1;}//end repeat loop
 				
 				
 				var _slice = sprite_get_nineslice(sprite.index);
@@ -642,14 +642,14 @@ function GUICompDropdown() : GUICompCore() constructor {
 							// otherwise we just drawn the bottom element's sprite
 							_draw(_posX, _posY, sprite.top, elements[_i]);
 							_posY += _element_dist;
-							_i++;
+							_i+=1;
 						}
 						
 						//draw the middle ones
 						repeat(_size-2) {
 							_draw(_posX, _posY, sprite.middle, elements[_i]);
 							_posY += _element_dist;
-						_i++;}//end repeat loop
+						_i+=1;}//end repeat loop
 						
 						//draw the bottom one
 						_draw(_posX, _posY, sprite.bottom, elements[_i]);
@@ -780,7 +780,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 							
 							_posY += _element_dist;
 							
-						_i++;}//end repeat loop
+						_i+=1;}//end repeat loop
 					}
 				}
 				

@@ -21,6 +21,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 						_scroll_text_height*0.5
 				)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc

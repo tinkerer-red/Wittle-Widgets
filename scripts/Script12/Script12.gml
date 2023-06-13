@@ -40,7 +40,7 @@ function __struct_inherited() {
 					}
 				} 
 			}
-			++_i;
+			_i+=1;
 		}
 		
 		while (_statics != undefined) {
@@ -55,7 +55,7 @@ function __struct_inherited() {
 						return (_func != undefined) ? _func : _dummy;
 					}
 				}
-				++_i;
+				_i+=1;
 			}
 			_statics = static_get(_statics);
 		}

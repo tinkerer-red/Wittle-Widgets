@@ -37,6 +37,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 						_scroll_text_height*0.5
 				)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc

@@ -23,6 +23,8 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 						_scroll_text_height*0.5
 				)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc

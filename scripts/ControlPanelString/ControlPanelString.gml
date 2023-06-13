@@ -30,6 +30,8 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 						_scroll_text_height*0.5
 				)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc

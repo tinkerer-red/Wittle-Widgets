@@ -106,7 +106,7 @@ function GUICompHandler() : GUICompController() constructor {
 						//xx = _component.x - (x-_x);
 						//yy = _component.y - (y-_y);
 						_component.__draw_gui_begin__(_input);
-					_i++;}//end repeat loop
+					_i+=1;}//end repeat loop
 		
 				}
 				#region jsDoc
@@ -126,7 +126,7 @@ function GUICompHandler() : GUICompController() constructor {
 						//xx = _component.x - (x-_x);
 						//yy = _component.y - (y-_y);
 						_component.__draw_gui__(_input);
-					_i++;}//end repeat loop
+					_i+=1;}//end repeat loop
 		
 				}
 				#region jsDoc
@@ -146,7 +146,7 @@ function GUICompHandler() : GUICompController() constructor {
 						//xx = _component.x - (x-_x);
 						//yy = _component.y - (y-_y);
 						_component.__draw_gui_end__(_input);
-					_i++;}//end repeat loop
+					_i+=1;}//end repeat loop
 					
 				}
 				
@@ -163,7 +163,7 @@ function GUICompHandler() : GUICompController() constructor {
 							_component.__cleanup__();
 							delete _component;
 				
-						_i++;}//end repeat loop
+						_i+=1;}//end repeat loop
 			
 					}
 				}

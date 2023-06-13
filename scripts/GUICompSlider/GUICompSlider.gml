@@ -1038,8 +1038,8 @@ function GUICompSlider() : GUICompCore() constructor {//log(["GUICompSlider", GU
 											_text_outline_col,
 											text.outline.alpha
 									);
-								_j++; }; //end inner repeat
-							_i++; }; //end outer repeat
+								_j+=1; }; //end inner repeat
+							_i+=1; }; //end outer repeat
 						}
 						
 						draw_text_color(

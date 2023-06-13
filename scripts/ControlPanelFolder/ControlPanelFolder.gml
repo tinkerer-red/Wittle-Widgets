@@ -26,6 +26,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 						_scroll_text_height*0.5
 				)
 				
+				update_component_positions()
+				
 				return self
 			}
 			#region jsDoc
@@ -107,6 +109,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			#endregion
 			static add = function(_comp) {
 				__folder__.add(_comp)
+				
+				update_component_positions()
 				
 				return self;
 			}

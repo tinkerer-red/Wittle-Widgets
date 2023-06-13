@@ -379,22 +379,40 @@ function GUICompScrollingText() : GUICompCore() constructor {
 					}
 				}
 				
-				__shader_set__(clip_region);
+				var _should_cull = false;
+				if (text.width > region.get_width())
+				|| (text.height > region.get_height()) {
+					_should_cull = true;
+				}
+				
+				if (_should_cull) __shader_set__(clip_region);
 				draw_gui_begin(_input)
-				__shader_reset__();
+				if (_should_cull) __shader_reset__();
 				//__draw_component_surface__(_x, _y);
 				
 			}
 			static __draw_gui__ = function(_input) {
-				__shader_set__(clip_region);
+				var _should_cull = false;
+				if (text.width > region.get_width())
+				|| (text.height > region.get_height()) {
+					_should_cull = true;
+				}
+				
+				if (_should_cull) __shader_set__(clip_region);
 				draw_gui(_input)
-				__shader_reset__();
+				if (_should_cull) __shader_reset__();
 				//__draw_component_surface__(_x, _y);
 			}
 			static __draw_gui_end__ = function(_input) {
-				__shader_set__(clip_region);
+				var _should_cull = false;
+				if (text.width > region.get_width())
+				|| (text.height > region.get_height()) {
+					_should_cull = true;
+				}
+				
+				if (_should_cull) __shader_set__(clip_region);
 				draw_gui_end(_input);
-				__shader_reset__();
+				if (_should_cull) __shader_reset__();
 				
 				xprevious = x;
 				yprevious = y;
@@ -455,6 +473,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				clip_region.top    = _top;
 				clip_region.bottom = _bottom;
 			}
+			
 		#endregion
 		
 	#endregion

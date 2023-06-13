@@ -145,32 +145,32 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @returns {Real}
 			#endregion
 			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
-				
 				var _changed = false;
 				
 				if (is_open)
 				&& (!__is_empty__) {
-					var _posX, _posY, _i, _comp, _comp_pos_changed;
+					var _posX, _posY, _i, _comp;
 					_posX = x + children_x_offset;
 					_posY = y + children_y_offset;
 					
 					_i=0; repeat(__children_count__) {
-						_comp_pos_changed = false;
-						
 						_comp = __children__[_i];
 						
-						if (_comp.x = _posX)
-						|| (_comp.y = _posY) {
-							_comp_pos_changed = true;
+						if (_comp.x != _posX)
+						|| (_comp.y != _posY) {
 							_changed = true;
 						}
+						
 						_comp.x = _posX;
 						_comp.y = _posY;
 						
 						if (_comp.__is_controller__) {
-							if (_comp_pos_changed) {
+							
 								_comp.update_component_positions();
-								//_comp.__update_controller_region__();
+								
+							if (_changed) {
+								//not this isnt needed if the parent is a folder, but if it's another folder inside a controller this is indeed neede
+								_comp.__update_controller_region__();
 							}
 							_posY += _comp.__controller_region__.get_height();
 						}
@@ -182,14 +182,8 @@ function GUICompFolder() : GUICompController() constructor {
 					
 				}
 				
-				if (_changed) {
-					__update_controller_region__();
-				}
+				__update_controller_region__();
 				
-				if (__is_child__)
-				&& (_changed) {
-					__parent__.update_component_positions();
-				}
 			}
 			
 		#endregion

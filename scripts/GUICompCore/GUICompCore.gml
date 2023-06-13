@@ -412,16 +412,17 @@ function GUICompCore() constructor {
 			/// @returns {Real}
 			#endregion
 			static update_all_component_positions = function() { 
-				var _prev_parent = self;
-				var _parent = __parent__;
-				while (_parent != noone) {
-					_prev_parent = _parent;
-					_parent = _parent.__parent__;
+				if (__is_child__) {
+					__parent__.update_component_positions();
 				}
-				if (_prev_parent.__is_controller__) {
-					log(["update_all_component_positions", update_all_component_positions])
-					_prev_parent.update_component_positions();
+				else {
+					//update_component_positions();
+					//if (__is_controller__){
+					//	__update_controller_region__();
+					//}
+					
 				}
+				
 			}
 			
 			#region GML Events

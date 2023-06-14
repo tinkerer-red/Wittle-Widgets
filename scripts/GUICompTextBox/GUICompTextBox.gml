@@ -148,7 +148,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @func    set_background_color()
 			/// @desc    Sets the color of the background.
 			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} color : The highlight color
+			/// @param   {Constant.Colour} color : The background color
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_background_color = function(_color=#363F39) {//log(["set_background_color", set_background_color]);
@@ -160,7 +160,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @func    set_background_alpha()
 			/// @desc    Sets the alpha of the background.
 			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} color : The highlight color
+			/// @param   {Constant.Colour} color : The background color
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_background_alpha = function(_color=#363F39) {//log(["set_background_alpha", set_background_alpha]);

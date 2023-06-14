@@ -93,6 +93,7 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
 				.set_text("")
+				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_text_offsets(0, 0, 1)
 			

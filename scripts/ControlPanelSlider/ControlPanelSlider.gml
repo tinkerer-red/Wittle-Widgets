@@ -138,13 +138,14 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 		
 		#region Variables
 			
-			var _sprite_button_dec = s9ScrollbarHorzButtonLeft;
-			var _sprite_button_inc = s9ScrollbarHorzButtonRight;
+			var _sprite_button_dec = sCPScrollbarHorzButtonLeft;
+			var _sprite_button_inc = sCPScrollbarHorzButtonRight;
 			
 			
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
 				.set_text("")
+				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
@@ -175,10 +176,10 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_alignment(fa_right, fa_top)
 				.set_value(clamp(_value, _min, _max))
 				.set_clamp_values(_min, _max)
-				.set_background_min_colors(#1E2F4A, #25466E, #326AAD, #1D3049)
-				.set_background_max_colors(#1E2F4A, #25466E, #326AAD, #1D3049)
-				.set_bar_min_colors(#4296FA, #4296FA, #4296FA, #4296FA)
-				.set_bar_max_colors(#4296FA, #4296FA, #4296FA, #4296FA)
+				.set_background_min_colors(#232428, #2B2D31, #313338, #1E1F22)
+				.set_background_max_colors(#232428, #2B2D31, #313338, #1E1F22)
+				.set_bar_min_colors(#670000, #800000, #8E0000, #5D0000)
+				.set_bar_max_colors(#670000, #800000, #8E0000, #5D0000)
 			
 			__textbox__ = new GUICompTextbox()
 				.set_anchor(-_info.right, _info.top)
@@ -189,7 +190,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_text(string(_value))
 				.set_text_font(__CP_FONT)
 				.set_text_color(c_white)
-				.set_background_color(#1E2F4A)
+				.set_background_color(#2B2D31)
 				.set_max_length(20)
 				.set_char_enforcement("0123456789.-")
 				.set_multiline(false)

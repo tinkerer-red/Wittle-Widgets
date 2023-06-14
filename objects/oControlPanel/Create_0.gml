@@ -1,13 +1,10 @@
 // Inherit the parent event
 event_inherited();
-show_debug_overlay(true)
+//show_debug_overlay(true)
 
 event_user(15);
 
-control_panel = new ControlPanelFolder(" > Control Panel", function(){
-	var _text = (control_panel.is_open) ? " V Control Panel" : " > Control Panel";
-	control_panel.set_text(_text)
-})
+control_panel = new ControlPanelFolder("Control Panel", function(){})
 
 cc.add(control_panel)
 

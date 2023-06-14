@@ -104,6 +104,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
 				.set_text("")
+				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
@@ -112,6 +113,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
+				.set_checkbox_sprites(sCPCheckboxChecked, sCPCheckboxUnChecked)
 			
 			__checkbox__.x -= __checkbox__.sprite.width
 			

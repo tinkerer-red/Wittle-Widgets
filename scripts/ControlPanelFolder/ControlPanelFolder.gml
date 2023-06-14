@@ -140,6 +140,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
+				.set_sprite(s9CPFolderOpened)
 				.set_text("")
 				.set_text_alignment(fa_left, fa_top)
 				.set_text_offsets(0, 0, 1)
@@ -180,7 +181,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			__SUPER__.add(__folder__);
 			__SUPER__.add(__scrolling_text__);
 			
-			set_children_offsets(8, 0)
+			set_children_offsets(12, 0)
 			
 			//set the default size of the component
 			//get the label width
@@ -255,6 +256,9 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
 					__folder__.set_open(!__folder__.is_open)
 					is_open = __folder__.is_open;
+					
+					var _spr = (is_open) ? s9CPFolderOpened : s9CPFolderClosed;
+					__button__.set_sprite(_spr);
 					
 					callback();
 				});

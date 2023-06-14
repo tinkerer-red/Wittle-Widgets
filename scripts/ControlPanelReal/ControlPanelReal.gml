@@ -106,6 +106,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
 				.set_text("")
+				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
@@ -129,7 +130,8 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_text(string(_value))
 				.set_text_font(__CP_FONT)
 				.set_text_color(c_white)
-				.set_background_color(#1E2F4A)
+				.set_background_color(#2B2D31)
+				.set_highlight_color(#800000)
 				.set_max_length(20)
 				.set_char_enforcement("0123456789")
 				.set_multiline(false)

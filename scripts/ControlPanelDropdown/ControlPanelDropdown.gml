@@ -110,6 +110,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
 				.set_text("")
+				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
@@ -118,6 +119,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			__dropdown__ = new GUICompDropdown() //the x/y doesnt matter as the set region will move this
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
+				.set_dropdown_sprites(s9CPDropDown, s9CPDropDownTop, s9CPDropDownMiddle, s9CPDropDownBottom)
 				.set_dropdown_array(_arr_of_str)
 				.set_sprite_to_auto_wrap()
 			__dropdown__.set_position(-__dropdown__.region.get_width(), 0)

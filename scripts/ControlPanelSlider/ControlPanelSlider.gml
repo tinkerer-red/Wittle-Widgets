@@ -397,7 +397,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 					callback(_value); //for use with the index as input
 				});
 				
-				//remove any second periods
+				//remove any second periods, double dashes, or any other missused formatting
 				__textbox__.__add_event_listener_priv__(__textbox__.events.change, function(_str) {
 					if (string_count(".", _str)) {
 						_str = string_replace(_str, ".", "#")

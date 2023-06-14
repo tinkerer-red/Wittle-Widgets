@@ -133,7 +133,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_background_color(#2B2D31)
 				.set_highlight_color(#800000)
 				.set_max_length(20)
-				.set_char_enforcement("0123456789")
+				.set_char_enforcement("0123456789.-")
 				.set_multiline(false)
 				//.set_force_wrapping(false)
 				//.set_shift_only_new_line(false)
@@ -255,8 +255,38 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				
 				//callback
 				__textbox__.__add_event_listener_priv__(__textbox__.events.submit, function(_str) {
-					callback(_str); //for use with the index as input
+					if (string_digits(_str) == "") {
+						_str = "0";
+						var _value = 0;
+						__textbox__.set_text(_str);
+					}
+					else {
+						var _value = real(_str);
+						//just incase it's a string like "-.0"
+						if (_value == 0) {
+							__textbox__.set_text("0")
+						}
+					}
+					
+					callback(_value); //for use with the index as input
 					//callback(_data.element); //for use with the string as input
+				});
+				
+				//remove any second periods, double dashes, or any other missused formatting
+				__textbox__.__add_event_listener_priv__(__textbox__.events.change, function(_str) {
+					if (string_count(".", _str)) {
+						_str = string_replace(_str, ".", "#")
+						_str = string_replace_all(_str, ".", "")
+						_str = string_replace(_str, "#", ".")
+					}
+					
+					var _pos = string_pos_ext("-", _str, 2)
+					while (_pos) {
+						_str = string_delete(_str, _pos, 1)
+						_pos = string_pos_ext("-", _str, 2)
+					}
+					
+					__textbox__.set_text(_str)
 				});
 				
 			#endregion

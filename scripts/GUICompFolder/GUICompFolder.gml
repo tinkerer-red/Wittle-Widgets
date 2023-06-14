@@ -242,7 +242,7 @@ function GUICompFolder() : GUICompController() constructor {
 						
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __step__ = function(_input){ //log(["__step__", __step__]);
 					__user_input__ = _input;
@@ -265,7 +265,7 @@ function GUICompFolder() : GUICompController() constructor {
 					
 					//__handle_click__(_input);
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
 					__user_input__ = _input;
@@ -288,7 +288,7 @@ function GUICompFolder() : GUICompController() constructor {
 					
 					__trigger_event__(self.events.post_update);
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				
 				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
@@ -314,7 +314,7 @@ function GUICompFolder() : GUICompController() constructor {
 						
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
 					__user_input__ = _input;
@@ -362,7 +362,7 @@ function GUICompFolder() : GUICompController() constructor {
 						
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
 					__user_input__ = _input;
@@ -385,7 +385,7 @@ function GUICompFolder() : GUICompController() constructor {
 						
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 					
 					xprevious = x;
 					yprevious = y;

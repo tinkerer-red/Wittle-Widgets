@@ -573,7 +573,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 					}
 					
 					//return the consumed inputs
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __step__ = function(_input) {//log(["__step__", __step__])
 					__user_input__ = _input;
@@ -589,7 +589,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 						__button_dec__.__step__(_input);
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __end_step__ = function(_input) {//log(["__end_step__", __end_step__])
 					__user_input__ = _input;
@@ -605,7 +605,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 					
 					__trigger_event__(self.events.post_update);
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				
 				static __draw_gui_begin__ = function(_input) {//log(["__draw_gui_begin__", __draw_gui_begin__])
@@ -622,7 +622,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 						__button_dec__.__draw_gui_begin__(_input);
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __draw_gui__ = function(_input) {//log(["__draw_gui__", __draw_gui__])
 					__user_input__ = _input;
@@ -636,7 +636,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 						__button_dec__.__draw_gui__(_input);
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 					
 				}
 				static __draw_gui_end__ = function(_input) {//log(["__draw_gui_end__", __draw_gui_end__])
@@ -651,7 +651,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 						__button_dec__.__draw_gui_end__(_input);
 					}
 					
-					//if (__user_input__.consumed) { capture_input(); };
+					if (__user_input__.consumed) { capture_input(); };
 					
 					xprevious = x;
 					yprevious = y;

@@ -140,7 +140,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			
 			__button__ = new GUICompButtonText()
 				.set_anchor(0,0)
-				.set_sprite(s9CPFolderOpened)
+				.set_sprite(s9CPFolderClosed)
 				.set_text("")
 				.set_text_alignment(fa_left, fa_top)
 				.set_text_offsets(0, 0, 1)
@@ -156,6 +156,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_header_shown(false)
 				.set_open(false)
 				.set_children_offsets(0, 0)
+			__folder__.set_open(false)
 			__folder__.should_draw_debug = false;
 			__folder__.draw_debug = method(__folder__, function() {
 				draw_set_color(c_yellow)
@@ -167,6 +168,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 						true
 				);
 			});
+			
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, _info.top - __button__.text_click_y_off)

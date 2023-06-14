@@ -399,9 +399,9 @@ function GUICompCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static capture_input = function() { //log(["capture_input", capture_input]);
-				//if (__is_child__) {
-				//	__parent__.capture_input()
-				//}
+				if (__is_child__) {
+					__parent__.capture_input()
+				}
 				
 				__user_input__.consumed = true;
 			}

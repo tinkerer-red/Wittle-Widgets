@@ -730,7 +730,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						}
 					}
 					else {
-						html_set_cursor(cr_default);
+						js_set_cursor(cr_default);
 					}
 				
 				}
@@ -760,7 +760,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 						}
 						else {
-							html_set_cursor(_cursor);
+							js_set_cursor(_cursor);
 						}
 						curt.view = _mouse_on_comp;
 					}
@@ -904,12 +904,13 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											clipboard_set_text(_text);
 										}
 										else {
-											clipboard_set_text_html(_text);
+											js_clipboard_set_text(_text);
 										}
 									}
 					
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.c;
 					
 									break;
@@ -936,8 +937,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									var _lines_shown = floor(_height/draw.line_height)
 									set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
 								
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.page_up;
 								
 									curt.button_repeat = 40;
@@ -959,8 +961,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									var _lines_shown = floor(_height/draw.line_height)
 									set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
 									
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.page_down;
 								
 									curt.button_repeat = 40;
@@ -986,8 +989,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										set_vert_scroll(scroll.y_off + _height)
 										set_cursor_y_pos(curt.current_line - _lines_shown)
 									
-										//need to do this because html5
+										//html5 support
 										keyboard_string = "";
+										
 										keys.last_key = keys.page_up;
 									
 										curt.button_repeat = 3;
@@ -1013,8 +1017,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										set_vert_scroll(scroll.y_off - _height)
 										set_cursor_y_pos(curt.current_line + _lines_shown)
 									
-										//need to do this because html5
+										//html5 support
 										keyboard_string = "";
+										
 										keys.last_key = keys.page_down;
 									
 										curt.button_repeat = 3;
@@ -1297,8 +1302,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										set_cursor_x_pos(_line_last_length);
 									}
 							
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.a;
 									
 									break;
@@ -1312,12 +1318,13 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											clipboard_set_text(_text);
 										}
 										else {
-											clipboard_set_text_html(_text);
+											js_clipboard_set_text(_text);
 										}
 									}
 			
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.c;
 									
 									break;
@@ -1331,15 +1338,16 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											clipboard_set_text(_text);
 										}
 										else {
-											clipboard_set_text_html(_text);
+											js_clipboard_set_text(_text);
 										}
 							
 										__textbox_delete_string__(false);
 										__update_scroll__();
 									}
-			
-									//need to do this because html5
+									
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.x;
 									
 									if (__event_exists__(self.events.change)) {
@@ -1357,8 +1365,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										if (_pasted_text != "") __textbox_insert_string__(_pasted_text);
 									}
 			
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.v;
 									
 									if (__event_exists__(self.events.change)) {
@@ -1376,8 +1385,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										__update_scroll__();
 									}
 			
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.z;
 									
 									if (__event_exists__(self.events.change)) {
@@ -1395,8 +1405,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										__update_scroll__();
 									}
 			
-									//need to do this because html5
+									//html5 support
 									keyboard_string = "";
+									
 									keys.last_key = keys.y;
 									
 									if (__event_exists__(self.events.change)) {
@@ -2242,8 +2253,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						}
 					}
 					else {
-						if (clipboard_has_text_html()) {
-							_pasted_string = clipboard_get_text_html();
+						if (js_clipboard_has_text_()) {
+							_pasted_string = js_clipboard_get_text();
 						}
 					}
 					

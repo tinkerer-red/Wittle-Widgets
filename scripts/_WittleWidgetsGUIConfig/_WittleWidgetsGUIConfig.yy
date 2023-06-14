@@ -1,7 +1,7 @@
 {
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
-  "name": "_RedsGUIConfig",
+  "name": "_WittleWidgetsGUIConfig",
   "isCompatibility": false,
   "isDnD": false,
   "parent": {

@@ -43,7 +43,7 @@
     "IDEVersion": "2023.4.0.84",
   },
   "resources": [
-    {"id":{"name":"_RedsGUIConfig","path":"scripts/_RedsGUIConfig/_RedsGUIConfig.yy",},},
+    {"id":{"name":"_WittleWidgetsGUIConfig","path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},},
     {"id":{"name":"Super","path":"scripts/Super/Super.yy",},},
     {"id":{"name":"s9SliderThumb","path":"sprites/s9SliderThumb/s9SliderThumb.yy",},},
     {"id":{"name":"oControlPanel","path":"objects/oControlPanel/oControlPanel.yy",},},

@@ -1,0 +1,2 @@
+#macro GUI_GLOBAL_DEBUG false // if the component system should gloabally debug, drawing the component's reletive developer information
+#macro GUI_GLOBAL_SAFETY true // enable or disable internal safety checks, including type checking, and recursion errors. leave on when developing and disable when publishing to increase performance slightly.

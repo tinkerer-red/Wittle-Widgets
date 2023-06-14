@@ -22,7 +22,7 @@
     {"name":"Assets","order":4,"path":"folders/ControlPanel/Assets.yy",},
   ],
   "ResourceOrderSettings": [
-    {"name":"_RedsGUIConfig","order":3,"path":"scripts/_RedsGUIConfig/_RedsGUIConfig.yy",},
+    {"name":"_WittleWidgetsGUIConfig","order":3,"path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},
     {"name":"Super","order":1,"path":"scripts/Super/Super.yy",},
     {"name":"s9SliderThumb","order":2,"path":"sprites/s9SliderThumb/s9SliderThumb.yy",},
     {"name":"ControlPanelSlider","order":5,"path":"scripts/ControlPanelSlider/ControlPanelSlider.yy",},

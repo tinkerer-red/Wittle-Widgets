@@ -144,3 +144,19 @@ _controller.add(_folder);
 //_controller.add(_btn);
 
 
+
+var _adjustment_spacing = move_speed; //how far from the outer eadge to check the inner collisions, roughly your move speed, but can be any number
+var _height_dist = 2; //how many pixels above the player's head to check, this will want to be > or = to your jump speed
+
+var _left_outer = collision_point(bbox_left, bbox_top, obj_solid, false, true);
+var _left_inner = collision_point(bbox_left+_adjustment_spacing, bbox_top-_height_dist, obj_solid, false, true);
+if (_left_outer) && (!_left_inner) { //if we barely touched a block on the left
+	//move right
+}
+var _right_outer = collision_point(bbox_right, bbox_top, obj_solid, false, true);
+var _right_inner = collision_point(bbox_right-_adjustment_spacing, bbox_top-_height_dist, obj_solid, false, true);
+if (_right_outer) && (!_right_inner) { //if we barely touched a block on the right
+	//move left
+}
+
+

@@ -829,12 +829,7 @@ function GUICompCore() constructor {
 			#region Surface
 				
 				static __surface_set_target__ = function() { //log(["__surface_set_target__", __surface_set_target__]);
-					//do not call this function unless you need the comonent on a surface for a specific reason.
-					//this function is only intended for the component systems internal surface handling.
-					// if you need to have a component use a surface which isnt part of the component system you can call
-					// __surface_reset_target__ instead. this will check to see if the current surface is their surface
-					// and if not revert to their component surface.
-		
+					
 					surface_region = (__is_controller__) ? __controller_region__ : region;
 		
 		
@@ -849,14 +844,17 @@ function GUICompCore() constructor {
 		
 					//rebuild surface if needed
 					if (is_undefined(__component_surface__)) {
-						__component_surface__ = surface_create((surface_bbox.right - surface_bbox.left),
-																				(surface_bbox.bottom - surface_bbox.top))
+						__component_surface__ = surface_create(
+								(surface_bbox.right - surface_bbox.left),
+								(surface_bbox.bottom - surface_bbox.top)
+						)
 					}
 					else{
-						__component_surface__ = __surface_rebuild__(__component_surface__,
-																							(surface_bbox.right - surface_bbox.left),
-																							(surface_bbox.bottom - surface_bbox.top)
-																						);
+						__component_surface__ = __surface_rebuild__(
+								__component_surface__,
+								(surface_bbox.right - surface_bbox.left),
+								(surface_bbox.bottom - surface_bbox.top)
+						);
 					}
 		
 					//set and clear our surface
@@ -904,14 +902,15 @@ function GUICompCore() constructor {
 				
 				static __draw_component_surface__ = function(_x=x, _y=y) { //log(["__draw_component_surface__", __draw_component_surface__]);
 		
-					draw_surface_stretched_ext(__component_surface__,
-																					_x+surface_bbox.left,
-																					_y+surface_bbox.top,
-																					(surface_bbox.right - surface_bbox.left),
-																					(surface_bbox.bottom - surface_bbox.top),
-																					c_white, 1
-																				);
-		
+					draw_surface_stretched_ext(
+							__component_surface__,
+							_x+surface_bbox.left,
+							_y+surface_bbox.top,
+							(surface_bbox.right - surface_bbox.left),
+							(surface_bbox.bottom - surface_bbox.top),
+							c_white, 1
+					);
+					
 				}
 				
 			#endregion

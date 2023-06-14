@@ -1,4 +1,4 @@
-function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func) : GUICompController(0, 0) constructor {
+function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func) : GUICompController() constructor {
 	
 	draw_debug = function(){
 		
@@ -191,6 +191,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_text_font(__CP_FONT)
 				.set_text_color(c_white)
 				.set_background_color(#2B2D31)
+				.set_highlight_color(#800000)
 				.set_max_length(20)
 				.set_char_enforcement("0123456789.-")
 				.set_multiline(false)

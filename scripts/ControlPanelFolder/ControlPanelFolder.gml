@@ -1,4 +1,4 @@
-function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
+function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController() constructor {
 	
 	#region Public
 		
@@ -179,6 +179,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
+			
 			__SUPER__.add(__button__);
 			__SUPER__.add(__folder__);
 			__SUPER__.add(__scrolling_text__);
@@ -261,6 +262,11 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 					
 					var _spr = (is_open) ? s9CPFolderOpened : s9CPFolderClosed;
 					__button__.set_sprite(_spr);
+					
+					//force update the children's regions to adapt to the window size
+					var _i=0; repeat(__folder__.__children_count__) {
+						__folder__.__children__[_i].__trigger_event__(self.events.pre_update);
+					_i+=1;}//end repeat loop
 					
 					callback();
 				});

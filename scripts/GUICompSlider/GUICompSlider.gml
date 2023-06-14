@@ -651,6 +651,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			self.events.mouse_over = "mouse_over";
 			self.events.pressed    = "pressed";
 			self.events.held       = "held";
+			self.events.long_press = "long_press";
 			self.events.released   = "released";
 			
 			self.events.value_input       = "value_input"; //if a value was input in any way, this will trigger every frame the slider is interacted wtih

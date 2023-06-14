@@ -1,4 +1,4 @@
-function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GUICompController(0, 0) constructor {
+function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GUICompController() constructor {
 	
 	draw_debug = function(){
 		draw_text(x,y,string(["is_open", is_open, "__dropdown__.is_open", __dropdown__.is_open]))

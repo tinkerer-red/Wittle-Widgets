@@ -1,4 +1,4 @@
-function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompController(0, 0) constructor {
+function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompController() constructor {
 	
 	draw_debug = function(){
 		
@@ -43,7 +43,8 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			#endregion
 			static set_text = function(_text="DefaultText") {
 				text = _text
-				__scrolling_text__.set_text(text);
+				
+				__scrolling_text__.set_text(_text);
 				
 				return self;
 			}
@@ -78,8 +79,10 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				_str = string_replace_all(_str, "\n", "\\n")
 				_str = string_replace_all(_str, "\t", "\\t")
 				_str = string_replace_all(_str, "\r", "\\r")
-				
+				log(["__textbox__.curt.lines", __textbox__.curt.lines])
 				__textbox__.set_text(_str)
+				__textbox__.should_draw_debug = true;
+				log(["__textbox__.curt.lines", __textbox__.curt.lines])
 				
 				return self;
 			}
@@ -138,17 +141,18 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
 				.set_region(0, 0, 0, _ideal_h)
-				.set_scrollbar_sizes(0, 0)
-				.set_text("fucking hell")
+			log(["__textbox__.get_vert_scroll()", __textbox__.get_vert_scroll()])
+			__textbox__.set_scrollbar_sizes(0, 0)
+				.set_text(string(_str))
 				.set_text_font(__CP_FONT)
 				.set_text_color(c_white)
 				.set_background_color(#2B2D31)
+				.set_highlight_color(#800000)
 				.set_max_length(infinity)
 				.set_char_enforcement()
 				.set_multiline(false)
 				.set_accepting_inputs(true)
 			
-			//set_value(string(_str))
 			__textbox__.set_position(0, 0)
 			
 			__scrolling_text__ = new GUICompScrollingText()

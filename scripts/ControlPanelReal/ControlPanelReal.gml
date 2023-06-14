@@ -1,4 +1,4 @@
-function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompController(0, 0) constructor {
+function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompController() constructor {
 	
 	draw_debug = function(){
 		

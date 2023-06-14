@@ -22,7 +22,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region]);
+			static set_region = function(_left, _top, _right, _bottom) { static __run_once__ = log(["set_region", set_region]);
 				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
 				return self;
@@ -34,7 +34,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Bool} is_enabled : If the component should be enabled or not.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_enabled = function(_enabled) {//log(["set_enabled", set_enabled]);
+			static set_enabled = function(_enabled) { static __run_once__ = log(["set_enabled", set_enabled]);
 				if(_enabled) {
 					enabled = true;
 					enabled_step = 0;
@@ -54,7 +54,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {String} str : The text to populate an empty text region
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text_placeholder = function(_placeholder="Enter Text") {//log(["set_text_placeholder", set_text_placeholder]);
+			static set_text_placeholder = function(_placeholder="Enter Text") { static __run_once__ = log(["set_text_placeholder", set_text_placeholder]);
 				curt.placeholder = _placeholder;
 				
 				return self;
@@ -66,9 +66,20 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {String} str : The text to write on the button
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text = function(_text="") {//log(["set_text", set_text]);
+			static set_text = function(_text="") { static __run_once__ = log(["set_text", set_text]);
+				var _prev_cursor_x = get_cursor_x_pos();
+				var _prev_cursor_y = get_cursor_y_pos();
+				var _prev_scroll_x = get_horz_scroll();
+				var _prev_scroll_y = get_vert_scroll();
+				log(["_prev_scroll_y", _prev_scroll_y])
 				clear_text();
 				__textbox_insert_string__(_text);
+				
+				set_cursor_x_pos(_prev_cursor_x);
+				set_cursor_y_pos(_prev_cursor_y);
+				set_horz_scroll(_prev_scroll_x);
+				set_vert_scroll(_prev_scroll_y);
+				
 				
 				return self;
 			}
@@ -79,7 +90,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Asset.GMFont} font : The font to use when drawing the text
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text_font = function(_font=fGUIDefault) {//log(["set_text_font", set_text_font]);
+			static set_text_font = function(_font=fGUIDefault) { static __run_once__ = log(["set_text_font", set_text_font]);
 				draw.font = _font;								// font
 				
 				if (!__char_enforcement_defined__) {
@@ -99,7 +110,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Constant.Colour} font : The font to use when drawing the text
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text_color = function(_color=#D9D9D9) {//log(["set_text_color", set_text_color]);
+			static set_text_color = function(_color=#D9D9D9) { static __run_once__ = log(["set_text_color", set_text_color]);
 				draw.font_color = _color;					// font color
 				
 				return self;
@@ -111,7 +122,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} height : The height of the courser and line spaces, this included the font, usually best as font height.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text_line_height = function(_height=-1) {//log(["set_text_line_height", set_text_line_height]);
+			static set_text_line_height = function(_height=-1) { static __run_once__ = log(["set_text_line_height", set_text_line_height]);
 				__line_height_defined__ = true;
 				draw.line_height = (_height != -1) ? _height : font_get_info(draw.font).size;
 				
@@ -125,7 +136,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} yoff : The y offset of the text from the start of a line.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_text_offsets = function(_x_off=0, _y_off=1) {//log(["set_text_offsets", set_text_offsets]);
+			static set_text_offsets = function(_x_off=0, _y_off=1) { static __run_once__ = log(["set_text_offsets", set_text_offsets]);
 				scroll.x_off = _x_off;
 				scroll.y_off = _y_off;
 				
@@ -138,7 +149,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Constant.Colour} color : The highlight color
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_highlight_color = function(_color=#0A68D8) {//log(["set_highlight_color", set_highlight_color]);
+			static set_highlight_color = function(_color=#0A68D8) { static __run_once__ = log(["set_highlight_color", set_highlight_color]);
 				draw.highlight_region_color = _color;
 				
 				return self;
@@ -150,7 +161,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Constant.Colour} color : The background color
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_background_color = function(_color=#363F39) {//log(["set_background_color", set_background_color]);
+			static set_background_color = function(_color=#363F39) { static __run_once__ = log(["set_background_color", set_background_color]);
 				draw.text_background_color = _color;
 				
 				return self;
@@ -162,7 +173,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Constant.Colour} color : The background color
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_background_alpha = function(_color=#363F39) {//log(["set_background_alpha", set_background_alpha]);
+			static set_background_alpha = function(_color=#363F39) { static __run_once__ = log(["set_background_alpha", set_background_alpha]);
 				draw.text_background_alpha = _color;
 				
 				return self;
@@ -174,7 +185,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} max_length : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_max_length = function(_max_length=infinity) {//log(["set_max_length", set_max_length]);
+			static set_max_length = function(_max_length=infinity) { static __run_once__ = log(["set_max_length", set_max_length]);
 				if (should_safety_check) {
 					if (_max_length < 0) {
 						show_error(string("Can not use a negative value for \"set_max_length()\" : {0}", _max_length), true);
@@ -191,7 +202,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_records_limit = function(_memory_limit=64) {//log(["set_records_limit", set_records_limit]);
+			static set_records_limit = function(_memory_limit=64) { static __run_once__ = log(["set_records_limit", set_records_limit]);
 				if (should_safety_check) {
 					if (_memory_limit < 0) {
 						show_error(string("Can not use a negative value for \"set_records_limit()\" : {0}", _memory_limit), true);
@@ -208,7 +219,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_char_enforcement = function(_allowed_char=undefined) {//log(["set_char_enforcement", set_char_enforcement]);
+			static set_char_enforcement = function(_allowed_char=undefined) { static __run_once__ = log(["set_char_enforcement", set_char_enforcement]);
 				
 				if (is_undefined(_allowed_char)) {
 					__allowed_char__ = __build_allowed_char__(draw.font);
@@ -230,7 +241,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Bool} multiline : If the textbox allows the inputting of "\n"
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_multiline = function(_multiline=true) {//log(["set_multiline", set_multiline]);
+			static set_multiline = function(_multiline=true) { static __run_once__ = log(["set_multiline", set_multiline]);
 				curt.multiline = _multiline;
 				
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
@@ -244,7 +255,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Bool} memory_limit : If the text box will break to a new line when reaching the width.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_force_wrapping = function(_force_wrapping=true) {//log(["set_force_wrapping", set_force_wrapping]);
+			static set_force_wrapping = function(_force_wrapping=true) { static __run_once__ = log(["set_force_wrapping", set_force_wrapping]);
 				curt.adaptive_width = _force_wrapping;
 				
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
@@ -258,7 +269,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Bool} memory_limit : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_shift_only_new_line = function(_shift_only_nl=true) {//log(["set_shift_only_new_line", set_shift_only_new_line]);
+			static set_shift_only_new_line = function(_shift_only_nl=true) { static __run_once__ = log(["set_shift_only_new_line", set_shift_only_new_line]);
 				curt.shift_only_new_line = _shift_only_nl;
 		
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
@@ -272,7 +283,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Bool} accepting_inputs : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_accepting_inputs = function(_bool=true) {//log(["set_accepting_inputs", set_accepting_inputs]);
+			static set_accepting_inputs = function(_bool=true) { static __run_once__ = log(["set_accepting_inputs", set_accepting_inputs]);
 				curt.accepting_inputs = _bool;
 		
 				return self;
@@ -284,7 +295,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Function} func : The return of this function will be what gets copied into the user's clipboard.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_copy_override = function(_func) {//log(["set_copy_override", set_copy_override]);
+			static set_copy_override = function(_func) { static __run_once__ = log(["set_copy_override", set_copy_override]);
 				copy_function = _func;
 				
 				return self;
@@ -296,7 +307,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Function} func : The return of this function will be what gets pasted into the user's clipboard.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_paste_override = function(_func) {//log(["set_paste_override", set_paste_override]);
+			static set_paste_override = function(_func) { static __run_once__ = log(["set_paste_override", set_paste_override]);
 				paste_function = _func;
 				
 				return self;
@@ -308,7 +319,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} xpos : The x position of the cursor
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_x_pos = function(_x_pos) {//log(["set_cursor_x_pos", set_cursor_x_pos]);
+			static set_cursor_x_pos = function(_x_pos) { static __run_once__ = log(["set_cursor_x_pos", set_cursor_x_pos]);
 				if (_x_pos == curt.cursor) {
 					return self;
 				}
@@ -331,7 +342,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} ypos : The y position of the cursor.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_y_pos = function(_y_pos) {//log(["set_cursor_y_pos", set_cursor_y_pos]);
+			static set_cursor_y_pos = function(_y_pos) { static __run_once__ = log(["set_cursor_y_pos", set_cursor_y_pos]);
 				if (_y_pos == curt.current_line) {
 					return self;
 				}
@@ -351,7 +362,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {Real} ypos : The y position of the cursor.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_gui_loc = function(_x, _y) {//log(["set_cursor_gui_loc", set_cursor_gui_loc]);
+			static set_cursor_gui_loc = function(_x, _y) { static __run_once__ = log(["set_cursor_gui_loc", set_cursor_gui_loc]);
 				draw_set_font(draw.font);
 				
 				var _cursor_x, _cursor_y;
@@ -537,7 +548,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {String}
 			#endregion
-			static get_text = function() {//log(["get_text", get_text]);
+			static get_text = function() { static __run_once__ = log(["get_text", get_text]);
 				return __textbox_return__();
 			}
 			#region jsDoc
@@ -546,7 +557,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Undefined}
 			#endregion
-			static clear_text = function() {//log(["clear_text", clear_text]);
+			static clear_text = function() { static __run_once__ = log(["clear_text", clear_text]);
 				var _last_line_index = curt.length - 1;
 				var _last_line_length = string_length(curt.lines[_last_line_index]);
 				if (_last_line_index < 1 && _last_line_length < 1) return;
@@ -562,7 +573,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_coverage_width = function() {//log(["get_coverage_width", get_coverage_width]);
+			static get_coverage_width = function() { static __run_once__ = log(["get_coverage_width", get_coverage_width]);
 				if (__scroll_vert_hidden__) {
 					return region.get_width()
 				}
@@ -576,7 +587,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_coverage_height = function() {//log(["get_coverage_height", get_coverage_height]);
+			static get_coverage_height = function() { static __run_once__ = log(["get_coverage_height", get_coverage_height]);
 				if (__scroll_horz_hidden__) {
 					return region.get_height()
 				}
@@ -590,7 +601,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_canvas_width = function() {//log(["get_canvas_width", get_canvas_width]);
+			static get_canvas_width = function() { static __run_once__ = log(["get_canvas_width", get_canvas_width]);
 				draw_set_font(draw.font);
 				var _width, _max_width, _lines, _size;
 				var _struct = {
@@ -612,7 +623,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_canvas_height = function() {//log(["get_canvas_height", get_canvas_height]);
+			static get_canvas_height = function() { static __run_once__ = log(["get_canvas_height", get_canvas_height]);
 				return curt.length * draw.line_height;
 			}
 			#region jsDoc
@@ -621,7 +632,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_x_pos = function() {//log(["get_cursor_x_pos", get_cursor_x_pos]);
+			static get_cursor_x_pos = function() { static __run_once__ = log(["get_cursor_x_pos", get_cursor_x_pos]);
 				var _derivative_x = string_width(string_copy(curt.lines[curt.current_line], 1, curt.cursor)) + scroll.x_off;
 				return x + _derivative_x;
 			}
@@ -631,7 +642,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_y_pos = function() {//log(["get_cursor_y_pos", get_cursor_y_pos]);
+			static get_cursor_y_pos = function() { static __run_once__ = log(["get_cursor_y_pos", get_cursor_y_pos]);
 				var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
 				var _derivative_y = curt.current_line * draw.line_height + scroll.y_off + _center_y;
 				return y + _derivative_y;
@@ -642,7 +653,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_width = function() {//log(["get_cursor_width", get_cursor_width]);
+			static get_cursor_width = function() { static __run_once__ = log(["get_cursor_width", get_cursor_width]);
 				return draw.cursor_width;
 			}
 			#region jsDoc
@@ -651,7 +662,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_height = function() {//log(["get_cursor_height", get_cursor_height]);
+			static get_cursor_height = function() { static __run_once__ = log(["get_cursor_height", get_cursor_height]);
 				return (draw.cursor_height < 0) ? draw.line_height : draw.cursor_height;;
 			}
 			#region jsDoc
@@ -660,7 +671,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @self    GUICompCore
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() {//log(["mouse_on_comp", mouse_on_comp]);
+			static mouse_on_comp = function() { static __run_once__ = log(["mouse_on_comp", mouse_on_comp]);
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
@@ -714,14 +725,14 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			
 			#region GML Events
 				
-				static __cleanup__ = function() {//log(["__cleanup__", __cleanup__]);
-				
+				static __cleanup__ = function() { static __run_once__ = log(["__cleanup__", __cleanup__]);
+					
 					cleanup();
-				
+					
 					if (__component_surface__ != undefined) {
 						surface_free(__component_surface__);
 					}
-				
+					
 					if (os_browser = browser_not_a_browser) {
 						if (os_type = os_windows) {
 							if (window_get_cursor() != cr_default) {
@@ -732,24 +743,24 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					else {
 						js_set_cursor(cr_default);
 					}
-				
+					
 				}
 				
-				static __step__ = function(_input) {//log(["__step__", __step__]);
+				static __step__ = function(_input) { static __run_once__ = log(["__step__", __step__]);
 					step(_input);
-				
+					
 					if (is_disabled) return;
-				
+					
 					var _mouse_x_gui = device_mouse_x_to_gui(0);
 					var _mouse_y_gui = device_mouse_y_to_gui(0);
-				
+					
 					var _draw_width = get_coverage_width();
 					var _draw_height = get_coverage_height();
 					var _start_x = x;
 					var _start_y = y;
 					var _scroll_width = (curt.multiline) ? draw.scroll_width : 0;
 					var _mouse_on_comp = !_input.consumed && mouse_on_comp();
-				
+					
 					if (_mouse_on_comp != curt.view) {
 						var _cursor = (_mouse_on_comp) ? cr_beam : cr_default
 						if (os_browser = browser_not_a_browser) {
@@ -764,7 +775,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						}
 						curt.view = _mouse_on_comp;
 					}
-				
+					
 					var _display_cursor = draw.display_cursor - 1;
 					if (_display_cursor < -30) {
 						_display_cursor = 30;
@@ -773,12 +784,12 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					else if (_display_cursor == 0) {
 						draw.refresh_surf = true;
 					}
-				
+					
 					draw.display_cursor = _display_cursor;
-				
+					
 					//allow early outs with breaks;
 					repeat (1) {
-					
+						
 						#region update cursor (with mouse)
 					
 							if (mouse_check_button_pressed(keys.mouse_left)) {
@@ -1484,7 +1495,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				
 				}
 				
-				static __draw_gui__ = function(_input) {//log(["__draw_gui__", __draw_gui__]);
+				static __draw_gui__ = function(_input) { static __run_once__ = log(["__draw_gui__", __draw_gui__]);
 				
 					draw_gui(_input);
 				
@@ -1629,7 +1640,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										);
 									
 									}
-								
+									
 									draw_text(_draw_x-_x_off, _draw_y+_derivative_y, _text);
 								
 									_displayed_lines_index+=1;
@@ -1702,7 +1713,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @param   {Asset.GMFont} font : The font to build the allowed charactor list.
 					/// @returns {Struct} Allowed Charactors Struct
 					#endregion
-					static __build_allowed_char__ = function(_font) {//log(["__build_allowed_char__", __build_allowed_char__]);
+					static __build_allowed_char__ = function(_font) { static __run_once__ = log(["__build_allowed_char__", __build_allowed_char__]);
 						var _info = font_get_info(_font);
 						var _struct_keys = variable_struct_get_names(_info.glyphs)
 						var _struct = {}
@@ -1755,7 +1766,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @param   {String} str : The string to edit
 					/// @returns {String}
 					#endregion
-					static __textbox_format_nowrap__ = function(_str) {//log(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
+					static __textbox_format_nowrap__ = function(_str) { static __run_once__ = log(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
 						var _return = string_replace_all(_str, "\n", "");
 						_return = string_replace_all(_return, "\r", "");
 						_return = string_replace_all(_return, "\t", "");
@@ -1771,7 +1782,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @param   {String} str : The string to edit
 					/// @returns {String}
 					#endregion
-					static __textbox_format_newline__ = function(_str) {//log(["__textbox_format_newline__", __textbox_format_newline__]);
+					static __textbox_format_newline__ = function(_str) { static __run_once__ = log(["__textbox_format_newline__", __textbox_format_newline__]);
 						var _return = string_replace_all(_str, "\r", "");
 						_return = string_replace_all(_return, "\t", "");
 						
@@ -1790,7 +1801,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @param   {Array<String>} arr : The array of strings
 					/// @returns {String}
 					#endregion
-					static __textbox_lines_to_text__ = function(_arr) {//log(["__textbox_lines_to_text__", __textbox_lines_to_text__]);
+					static __textbox_lines_to_text__ = function(_arr) { static __run_once__ = log(["__textbox_lines_to_text__", __textbox_lines_to_text__]);
 						
 						var _str = _arr[0];
 						var _i = 1;
@@ -1812,7 +1823,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @param   {String} str : The string to convert to an array
 					/// @returns {String}
 					#endregion
-					static __textbox_text_to_lines__ = function(_str) {//log(["__textbox_text_to_lines__", __textbox_text_to_lines__]);
+					static __textbox_text_to_lines__ = function(_str) { static __run_once__ = log(["__textbox_text_to_lines__", __textbox_text_to_lines__]);
 					
 						var _total_line_breaks = string_count("\n", _str)
 						var _arr = array_create(_total_line_breaks+1, 0);
@@ -1836,7 +1847,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					/// @self    GUICompTextbox
 					/// @returns {String}
 					#endregion
-					static __textbox_return__ = function() {//log(["__textbox_return__", __textbox_return__]);
+					static __textbox_return__ = function() { static __run_once__ = log(["__textbox_return__", __textbox_return__]);
 						var _text = "";
 						
 						_text = __textbox_lines_to_text__(curt.lines);
@@ -1863,7 +1874,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 					/// @param current_line
 					/// @param cursor
-					static __textbox_records_add__ = function(_line, _cursor) {//log(["__textbox_records_add__", __textbox_records_add__]);
+					static __textbox_records_add__ = function(_line, _cursor) { static __run_once__ = log(["__textbox_records_add__", __textbox_records_add__]);
 						var _cursor_records = curt.records_cursor + 1;
 
 						if (_cursor_records < array_length(curt.historic_records)) {
@@ -1893,7 +1904,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 					/// @param current_line
 					/// @param cursor
-					static __textbox_records_rec__ = function(_line, _cursor) {//log(["__textbox_records_rec__", __textbox_records_rec__]);
+					static __textbox_records_rec__ = function(_line, _cursor) { static __run_once__ = log(["__textbox_records_rec__", __textbox_records_rec__]);
 						
 						var _record = curt.historic_records[curt.records_cursor];
 						
@@ -1904,7 +1915,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					}
 					
 					/// @param change
-					static __textbox_records_set__ = function(_change) {//log(["__textbox_records_set__", __textbox_records_set__]);
+					static __textbox_records_set__ = function(_change) { static __run_once__ = log(["__textbox_records_set__", __textbox_records_set__]);
 						
 						var _historic_records = curt.historic_records;
 						var _cursor_records = curt.records_cursor + _change;
@@ -1929,7 +1940,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 				#endregion
 				
-				static __update_scroll__ = function() {//log(["__update_scroll__", __update_scroll__]);
+				static __update_scroll__ = function() { static __run_once__ = log(["__update_scroll__", __update_scroll__]);
 					
 					var _canvas_width, _canvas_height, _draw_width, _draw_height;
 					
@@ -2005,7 +2016,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				
-				static __textbox_max_length__ = function() {//log(["__textbox_max_length__", __textbox_max_length__]);
+				static __textbox_max_length__ = function() { static __run_once__ = log(["__textbox_max_length__", __textbox_max_length__]);
 					var _max_length = curt.max_length;
 					if (should_safety_check) {
 						if (_max_length < 0) {
@@ -2055,7 +2066,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				/// @param string
-				static __textbox_insert_string__ = function(_str) {//log(["__textbox_insert_string__", __textbox_insert_string__]);
+				static __textbox_insert_string__ = function(_str) { static __run_once__ = log(["__textbox_insert_string__", __textbox_insert_string__]);
 					
 					_str = __string_keep_allowed_char__(_str, __allowed_char__)
 					
@@ -2137,7 +2148,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				/// @param delete_key?
-				static __textbox_delete_string__ = function(_delete_key) {//log(["__textbox_delete_string__", __textbox_delete_string__]);
+				static __textbox_delete_string__ = function(_delete_key) { static __run_once__ = log(["__textbox_delete_string__", __textbox_delete_string__]);
 					var _current_line = curt.current_line;
 					var _cursor = curt.cursor;
 					var _select_line = curt.select_line;
@@ -2210,7 +2221,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					__textbox_records_add__(_current_line, _cursor);
 				}
 				
-				static __textbox_copy_string__ = function() {//log(["__textbox_copy_string__", __textbox_copy_string__]);
+				static __textbox_copy_string__ = function() { static __run_once__ = log(["__textbox_copy_string__", __textbox_copy_string__]);
 	
 					var _select = curt.select;
 					if (_select < 0) return;
@@ -2244,7 +2255,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					return _text;
 				}
 				
-				static __textbox_paste_string__ = function() {//log(["__textbox_paste_string__", __textbox_paste_string__]);
+				static __textbox_paste_string__ = function() { static __run_once__ = log(["__textbox_paste_string__", __textbox_paste_string__]);
 					var _pasted_string;
 					
 					if (os_browser == browser_not_a_browser) {
@@ -2261,7 +2272,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					return _pasted_string;
 				}
 				
-				static __textbox_break_line__ = function() {//log(["__textbox_break_line__", __textbox_break_line__]);
+				static __textbox_break_line__ = function() { static __run_once__ = log(["__textbox_break_line__", __textbox_break_line__]);
 					
 					var _current_line = curt.current_line;
 					var _text = curt.lines[_current_line];
@@ -2295,7 +2306,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				/// @param count
 				/// @param length
 				/// @param \n_length
-				static __textbox_break_lines__ = function(_start_line, _count, _length = 0, _nl_length = 0) {//log(["__textbox_break_lines__", __textbox_break_lines__]);
+				static __textbox_break_lines__ = function(_start_line, _count, _length = 0, _nl_length = 0) { static __run_once__ = log(["__textbox_break_lines__", __textbox_break_lines__]);
 					
 					static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
 					
@@ -2411,7 +2422,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				
 				/// @param string
 				/// @param start_line
-				static __textbox_close_lines__ = function(_string, _start_line) {//log(["__textbox_close_lines__", __textbox_close_lines__]);
+				static __textbox_close_lines__ = function(_string, _start_line) { static __run_once__ = log(["__textbox_close_lines__", __textbox_close_lines__]);
 					var _breakpoints = curt.width_breakpoints;
 					var _text = _string;
 					var _copied_text = _string;
@@ -2436,7 +2447,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				/// @param change
-				static __textbox_check_hinput__ = function(_change) {//log(["__textbox_check_hinput__", __textbox_check_hinput__]);
+				static __textbox_check_hinput__ = function(_change) { static __run_once__ = log(["__textbox_check_hinput__", __textbox_check_hinput__]);
 					
 					var _arr_lines = __array_clone__(curt.lines);
 					var _current_line = curt.current_line;
@@ -2469,7 +2480,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				/// @param change
-				static __textbox_check_vinput__ = function(_change) {//log(["__textbox_check_vinput__", __textbox_check_vinput__]);
+				static __textbox_check_vinput__ = function(_change) { static __run_once__ = log(["__textbox_check_vinput__", __textbox_check_vinput__]);
 					
 					var _current_line = curt.current_line;
 					var _cursor_update = curt.cursor;
@@ -2503,7 +2514,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				/// @param select?
-				static __textbox_check_minput__ = function(_select) {//log(["__textbox_check_minput__", __textbox_check_minput__]);
+				static __textbox_check_minput__ = function(_select) { static __run_once__ = log(["__textbox_check_minput__", __textbox_check_minput__]);
 					var _select_line , _select_end;
 					
 					//cache the select line
@@ -2537,7 +2548,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				/// @param change
 				/// @param select?
 				/// @param vertical?
-				static __textbox_update_cursor__ = function(_change, _shift, _vertical) {//log(["__textbox_update_cursor__", __textbox_update_cursor__]);
+				static __textbox_update_cursor__ = function(_change, _shift, _vertical) { static __run_once__ = log(["__textbox_update_cursor__", __textbox_update_cursor__]);
 					
 					if (_shift) {
 						var _current_line = curt.current_line;
@@ -2579,7 +2590,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 				}
 				
-				static __array_clone__ = function(_arr) {//log(["__array_clone__", __array_clone__]);
+				static __array_clone__ = function(_arr) { static __run_once__ = log(["__array_clone__", __array_clone__]);
 					var _new_arr = array_create(0,0);
 					array_copy(_new_arr, 0, _arr, 0, array_length(_arr));
 					return _new_arr;
@@ -2594,7 +2605,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 	copy_function  = __textbox_copy_string__;
 	paste_function = __textbox_paste_string__;
 	__allowed_char__ = __build_allowed_char__(fGUIDefault);
-	__textbox_insert_string__("");
+	set_text("");
 }
 
 

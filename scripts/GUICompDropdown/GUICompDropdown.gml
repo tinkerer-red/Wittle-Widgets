@@ -256,6 +256,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 			self.events.mouse_over = "mouse_over"; //triggered when the mouse is over the header
 			self.events.pressed    = "pressed"; //triggered when mouse first clicks the header
 			self.events.held       = "held"; //triggered every frame the mouse's click is down on the header
+			self.events.long_press = "long_press";
 			self.events.released   = "released"; //triggered when when the mouses click is released from the header
 			
 			self.events.element_mouse_over = "element_mouse_over"; //triggered when the mouse is over an element

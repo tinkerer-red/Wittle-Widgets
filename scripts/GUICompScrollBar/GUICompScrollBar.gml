@@ -224,6 +224,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			self.events.mouse_over = "mouse_over";
 			self.events.pressed    = "pressed";
 			self.events.held       = "held";
+			self.events.long_press = "long_press";
 			self.events.released   = "released";
 			
 			self.events.value_input       = "value_input"; //if a value was input in any way, this will trigger every frame the slider is interacted wtih
@@ -485,6 +486,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.mouse_over, method(self, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)}));
 					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.pressed   , method(self, function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)}));
 					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.held      , method(self, function() {__trigger_event__(self.events.held      , __scrollbar__.value)}));
+					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.long_press, method(self, function() {__trigger_event__(self.events.long_press, __scrollbar__.value)}));
 					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.released  , method(self, function() {__trigger_event__(self.events.released  , __scrollbar__.value)}));
 					
 					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.value_input      , method(self, function() {__trigger_event__(self.events.value_input      , __scrollbar__.value)}));

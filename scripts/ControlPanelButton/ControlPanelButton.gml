@@ -1,4 +1,4 @@
-function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController(0, 0) constructor {
+function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController() constructor {
 	
 	#region Public
 		

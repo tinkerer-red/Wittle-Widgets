@@ -79,10 +79,10 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				_str = string_replace_all(_str, "\n", "\\n")
 				_str = string_replace_all(_str, "\t", "\\t")
 				_str = string_replace_all(_str, "\r", "\\r")
-				log(["__textbox__.curt.lines", __textbox__.curt.lines])
+				
 				__textbox__.set_text(_str)
 				__textbox__.should_draw_debug = true;
-				log(["__textbox__.curt.lines", __textbox__.curt.lines])
+				
 				
 				return self;
 			}
@@ -141,8 +141,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
 				.set_region(0, 0, 0, _ideal_h)
-			log(["__textbox__.get_vert_scroll()", __textbox__.get_vert_scroll()])
-			__textbox__.set_scrollbar_sizes(0, 0)
+				.set_scrollbar_sizes(0, 0)
 				.set_text(string(_str))
 				.set_text_font(__CP_FONT)
 				.set_text_color(c_white)

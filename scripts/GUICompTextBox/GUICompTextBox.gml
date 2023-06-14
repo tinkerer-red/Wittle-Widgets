@@ -55,7 +55,6 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_text_placeholder = function(_placeholder="Enter Text") {//log(["set_text_placeholder", set_text_placeholder]);
-				log_func();
 				curt.placeholder = _placeholder;
 				
 				return self;
@@ -1815,8 +1814,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						_i+=1;}//end repeat loop
 
 						_arr[_i] = _text;
-						//log(["_arr", _arr])
-					
+						
 						return _arr;
 
 					}

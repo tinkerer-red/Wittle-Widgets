@@ -42,7 +42,8 @@ var _folder = new ControlPanelFolder("Folder 1", function(){log("Folder 1")})
 #endregion
 control_panel.add(_folder)
 
-repeat(10) {
+//kept for stress testing
+repeat(1) {
 #region Folder 4
 
 var _folder4 = new ControlPanelFolder("Folder 4", function(){log("Folder 1")})

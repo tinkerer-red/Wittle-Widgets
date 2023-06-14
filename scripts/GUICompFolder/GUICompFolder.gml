@@ -412,8 +412,6 @@ function GUICompFolder() : GUICompController() constructor {
 			#endregion
 			
 			static __update_controller_region__ = function() { //log(["__update_controller_region__", __update_controller_region__]);
-				//trace(debug_get_callstack(4))
-				
 				var _left   = region.left;
 				var _top    = region.top;
 				var _right  = region.right;

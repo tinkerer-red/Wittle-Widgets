@@ -297,7 +297,6 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				
 				//set the focus to the textbox
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
-					log("button pressed")
 					with (__textbox__) {
 						__is_on_focus__ = true;
 						__trigger_event__(self.events.on_focus);

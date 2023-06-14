@@ -262,7 +262,6 @@ function GUICompRegion() : GUICompController() constructor {
 			static set_scrollbar_hidden = function(_horz_hidden=undefined, _vert_hidden=undefined) {
 				if (!is_undefined(_horz_hidden))
 				&& (__scroll_horz_hidden__ != _horz_hidden) {
-					log("updating horz")
 					__scroll_horz_hidden__ = (is_undefined(_horz_hidden)) ? __scroll_horz_hidden__ : _horz_hidden
 					var _view_width  = (__scroll_vert_hidden__) ? region.get_width()  : region.get_width()  - __scroll_vert_size__
 					__scroll_horz__.set_region(0, 0, _view_width, __scroll_horz_size__)
@@ -270,10 +269,6 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				if (!is_undefined(_vert_hidden))
 				&& (__scroll_vert_hidden__ != _vert_hidden) {
-					if (_vert_hidden == 0) {
-						log(debug_get_callstack())
-					}
-					log("updating vert to "+string(_vert_hidden))
 					__scroll_vert_hidden__ = (is_undefined(_vert_hidden)) ? __scroll_vert_hidden__ : _vert_hidden
 					var _view_height = (__scroll_horz_hidden__) ? region.get_height() : region.get_height() - __scroll_horz_size__
 					__scroll_vert__.set_region(0, 0, __scroll_vert_size__, _view_height)
@@ -395,12 +390,10 @@ function GUICompRegion() : GUICompController() constructor {
 				//create the children sliders
 				
 				//init both before we start building as they are codependant
-				log("about to spawn scrolls")
 				__scroll_vert__ = new GUICompScrollBar()
 					.set_position(0,0)
 				__scroll_horz__ = new GUICompScrollBar()
 					.set_position(0,0)
-				log("spawned scrolls")
 				
 				//vertical
 				__scroll_vert__.__is_child__ = true;
@@ -603,10 +596,6 @@ function GUICompRegion() : GUICompController() constructor {
 				__controller_region__.top    = region.top;
 				__controller_region__.right  = region.right;
 				__controller_region__.bottom = region.bottom;
-				
-				if (__controller_region__.bottom == 21) {
-					log(debug_get_callstack(8))
-				}
 				
 				__update_scrollbar_thumbs__();
 				

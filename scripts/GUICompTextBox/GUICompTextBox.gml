@@ -71,7 +71,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				var _prev_cursor_y = get_cursor_y_pos();
 				var _prev_scroll_x = get_horz_scroll();
 				var _prev_scroll_y = get_vert_scroll();
-				log(["_prev_scroll_y", _prev_scroll_y])
+				
 				clear_text();
 				__textbox_insert_string__(_text);
 				
@@ -322,6 +322,12 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			static set_cursor_x_pos = function(_x_pos) { static __run_once__ = log(["set_cursor_x_pos", set_cursor_x_pos]);
 				if (_x_pos == curt.cursor) {
 					return self;
+				}
+				
+				//clamp the value
+				var _line_length = string_length(curt.lines[curt.current_line]);
+				if (_x_pos > _line_length) {
+					_x_pos = _line_length;
 				}
 				
 				curt.cursor = _x_pos;

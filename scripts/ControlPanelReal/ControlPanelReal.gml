@@ -286,7 +286,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 						_pos = string_pos_ext("-", _str, 2)
 					}
 					
-					__textbox__.set_text(_str)
+					__textbox__.set_text(_str);
 				});
 				
 			#endregion

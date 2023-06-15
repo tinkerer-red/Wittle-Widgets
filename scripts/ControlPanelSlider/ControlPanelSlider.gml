@@ -422,7 +422,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						}
 					}
 					
-					__textbox__.set_text(_str)
+					__textbox__.set_text(_str);
 				});
 				
 			#endregion

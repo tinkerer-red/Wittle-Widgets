@@ -71,7 +71,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				var _prev_cursor_y = get_cursor_y_pos();
 				var _prev_scroll_x = get_horz_scroll();
 				var _prev_scroll_y = get_vert_scroll();
-				
+				log(["_prev_cursor_x", _prev_cursor_x])
 				clear_text();
 				__textbox_insert_string__(_text);
 				
@@ -639,8 +639,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @returns {Real}
 			#endregion
 			static get_cursor_x_pos = function() { static __run_once__ = log(["get_cursor_x_pos", get_cursor_x_pos]);
-				var _derivative_x = string_width(string_copy(curt.lines[curt.current_line], 1, curt.cursor)) + scroll.x_off;
-				return x + _derivative_x;
+				return curt.cursor;
 			}
 			#region jsDoc
 			/// @func    get_cursor_y_pos()
@@ -649,6 +648,25 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @returns {Real}
 			#endregion
 			static get_cursor_y_pos = function() { static __run_once__ = log(["get_cursor_y_pos", get_cursor_y_pos]);
+				return curt.current_line;
+			}
+			#region jsDoc
+			/// @func    get_cursor_x_pos_gui()
+			/// @desc    Get cursor's x position in the GUI
+			/// @self    GUICompTextbox
+			/// @returns {Real}
+			#endregion
+			static get_cursor_x_pos_gui = function() { static __run_once__ = log(["get_cursor_x_pos_gui", get_cursor_x_pos_gui]);
+				var _derivative_x = string_width(string_copy(curt.lines[curt.current_line], 1, curt.cursor)) + scroll.x_off;
+				return x + _derivative_x;
+			}
+			#region jsDoc
+			/// @func    get_cursor_y_pos_gui()
+			/// @desc    Get cursor's y position in the GUI
+			/// @self    GUICompTextbox
+			/// @returns {Real}
+			#endregion
+			static get_cursor_y_pos_gui = function() { static __run_once__ = log(["get_cursor_y_pos_gui", get_cursor_y_pos_gui]);
 				var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
 				var _derivative_y = curt.current_line * draw.line_height + scroll.y_off + _center_y;
 				return y + _derivative_y;
@@ -1667,8 +1685,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								draw_sprite_stretched_ext(
 										s9GUIPixel,
 										0,
-										_cursor_xoff + get_cursor_x_pos(),
-										_cursor_yoff + get_cursor_y_pos() + _y_offset,
+										_cursor_xoff + get_cursor_x_pos_gui(),
+										_cursor_yoff + get_cursor_y_pos_gui() + _y_offset,
 										get_cursor_width(),
 										get_cursor_height(),
 										draw.highlight_region_color,

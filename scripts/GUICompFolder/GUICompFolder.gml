@@ -1,3 +1,4 @@
+
 #region jsDoc
 /// @func    GUICompFolder()
 /// @desc    Creates a folder component
@@ -228,7 +229,9 @@ function GUICompFolder() : GUICompController() constructor {
 					__trigger_event__(self.events.pre_update);
 					
 					begin_step(__user_input__);
-					__button__.__begin_step__(_input);
+					if (header_shown) {
+						__button__.__begin_step__(_input);
+					}
 					
 					//run the children
 					if(!__is_empty__ and is_open) {
@@ -248,7 +251,9 @@ function GUICompFolder() : GUICompController() constructor {
 					__user_input__ = _input;
 					
 					step(__user_input__);
-					__button__.__step__(_input);
+					if (header_shown) {
+						__button__.__step__(_input);
+					}
 					
 					//run children
 					if(!__is_empty__ and is_open) {
@@ -272,7 +277,9 @@ function GUICompFolder() : GUICompController() constructor {
 					
 					
 					end_step(__user_input__);
-					__button__.__end_step__(_input);
+					if (header_shown) {
+						__button__.__end_step__(_input);
+					}
 					
 					if(!__is_empty__ and is_open) {
 						//run the children

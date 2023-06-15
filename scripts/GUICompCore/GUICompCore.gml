@@ -1049,7 +1049,6 @@ function GUICompCore() constructor {
 						image.index = GUI_IMAGE_CLICKED;
 						__trigger_event__(self.events.held);
 						
-						
 						__click_held_timer__ += 1;
 						if (__click_held_timer__ > game_get_speed(gamespeed_fps)/3)
 						&& (__click_held_timer__  % floor(game_get_speed(gamespeed_fps)/30) == 0) {

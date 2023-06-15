@@ -5,7 +5,6 @@ event_inherited();
 event_user(15);
 
 control_panel = new ControlPanelFolder("Control Panel", function(){})
-
 cc.add(control_panel)
 
 #region Folder 1

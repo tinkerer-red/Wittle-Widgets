@@ -29,10 +29,10 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Slider","folderPath":"folders/_Libraries/Wittle Widgets/Assets/Slider.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Shaders","folderPath":"folders/_Libraries/Wittle Widgets/Shaders.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/ControlPanel.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/ControlPanel/Assets.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/ControlPanel/Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Examples","folderPath":"folders/Examples.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Example 1","folderPath":"folders/Examples/Example 1.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/ControlPanel/Assets.yy",},
   ],
   "IncludedFiles": [
     {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"RedsFont.ttf","CopyToMask":-1,"filePath":"datafiles",},

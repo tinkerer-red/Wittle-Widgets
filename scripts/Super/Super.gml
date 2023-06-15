@@ -12,19 +12,24 @@
 //		__super__
 
 #macro __SUPER__ static __super__ = new __super(); global.__super_self__ = self; __super__
-function __super(_super) constructor {
-	
+function __super() constructor {
+	static is_browser = (os_browser != browser_not_a_browser);
 	#region grab the callstack
+		if (!is_browser) {
+			var _callback = debug_get_callstack(2)[1];
+		}
+		else {
+			//on html5 the callstack includes "__yy_gml_object_create"
+			var _callback = debug_get_callstack(3)[2];
+		}
 		
-		var _str;
-		var _callback = debug_get_callstack(2)[1];
 		var _pos = string_pos(":", _callback);
 		if (_pos != 0) {
-			_str = string_copy(_callback, 1, _pos-1);
+			var _str = string_copy(_callback, 1, _pos-1);
 		}
 		else {
 			//support for when the compiled code doesnt return the line number ":40" on the suffix
-			_str = _callback;
+			var _str = _callback;
 		}
 		
 	#endregion
@@ -50,10 +55,10 @@ function __super(_super) constructor {
 			_pos = string_pos(_constructor_func_str_header, _str)
 			if (_pos == 1) {
 				static _constructor_header_end = string_length(_constructor_func_str_header);
-		    _str = string_delete(_str, 1, _constructor_header_end);
+				_str = string_delete(_str, 1, _constructor_header_end);
 			}
 		}
-		
+		log(["_str", _str])
 		//there are probably a lot more i could add but they are either really bad practice or not currently possible
 		
 		_parent_struct_name = _str;
@@ -61,17 +66,21 @@ function __super(_super) constructor {
 	#endregion
 	
 	var _parent_methodID = asset_get_index(_parent_struct_name);
-	var _parent_statics = static_get(_parent_methodID)
-	var _parent_struct_name = instanceof(_parent_statics)
+	var _statics = static_get(_parent_methodID);
+	var _parent_statics = static_get(_statics);
+	
+	
+	//this is used as a massive work around for html5 lacking support for `instanceof(_statics)`
+	// in the future uncomment out the parent struct name != object lines
+	static __blank_constructor__ = function() constructor {};
+	static __blank_object__ = new __blank_constructor__();
+	static __object_statics__ = static_get(static_get(__blank_object__));
+	///////////////////////////////////////////////////////////////////////////////////////////
 	
 	#region Find all parent structs
 		
-		while (_parent_struct_name != "Object") {
-			
-			var _parent_methodID = asset_get_index(_parent_struct_name);
-			var _parent_statics = static_get(_parent_methodID)
-			
-			
+		/////while (_parent_struct_name != "Object") {
+		while (__object_statics__ != _parent_statics) {
 			
 			var _key, _val;
 			var _names = variable_struct_get_names(_parent_statics);
@@ -96,7 +105,8 @@ function __super(_super) constructor {
 			
 			
 			//continue to the next struct
-			var _parent_struct_name = instanceof(_parent_statics)
+			//var _parent_struct_name = instanceof(_parent_statics)
+			_parent_statics = static_get(_parent_statics);
 		}
 		
 	#endregion

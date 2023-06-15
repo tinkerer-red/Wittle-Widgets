@@ -2256,7 +2256,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				static __textbox_paste_string__ = function() { static __run_once__ = log(["__textbox_paste_string__", __textbox_paste_string__]);
-					var _pasted_string;
+					var _pasted_string = "";
 					
 					if (os_browser == browser_not_a_browser) {
 						if (clipboard_has_text()) {

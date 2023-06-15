@@ -286,7 +286,6 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @returns {Struct.GUICompScrollRegion}
 			#endregion
 			static set_vert_scroll = function(_y_off=0) {
-				log(debug_get_callstack(4))
 				scroll.y_off = clamp(_y_off, min(0, -__canvas_region__.get_height()), 0);
 				__scroll_vert__.set_value(-scroll.y_off);
 				update_component_positions();
@@ -311,7 +310,7 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_horz_scroll = function() {log(["get_horz_scroll", get_horz_scroll])
+			static get_horz_scroll = function() {//log(["get_horz_scroll", get_horz_scroll])
 				return scroll.x_off;
 			}
 			#region jsDoc

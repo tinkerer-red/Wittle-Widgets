@@ -1,6 +1,3 @@
-#macro DEBUG_SPEED_INIT var ___time = get_timer()
-#macro DEBUG_SPEED_GET show_debug_message(string((get_timer()-___time)/1000) + "ms")
-
 #region jsDoc
 /// @func    GUICompCore()
 /// @desc    This is the root most component, only use this if you need a very basic component for drawing purposes or if you're creating a new component.

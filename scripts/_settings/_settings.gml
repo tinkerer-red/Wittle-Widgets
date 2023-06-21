@@ -5,28 +5,27 @@ if (__SETTINGS_AUTO_SCALE) {
 		static get_current_width  = (is_browser) ? function() {return browser_width}  : window_get_width;
 		static get_current_height = (is_browser) ? function() {return browser_height} : window_get_height;
 		
-		var _width = get_current_width();
-		var _height = get_current_height();
+		static browser_extra = (is_browser) ? -4 : 0;
 		
-		log(["camera_get_view_width(0)", camera_get_view_width(0)])
-		log(["browser_width", browser_width])
-		log(["window_get_width()", window_get_width()])
-		//log(["camera_get_view_height(0)", camera_get_view_height(0)])
-		//log(["_height", _height])
+		var _width = get_current_width() + browser_extra;
+		var _height = get_current_height() + browser_extra;
+		
+		
 		
 		if (_width <= 0)
 		|| (_height <= 0) {
 			return
 		}
 		
-		if (camera_get_view_width(0) != _width)
-		|| (camera_get_view_height(0) != _height) {
+		if (camera_get_view_width(view_camera[0]) != _width)
+		|| (camera_get_view_height(view_camera[0]) != _height) {
 			//resize the browser's window
 			if (is_browser) {
-				window_set_size(browser_width, browser_height);
+				window_set_size(_width, _height);
 			}
-			
+			show_debug_message(["camera_get_view_width(view_camera[0])", camera_get_view_width(view_camera[0])])
 			camera_set_view_size(view_camera[0], _width, _height);
+			show_debug_message(["camera_get_view_width(view_camera[0])", camera_get_view_width(view_camera[0])])
 			surface_resize(application_surface, _width, _height);
 		}
 		

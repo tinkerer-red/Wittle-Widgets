@@ -1,3 +1,6 @@
+#macro DEBUG_SPEED_INIT var ___time = get_timer()
+#macro DEBUG_SPEED_GET show_debug_message(string((get_timer()-___time)/1000) + "ms")
+
 #region jsDoc
 /// @func    GUICompCore()
 /// @desc    This is the root most component, only use this if you need a very basic component for drawing purposes or if you're creating a new component.
@@ -195,14 +198,14 @@ function GUICompCore() constructor {
 			
 			events = {};
 			
-			events.on_focus    = "on_focus"; //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			events.on_blur     = "on_blur";  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
-			events.on_hover    = "on_hover"; //triggered every frame the mouse is over the regions bounding box
-			events.pre_update  = "pre_update"; //triggered every frame before the begin step event is activated
-			events.post_update = "post_update"; //triggered every frame after the end step event is activated
-			events.enabled     = "enabled"; //triggered when the component is enabled (this is done by the developer)
-			events.disabled    = "disabled"; //triggered when the component is disabled (this is done by the developer)
-			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			events.on_focus    = variable_get_hash("on_focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.on_blur     = variable_get_hash("on_blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
+			events.on_hover    = variable_get_hash("on_hover"); //triggered every frame the mouse is over the regions bounding box
+			events.pre_update  = variable_get_hash("pre_update"); //triggered every frame before the begin step event is activated
+			events.post_update = variable_get_hash("post_update"); //triggered every frame after the end step event is activated
+			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
+			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
+			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 		
@@ -265,13 +268,16 @@ function GUICompCore() constructor {
 			/// @returns {Real}
 			#endregion
 			static add_event_listener = function(_event_id, _func) { //log(["add_event_listener", add_event_listener]);
-				if (!variable_struct_exists(self.__event_listeners__, _event_id)) {
-					self.__event_listeners__[$ _event_id] = [];
+				var _hash = _event_id;
+				if (struct_get_from_hash(self.__event_listeners__, _hash) == undefined) {
+					struct_set_from_hash(self.__event_listeners__, _hash, [])
 				}
 				
 				var _uid = __event_listener_uid__;
 				__event_listener_uid__+=1;
-				array_push(self.__event_listeners__[$ _event_id], {func: _func, UID: _uid});
+				var _arr = struct_get_from_hash(self.__event_listeners__, _hash)
+				array_push(_arr, {func: _func, UID: _uid});
+				struct_set_from_hash(self.__event_listeners__, _hash, _arr)
 				
 				return _uid
 			}
@@ -285,8 +291,10 @@ function GUICompCore() constructor {
 			#endregion
 			static remove_event_listener = function(_uid) { //log(["remove_event_listener", remove_event_listener]);
 				var _struct, _func;
-		
-				var _event_arr = self.__event_listeners__[$ _event_id];
+				
+				var _hash = _uid;
+				
+				var _event_arr = struct_get_from_hash(self.__event_listeners__, _hash);
 				var _size = array_length(_event_arr);
 		
 				var _i=0; repeat(_size) {
@@ -298,6 +306,7 @@ function GUICompCore() constructor {
 		
 				if (_i < _size) {
 					array_delete(_event_arr, _i, 1);
+					struct_set_from_hash(self.__event_listeners__, _hash, _event_arr)
 					return self;
 				}
 				else{
@@ -701,15 +710,15 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static __trigger_event__ = function(_event_id, _data={}) { //log(["__trigger_event__", __trigger_event__]);
+			static __trigger_event__ = function(_event_id, _data) { //log(["__trigger_event__", __trigger_event__]);
 				//leave if the relevant event listener doesnt exist
 				var _struct, _func, _event_arr, _size, _i;
+				var _hash = _event_id;
 				
 				#region public event listener
-					var _test = self.__event_listeners__[$ _event_id]
 					
-					if (variable_struct_exists(self.__event_listeners__, _event_id)) {
-						_event_arr = self.__event_listeners__[$ _event_id];
+					_event_arr = struct_get_from_hash(self.__event_listeners__, _hash)
+					if (_event_arr != undefined) {
 						_size = array_length(_event_arr);
 						
 						_i=0; repeat(_size) {
@@ -722,8 +731,8 @@ function GUICompCore() constructor {
 				
 				#region privat event listener
 					
-					if (variable_struct_exists(self.__priv_event_listeners__, _event_id)) {
-						_event_arr = self.__priv_event_listeners__[$ _event_id];
+					_event_arr = struct_get_from_hash(self.__priv_event_listeners__, _hash)
+					if (_event_arr != undefined) {
 						_size = array_length(_event_arr);
 						
 						_i=0; repeat(_size) {
@@ -747,13 +756,17 @@ function GUICompCore() constructor {
 			/// @returns {Real}
 			#endregion
 			static __add_event_listener_priv__ = function(_event_id, _func) { //log(["__add_event_listener_priv__", __add_event_listener_priv__]);
-				if (!variable_struct_exists(self.__priv_event_listeners__, _event_id)) {
-					self.__priv_event_listeners__[$ _event_id] = [];
+				var _hash = _event_id;
+				if (struct_get_from_hash(self.__priv_event_listeners__, _hash) == undefined) {
+					struct_set_from_hash(self.__priv_event_listeners__, _hash, [])
 				}
 				
-				var _uid = __priv_event_listener_uid__;
-				__priv_event_listener_uid__+=1;
-				array_push(self.__priv_event_listeners__[$ _event_id], {func: _func, UID: _uid});
+				var _uid = __event_listener_uid__;
+				__event_listener_uid__+=1;
+				
+				var _arr = struct_get_from_hash(self.__priv_event_listeners__, _hash)
+				array_push(_arr, {func: _func, UID: _uid});
+				struct_set_from_hash(self.__priv_event_listeners__, _hash, _arr)
 				
 				return _uid
 			}

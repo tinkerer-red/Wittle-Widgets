@@ -253,23 +253,23 @@ function GUICompDropdown() : GUICompCore() constructor {
 		
 		#region Events
 			
-			self.events.mouse_over = "mouse_over"; //triggered when the mouse is over the header
-			self.events.pressed    = "pressed"; //triggered when mouse first clicks the header
-			self.events.held       = "held"; //triggered every frame the mouse's click is down on the header
-			self.events.long_press = "long_press";
-			self.events.released   = "released"; //triggered when when the mouses click is released from the header
+			self.events.mouse_over = variable_get_hash("mouse_over"); //triggered when the mouse is over the header
+			self.events.pressed    = variable_get_hash("pressed"); //triggered when mouse first clicks the header
+			self.events.held       = variable_get_hash("held"); //triggered every frame the mouse's click is down on the header
+			self.events.long_press = variable_get_hash("long_press");
+			self.events.released   = variable_get_hash("released"); //triggered when when the mouses click is released from the header
 			
-			self.events.element_mouse_over = "element_mouse_over"; //triggered when the mouse is over an element
-			self.events.element_pressed    = "element_pressed"; //triggered when mouse first clicks an element
-			self.events.element_held       = "element_held"; //triggered every frame the mouse's click is down on an element
-			self.events.element_released   = "element_released"; //triggered when when the mouses click is released from an element
+			self.events.element_mouse_over = variable_get_hash("element_mouse_over"); //triggered when the mouse is over an element
+			self.events.element_pressed    = variable_get_hash("element_pressed"); //triggered when mouse first clicks an element
+			self.events.element_held       = variable_get_hash("element_held"); //triggered every frame the mouse's click is down on an element
+			self.events.element_released   = variable_get_hash("element_released"); //triggered when when the mouses click is released from an element
 			
-			self.events.opened = "opened"; //triggered when the dropdown is expanded
-			self.events.closed = "closed"; //triggered when the dropdown is collapsed
+			self.events.opened = variable_get_hash("opened"); //triggered when the dropdown is expanded
+			self.events.closed = variable_get_hash("closed"); //triggered when the dropdown is collapsed
 			
-			self.events.selected = "selected"; //triggered when an element is selected
-			self.events.changed  = "changed"; //triggered when a different element then the currently active one is selected (This will be triggered any time set_value is used)
-			self.events.cleared  = "cleared"; //triggered when the dropdown is cleared (this is done by the developer)
+			self.events.selected = variable_get_hash("selected"); //triggered when an element is selected
+			self.events.changed  = variable_get_hash("changed"); //triggered when a different element then the currently active one is selected (This will be triggered any time set_value is used)
+			self.events.cleared  = variable_get_hash("cleared"); //triggered when the dropdown is cleared (this is done by the developer)
 			
 		#endregion
 		

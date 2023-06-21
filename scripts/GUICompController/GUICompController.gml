@@ -82,7 +82,7 @@ function GUICompController() : GUICompCore() constructor {
 		
 		#region Events
 			
-			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 		
@@ -316,15 +316,16 @@ function GUICompController() : GUICompCore() constructor {
 			static adopt_builder_functions = function(_comp) { //log(["adopt_builder_functions", adopt_builder_functions]);
 				var _arr = _comp.get_builder_functions();
 				
-				var _key;
+				//var _key;
 				var _i=0; repeat(array_length(_arr)) {
-					_key = _arr[_i];
-					if (!variable_struct_exists(self, _key)) {
-						self[$ _key] = method(self, _comp[$ _key]);
-					}
-					else {
+					//_key = _arr[_i];
+					var _hash = variable_get_hash(_arr[_i]);
+					var _func = struct_get_from_hash(_comp, _hash);
+					
+					struct_set_from_hash(self, _hash, method(self, _func));
+					
+					if (struct_get_from_hash(self, _hash) = undefined) {
 						show_debug_message(":: Wittle Widgets :: Component <"+debug_name+"> builder function <"+_key+"> replaced with adopted builder function from <"+_comp.debug_name+">.")
-						self[$ _key] = method(self, _comp[$ _key]);
 					}
 				_i+=1;}//end repeat loop
 			}

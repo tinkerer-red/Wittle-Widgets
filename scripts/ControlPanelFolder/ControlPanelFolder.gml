@@ -154,9 +154,9 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_anchor(0, __button__.region.get_height())
 				.set_text_alignment(fa_left, fa_top)
 				.set_header_shown(false)
-				.set_open(false)
+				.set_open(true)
 				.set_children_offsets(0, 0)
-			__folder__.set_open(false)
+			__folder__.set_open(true)
 			__folder__.should_draw_debug = false;
 			__folder__.draw_debug = method(__folder__, function() {
 				draw_set_color(c_yellow)

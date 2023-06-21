@@ -8,6 +8,12 @@ if (__SETTINGS_AUTO_SCALE) {
 		var _width = get_current_width();
 		var _height = get_current_height();
 		
+		log(["camera_get_view_width(0)", camera_get_view_width(0)])
+		log(["browser_width", browser_width])
+		log(["window_get_width()", window_get_width()])
+		//log(["camera_get_view_height(0)", camera_get_view_height(0)])
+		//log(["_height", _height])
+		
 		if (_width <= 0)
 		|| (_height <= 0) {
 			return

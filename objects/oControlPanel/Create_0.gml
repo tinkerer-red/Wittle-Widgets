@@ -1,6 +1,6 @@
 // Inherit the parent event
 event_inherited();
-//show_debug_overlay(true)
+show_debug_overlay(true)
 
 event_user(15);
 
@@ -42,7 +42,7 @@ var _folder = new ControlPanelFolder("Folder 1", function(){log("Folder 1")})
 control_panel.add(_folder)
 
 //kept for stress testing
-repeat(1) {
+repeat(50) {
 #region Folder 4
 
 var _folder4 = new ControlPanelFolder("Folder 4", function(){log("Folder 1")})

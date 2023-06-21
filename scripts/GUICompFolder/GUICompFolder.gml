@@ -63,9 +63,9 @@ function GUICompFolder() : GUICompController() constructor {
 	
 		#region Events
 		
-			self.events.opened = "opened";
-			self.events.closed = "closed";
-			self.events.on_hover_controller = "on_hover_controller"; //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			self.events.opened = variable_get_hash("opened");
+			self.events.closed = variable_get_hash("closed");
+			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 	
@@ -74,7 +74,7 @@ function GUICompFolder() : GUICompController() constructor {
 			children_x_offset = 0;
 			children_y_offset = 0;
 			sprite.index = s9ButtonText;
-			is_open = false;
+			is_open = true;
 			header_shown = true;
 			halign = fa_left;
 			valign = fa_top;

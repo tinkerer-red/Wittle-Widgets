@@ -454,8 +454,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 		
 		#region Events
 			
-			self.events.change     = "change";
-			self.events.submit     = "submit";
+			self.events.change     = variable_get_hash("change");
+			self.events.submit     = variable_get_hash("submit");
 			
 		#endregion
 		
@@ -911,7 +911,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 
 						#endregion
-					
+						
 						#region update mouse selector
 						
 							//allow highlighting if the region is not an input region and it's just displaying copy-able text
@@ -927,145 +927,148 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 						
 						#endregion
-					
-						#region Copy
 						
-							if (curt.focus)
-							&& (keyboard_check(keys.control)) {
-								if (keyboard_check(keys.c)) {
-									if (keyboard_check_pressed(keys.c)) {
-										var _text = copy_function();
-										if (os_browser == browser_not_a_browser) {
-											clipboard_set_text(_text);
-										}
-										else {
-											js_clipboard_set_text(_text);
-										}
-									}
-					
-									//html5 support
-									keyboard_string = "";
-									
-									keys.last_key = keys.c;
-					
-									break;
-								}
-							}
-						
-						#endregion
-					
-						#region PageUp PageDown
-						
-							if (curt.focus) {
-								if (keyboard_check_pressed(keys.page_up)) {
-									if (keyboard_check(keys.shift)) {
-										if (curt.select == -1) {
-											curt.select_line = curt.current_line;
-											curt.select = curt.cursor;
-										}
-									}
-									else {
-										curt.select = -1;
-									}
-								
-									var _height = get_coverage_height();
-									var _lines_shown = floor(_height/draw.line_height)
-									set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
-								
-									//html5 support
-									keyboard_string = "";
-									
-									keys.last_key = keys.page_up;
-								
-									curt.button_repeat = 40;
-								
-									break;
-								}
-								else if (keyboard_check_pressed(keys.page_down)) {
-									if (keyboard_check(keys.shift)) {
-										if (curt.select == -1) {
-											curt.select_line = curt.current_line;
-											curt.select = curt.cursor;
-										}
-									}
-									else {
-										curt.select = -1;
-									}
-									
-									var _height = get_coverage_height();
-									var _lines_shown = floor(_height/draw.line_height)
-									set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
-									
-									//html5 support
-									keyboard_string = "";
-									
-									keys.last_key = keys.page_down;
-								
-									curt.button_repeat = 40;
-								
-									break;
-								}
+						if (keyboard_check(vk_anykey)) {
 							
-								if (keyboard_check(keys.page_up)) {
-									curt.button_repeat --;
-									if (curt.button_repeat < 0) {
-										if (keyboard_check(keys.shift)) {
-											if (curt.select == -1) {
-												curt.select_line = curt.current_line;
-												curt.select = curt.cursor;
+							#region Copy
+								
+								if (curt.focus)
+								&& (keyboard_check(keys.control)) {
+									if (keyboard_check(keys.c)) {
+										if (keyboard_check_pressed(keys.c)) {
+											var _text = copy_function();
+											if (os_browser == browser_not_a_browser) {
+												clipboard_set_text(_text);
+											}
+											else {
+												js_clipboard_set_text(_text);
 											}
 										}
-										else {
-											curt.select = -1;
-										}
-									
-										var _height = get_coverage_height();
-										var _lines_shown = _height/draw.line_height
-										set_vert_scroll(scroll.y_off + _height)
-										set_cursor_y_pos(curt.current_line - _lines_shown)
-									
+										
 										//html5 support
 										keyboard_string = "";
 										
-										keys.last_key = keys.page_up;
-									
-										curt.button_repeat = 3;
-									
-										break;
-									}
-								}
-								else if (keyboard_check(keys.page_down)) {
-									curt.button_repeat --;
-									if (curt.button_repeat < 0) {
-										if (keyboard_check(keys.shift)) {
-											if (curt.select == -1) {
-												curt.select_line = curt.current_line;
-												curt.select = curt.cursor;
-											}
-										}
-										else {
-											curt.select = -1;
-										}
-									
-										var _height = get_coverage_height();
-										var _lines_shown = _height/draw.line_height
-										set_vert_scroll(scroll.y_off - _height)
-										set_cursor_y_pos(curt.current_line + _lines_shown)
-									
-										//html5 support
-										keyboard_string = "";
-										
-										keys.last_key = keys.page_down;
-									
-										curt.button_repeat = 3;
-									
-										break;
-									}
-								}
-							}
-						
-						#endregion
+										keys.last_key = keys.c;
 					
+										break;
+									}
+								}
+								
+							#endregion
+							
+							#region PageUp PageDown
+						
+								if (curt.focus) {
+									if (keyboard_check_pressed(keys.page_up)) {
+										if (keyboard_check(keys.shift)) {
+											if (curt.select == -1) {
+												curt.select_line = curt.current_line;
+												curt.select = curt.cursor;
+											}
+										}
+										else {
+											curt.select = -1;
+										}
+								
+										var _height = get_coverage_height();
+										var _lines_shown = floor(_height/draw.line_height)
+										set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
+								
+										//html5 support
+										keyboard_string = "";
+									
+										keys.last_key = keys.page_up;
+								
+										curt.button_repeat = 40;
+								
+										break;
+									}
+									else if (keyboard_check_pressed(keys.page_down)) {
+										if (keyboard_check(keys.shift)) {
+											if (curt.select == -1) {
+												curt.select_line = curt.current_line;
+												curt.select = curt.cursor;
+											}
+										}
+										else {
+											curt.select = -1;
+										}
+									
+										var _height = get_coverage_height();
+										var _lines_shown = floor(_height/draw.line_height)
+										set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
+									
+										//html5 support
+										keyboard_string = "";
+									
+										keys.last_key = keys.page_down;
+								
+										curt.button_repeat = 40;
+								
+										break;
+									}
+									
+									if (keyboard_check(keys.page_up)) {
+										curt.button_repeat --;
+										if (curt.button_repeat < 0) {
+											if (keyboard_check(keys.shift)) {
+												if (curt.select == -1) {
+													curt.select_line = curt.current_line;
+													curt.select = curt.cursor;
+												}
+											}
+											else {
+												curt.select = -1;
+											}
+									
+											var _height = get_coverage_height();
+											var _lines_shown = _height/draw.line_height
+											set_vert_scroll(scroll.y_off + _height)
+											set_cursor_y_pos(curt.current_line - _lines_shown)
+									
+											//html5 support
+											keyboard_string = "";
+										
+											keys.last_key = keys.page_up;
+									
+											curt.button_repeat = 3;
+									
+											break;
+										}
+									}
+									else if (keyboard_check(keys.page_down)) {
+										curt.button_repeat --;
+										if (curt.button_repeat < 0) {
+											if (keyboard_check(keys.shift)) {
+												if (curt.select == -1) {
+													curt.select_line = curt.current_line;
+													curt.select = curt.cursor;
+												}
+											}
+											else {
+												curt.select = -1;
+											}
+									
+											var _height = get_coverage_height();
+											var _lines_shown = _height/draw.line_height
+											set_vert_scroll(scroll.y_off - _height)
+											set_cursor_y_pos(curt.current_line + _lines_shown)
+									
+											//html5 support
+											keyboard_string = "";
+										
+											keys.last_key = keys.page_down;
+									
+											curt.button_repeat = 3;
+									
+											break;
+										}
+									}
+								}
+						
+							#endregion
+							
+						}
 					}
 					
 					if (curt.multiline) {
@@ -1075,8 +1078,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					if (_mouse_on_comp) {
 						capture_input();
 					}
-				
-					if (!__is_on_focus__) return;
+					
+					if (!__is_on_focus__)
+					|| (!keyboard_check(vk_anykey)) {
+						return;
+					}
 				
 					//allow early outs with breaks;
 					repeat (1) {

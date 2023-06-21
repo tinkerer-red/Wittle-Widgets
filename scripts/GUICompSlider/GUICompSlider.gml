@@ -648,16 +648,16 @@ function GUICompSlider() : GUICompCore() constructor {
 		
 		#region Events
 			
-			self.events.mouse_over = "mouse_over";
-			self.events.pressed    = "pressed";
-			self.events.held       = "held";
-			self.events.long_press = "long_press";
-			self.events.released   = "released";
+			self.events.mouse_over = variable_get_hash("mouse_over");
+			self.events.pressed    = variable_get_hash("pressed");
+			self.events.held       = variable_get_hash("held");
+			self.events.long_press = variable_get_hash("long_press");
+			self.events.released   = variable_get_hash("released");
 			
-			self.events.value_input       = "value_input"; //if a value was input in any way, this will trigger every frame the slider is interacted wtih
-			self.events.value_changed     = "value_changed"; //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
-			self.events.value_incremented = "value_incremented"; //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
-			self.events.value_decremented = "value_decremented"; //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
+			self.events.value_input       = variable_get_hash("value_input"); //if a value was input in any way, this will trigger every frame the slider is interacted wtih
+			self.events.value_changed     = variable_get_hash("value_changed"); //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
+			self.events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
+			self.events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
 			
 		#endregion
 		
@@ -880,12 +880,14 @@ function GUICompSlider() : GUICompCore() constructor {
 							break;}
 						}
 						
-						var _thumb_col    = (!thumb.enabled)    ? 0 : _color_blend(thumb.min_color[$ _state],      thumb.max_color[$ _state],      normalized_value);
-						var _bar_col      = (!bar.enabled)      ? 0 : _color_blend(bar.min_color[$ _state],        bar.max_color[$ _state],        normalized_value);
-						var _background_col = (!background.enabled) ? 0 : _color_blend(background.min_color[$ _state], background.max_color[$ _state], normalized_value);
-						var _text_col     = (!text.enabled)     ? 0 : _color_blend(text.min_color[$ _state],       text.max_color[$ _state],       normalized_value);
+						var _hash = variable_get_hash(_state);
 						
-						var _text_outline_col = ((!text.enabled) || (text.outline.thickness == 0)) ? 0 : _color_blend(text.outline.min_color[$ _state], text.outline.max_color[$ _state], normalized_value);
+						var _thumb_col    = (!thumb.enabled)    ? 0 : _color_blend(struct_get_from_hash(thumb.min_color, _hash),      struct_get_from_hash(thumb.max_color, _hash),      normalized_value);
+						var _bar_col      = (!bar.enabled)      ? 0 : _color_blend(struct_get_from_hash(bar.min_color, _hash),        struct_get_from_hash(bar.max_color, _hash),        normalized_value);
+						var _background_col = (!background.enabled) ? 0 : _color_blend(struct_get_from_hash(background.min_color, _hash), struct_get_from_hash(background.max_color, _hash), normalized_value);
+						var _text_col     = (!text.enabled)     ? 0 : _color_blend(struct_get_from_hash(text.min_color, _hash),       struct_get_from_hash(text.max_color, _hash),       normalized_value);
+						
+						var _text_outline_col = ((!text.enabled) || (text.outline.thickness == 0)) ? 0 : _color_blend(struct_get_from_hash(text.outline.min_color, _hash), struct_get_from_hash(text.outline.max_color, _hash), normalized_value);
 						
 					#endregion
 				

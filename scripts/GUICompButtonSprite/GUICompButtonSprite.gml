@@ -43,11 +43,11 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 		
 		#region Events
 			
-			self.events.mouse_over = "mouse_over";
-			self.events.pressed    = "pressed";
-			self.events.held       = "held";
-			self.events.long_press = "long_press";
-			self.events.released   = "released";
+			self.events.mouse_over = variable_get_hash("mouse_over");
+			self.events.pressed    = variable_get_hash("pressed");
+			self.events.held       = variable_get_hash("held");
+			self.events.long_press = variable_get_hash("long_press");
+			self.events.released   = variable_get_hash("released");
 			
 		#endregion
 		

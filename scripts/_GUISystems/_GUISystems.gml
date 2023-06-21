@@ -25,6 +25,7 @@ function __surface_rebuild__(_surface, _w, _h) {
 /// @returns {Real}
 #endregion
 function __get_controller_archor_x__(_halign=fa_center) {
+	gml_pragma("forceinline");
 	//var _calling_inst = other;
 	//with (_calling_inst) {
 		switch (_halign) {
@@ -49,6 +50,7 @@ function __get_controller_archor_x__(_halign=fa_center) {
 /// @returns {Real}
 #endregion
 function __get_controller_archor_y__(_valign=fa_middle) {
+	gml_pragma("forceinline");
 	//var _calling_inst = other;
 	//with (_calling_inst) {
 		switch (_valign) {

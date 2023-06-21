@@ -221,16 +221,16 @@ function GUICompScrollBar() : GUICompController() constructor {
 		
 		#region Events
 			
-			self.events.mouse_over = "mouse_over";
-			self.events.pressed    = "pressed";
-			self.events.held       = "held";
-			self.events.long_press = "long_press";
-			self.events.released   = "released";
+			self.events.mouse_over = variable_get_hash("mouse_over");
+			self.events.pressed    = variable_get_hash("pressed");
+			self.events.held       = variable_get_hash("held");
+			self.events.long_press = variable_get_hash("long_press");
+			self.events.released   = variable_get_hash("released");
 			
-			self.events.value_input       = "value_input"; //if a value was input in any way, this will trigger every frame the slider is interacted wtih
-			self.events.value_changed     = "value_changed"; //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
-			self.events.value_incremented = "value_incremented"; //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
-			self.events.value_decremented = "value_decremented"; //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
+			self.events.value_input       = variable_get_hash("value_input"); //if a value was input in any way, this will trigger every frame the slider is interacted wtih
+			self.events.value_changed     = variable_get_hash("value_changed"); //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
+			self.events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
+			self.events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
 			
 		#endregion
 		

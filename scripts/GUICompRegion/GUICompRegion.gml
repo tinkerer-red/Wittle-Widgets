@@ -327,11 +327,11 @@ function GUICompRegion() : GUICompController() constructor {
 		
 		#region Events
 			
-			self.events.scrolled       = "scrolled"; //if the scroll region has moved it's view in any way
-			self.events.scrolled_up    = "scrolled_up"; //if the scroll region has scrolled up
-			self.events.scrolled_down  = "scrolled_down"; //if the scroll region has scrolled down
-			self.events.scrolled_left  = "scrolled_left"; //if the scroll region has scrolled left
-			self.events.scrolled_right = "scrolled_right"; //if the scroll region has scrolled right
+			self.events.scrolled       = variable_get_hash("scrolled"); //if the scroll region has moved it's view in any way
+			self.events.scrolled_up    = variable_get_hash("scrolled_up"); //if the scroll region has scrolled up
+			self.events.scrolled_down  = variable_get_hash("scrolled_down"); //if the scroll region has scrolled down
+			self.events.scrolled_left  = variable_get_hash("scrolled_left"); //if the scroll region has scrolled left
+			self.events.scrolled_right = variable_get_hash("scrolled_right"); //if the scroll region has scrolled right
 			
 		#endregion
 		

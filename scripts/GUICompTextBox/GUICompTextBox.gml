@@ -1562,20 +1562,20 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 					draw_set_color(draw.font_color);
 					draw_set_alpha(1);
-				
+					
 					//pre draw cached surf
 					if (__using_cached_drawing__)
 					&& (draw.refresh_surf) {
 						//set the surface
 						__surface_set_target__();
 					}
-				
+					
 					//draw the component it's self, either on a cached surf or directly.
 					if (!__using_cached_drawing__) 
 					|| (draw.refresh_surf) {
 						var _draw_x = (__using_cached_drawing__) ? 0 : x;
 						var _draw_y = (__using_cached_drawing__) ? 0 : y;
-					
+						
 						var _font_color = draw.font_color;
 						var _x_off = -scroll.x_off;
 						var _y_off = -scroll.y_off;
@@ -1585,13 +1585,13 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						var _current_line = curt.current_line;
 						var _cursor_update = curt.cursor;
 						var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
-					
+						
 						draw_set_font(draw.font);
 						draw_set_color(draw.font_color);
 						draw_set_alpha(1);
 						draw_set_valign(fa_top);
 						draw_set_halign(fa_left);
-					
+						
 						#region draw text
 							
 							if (_line_count == 1 && _arr_lines[0] == "") {
@@ -1687,7 +1687,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 							
 						#endregion
-					
+						
 						#region draw cursor
 						
 							if (__is_on_focus__)
@@ -1711,9 +1711,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 						
 						#endregion
-					
+						
 					}
-				
+					
 					//post draw cached surf
 					if (__using_cached_drawing__) {
 						if (draw.refresh_surf) {

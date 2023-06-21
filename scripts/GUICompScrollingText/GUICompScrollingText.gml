@@ -93,7 +93,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				
 				draw_set_font(text.font);
 				text.width  = string_width(text.text);
-				text.height = string_height(text.text);
+				text.height = font_get_info(text.font).size;
 				
 				return self;
 			}
@@ -109,7 +109,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				
 				draw_set_font(text.font);
 				text.width  = string_width(text.text);
-				text.height = string_height(text.text);
+				text.height = font_get_info(text.font).size;
 				
 				
 				return self;
@@ -283,14 +283,23 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				//		true
 				//);
 				//
-				//draw_set_color(c_yellow)
-				//draw_rectangle(
-				//		x+clip_region.left,
-				//		y+clip_region.top,
-				//		x+clip_region.right,
-				//		y+clip_region.bottom,
-				//		true
-				//);
+				draw_set_color(c_yellow)
+				draw_rectangle(
+						x+clip_region.left,
+						y+clip_region.top,
+						x+clip_region.right,
+						y+clip_region.bottom,
+						true
+				);
+				
+				draw_set_color(c_green)
+				draw_rectangle(
+						x,
+						y,
+						x+text.width,
+						y+text.height,
+						true
+				);
 				
 			}
 			
@@ -380,8 +389,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				}
 				
 				var _should_cull = false;
-				if (text.width > region.get_width())
-				|| (text.height > region.get_height()) {
+				if (text.width > clip_region.get_width())
+				|| (text.height > clip_region.get_height()) {
 					_should_cull = true;
 				}
 				

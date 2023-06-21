@@ -25,6 +25,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			static set_region = function(_left, _top, _right, _bottom) { static __run_once__ = log(["set_region", set_region]);
 				__SUPER__.set_region(_left, _top, _right, _bottom);
 				
+				__update_scroll__();
+				
 				return self;
 			}
 			#region jsDoc
@@ -1545,13 +1547,19 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					//var _texfilter_previous = gpu_get_texfilter();
 					//gpu_set_texfilter(true);
 					
-					__shader_set__();
 					
 					var _start_x = x;
 					var _start_y = y;
 					var _draw_width = get_coverage_width();
 					var _draw_height = get_coverage_height();
-				
+					
+					var _using_shader = false;
+					if (!__scroll_horz_hidden__)
+					|| (!__scroll_vert_hidden__) {
+						_using_shader = true;
+						__shader_set__();
+					}
+					
 					draw_set_color(draw.font_color);
 					draw_set_alpha(1);
 				
@@ -1594,12 +1602,12 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 							else {
 								var _select_line_start, _select_line_end, _cursor_start, _cursor_end;
-							
+								
 								var _select_line = curt.select_line;
 								var _select = curt.select;
 								var _displayed_lines_index = floor(-scroll.y_off / draw.line_height);
 								var _displayed_lines_length = min(_line_count - _displayed_lines_index, ceil(get_coverage_height() / draw.line_height));
-							
+								
 								if (_select > -1) {
 									_select_line_start = _select_line;
 									_select_line_end = _current_line;
@@ -1613,22 +1621,22 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										_cursor_end = _select;
 									}
 								}
-							
+								
 								//prep the drawing of text, this wont effect the drawing of the selection box.
 								draw_set_color(draw.font_color);
-							
+								
 								//an optimizer for empty line selection and /n selection
 								// this is used any time the line's string is empty, or when wrapping the selection to the next line
 								var _selection_end_cap_width = string_width(" ");
-							
+								
 								var _selection_x1 = 0;
 								var _selection_x2 = 0;
 								var _text, _derivative_y;
-							
+								
 								repeat (_displayed_lines_length) {
 									_text = _arr_lines[_displayed_lines_index];
 									_derivative_y = _displayed_lines_index * _line_height - _y_off - _center_y;
-								
+									
 									if (_select > -1)
 									&& (_displayed_lines_index >= _select_line_start)
 									&& (_displayed_lines_index <= _select_line_end) {
@@ -1672,9 +1680,10 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 									
 									draw_text(_draw_x-_x_off, _draw_y+_derivative_y, _text);
-								
+									
 									_displayed_lines_index+=1;
 								}
+								
 							}
 							
 						#endregion
@@ -1715,7 +1724,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						__draw_component_surface__();
 					}
 					
-					__shader_reset__();
+					if (_using_shader) {
+						__shader_reset__();
+					}
 					
 					//if (!_texfilter_previous) {
 					//	gpu_set_texfilter(_texfilter_previous);
@@ -2022,7 +2033,6 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 							
 						}
-						
 					}
 					
 					// Update x-offset.
@@ -2040,7 +2050,6 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 							
 						}
-						
 					}
 					
 				}

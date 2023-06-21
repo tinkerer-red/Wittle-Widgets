@@ -544,7 +544,12 @@ function GUICompRegion() : GUICompController() constructor {
 			static __draw_gui__ = function(_input) {
 				__user_input__ = _input;
 				
-				__shader_set__();
+				var _using_shader = false;
+				if (!__scroll_horz_hidden__)
+				|| (!__scroll_vert_hidden__) {
+					_using_shader = true;
+					__shader_set__();
+				}
 				
 				draw_gui(__user_input__);
 				
@@ -559,7 +564,9 @@ function GUICompRegion() : GUICompController() constructor {
 					
 				}
 				
-				__shader_reset__();
+				if (_using_shader) {
+					__shader_reset__();
+				}
 				
 				//draw the sliders ontop
 				if (!__scroll_horz_hidden__) __scroll_horz__.__draw_gui__(__user_input__);
@@ -572,12 +579,18 @@ function GUICompRegion() : GUICompController() constructor {
 			static __draw_gui_end__ = function(_input) {
 				__user_input__ = _input;
 				
-				__shader_set__({
-					left   : region.left,
-					top    : region.top,
-					right  : region.right,
-					bottom : 999999
-				});
+				var _using_shader = false;
+				if (!__scroll_horz_hidden__)
+				|| (!__scroll_vert_hidden__) {
+					_using_shader = true;
+					__shader_set__({
+						left   : region.left,
+						top    : region.top,
+						right  : region.right,
+						bottom : 999999
+					});
+				}
+				
 				
 				draw_gui_end(__user_input__);
 				
@@ -592,7 +605,9 @@ function GUICompRegion() : GUICompController() constructor {
 					
 				}
 				
-				__shader_reset__();
+				if (_using_shader) {
+					__shader_reset__();
+				}
 				
 				//draw the sliders ontop of the surface
 				__scroll_vert__.__draw_gui_end__(__user_input__);

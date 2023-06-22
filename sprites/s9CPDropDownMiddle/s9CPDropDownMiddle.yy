@@ -51,8 +51,8 @@
   },
   "origin": 0,
   "parent": {
-    "name": "Components",
-    "path": "folders/ControlPanel/Components.yy",
+    "name": "Assets",
+    "path": "folders/_Libraries/ControlPanel/Assets.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

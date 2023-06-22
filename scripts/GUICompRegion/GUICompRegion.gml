@@ -101,7 +101,7 @@ function GUICompRegion() : GUICompController() constructor {
 				}
 				
 				__update_scrollbar_thumbs__();
-		
+				
 				return self;
 			}
 			#region jsDoc
@@ -260,19 +260,19 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @returns {Struct.GUICompScrollRegion}
 			#endregion
 			static set_scrollbar_hidden = function(_horz_hidden=undefined, _vert_hidden=undefined) {
-				if (!is_undefined(_horz_hidden))
-				&& (__scroll_horz_hidden__ != _horz_hidden) {
-					__scroll_horz_hidden__ = (is_undefined(_horz_hidden)) ? __scroll_horz_hidden__ : _horz_hidden
-					var _view_width  = (__scroll_vert_hidden__) ? region.get_width()  : region.get_width()  - __scroll_vert_size__
-					__scroll_horz__.set_region(0, 0, _view_width, __scroll_horz_size__)
-				}
+				//make sure both values get updated at the same time
+				_horz_hidden = (_horz_hidden == undefined) ? __scroll_horz_hidden__ : _horz_hidden;
+				_vert_hidden = (_vert_hidden == undefined) ? __scroll_vert_hidden__ : _vert_hidden;
 				
-				if (!is_undefined(_vert_hidden))
-				&& (__scroll_vert_hidden__ != _vert_hidden) {
-					__scroll_vert_hidden__ = (is_undefined(_vert_hidden)) ? __scroll_vert_hidden__ : _vert_hidden
-					var _view_height = (__scroll_horz_hidden__) ? region.get_height() : region.get_height() - __scroll_horz_size__
-					__scroll_vert__.set_region(0, 0, __scroll_vert_size__, _view_height)
-				}
+				//horz
+				__scroll_horz_hidden__ = (is_undefined(_horz_hidden)) ? __scroll_horz_hidden__ : _horz_hidden
+				var _view_width  = (__scroll_vert_hidden__) ? region.get_width()  : region.get_width()  - __scroll_vert_size__
+				__scroll_horz__.set_region(0, 0, _view_width, __scroll_horz_size__)
+				
+				//vert
+				__scroll_vert_hidden__ = (is_undefined(_vert_hidden)) ? __scroll_vert_hidden__ : _vert_hidden
+				var _view_height = (__scroll_horz_hidden__) ? region.get_height() : region.get_height() - __scroll_horz_size__
+				__scroll_vert__.set_region(0, 0, __scroll_vert_size__, _view_height)
 				
 				update_component_positions();
 				
@@ -409,26 +409,30 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				//init both before we start building as they are codependant
 				__scroll_vert__ = new GUICompScrollBar()
-					.set_position(0,0)
+					.set_anchor(0,0)
+					.set_alignment(fa_right, fa_top)
+					.set_vertical(true)
 				__scroll_horz__ = new GUICompScrollBar()
-					.set_position(0,0)
+					.set_anchor(0,0)
+					.set_alignment(fa_left, fa_bottom)
+					.set_button_sprites(s9ScrollbarHorzButtonLeft, s9ScrollbarHorzButtonRight)
+					.set_background_sprite(s9ScrollbarHorzBackground)
 				
 				//vertical
 				__scroll_vert__.__is_child__ = true;
 				__scroll_vert__.__parent__ = self;
-				__scroll_vert__.set_alignment(fa_right, fa_top);
-				__scroll_vert__.set_vertical(true);
-				__scroll_vert__.add_event_listener(__scroll_vert__.events.value_changed,method(self, function(_val) {
+				__scroll_vert__.set_anchor(__scroll_vert__.region.get_width(), 0)
+				__scroll_vert__.add_event_listener(__scroll_vert__.events.value_changed, function(_val) {
 					scroll.y_off = -_val;
-				}));
+				});
 				
 				//horizontal
 				__scroll_horz__.__is_child__ = true;
 				__scroll_horz__.__parent__ = self;
-				__scroll_horz__.set_alignment(fa_left, fa_bottom);
-				__scroll_horz__.add_event_listener(__scroll_horz__.events.value_changed, method(self, function(_val) {
+				__scroll_horz__.set_anchor(0, __scroll_horz__.region.get_height())
+				__scroll_horz__.add_event_listener(__scroll_horz__.events.value_changed, function(_val) {
 					scroll.x_off = -_val;
-				}));
+				});
 				
 				//set the regions
 				//__scroll_vert__.old_set_region = __scroll_vert__.set_region
@@ -465,7 +469,8 @@ function GUICompRegion() : GUICompController() constructor {
 				#endregion
 				
 				//run children
-				if(!__is_empty__ and is_open) {
+				if (!__is_empty__)
+				&& (is_open) {
 					//run the children
 					var _component, xx, yy;
 					var _i=__children_count__; repeat(__children_count__) { _i--;
@@ -554,7 +559,8 @@ function GUICompRegion() : GUICompController() constructor {
 				draw_gui(__user_input__);
 				
 				//run children
-				if(!__is_empty__ and is_open) {
+				if (!__is_empty__)
+				&& (is_open) {
 					//run the children
 					var _component;
 					var _i=0; repeat(__children_count__) {
@@ -595,7 +601,8 @@ function GUICompRegion() : GUICompController() constructor {
 				draw_gui_end(__user_input__);
 				
 				//run children
-				if(!__is_empty__ and is_open) {
+				if (!__is_empty__)
+				&& (is_open) {
 					//run the children
 					var _component;
 					var _i=0; repeat(__children_count__) {
@@ -639,6 +646,7 @@ function GUICompRegion() : GUICompController() constructor {
 			}
 			
 			static __update_scrollbar_positions__ = function() {
+				
 				__scroll_vert__.x = x + region.right - (__scroll_vert__.region.get_width());
 				__scroll_vert__.y = y + region.top;
 				

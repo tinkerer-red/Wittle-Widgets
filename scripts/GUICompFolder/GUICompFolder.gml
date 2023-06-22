@@ -234,7 +234,8 @@ function GUICompFolder() : GUICompController() constructor {
 					}
 					
 					//run the children
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						var _component, xx, yy;
 						var _i=__children_count__; repeat(__children_count__) { _i--;
 							_component = __children__[_i];
@@ -256,7 +257,8 @@ function GUICompFolder() : GUICompController() constructor {
 					}
 					
 					//run children
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						//run the children
 						var _component, xx, yy;
 						var _i=__children_count__; repeat(__children_count__) { _i--;
@@ -281,7 +283,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__end_step__(_input);
 					}
 					
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						//run the children
 						var _component, xx, yy;
 						var _i=__children_count__; repeat(__children_count__) { _i--;
@@ -308,7 +311,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__draw_gui_begin__(_input);
 					}
 					
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						
 						//run the children
 						var _component, xx, yy;
@@ -354,7 +358,8 @@ function GUICompFolder() : GUICompController() constructor {
 					};
 					
 					//run children
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						//update childrens possitions
 						//update_component_positions();
 						
@@ -379,7 +384,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__draw_gui_end__(_input);
 					}
 					
-					if(!__is_empty__ and is_open) {
+					if (!__is_empty__)
+					&& (is_open) {
 						
 						//run the children
 						var _component, xx, yy;
@@ -406,7 +412,7 @@ function GUICompFolder() : GUICompController() constructor {
 					cleanup();
 					__button__.__cleanup__();
 					
-					if(!__is_empty__) {
+					if (!__is_empty__) {
 						var _i=0; repeat(__children_count__) {
 							var _comp = __children__[_i];
 							_comp.__cleanup__();
@@ -423,16 +429,17 @@ function GUICompFolder() : GUICompController() constructor {
 				var _top    = region.top;
 				var _right  = region.right;
 				var _bottom = region.bottom;
-		
+				
 				//if it's closed we dont need to add anything extra to this
-				if(!__is_empty__ and is_open) {
+				if (!__is_empty__)
+				&& (is_open) {
 					var _component, xoff, yoff;
 					var _i = 0; repeat(__children_count__) {
 						_component = __children__[_i];
 						xoff = _component.x-x;
 						yoff = _component.y-y;
 				
-						if(_component.__is_controller__) {
+						if (_component.__is_controller__) {
 							_left   = min(_left,   xoff+_component.__controller_region__.left);
 							_top    = min(_top,    yoff+_component.__controller_region__.top);
 							_right  = max(_right,  xoff+_component.__controller_region__.right);
@@ -447,7 +454,7 @@ function GUICompFolder() : GUICompController() constructor {
 						_i+=1
 					}
 				}
-		
+				
 				__controller_region__.left   = _left;
 				__controller_region__.top    = _top;
 				__controller_region__.right  = _right;

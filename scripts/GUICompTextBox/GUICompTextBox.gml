@@ -37,7 +37,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
 			static set_enabled = function(_enabled) { static __run_once__ = log(["set_enabled", set_enabled]);
-				if(_enabled) {
+				if (_enabled) {
 					enabled = true;
 					enabled_step = 0;
 					keyboard_string = "";
@@ -100,7 +100,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				if (!__line_height_defined__) {
-					draw.line_height = font_get_info(draw.font).size;
+					draw.line_height = font_get_info(draw.font).size + 1;
 				}
 				
 				return self;
@@ -126,7 +126,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			#endregion
 			static set_text_line_height = function(_height=-1) { static __run_once__ = log(["set_text_line_height", set_text_line_height]);
 				__line_height_defined__ = true;
-				draw.line_height = (_height != -1) ? _height : font_get_info(draw.font).size;
+				draw.line_height = (_height != -1) ? _height : font_get_info(draw.font).size + 1;
 				
 				return self;
 			}
@@ -1088,7 +1088,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				
 					//allow early outs with breaks;
 					repeat (1) {
-					
+						
 						#region escape
 				
 							if (keyboard_check_pressed(keys.escape))
@@ -1107,7 +1107,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 
 						#endregion
-					
+						
 						#region break line
 	
 							if (keyboard_check_pressed(keys.enter)) {
@@ -1123,9 +1123,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 
 						#endregion
-					
+						
 						#region update cursor
-	
+							
 							static _control_skip_word = function(_horz_input_vector) {
 								static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
 							
@@ -1171,23 +1171,23 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							
 								return _horz_input_vector+_dir;
 							}
-						
+							
 							//the initial press
 							var _horz_input_vector = keyboard_check_pressed(keys.right) - keyboard_check_pressed(keys.left);
 							if (_horz_input_vector != 0) {
 								if (keyboard_check(keys.control)) {
 									_horz_input_vector = _control_skip_word(_horz_input_vector)
 								}
-							
+								
 								curt.button_repeat = 40;
 								__textbox_update_cursor__(_horz_input_vector, keyboard_check(keys.shift), false);
 								break;
 							}
-						
+							
 							//the held press
 							_horz_input_vector = keyboard_check(keys.right) - keyboard_check(keys.left);
 							if (_horz_input_vector != 0) {
-							
+								
 								curt.button_repeat --;
 								if (curt.button_repeat < 0) {
 									if (keyboard_check(keys.control)) {
@@ -1198,11 +1198,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								}
 								break;
 							}
-						
-						
-						
+							
+							
+							
 							var _vert_input_vector = keyboard_check_pressed(keys.down) - keyboard_check_pressed(keys.up);
-						
+							
 							#region Top Bottom Lines
 							
 								//full left if on top line
@@ -1238,7 +1238,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								}
 							
 							#endregion
-						
+							
 							if (curt.multiline)
 							&& (curt.length != 1) {
 							
@@ -1278,9 +1278,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									break;
 								}
 							}
-	
+							
 						#endregion
-					
+						
 						#region delete string
 					
 							var _delete = keyboard_check_pressed(keys.delete_key);
@@ -1310,14 +1310,14 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 
 						#endregion
-					
+						
 						#region edit string
 	
 							if (keyboard_check(keys.control)) {
 		
 								// Keyboard repeat stuff
-								if(keys.last_key != undefined) {
-									if(keyboard_check(keys.last_key)) {
+								if (keys.last_key != undefined) {
+									if (keyboard_check(keys.last_key)) {
 										keys.last_key_time += 1;
 									
 										if (keys.last_key_time > game_get_speed(gamespeed_fps)/3)
@@ -1464,7 +1464,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 	
 						#endregion
-					
+						
 						#region others
 	
 							// Go to the beginning.
@@ -1504,7 +1504,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 	
 						#endregion
-					
+						
 						#region get string
 					
 							var _keyboard_string = keyboard_string;
@@ -1522,7 +1522,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							}
 	
 						#endregion
-					
+						
 					}
 				
 				}

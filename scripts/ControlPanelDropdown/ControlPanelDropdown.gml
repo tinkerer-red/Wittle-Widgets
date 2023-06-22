@@ -26,7 +26,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					__dropdown__.set_width(_width)
 				}
 				
-				__dropdown__.set_position(-__dropdown__.region.get_width(), 0)
+				__dropdown__.set_anchor(-_info.right - __dropdown__.region.get_width(), +_info.top)
 				
 				
 				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
@@ -122,7 +122,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				.set_dropdown_sprites(s9CPDropDown, s9CPDropDownTop, s9CPDropDownMiddle, s9CPDropDownBottom)
 				.set_dropdown_array(_arr_of_str)
 				.set_sprite_to_auto_wrap()
-			__dropdown__.set_position(-__dropdown__.region.get_width(), 0)
+			__dropdown__.set_anchor(-_info.right - __dropdown__.region.get_width(), +_info.top)
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)
@@ -145,7 +145,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
 			
-			var _info = sprite_get_nineslice(__button__.sprite.index)
+			var _info = sprite_get_nineslice(__button__.sprite.index);
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);

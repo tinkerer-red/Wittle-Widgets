@@ -156,7 +156,7 @@ function GUICompHandler() : GUICompController() constructor {
 				/// @self    GUICompHandler
 				#endregion
 				static cleanup = function() {
-					if(!__is_empty__){
+					if (!__is_empty__){
 						var _i=0; repeat(__children_count__) {
 				
 							var _component = __children__[_i];

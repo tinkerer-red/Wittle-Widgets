@@ -20,7 +20,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				var _width = _right - _info.left - _info.right;
 				
 				__textbox__.set_width(_width*0.5)
-				__textbox__.set_position(-_width*0.5, 0)
+				__textbox__.set_anchor(-_info.right - _width*0.5, _info.top)
 				
 				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
 				__scrolling_text__.set_region(
@@ -151,8 +151,6 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				.set_char_enforcement()
 				.set_multiline(false)
 				.set_accepting_inputs(true)
-			
-			__textbox__.set_position(0, 0)
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)

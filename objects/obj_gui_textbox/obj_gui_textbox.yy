@@ -1,19 +1,21 @@
 {
   "resourceType": "GMObject",
   "resourceVersion": "1.0",
-  "name": "oControlPanel",
+  "name": "obj_gui_textbox",
   "eventList": [
     {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":0,"eventType":0,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":64,"eventType":8,"isDnD":false,},
+    {"resourceType":"GMEvent","resourceVersion":"1.0","name":"","collisionObjectId":null,"eventNum":1,"eventType":3,"isDnD":false,},
   ],
-  "managed": true,
+  "managed": false,
   "overriddenProperties": [],
   "parent": {
-    "name": "ControlPanel",
-    "path": "folders/_Libraries/ControlPanel.yy",
+    "name": "Standalone Examples",
+    "path": "folders/Examples/Standalone Examples.yy",
   },
   "parentObjectId": {
-    "name": "oGUIController",
-    "path": "objects/oGUIController/oGUIController.yy",
+    "name": "obj_gui_standalone",
+    "path": "objects/obj_gui_standalone/obj_gui_standalone.yy",
   },
   "persistent": false,
   "physicsAngularDamping": 0.1,

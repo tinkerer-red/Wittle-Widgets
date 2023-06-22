@@ -43,30 +43,30 @@ function GUICompCore() constructor {
 				
 				return self;
 			}
-			#region jsDoc
-			/// @func    set_position()
-			/// @desc    Sets the position of the component, This position will be reletive to the parent controller and the anchor.
-			/// @self    GUICompCore
-			/// @param   {Real} x : The x of the component.
-			/// @param   {Real} y : The y of the component.
-			/// @returns {Struct.GUICompCore}
-			#endregion
-			static set_position = function(_x, _y) { //log(["set_position", set_position]);
-				self.x = _x;
-				self.y = _y;
-				self.__internal_x__ = _x;
-				self.__internal_y__ = _y;
-				
-				if (__position_set__ == false) {
-					__position_set__ = true;
-					self.xprevious = self.x;
-					self.yprevious = self.y;
-					self.xstart = self.x;
-					self.ystart = self.y;
-				}
-				
-				return self;
-			}
+			//#region jsDoc
+			///// @func    set_position()
+			///// @desc    Sets the position of the component, This position will be reletive to the parent controller and the anchor.
+			///// @self    GUICompCore
+			///// @param   {Real} x : The x of the component.
+			///// @param   {Real} y : The y of the component.
+			///// @returns {Struct.GUICompCore}
+			//#endregion
+			//static set_position = function(_x, _y) { //log(["set_position", set_position]);
+			//	self.x = _x;
+			//	self.y = _y;
+			//	self.__internal_x__ = _x;
+			//	self.__internal_y__ = _y;
+			//	
+			//	if (__position_set__ == false) {
+			//		__position_set__ = true;
+			//		self.xprevious = self.x;
+			//		self.yprevious = self.y;
+			//		self.xstart = self.x;
+			//		self.ystart = self.y;
+			//	}
+			//	
+			//	return self;
+			//}
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets all default GML object's sprite variables with a given sprite.

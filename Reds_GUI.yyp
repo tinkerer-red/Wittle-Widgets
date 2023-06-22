@@ -28,11 +28,13 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Vert","folderPath":"folders/_Libraries/Wittle Widgets/Assets/Scrollbar/Vert.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Slider","folderPath":"folders/_Libraries/Wittle Widgets/Assets/Slider.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Shaders","folderPath":"folders/_Libraries/Wittle Widgets/Shaders.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/ControlPanel.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/ControlPanel/Assets.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/ControlPanel/Components.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/_Libraries/ControlPanel.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/_Libraries/ControlPanel/Assets.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/_Libraries/ControlPanel/Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Examples","folderPath":"folders/Examples.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Example 1","folderPath":"folders/Examples/Example 1.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Standalone Examples","folderPath":"folders/Examples/Standalone Examples.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_system","folderPath":"folders/Examples/Standalone Examples/_system.yy",},
   ],
   "IncludedFiles": [
     {"resourceType":"GMIncludedFile","resourceVersion":"1.0","name":"RedsFont.ttf","CopyToMask":-1,"filePath":"datafiles",},
@@ -40,7 +42,7 @@
   "isEcma": false,
   "LibraryEmitters": [],
   "MetaData": {
-    "IDEVersion": "2023.4.0.84",
+    "IDEVersion": "2023.600.0.363",
   },
   "resources": [
     {"id":{"name":"_WittleWidgetsGUIConfig","path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},},
@@ -63,6 +65,7 @@
     {"id":{"name":"s9CPScrollbarThumbHorz","path":"sprites/s9CPScrollbarThumbHorz/s9CPScrollbarThumbHorz.yy",},},
     {"id":{"name":"oGUIController","path":"objects/oGUIController/oGUIController.yy",},},
     {"id":{"name":"GUICompHandler","path":"scripts/GUICompHandler/GUICompHandler.yy",},},
+    {"id":{"name":"obj_gui_standalone","path":"objects/obj_gui_standalone/obj_gui_standalone.yy",},},
     {"id":{"name":"ControlPanelVisualMacros","path":"scripts/ControlPanelVisualMacros/ControlPanelVisualMacros.yy",},},
     {"id":{"name":"s9CPButton","path":"sprites/s9CPButton/s9CPButton.yy",},},
     {"id":{"name":"sCPCheckboxUnChecked","path":"sprites/sCPCheckboxUnChecked/sCPCheckboxUnChecked.yy",},},
@@ -86,6 +89,7 @@
     {"id":{"name":"GUICompDropdown","path":"scripts/GUICompDropdown/GUICompDropdown.yy",},},
     {"id":{"name":"shd_clip_rect","path":"shaders/shd_clip_rect/shd_clip_rect.yy",},},
     {"id":{"name":"GUICompScrollBar","path":"scripts/GUICompScrollBar/GUICompScrollBar.yy",},},
+    {"id":{"name":"rm_stand_alone_xamples","path":"rooms/rm_stand_alone_xamples/rm_stand_alone_xamples.yy",},},
     {"id":{"name":"s9CPScrollbarThumbVert","path":"sprites/s9CPScrollbarThumbVert/s9CPScrollbarThumbVert.yy",},},
     {"id":{"name":"s9CPScrollbarVertBackground","path":"sprites/s9CPScrollbarVertBackground/s9CPScrollbarVertBackground.yy",},},
     {"id":{"name":"s9CPDropDown","path":"sprites/s9CPDropDown/s9CPDropDown.yy",},},
@@ -97,6 +101,7 @@
     {"id":{"name":"s9ScrollbarHorzButtonRight","path":"sprites/s9ScrollbarHorzButtonRight/s9ScrollbarHorzButtonRight.yy",},},
     {"id":{"name":"ControlPanelReal","path":"scripts/ControlPanelReal/ControlPanelReal.yy",},},
     {"id":{"name":"GUICompScrollingText","path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},},
+    {"id":{"name":"obj_gui_textbox","path":"objects/obj_gui_textbox/obj_gui_textbox.yy",},},
     {"id":{"name":"sCPScrollbarVertButtonUp","path":"sprites/sCPScrollbarVertButtonUp/sCPScrollbarVertButtonUp.yy",},},
     {"id":{"name":"sCPCheckboxChecked","path":"sprites/sCPCheckboxChecked/sCPCheckboxChecked.yy",},},
     {"id":{"name":"ControlPanelFolder","path":"scripts/ControlPanelFolder/ControlPanelFolder.yy",},},
@@ -121,6 +126,7 @@
   ],
   "RoomOrderNodes": [
     {"roomId":{"name":"rmControlPanel","path":"rooms/rmControlPanel/rmControlPanel.yy",},},
+    {"roomId":{"name":"rm_stand_alone_xamples","path":"rooms/rm_stand_alone_xamples/rm_stand_alone_xamples.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
   ],
   "TextureGroups": [

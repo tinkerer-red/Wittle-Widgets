@@ -60,7 +60,7 @@ function GUICompController() : GUICompCore() constructor {
 			static set_enabled = function(_is_enabled) { //log(["set_enabled", set_enabled]);
 				is_enabled = _is_enabled;
 				
-				if(!__is_empty__) {
+				if (!__is_empty__) {
 					var _comp;
 					var _i=0; repeat(__children_count__) {
 						_comp = __children__[_i];
@@ -182,7 +182,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Real}
 			#endregion
 			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
-				if(!__is_empty__) {
+				if (!__is_empty__) {
 					var _anchor_point, _comp, _xx, _yy;
 					
 					//move the children
@@ -475,7 +475,7 @@ function GUICompController() : GUICompCore() constructor {
 				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
 					cleanup();
 		
-					if(!__is_empty__) {
+					if (!__is_empty__) {
 						var _comp;
 						var _i=0; repeat(__children_count__) {
 							_comp = __children__[_i];
@@ -534,7 +534,7 @@ function GUICompController() : GUICompCore() constructor {
 			#endregion
 			static __reset_focus_to_false__ = function() { //log(["__reset_focus_to_false__", __reset_focus_to_false__]);
 				//this function is used to unfocus all sub components
-				if(!__is_empty__) {
+				if (!__is_empty__) {
 					var _comp;
 					var _i=0; repeat(__children_count__) {
 						_comp = __children__[i];
@@ -618,7 +618,7 @@ function GUICompController() : GUICompCore() constructor {
 						switch (_comp.halign) {
 							default:
 							case fa_left:{
-								 if(_comp.__is_controller__) {
+								 if (_comp.__is_controller__) {
 									 _right  = max(_right,  xoff+_comp.__controller_region__.right);
 								 }
 								 else {
@@ -626,7 +626,7 @@ function GUICompController() : GUICompCore() constructor {
 								 }
 							break;}
 							case fa_center:{
-								 if(_comp.__is_controller__) {
+								 if (_comp.__is_controller__) {
 									 _left   = min(_left,   xoff+_comp.__controller_region__.left);
 									 _right  = max(_right,  xoff+_comp.__controller_region__.right);
 								 }
@@ -638,7 +638,7 @@ function GUICompController() : GUICompCore() constructor {
 							case fa_right:{
 							//We do not add Right anchors objects because they will always be with in the range of the right side and can not effect the left side
 							
-							//	 if(_comp.__is_controller__) {
+							//	 if (_comp.__is_controller__) {
 							//		 _left   = min(_left,   xoff+_comp.__controller_region__.left);
 							//	 }
 							//	 else {
@@ -650,7 +650,7 @@ function GUICompController() : GUICompCore() constructor {
 						switch (_comp.valign) {
 							default:
 							case fa_top:{
-								 if(_comp.__is_controller__) {
+								 if (_comp.__is_controller__) {
 									 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
 								 }
 								 else {
@@ -658,7 +658,7 @@ function GUICompController() : GUICompCore() constructor {
 								 }
 							break;}
 							case fa_middle:{
-								 if(_comp.__is_controller__) {
+								 if (_comp.__is_controller__) {
 									 _top    = min(_top,    yoff+_comp.__controller_region__.top);
 									 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
 								 }
@@ -670,7 +670,7 @@ function GUICompController() : GUICompCore() constructor {
 							case fa_bottom:{
 							//We do not add Bottom anchors objects because they will always be with in the range of the right side and can not effect the top side
 							
-							//	 if(_comp.__is_controller__) {
+							//	 if (_comp.__is_controller__) {
 							//		 _top    = min(_top,    yoff+_comp.__controller_region__.top);
 							//	 }
 							//	 else {
@@ -775,11 +775,11 @@ function GUICompController() : GUICompCore() constructor {
 						switch (_comp.halign) {
 							case fa_left:{
 								//make sure the child component's region does not reach outside of the controller's left side
-								if(_comp.__is_controller__) {
-									var _offset = self.__controller_region__.left - _comp.x - _comp.__controller_region__.left;
+								if (_comp.__is_controller__) {
+									var _offset = self.__controller_region__.left - _comp.x_anchor - _comp.__controller_region__.left;
 								}
 								else {
-									var _offset = self.__controller_region__.left - _comp.x - _comp.region.left;
+									var _offset = self.__controller_region__.left - _comp.x_anchor - _comp.region.left;
 								}
 								
 								if (_offset > 0) {
@@ -793,11 +793,11 @@ function GUICompController() : GUICompCore() constructor {
 							break;}
 							case fa_right:{
 								//make sure the child component's region does not reach outside of the controller's right side
-								if(_comp.__is_controller__) {
-									var _offset = _comp.x + _comp.__controller_region__.right - self.__controller_region__.right;
+								if (_comp.__is_controller__) {
+									var _offset = _comp.x_anchor + _comp.__controller_region__.right - self.__controller_region__.right;
 								}
 								else {
-									var _offset = _comp.x + _comp.region.right - self.__controller_region__.right;
+									var _offset = _comp.x_anchor + _comp.region.right - self.__controller_region__.right;
 								}
 								
 								if (_offset > 0) {
@@ -811,11 +811,11 @@ function GUICompController() : GUICompCore() constructor {
 						switch (_comp.valign) {
 							case fa_top:{
 								//make sure the child component's region does not reach outside of the controller's top side
-								if(_comp.__is_controller__) {
-									var _offset = self.__controller_region__.top - _comp.y - _comp.__controller_region__.top;
+								if (_comp.__is_controller__) {
+									var _offset = self.__controller_region__.top - _comp.y_anchor - _comp.__controller_region__.top;
 								}
 								else {
-									var _offset = self.__controller_region__.top - _comp.y - _comp.region.top;
+									var _offset = self.__controller_region__.top - _comp.y_anchor - _comp.region.top;
 								}
 								
 								if (_offset > 0) {
@@ -829,11 +829,11 @@ function GUICompController() : GUICompCore() constructor {
 							break;}
 							case fa_bottom:{
 								//make sure the child component's region does not reach outside of the controller's bottom side
-								if(_comp.__is_controller__) {
-									var _offset = _comp.y + _comp.__controller_region__.bottom - self.__controller_region__.bottom;
+								if (_comp.__is_controller__) {
+									var _offset = _comp.y_anchor + _comp.__controller_region__.bottom - self.__controller_region__.bottom;
 								}
 								else {
-									var _offset = _comp.y + _comp.region.bottom - self.__controller_region__.bottom;
+									var _offset = _comp.y_anchor + _comp.region.bottom - self.__controller_region__.bottom;
 								}
 								
 								if (_offset > 0) {

@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "ControlPanel",
-    "path": "folders/ControlPanel.yy",
+    "path": "folders/_Libraries/ControlPanel.yy",
   },
 }

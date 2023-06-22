@@ -513,7 +513,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				
 				array_delete(elements, _index, 1);
 				
-				if(array_length(elements) == 0) {
+				if (array_length(elements) == 0) {
 					__is_empty__ = true;
 				}
 				

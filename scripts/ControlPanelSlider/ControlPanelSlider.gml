@@ -49,9 +49,9 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						_textbox_width,
 						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				)
-				__textbox__.set_position(-_textbox_width, 0)
+				__textbox__.set_anchor(-_info.right - _textbox_width, _info.top)
 				
-				__button_inc__.set_position(-_textbox_width - _spacing - __button_inc__.region.get_width(), 0)
+				__button_inc__.set_anchor(-_info.right - _textbox_width - _spacing - __button_inc__.region.get_width(), _info.top)
 				
 				__slider__.set_region(
 						0,
@@ -59,9 +59,9 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						_width - _textbox_width - _info.right,
 						_bottom - _info.top  - _info.bottom + __button__.text_click_y_off
 				)
-				__slider__.set_position(-_textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width(), 0)
+				__slider__.set_anchor(-_info.right - _textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width(), _info.top)
 				
-				__button_dec__.set_position(-_textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width() - _spacing - __button_dec__.region.get_width(), 0)
+				__button_dec__.set_anchor(-_info.right - _textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width() - _spacing - __button_dec__.region.get_width(), _info.top)
 				
 				update_component_positions()
 				
@@ -160,16 +160,16 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 			__button__.set_region(0,0,0,_ideal_h)
 			
 			__button_inc__ = new GUICompButtonSprite()
-				.set_anchor(-_info.right, _info.top)
+				//.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_sprite(_sprite_button_inc)
-			__button_inc__.set_position(-__button_inc__.region.get_width(), 0)
+			__button_inc__.set_anchor(-_info.right - __button_inc__.region.get_width(), _info.top)
 			
 			__button_dec__ = new GUICompButtonSprite()
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_sprite(_sprite_button_dec)
-			__button_dec__.set_position(-__button_dec__.region.get_width(), 0)
+			__button_dec__.set_anchor(-_info.right - __button_dec__.region.get_width(), _info.top)
 			
 			__slider__ = new GUICompSlider()
 				.set_anchor(-_info.right, _info.top)

@@ -965,7 +965,7 @@ function GUICompSlider() : GUICompCore() constructor {
 					}
 				
 					//draw thumb
-					if(thumb.enabled) {
+					if (thumb.enabled) {
 					
 					
 						if (sprite_exists(thumb.sprite)) {

@@ -122,7 +122,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			__button__.set_region(0,0,0,_ideal_h)
 			
 			__textbox__ = new GUICompTextbox()
-				.set_anchor(-_info.right, _info.top)
+				.set_anchor(-_info.right - _ideal_w, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("Value...")
 				.set_region(0, 0, _ideal_w, _ideal_h)
@@ -138,8 +138,6 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				//.set_force_wrapping(false)
 				//.set_shift_only_new_line(false)
 				.set_accepting_inputs(true)
-			
-			__textbox__.set_position(-_ideal_w, 0)
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)

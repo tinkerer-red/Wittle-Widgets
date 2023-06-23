@@ -111,25 +111,21 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
 			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
-				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_checkbox_sprites(sCPCheckboxChecked, sCPCheckboxUnChecked)
-			
-			__checkbox__.x -= __checkbox__.sprite.width
+			__checkbox__.set_anchor(-_info.right - __checkbox__.sprite.width, _info.top)
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_position(_info.left, 0)
+				.set_anchor(_info.left, 0)
+				.set_alignment(fa_left, fa_middle)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
 				.set_scroll_speeds(-2,0)
 				.set_text_alignment(fa_left, fa_middle)
-				.set_alignment(fa_left, fa_middle)
 			
 			
-			add(__button__);
-			add(__checkbox__);
-			add(__scrolling_text__);
+			add([__button__, __checkbox__, __scrolling_text__]);
 			
 			//set the default size of the component
 			var _prev_font = draw_get_font();

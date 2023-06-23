@@ -180,9 +180,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_alignment(fa_left, fa_top)
 			
 			
-			__SUPER__.add(__button__);
-			__SUPER__.add(__folder__);
-			__SUPER__.add(__scrolling_text__);
+			__SUPER__.add([__button__, __folder__, __scrolling_text__]);
 			
 			set_children_offsets(12, 0)
 			

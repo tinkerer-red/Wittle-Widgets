@@ -111,8 +111,7 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
-			add(__button__);
-			add(__scrolling_text__);
+			add([__button__, __scrolling_text__]);
 			
 			//set the default size of the component
 			//get the label width

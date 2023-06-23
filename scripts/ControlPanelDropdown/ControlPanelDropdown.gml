@@ -18,11 +18,9 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
+				__dropdown__.set_sprite_to_auto_wrap()
 				var _width = floor((_right  - _info.left - _info.right)*0.5);
-				if (__dropdown__.region.get_width() > _width) {
-					__dropdown__.set_sprite_to_auto_wrap()
-				}
-				else {
+				if (_width > __dropdown__.region.get_width()) {
 					__dropdown__.set_width(_width)
 				}
 				
@@ -133,9 +131,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			add(__button__);
-			add(__dropdown__);
-			add(__scrolling_text__);
+			add([__button__, __dropdown__, __scrolling_text__]);
 			
 			
 			//set the default size of the component

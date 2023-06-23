@@ -247,7 +247,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				curt.multiline = _multiline;
 				
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
-		
+				
+				if (!_multiline) {
+					set_vert_scroll(0)
+				}
+				
 				return self;
 			}
 			#region jsDoc

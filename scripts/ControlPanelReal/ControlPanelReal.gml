@@ -135,9 +135,8 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_max_length(20)
 				.set_char_enforcement("0123456789.-")
 				.set_multiline(false)
-				//.set_force_wrapping(false)
-				//.set_shift_only_new_line(false)
 				.set_accepting_inputs(true)
+			
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)
@@ -148,9 +147,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			add(__button__);
-			add(__textbox__);
-			add(__scrolling_text__);
+			add([__button__, __textbox__, __scrolling_text__]);
 			
 			draw_debug = function() {
 				draw_rectangle(

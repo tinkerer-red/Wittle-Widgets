@@ -208,12 +208,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			add(__button__);
-			add(__textbox__);
-			add(__button_inc__);
-			add(__slider__);
-			add(__button_dec__);
-			add(__scrolling_text__);
+			add([__button__, __textbox__, __button_inc__, __slider__, __button_dec__, __scrolling_text__]);
 			
 			draw_debug = function() {
 				draw_rectangle(

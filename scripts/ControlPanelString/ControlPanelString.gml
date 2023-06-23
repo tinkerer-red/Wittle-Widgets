@@ -137,6 +137,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			__button__.set_region(0,0,0,_ideal_h)
 			
 			__textbox__ = new GUICompTextbox()
+				.set_multiline(false)
 				.set_anchor(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
@@ -149,8 +150,9 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				.set_highlight_color(#800000)
 				.set_max_length(infinity)
 				.set_char_enforcement()
-				.set_multiline(false)
+				
 				.set_accepting_inputs(true)
+			
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)
@@ -161,9 +163,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				.set_text_alignment(fa_left, fa_middle)
 				.set_alignment(fa_left, fa_middle)
 			
-			add(__button__);
-			add(__textbox__);
-			add(__scrolling_text__);
+			add([__button__, __textbox__, __scrolling_text__]);
 			
 			draw_debug = function() {
 				draw_rectangle(

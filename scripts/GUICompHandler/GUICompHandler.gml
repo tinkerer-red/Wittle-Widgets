@@ -35,13 +35,21 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__begin_step__(_input);
-					}//end repeat loop
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__begin_step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__begin_step__(_input);
+						}//end repeat loop
+					}
+					
 				}
 				#region jsDoc
 				/// @func    step()
@@ -54,14 +62,20 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__step__(_input);
-					}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__step__(_input);
+						}//end repeat loop
+					}
 				}
 				#region jsDoc
 				/// @func    end_step()
@@ -74,13 +88,20 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__end_step__(_input);
-					}//end repeat loop
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__end_step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__end_step__(_input);
+						}//end repeat loop
+					}
 					
 					__trigger_event__(self.events.post_update);
 				}
@@ -100,14 +121,20 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__draw_gui_begin__(_input);
-					_i+=1;}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui_begin__(self);
+						}));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__draw_gui_begin__(_input);
+						_i+=1;}//end repeat loop
+					}
 				}
 				#region jsDoc
 				/// @func    draw_gui()
@@ -120,14 +147,20 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__draw_gui__(_input);
-					_i+=1;}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui__(self);
+						}));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__draw_gui__(_input);
+						_i+=1;}//end repeat loop
+					}
 				}
 				#region jsDoc
 				/// @func    draw_gui_end()
@@ -140,14 +173,20 @@ function GUICompHandler() : GUICompController() constructor {
 					var _y=y;
 		
 					//run the children
-					var _component, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_component = __children__[_i];
-						//xx = _component.x - (x-_x);
-						//yy = _component.y - (y-_y);
-						_component.__draw_gui_end__(_input);
-					_i+=1;}//end repeat loop
-					
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui_end__(self);
+						}));
+					}
+					else {
+						var _component, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_component = __children__[_i];
+							//xx = _component.x - (x-_x);
+							//yy = _component.y - (y-_y);
+							_component.__draw_gui_end__(_input);
+						_i+=1;}//end repeat loop
+					}
 				}
 				
 				#region jsDoc
@@ -158,11 +197,19 @@ function GUICompHandler() : GUICompController() constructor {
 				static cleanup = function() {
 					if (!__is_empty__){
 						var _i=0; repeat(__children_count__) {
-				
-							var _component = __children__[_i];
-							_component.__cleanup__();
-							delete _component;
-				
+							
+							if (USE_FOREACH) {
+								array_foreach(__children__, function(_element, _index){
+									_element.__cleanup__();
+									delete _element;
+								});
+							}
+							else {
+								var _component = __children__[_i];
+								_component.__cleanup__();
+								delete _component;
+							}
+							
 						_i+=1;}//end repeat loop
 			
 					}
@@ -211,12 +258,12 @@ function GUICompHandler() : GUICompController() constructor {
 				var _names = variable_struct_get_names(__default_user_input__);
 				var _size = array_length(_names);
 				var _key, _val;
-			
+				
 				var _i=0; repeat(_size) {
 					_key = _names[_i];
 					__user_input__[$ _key] = __default_user_input__[$ _key];
 				_i+=1;}//end repeat loop
-			
+				
 				return __user_input__;
 			}
 			

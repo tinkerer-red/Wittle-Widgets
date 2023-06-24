@@ -89,6 +89,7 @@
     {"id":{"name":"GUICompDropdown","path":"scripts/GUICompDropdown/GUICompDropdown.yy",},},
     {"id":{"name":"shd_clip_rect","path":"shaders/shd_clip_rect/shd_clip_rect.yy",},},
     {"id":{"name":"GUICompScrollBar","path":"scripts/GUICompScrollBar/GUICompScrollBar.yy",},},
+    {"id":{"name":"FOREACH_EXAMPLE","path":"scripts/FOREACH_EXAMPLE/FOREACH_EXAMPLE.yy",},},
     {"id":{"name":"rm_stand_alone_xamples","path":"rooms/rm_stand_alone_xamples/rm_stand_alone_xamples.yy",},},
     {"id":{"name":"s9CPScrollbarThumbVert","path":"sprites/s9CPScrollbarThumbVert/s9CPScrollbarThumbVert.yy",},},
     {"id":{"name":"s9CPScrollbarVertBackground","path":"sprites/s9CPScrollbarVertBackground/s9CPScrollbarVertBackground.yy",},},

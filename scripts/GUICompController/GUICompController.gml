@@ -367,14 +367,21 @@ function GUICompController() : GUICompCore() constructor {
 					begin_step(_input);
 		
 					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__begin_step__(_input);
-					}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(__user_input__, function(_element, _index){
+							_element.__begin_step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__begin_step__(_input);
+						}//end repeat loop
+					}
+					
 					//return the consumed inputs
 					if (__user_input__.consumed) { capture_input(); };
 				}
@@ -384,14 +391,21 @@ function GUICompController() : GUICompCore() constructor {
 					step(_input);
 		
 					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__step__(_input);
-					}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__step__(_input);
+						}//end repeat loop
+					}
+					
 					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
@@ -400,13 +414,20 @@ function GUICompController() : GUICompCore() constructor {
 					end_step(_input);
 		
 					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__end_step__(_input);
-					}//end repeat loop
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__end_step__(self);
+						}), -1, -array_length(__children__));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=__children_count__; repeat(__children_count__) { _i--;
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__end_step__(_input);
+						}//end repeat loop
+					}
 					
 					__trigger_event__(self.events.post_update);
 					
@@ -421,14 +442,21 @@ function GUICompController() : GUICompCore() constructor {
 					draw_gui_begin(_input);
 		
 					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui_begin__(_input);
-					_i+=1;}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui_begin__(self);
+						}));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__draw_gui_begin__(_input);
+						_i+=1;}//end repeat loop
+					}
+					
 					if (__user_input__.consumed) { capture_input(); };
 				}
 				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
@@ -437,14 +465,21 @@ function GUICompController() : GUICompCore() constructor {
 					draw_gui(_input);
 				
 					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui__(_input);
-					_i+=1;}//end repeat loop
-				
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui__(self);
+						}));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__draw_gui__(_input);
+						_i+=1;}//end repeat loop
+					}
+					
 					if (__user_input__.consumed) { capture_input(); };
 					
 				}
@@ -454,14 +489,21 @@ function GUICompController() : GUICompCore() constructor {
 					draw_gui_end(_input);
 		
 					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui_end__(_input);
-					_i+=1;}//end repeat loop
-		
+					if (USE_FOREACH) {
+						array_foreach(__children__, method(_input, function(_element, _index){
+							_element.__draw_gui_end__(self);
+						}));
+					}
+					else {
+						var _comp, xx, yy;
+						var _i=0; repeat(__children_count__) {
+							_comp = __children__[_i];
+							//xx = _comp.x - x;
+							//yy = _comp.y - y;
+							_comp.__draw_gui_end__(_input);
+						_i+=1;}//end repeat loop
+					}
+					
 					if (__user_input__.consumed) { capture_input(); };
 		
 					xprevious = x;
@@ -476,13 +518,20 @@ function GUICompController() : GUICompCore() constructor {
 					cleanup();
 		
 					if (!__is_empty__) {
-						var _comp;
-						var _i=0; repeat(__children_count__) {
-							_comp = __children__[_i];
-							_comp.__cleanup__();
-							delete _comp;
-						_i+=1;}//end repeat loop
-			
+						if (USE_FOREACH) {
+							array_foreach(__children__, function(_element, _index){
+								_element.__cleanup__();
+								delete _element;
+							})
+						}
+						else {
+							var _comp;
+							var _i=0; repeat(__children_count__) {
+								_comp = __children__[_i];
+								_comp.__cleanup__();
+								delete _comp;
+							_i+=1;}//end repeat loop
+						}
 					}
 				}
 				
@@ -518,7 +567,7 @@ function GUICompController() : GUICompCore() constructor {
 			static __post_remove__ = function() { //log(["__post_remove__", __post_remove__]);
 				//sort the array to contain the largest numbers first, as we will be cycling from back to front
 				array_sort(__remove_requests__, true)
-		
+				
 				var _size = array_length(__remove_requests__);
 				var _index;
 				var _i=_size; repeat(_size) { _i--;
@@ -535,11 +584,18 @@ function GUICompController() : GUICompCore() constructor {
 			static __reset_focus_to_false__ = function() { //log(["__reset_focus_to_false__", __reset_focus_to_false__]);
 				//this function is used to unfocus all sub components
 				if (!__is_empty__) {
-					var _comp;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[i];
-						_comp.__reset_focus_to_false__();
-					_i+=1;}//end repeat loop
+					if (USE_FOREACH) {
+						array_foreach(__children__, function(_element, _index){
+							_element.__reset_focus_to_false__();
+						})
+					}
+					else {
+						var _comp;
+						var _i=0; repeat(__children_count__) {
+							_comp = __children__[i];
+							_comp.__reset_focus_to_false__();
+						_i+=1;}//end repeat loop
+					}
 				}
 				__is_on_focus__ = false;
 				__trigger_event__(self.events.on_blur);
@@ -607,81 +663,168 @@ function GUICompController() : GUICompCore() constructor {
 					var _prev_right  = __controller_region__.right;
 					var _prev_bottom = __controller_region__.bottom;
 					
-					
-					var _comp, xoff, yoff;
-					var i = 0; repeat(__children_count__) {
-						_comp = __children__[i];
-						xoff = _comp.x-x;
-						yoff = _comp.y-y;
+					if (USE_FOREACH) {
+						static _temp_struct = {};
+						_temp_struct.left   = _left;
+						_temp_struct.top    = _top;
+						_temp_struct.right  = _right;
+						_temp_struct.bottom = _bottom;
+						_temp_struct.x = x;
+						_temp_struct.y = y;
+						
+						array_foreach(__children__, method(_temp_struct, function(_element, _index){
+							var xoff = _element.x-x;
+							var yoff = _element.y-y;
 						
 						
-						switch (_comp.halign) {
-							default:
-							case fa_left:{
-								 if (_comp.__is_controller__) {
-									 _right  = max(_right,  xoff+_comp.__controller_region__.right);
-								 }
-								 else {
-									 _right  = max(_right,  xoff+_comp.region.right);
-								 }
-							break;}
-							case fa_center:{
-								 if (_comp.__is_controller__) {
-									 _left   = min(_left,   xoff+_comp.__controller_region__.left);
-									 _right  = max(_right,  xoff+_comp.__controller_region__.right);
-								 }
-								 else {
-									 _left   = min(_left,   xoff+_comp.region.left);
-									 _right  = max(_right,  xoff+_comp.region.right);
-								 }
-							break;}
-							case fa_right:{
-							//We do not add Right anchors objects because they will always be with in the range of the right side and can not effect the left side
+							switch (_element.halign) {
+								default:
+								case fa_left:{
+									 if (_element.__is_controller__) {
+										 right  = max(right,  xoff+_element.__controller_region__.right);
+									 }
+									 else {
+										 right  = max(right,  xoff+_element.region.right);
+									 }
+								break;}
+								case fa_center:{
+									 if (_element.__is_controller__) {
+										 left   = min(left,   xoff+_element.__controller_region__.left);
+										 right  = max(right,  xoff+_element.__controller_region__.right);
+									 }
+									 else {
+										 left   = min(left,   xoff+_element.region.left);
+										 right  = max(right,  xoff+_element.region.right);
+									 }
+								break;}
+								case fa_right:{
+								//We do not add Right anchors objects because they will always be with in the range of the right side and can not effect the left side
 							
-							//	 if (_comp.__is_controller__) {
-							//		 _left   = min(_left,   xoff+_comp.__controller_region__.left);
-							//	 }
-							//	 else {
-							//		 _left   = min(_left,   xoff+_comp.region.left);
-							//	 }
-							break;}
-						}
+								//	 if (_element.__is_controller__) {
+								//		 left   = min(left,   xoff+_element.__controller_region__.left);
+								//	 }
+								//	 else {
+								//		 left   = min(left,   xoff+_element.region.left);
+								//	 }
+								break;}
+							}
 						
-						switch (_comp.valign) {
-							default:
-							case fa_top:{
-								 if (_comp.__is_controller__) {
-									 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
-								 }
-								 else {
-									 _bottom = max(_bottom, yoff+_comp.region.bottom);
-								 }
-							break;}
-							case fa_middle:{
-								 if (_comp.__is_controller__) {
-									 _top    = min(_top,    yoff+_comp.__controller_region__.top);
-									 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
-								 }
-								 else {
-									 _top    = min(_top,    yoff+_comp.region.top);
-									 _bottom = max(_bottom, yoff+_comp.region.bottom);
-								 }
-							break;}
-							case fa_bottom:{
-							//We do not add Bottom anchors objects because they will always be with in the range of the right side and can not effect the top side
+							switch (_element.valign) {
+								default:
+								case fa_top:{
+									 if (_element.__is_controller__) {
+										 bottom = max(bottom, yoff+_element.__controller_region__.bottom);
+									 }
+									 else {
+										 bottom = max(bottom, yoff+_element.region.bottom);
+									 }
+								break;}
+								case fa_middle:{
+									 if (_element.__is_controller__) {
+										 top    = min(top,    yoff+_element.__controller_region__.top);
+										 bottom = max(bottom, yoff+_element.__controller_region__.bottom);
+									 }
+									 else {
+										 top    = min(top,    yoff+_element.region.top);
+										 bottom = max(bottom, yoff+_element.region.bottom);
+									 }
+								break;}
+								case fa_bottom:{
+								//We do not add Bottom anchors objects because they will always be with in the range of the right side and can not effect the top side
 							
-							//	 if (_comp.__is_controller__) {
-							//		 _top    = min(_top,    yoff+_comp.__controller_region__.top);
-							//	 }
-							//	 else {
-							//		 _top    = min(_top,    yoff+_comp.region.top);
-							//	 }
-							break;}
-						}
+								//	 if (_element.__is_controller__) {
+								//		 top    = min(top,    yoff+_element.__controller_region__.top);
+								//	 }
+								//	 else {
+								//		 top    = min(top,    yoff+_element.region.top);
+								//	 }
+								break;}
+							}
 						
-						i+=1
+						}));
+						
+						_left   = _temp_struct.left;
+						_top    = _temp_struct.top;
+						_right  = _temp_struct.right;
+						_bottom = _temp_struct.bottom;
+						
 					}
-				
+					else {
+						var _comp, xoff, yoff;
+						var i = 0; repeat(__children_count__) {
+							_comp = __children__[i];
+							xoff = _comp.x-x;
+							yoff = _comp.y-y;
+							
+							
+							switch (_comp.halign) {
+								default:
+								case fa_left:{
+									 if (_comp.__is_controller__) {
+										 _right  = max(_right,  xoff+_comp.__controller_region__.right);
+									 }
+									 else {
+										 _right  = max(_right,  xoff+_comp.region.right);
+									 }
+								break;}
+								case fa_center:{
+									 if (_comp.__is_controller__) {
+										 _left   = min(_left,   xoff+_comp.__controller_region__.left);
+										 _right  = max(_right,  xoff+_comp.__controller_region__.right);
+									 }
+									 else {
+										 _left   = min(_left,   xoff+_comp.region.left);
+										 _right  = max(_right,  xoff+_comp.region.right);
+									 }
+								break;}
+								case fa_right:{
+								//We do not add Right anchors objects because they will always be with in the range of the right side and can not effect the left side
+							
+								//	 if (_comp.__is_controller__) {
+								//		 _left   = min(_left,   xoff+_comp.__controller_region__.left);
+								//	 }
+								//	 else {
+								//		 _left   = min(_left,   xoff+_comp.region.left);
+								//	 }
+								break;}
+							}
+							
+							switch (_comp.valign) {
+								default:
+								case fa_top:{
+									 if (_comp.__is_controller__) {
+										 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
+									 }
+									 else {
+										 _bottom = max(_bottom, yoff+_comp.region.bottom);
+									 }
+								break;}
+								case fa_middle:{
+									 if (_comp.__is_controller__) {
+										 _top    = min(_top,    yoff+_comp.__controller_region__.top);
+										 _bottom = max(_bottom, yoff+_comp.__controller_region__.bottom);
+									 }
+									 else {
+										 _top    = min(_top,    yoff+_comp.region.top);
+										 _bottom = max(_bottom, yoff+_comp.region.bottom);
+									 }
+								break;}
+								case fa_bottom:{
+								//We do not add Bottom anchors objects because they will always be with in the range of the right side and can not effect the top side
+							
+								//	 if (_comp.__is_controller__) {
+								//		 _top    = min(_top,    yoff+_comp.__controller_region__.top);
+								//	 }
+								//	 else {
+								//		 _top    = min(_top,    yoff+_comp.region.top);
+								//	 }
+								break;}
+							}
+							
+							i+=1
+						}
+					}
+					
 					//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
 					__controller_region__.left   = _left;
 					__controller_region__.top    = _top;

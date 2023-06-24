@@ -78,10 +78,16 @@ function GUICompDropdown() : GUICompCore() constructor {
 				
 				var _elm;
 				var _length = array_length(_strings_array)
-				var _i=0; repeat(_length) {
-					elements[_i] = new __new_element__(_strings_array[_i]);
-				_i+=1;}//end repeat loop
-				
+				if (USE_FOREACH) {
+					array_foreach(_strings_array, function(_element, _index) {
+						elements[_index] = new __new_element__(_element);
+					})
+				}
+				else {
+					var _i=0; repeat(_length) {
+						elements[_i] = new __new_element__(_strings_array[_i]);
+					_i+=1;}//end repeat loop
+				}
 				
 				__is_empty__ = (_length == 0);
 				
@@ -216,10 +222,24 @@ function GUICompDropdown() : GUICompCore() constructor {
 				var _largest_text_width  = string_width(text);
 				var _largest_text_height = string_height(text);
 				
-				var _i=0; repeat(array_length(elements)) {
-					_largest_text_width  = max(_largest_text_width,  string_width(elements[_i].text) );
-					_largest_text_height = max(_largest_text_height, string_height(elements[_i].text) );
-				_i+=1;}//end repeat loop
+				if (USE_FOREACH) {
+					static _temp_struct = {};
+					_temp_struct.largest_text_width  = 0;
+					_temp_struct.largest_text_height = 0;
+					array_foreach(elements, method(_temp_struct, function(_element, _index){
+						largest_text_width  = max(largest_text_width,  string_width( _element.text) );
+						largest_text_height = max(largest_text_height, string_height(_element.text) );
+					}));
+					_largest_text_width  = _temp_struct.largest_text_width;
+					_largest_text_height = _temp_struct.largest_text_height;
+				}
+				else {
+					var _i=0; repeat(array_length(elements)) {
+						_largest_text_width  = max(_largest_text_width,  string_width(elements[_i].text) );
+						_largest_text_height = max(_largest_text_height, string_height(elements[_i].text) );
+					_i+=1;}//end repeat loop
+				}
+				
 				
 				
 				var _slice = sprite_get_nineslice(sprite.index);
@@ -339,19 +359,39 @@ function GUICompDropdown() : GUICompCore() constructor {
 				
 				//convert supplied data to expected data
 				if (is_array(_string)) {
-					_length = array_length(_string);
 					
-					//write the texts in
-					var _i=0; repeat(_length) {
-						//check to make sure it's a string
-						if (should_safety_check) {
-							if (!is_string(_string[_i])) {
-								show_error("Trying to insert a value which is not a string", true)
+					
+					if (USE_FOREACH) {
+						static _temp_struct = {};
+						_temp_struct.push_info = _push_info;
+						array_foreach(_string, function(_element, _index){
+							//check to make sure it's a string
+							if (should_safety_check) {
+								if (!is_string(_element)) {
+									show_error("Trying to insert a value which is not a string", true)
+								}
 							}
-						}
+							
+							push_info[_index] = new __new_element__(_element);
+						})
 						
-						_push_info[_i] = new __new_element__(_string[_i]);
-					_i+=1;}//end repeat loop
+						_push_info = _temp_struct.push_info;
+					}
+					else {
+						_length = array_length(_string);
+						//write the texts in
+						var _i=0; repeat(_length) {
+							//check to make sure it's a string
+							if (should_safety_check) {
+								if (!is_string(_string[_i])) {
+									show_error("Trying to insert a value which is not a string", true)
+								}
+							}
+						
+							_push_info[_i] = new __new_element__(_string[_i]);
+						_i+=1;}//end repeat loop
+					}
+					
 					
 				}
 				else {
@@ -719,7 +759,7 @@ function GUICompDropdown() : GUICompCore() constructor {
 				//mouse over drop down region
 				if (!__is_empty__)
 				&& (is_open) {
-					var _size = array_length(elements);
+					
 					
 					if (!_input.consumed) {
 						var _slice = sprite_get_nineslice(sprite.index);
@@ -728,60 +768,124 @@ function GUICompDropdown() : GUICompCore() constructor {
 						var _posX = x;
 						var _posY = y + _element_dist;
 						
-						
-						_i=0; repeat(_size) {
-							//if element is disabled continue
-							if (!elements[_i].is_enabled) {
-								elements[_i].image.index = GUI_IMAGE_DISABLED;
-								_i+=1;
-								continue;
-							}
+						if (USE_FOREACH) {
+							static _temp_struct = {};
+							_temp_struct.slice = _slice;
+							_temp_struct.element_dist = _element_dist;
+							_temp_struct.posX = _posX;
+							_temp_struct.posY = _posY;
+							_temp_struct.mX = _mX;
+							_temp_struct.mY = _mY;
+							_temp_struct.this = self;
 							
-							if (point_in_rectangle(_mX, _mY, _posX, _posY, _posX + region.get_width(), _posY + region.get_height())) {
-								capture_input();
-								elements[_i].image.index = GUI_IMAGE_HOVER;
-								
-								__trigger_event__(self.events.on_hover);
-								
-								if (mouse_check_button_pressed(mb_left)) {
-									//trigger events
-									__trigger_event__(self.events.element_pressed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
-									
-									elements[_i].image.index = GUI_IMAGE_CLICKED;
-									
+							array_foreach(elements, method(_temp_struct, function(_element, _index){
+								//if element is disabled continue
+								if (!_element.is_enabled) {
+									_element.image.index = GUI_IMAGE_DISABLED;
+									return;
 								}
-								else if (mouse_check_button(mb_left)) {
-									//trigger events
-									__trigger_event__(self.events.element_held, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+								
+								if (point_in_rectangle(mX, mY, posX, posY, posX + this.region.get_width(), posY + this.region.get_height())) {
+									capture_input();
+									_element.image.index = GUI_IMAGE_HOVER;
+								
+									this.__trigger_event__(this.events.on_hover);
+								
+									if (mouse_check_button_pressed(mb_left)) {
+										//trigger events
+										this.__trigger_event__(this.events.element_pressed, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
+										
+										_element.image.index = GUI_IMAGE_CLICKED;
 									
-									elements[_i].image.index = GUI_IMAGE_CLICKED;
-									
-								}
-								else if (mouse_check_button_released(mb_left)) {
-									var _changed = get_value() != _i
-									
-									elements[_i].image.index = GUI_IMAGE_HOVER;
-									set_value(_i);
-									is_open = false;
-									
-									//trigger events
-									__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
-									__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
-									if (_changed) {
-										__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
 									}
-									__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+									else if (mouse_check_button(mb_left)) {
+										//trigger events
+										this.__trigger_event__(this.events.element_held, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
 									
+										_element.image.index = GUI_IMAGE_CLICKED;
+									
+									}
+									else if (mouse_check_button_released(mb_left)) {
+										var _changed = this.get_value() != _index
+									
+										_element.image.index = GUI_IMAGE_HOVER;
+										this.set_value(_index);
+										this.is_open = false;
+									
+										//trigger events
+										this.__trigger_event__(this.events.element_released, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
+										this.__trigger_event__(this.events.selected, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
+										if (_changed) {
+											this.__trigger_event__(this.events.changed, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
+										}
+										this.__trigger_event__(this.events.closed, {index : _index, element : (this.current_index == -1) ? undefined : _element.text});
+										
+									}
+								
+								}
+								else{
+									_element.image.index = GUI_IMAGE_ENABLED;
 								}
 								
-							}
-							else{
-								elements[_i].image.index = GUI_IMAGE_ENABLED;
-							}
+							}));
+						}
+						else {
+							var _size = array_length(elements);
+							_i=0; repeat(_size) {
+								//if element is disabled continue
+								if (!elements[_i].is_enabled) {
+									elements[_i].image.index = GUI_IMAGE_DISABLED;
+									_i+=1;
+									continue;
+								}
 							
-							_posY += _element_dist;
+								if (point_in_rectangle(_mX, _mY, _posX, _posY, _posX + region.get_width(), _posY + region.get_height())) {
+									capture_input();
+									elements[_i].image.index = GUI_IMAGE_HOVER;
+								
+									__trigger_event__(self.events.on_hover);
+								
+									if (mouse_check_button_pressed(mb_left)) {
+										//trigger events
+										__trigger_event__(self.events.element_pressed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+									
+										elements[_i].image.index = GUI_IMAGE_CLICKED;
+									
+									}
+									else if (mouse_check_button(mb_left)) {
+										//trigger events
+										__trigger_event__(self.events.element_held, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+									
+										elements[_i].image.index = GUI_IMAGE_CLICKED;
+									
+									}
+									else if (mouse_check_button_released(mb_left)) {
+										var _changed = get_value() != _i
+									
+										elements[_i].image.index = GUI_IMAGE_HOVER;
+										set_value(_i);
+										is_open = false;
+									
+										//trigger events
+										__trigger_event__(self.events.element_released, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+										__trigger_event__(self.events.selected, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+										if (_changed) {
+											__trigger_event__(self.events.changed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+										}
+										__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index].text});
+									
+									}
+								
+								}
+								else{
+									elements[_i].image.index = GUI_IMAGE_ENABLED;
+								}
+								
+								_posY += _element_dist;
 							
-						_i+=1;}//end repeat loop
+							_i+=1;}//end repeat loop
+						}
+						
 					}
 				}
 				

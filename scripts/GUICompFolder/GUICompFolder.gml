@@ -106,13 +106,21 @@ function GUICompFolder() : GUICompController() constructor {
 				}
 				
 				//fixes a bug where when a folder is added at the end of another folder, both folder's regions is incorrect
-				var _i=0; repeat(array_length(_arr)) {
-					_comp = _arr[_i];
-					if (_comp.__is_controller__) {
-						_comp.__update_controller_region__();
-					}
-				_i+=1;}//end repeat loop
-				
+				if (USE_FOREACH) {
+					array_foreach(_arr, function(_element, _index){
+						if (_element.__is_controller__) {
+							_element.__update_controller_region__();
+						}
+					});
+				}
+				else {
+					var _i=0; repeat(array_length(_arr)) {
+						_comp = _arr[_i];
+						if (_comp.__is_controller__) {
+							_comp.__update_controller_region__();
+						}
+					_i+=1;}//end repeat loop
+				}
 				
 			}
 			#region jsDoc
@@ -236,14 +244,20 @@ function GUICompFolder() : GUICompController() constructor {
 					//run the children
 					if (!__is_empty__)
 					&& (is_open) {
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__begin_step__(__user_input__);
-						}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__begin_step__(self);
+							}), -1, -array_length(__children__));
+						}
+						else {
+							var _component, xx, yy;
+							var _i=__children_count__; repeat(__children_count__) { _i--;
+								_component = __children__[_i];
+								////xx = _component.x - (x-_x);
+								////yy = _component.y - (y-_y);
+								_component.__begin_step__(__user_input__);
+							}//end repeat loop
+						}
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -260,14 +274,20 @@ function GUICompFolder() : GUICompController() constructor {
 					if (!__is_empty__)
 					&& (is_open) {
 						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__step__(__user_input__);
-						}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__step__(self);
+							}), -1, -array_length(__children__));
+						}
+						else {
+							var _component, xx, yy;
+							var _i=__children_count__; repeat(__children_count__) { _i--;
+								_component = __children__[_i];
+								////xx = _component.x - (x-_x);
+								////yy = _component.y - (y-_y);
+								_component.__step__(__user_input__);
+							}//end repeat loop
+						}
 					}
 					
 					//__handle_click__(_input);
@@ -285,15 +305,21 @@ function GUICompFolder() : GUICompController() constructor {
 					
 					if (!__is_empty__)
 					&& (is_open) {
-						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__end_step__(__user_input__);
-						}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__end_step__(self);
+							}), -1, -array_length(__children__));
+						}
+						else {
+							//run the children
+							var _component, xx, yy;
+							var _i=__children_count__; repeat(__children_count__) { _i--;
+								_component = __children__[_i];
+								//xx = _component.x - (x-_x);
+								//yy = _component.y - (y-_y);
+								_component.__end_step__(__user_input__);
+							}//end repeat loop
+						}
 					}
 					
 					__trigger_event__(self.events.post_update);
@@ -315,14 +341,20 @@ function GUICompFolder() : GUICompController() constructor {
 					&& (is_open) {
 						
 						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui_begin__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__draw_gui_begin__(self);
+							}));
+						}
+						else {
+							var _component, xx, yy;
+							var _i=0; repeat(__children_count__) {
+								_component = __children__[_i];
+								//xx = _component.x - (x-_x);
+								//yy = _component.y - (y-_y);
+								_component.__draw_gui_begin__(__user_input__);
+							_i+=1;}//end repeat loop
+						}
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -364,14 +396,20 @@ function GUICompFolder() : GUICompController() constructor {
 						//update_component_positions();
 						
 						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__draw_gui__(self);
+							}));
+						}
+						else {
+							var _component, xx, yy;
+							var _i=0; repeat(__children_count__) {
+								_component = __children__[_i];
+								//xx = _component.x - (x-_x);
+								//yy = _component.y - (y-_y);
+								_component.__draw_gui__(__user_input__);
+							_i+=1;}//end repeat loop
+						}
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -388,14 +426,20 @@ function GUICompFolder() : GUICompController() constructor {
 					&& (is_open) {
 						
 						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui_end__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, method(__user_input__, function(_element, _index){
+								_element.__draw_gui_end__(self);
+							}));
+						}
+						else {
+							var _component, xx, yy;
+							var _i=0; repeat(__children_count__) {
+								_component = __children__[_i];
+								//xx = _component.x - (x-_x);
+								//yy = _component.y - (y-_y);
+								_component.__draw_gui_end__(__user_input__);
+							_i+=1;}//end repeat loop
+						}
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -413,12 +457,19 @@ function GUICompFolder() : GUICompController() constructor {
 					__button__.__cleanup__();
 					
 					if (!__is_empty__) {
-						var _i=0; repeat(__children_count__) {
-							var _comp = __children__[_i];
-							_comp.__cleanup__();
-							delete _comp;
-						_i+=1;}//end repeat loop
-						
+						if (USE_FOREACH) {
+							array_foreach(__children__, function(_element, _index){
+								_element.__cleanup__();
+								delete _element;
+							});
+						}
+						else {
+							var _i=0; repeat(__children_count__) {
+								var _comp = __children__[_i];
+								_comp.__cleanup__();
+								delete _comp;
+							_i+=1;}//end repeat loop
+						}
 					}
 				}
 				
@@ -433,25 +484,59 @@ function GUICompFolder() : GUICompController() constructor {
 				//if it's closed we dont need to add anything extra to this
 				if (!__is_empty__)
 				&& (is_open) {
-					var _component, xoff, yoff;
-					var _i = 0; repeat(__children_count__) {
-						_component = __children__[_i];
-						xoff = _component.x-x;
-						yoff = _component.y-y;
+					if (USE_FOREACH) {
+						static _temp_struct = {};
+						_temp_struct.left   = _left;
+						_temp_struct.top    = _top;
+						_temp_struct.right  = _right;
+						_temp_struct.bottom = _bottom;
+						_temp_struct.x = x;
+						_temp_struct.y = y;
+						
+						array_foreach(__children__, method(_temp_struct, function(_element, _index){
+							var xoff = _element.x-x;
+							var yoff = _element.y-y;
+							
+							if (_element.__is_controller__) {
+								left   = min(left,   xoff+_element.__controller_region__.left);
+								top    = min(top,    yoff+_element.__controller_region__.top);
+								right  = max(right,  xoff+_element.__controller_region__.right);
+								bottom = max(bottom, yoff+_element.__controller_region__.bottom);
+							}
+						
+							left   = min(left,   xoff+_element.region.left);
+							top    = min(top,    yoff+_element.region.top);
+							right  = max(right,  xoff+_element.region.right);
+							bottom = max(bottom, yoff+_element.region.bottom);
+						}));
+						
+						_left   = _temp_struct.left;
+						_top    = _temp_struct.top;
+						_right  = _temp_struct.right;
+						_bottom = _temp_struct.bottom;
+						
+					}
+					else {
+						var _component, xoff, yoff;
+						var _i = 0; repeat(__children_count__) {
+							_component = __children__[_i];
+							xoff = _component.x-x;
+							yoff = _component.y-y;
 				
-						if (_component.__is_controller__) {
-							_left   = min(_left,   xoff+_component.__controller_region__.left);
-							_top    = min(_top,    yoff+_component.__controller_region__.top);
-							_right  = max(_right,  xoff+_component.__controller_region__.right);
-							_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+							if (_component.__is_controller__) {
+								_left   = min(_left,   xoff+_component.__controller_region__.left);
+								_top    = min(_top,    yoff+_component.__controller_region__.top);
+								_right  = max(_right,  xoff+_component.__controller_region__.right);
+								_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+							}
+						
+							_left   = min(_left,   xoff+_component.region.left);
+							_top    = min(_top,    yoff+_component.region.top);
+							_right  = max(_right,  xoff+_component.region.right);
+							_bottom = max(_bottom, yoff+_component.region.bottom);
+						
+							_i+=1
 						}
-						
-						_left   = min(_left,   xoff+_component.region.left);
-						_top    = min(_top,    yoff+_component.region.top);
-						_right  = max(_right,  xoff+_component.region.right);
-						_bottom = max(_bottom, yoff+_component.region.bottom);
-						
-						_i+=1
 					}
 				}
 				

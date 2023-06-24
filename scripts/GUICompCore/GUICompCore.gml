@@ -711,17 +711,26 @@ function GUICompCore() constructor {
 				//leave if the relevant event listener doesnt exist
 				var _struct, _func, _event_arr, _size, _i;
 				var _hash = _event_id;
+				static _temp_struct = {};
 				
 				#region public event listener
 					
 					_event_arr = struct_get_from_hash(self.__event_listeners__, _hash)
 					if (_event_arr != undefined) {
-						_size = array_length(_event_arr);
+						if (USE_FOREACH) {
+							_temp_struct.data = _data;
+							array_foreach(_event_arr, method(_temp_struct, function(_element, _index){
+								_element.func(data);
+							}));
+						}
+						else {
+							_size = array_length(_event_arr);
 						
-						_i=0; repeat(_size) {
-							_struct = _event_arr[_i];
-							_struct.func(_data);
-						_i+=1;}//end repeat loop
+							_i=0; repeat(_size) {
+								_struct = _event_arr[_i];
+								_struct.func(_data);
+							_i+=1;}//end repeat loop
+						}
 					}
 					
 				#endregion
@@ -730,12 +739,19 @@ function GUICompCore() constructor {
 					
 					_event_arr = struct_get_from_hash(self.__priv_event_listeners__, _hash)
 					if (_event_arr != undefined) {
-						_size = array_length(_event_arr);
-						
-						_i=0; repeat(_size) {
-							_struct = _event_arr[_i];
-							_struct.func(_data);
-						_i+=1;}//end repeat loop
+						if (USE_FOREACH) {
+							_temp_struct.data = _data;
+							array_foreach(_event_arr, method(_temp_struct, function(_element, _index){
+								_element.func(data);
+							}));
+						}
+						else {
+							_size = array_length(_event_arr);
+							_i=0; repeat(_size) {
+								_struct = _event_arr[_i];
+								_struct.func(_data);
+							_i+=1;}//end repeat loop
+						}
 					}
 					
 				#endregion
@@ -827,12 +843,12 @@ function GUICompCore() constructor {
 				//if we're not a child early out
 				if (!__is_child__) { return -1; };
 				var _comps = __parent__.__children__;
-		
+				
 				var _i = 0; repeat(__parent__.__children_count__) {
 					if (_comps[_i].__cid__ == __cid__) break;
 					_i+=1;
 				}
-		
+				
 				return _i;
 			}
 			

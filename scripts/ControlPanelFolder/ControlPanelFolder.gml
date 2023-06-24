@@ -262,9 +262,16 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 					__button__.set_sprite(_spr);
 					
 					//force update the children's regions to adapt to the window size
-					var _i=0; repeat(__folder__.__children_count__) {
-						__folder__.__children__[_i].__trigger_event__(self.events.pre_update);
-					_i+=1;}//end repeat loop
+					if (USE_FOREACH) {
+						array_foreach(__folder__.__children__, function(_element, _index){
+							_element.__trigger_event__(_element.events.pre_update)
+						});
+					}
+					else {
+						var _i=0; repeat(__folder__.__children_count__) {
+							__folder__.__children__[_i].__trigger_event__(self.events.pre_update);
+						_i+=1;}//end repeat loop
+					}
 					
 					callback();
 				});

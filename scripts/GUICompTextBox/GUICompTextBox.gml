@@ -1130,11 +1130,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							
 							static _control_skip_word = function(_horz_input_vector) {
 								static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
-							
+								
 								//find our position on the line
 								var _current_line = curt.current_line;
 								var _cursor_pos_on_line = curt.cursor;
-							
+								
 								//loop backwards to find the first thing which breaks a connected word like .,/
 								var _current_line_text = curt.lines[_current_line];
 								var _dir = _horz_input_vector;
@@ -1142,19 +1142,19 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								var _prev_char;
 								var _char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
 								var _loop = (_dir) ? string_length(curt.lines[_current_line])-_cursor_pos_on_line : _cursor_pos_on_line;
-							
+								
 								//skip to the next word breaker, this will skip double spaces
 								repeat(_loop) {
 									_prev_char = _char;
 									_char = (_breaker_pos < 0 ) ? "\n" : string_char_at(_current_line_text, _breaker_pos);
-								
+									
 									_horz_input_vector = _breaker_pos - _cursor_pos_on_line;
-								
+									
 									if (_breaker_pos == 0) {
 										return _horz_input_vector-1;
 									}
-								
-								
+									
+									
 									if (_dir > 0) {
 										if (string_pos(_prev_char, _word_breakers))
 										&& (!string_pos(_char, _word_breakers)) {
@@ -1169,8 +1169,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 								
 								_breaker_pos += _dir;}//end repeat loop
-							
-							
+								
+								
 								return _horz_input_vector+_dir;
 							}
 							
@@ -1761,9 +1761,16 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						var _struct_keys = variable_struct_get_names(_info.glyphs)
 						var _struct = {}
 						
-						var _i=0; repeat(array_length(_struct_keys)) {
-							_struct[$ _struct_keys[_i]] = true
-						_i+=1;}//end repeat loop
+						if (USE_FOREACH) {
+							array_foreach(_struct_keys, method(_struct, function(_element, _index){
+								self[$ _element] = true
+							}));
+						}
+						else {
+							var _i=0; repeat(array_length(_struct_keys)) {
+								_struct[$ _struct_keys[_i]] = true
+							_i+=1;}//end repeat loop
+						}
 						
 						return _struct;
 					}

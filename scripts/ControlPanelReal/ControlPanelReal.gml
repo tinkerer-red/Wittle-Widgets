@@ -291,3 +291,5 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 	#endregion
 	
 }
+
+

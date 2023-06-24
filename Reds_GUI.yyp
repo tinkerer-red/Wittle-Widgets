@@ -15,6 +15,9 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Settings","folderPath":"folders/_Config/Settings.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_internal","folderPath":"folders/_Config/Settings/_internal.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_Libraries","folderPath":"folders/_Libraries.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/_Libraries/ControlPanel.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/_Libraries/ControlPanel/Assets.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/_Libraries/ControlPanel/Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Wittle Widgets","folderPath":"folders/_Libraries/Wittle Widgets.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_Components","folderPath":"folders/_Libraries/Wittle Widgets/_Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_system","folderPath":"folders/_Libraries/Wittle Widgets/_Components/_system.yy",},
@@ -28,9 +31,6 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Vert","folderPath":"folders/_Libraries/Wittle Widgets/Assets/Scrollbar/Vert.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Slider","folderPath":"folders/_Libraries/Wittle Widgets/Assets/Slider.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Shaders","folderPath":"folders/_Libraries/Wittle Widgets/Shaders.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/_Libraries/ControlPanel.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/_Libraries/ControlPanel/Assets.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/_Libraries/ControlPanel/Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Examples","folderPath":"folders/Examples.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Example 1","folderPath":"folders/Examples/Example 1.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Standalone Examples","folderPath":"folders/Examples/Standalone Examples.yy",},
@@ -42,7 +42,7 @@
   "isEcma": false,
   "LibraryEmitters": [],
   "MetaData": {
-    "IDEVersion": "2023.600.0.363",
+    "IDEVersion": "2023.600.0.368",
   },
   "resources": [
     {"id":{"name":"_WittleWidgetsGUIConfig","path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},},

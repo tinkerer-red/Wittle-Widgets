@@ -446,8 +446,6 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				return self;
 			}
 			
-			
-			
 			//forget the parent's functions, this is temporary and if it made it to release then Red messed up.
 			// TODO: remove these and make the text region it's own internal functions to handle scrolling.
 			//static set_canvas_size = undefined;

@@ -42,6 +42,7 @@
     {"name":"GUICompHandler","order":3,"path":"scripts/GUICompHandler/GUICompHandler.yy",},
     {"name":"ControlPanelVisualMacros","order":3,"path":"scripts/ControlPanelVisualMacros/ControlPanelVisualMacros.yy",},
     {"name":"sCPCheckboxUnChecked","order":13,"path":"sprites/sCPCheckboxUnChecked/sCPCheckboxUnChecked.yy",},
+    {"name":"_GUICompControllerStacked","order":2,"path":"scripts/_GUICompControllerStacked/_GUICompControllerStacked.yy",},
     {"name":"s9DropDownTop","order":3,"path":"sprites/s9DropDownTop/s9DropDownTop.yy",},
     {"name":"sCPScrollbarHorzButtonLeft","order":15,"path":"sprites/sCPScrollbarHorzButtonLeft/sCPScrollbarHorzButtonLeft.yy",},
     {"name":"s9CPFolderClosed","order":5,"path":"sprites/s9CPFolderClosed/s9CPFolderClosed.yy",},

@@ -91,7 +91,6 @@ function GUICompController() : GUICompCore() constructor {
 		#endregion
 		
 		#region Functions
-			
 			#region jsDoc
 			/// @func    add()
 			/// @desc    Add a Component to the controller.
@@ -115,7 +114,6 @@ function GUICompController() : GUICompCore() constructor {
 				__update_controller_region__();
 				
 			}
-			
 			#region jsDoc
 			/// @func    insert()
 			/// @desc    Inserts a Component into the controller's children array.
@@ -127,26 +125,16 @@ function GUICompController() : GUICompCore() constructor {
 			static insert = function(_index, _comp) { //log(["insert", insert]);
 				__is_empty__ = false;
 				
-				var _count = __children_count__;
-				
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
 				
 				__validate_component_additions__(_arr);
 				
-				//add and edit the children
-				var _size = array_length(_arr);
-				__children_count__ += _size;
-				var _i=0; repeat(_size) {
-					_arr[_i].__is_child__ = true;
-					_arr[_i].__parent__ = self;
-					array_insert(__children__, _index, _arr[_i]);
-				_i+=1;}//end repeat loop
+				__include_children__(_comp, _index)
 				
 				__update_controller_region__();
 				
-				return _count;
+				return __children_count__;
 			}
-			
 			#region jsDoc
 			/// @func    remove()
 			/// @desc    Remove a Component from the controller's children array. Removal is done at the next event automatically and is not instantaneous.

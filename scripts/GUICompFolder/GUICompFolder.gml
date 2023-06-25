@@ -1,4 +1,3 @@
-
 #region jsDoc
 /// @func    GUICompFolder()
 /// @desc    Creates a folder component
@@ -11,7 +10,7 @@ function GUICompFolder() : GUICompController() constructor {
 	debug_name = "GUICompFolder";
 	
 	#region Public
-	
+		
 		#region Builder Functions
 		
 			#region jsDoc
@@ -25,10 +24,7 @@ function GUICompFolder() : GUICompController() constructor {
 			static set_children_offsets = function(_xoff=0,_yoff=0){ //log(["set_children_offsets", set_children_offsets]);
 				//sets the indenting for sub components from the previous component
 				
-				children_x_offset = _xoff;
-				children_y_offset = _yoff;
-				
-				update_component_positions();
+				__controller__.set_children_offsets(_xoff, _yoff);
 				
 				return self;
 			}
@@ -54,13 +50,12 @@ function GUICompFolder() : GUICompController() constructor {
 			#endregion
 			static set_header_shown = function(_header_shown=true){ //log(["set_header_shown", set_header_shown]);
 				header_shown = _header_shown;
-				set_region(0,0,0,0)
 				
 				return self;
 			}
 			
 		#endregion
-	
+		
 		#region Events
 		
 			self.events.opened = variable_get_hash("opened");
@@ -68,12 +63,9 @@ function GUICompFolder() : GUICompController() constructor {
 			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
-	
+		
 		#region Variables
 			
-			children_x_offset = 0;
-			children_y_offset = 0;
-			sprite.index = s9ButtonText;
 			is_open = true;
 			header_shown = true;
 			halign = fa_left;
@@ -92,27 +84,14 @@ function GUICompFolder() : GUICompController() constructor {
 			#endregion
 			static add = function(_comp) { //log(["add", add]);
 				
-				__is_empty__ = false;
-				
-				var _arr = (is_array(_comp)) ? _comp : [_comp];
-				
-				__validate_component_additions__(_arr);
-				
-				__include_children__(_arr, -1);
+				var _r = __controller__.add(_comp);
 				
 				if (is_open) {
 					update_component_positions();
 					__update_controller_region__();
 				}
 				
-				//fixes a bug where when a folder is added at the end of another folder, both folder's regions is incorrect
-				var _i=0; repeat(array_length(_arr)) {
-					_comp = _arr[_i];
-					if (_comp.__is_controller__) {
-						_comp.__update_controller_region__();
-					}
-				_i+=1;}//end repeat loop
-				
+				return _r;
 				
 			}
 			#region jsDoc
@@ -125,19 +104,14 @@ function GUICompFolder() : GUICompController() constructor {
 			#endregion
 			static insert = function(_comp, _index) { //log(["insert", insert]);
 				
-				__is_empty__ = false;
-				
-				var _arr = (is_array(_comp)) ? _comp : [_comp];
-				
-				__validate_component_additions__(_arr);
-				
-				__include_children__(_arr, _index);
+				var _r = __controller__.add(_comp);
 				
 				if (is_open) {
 					update_component_positions();
 					__update_controller_region__();
 				}
 				
+				return _r;
 			}
 			#region jsDoc
 			/// @func    update_component_positions()
@@ -148,43 +122,25 @@ function GUICompFolder() : GUICompController() constructor {
 			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
 				var _changed = false;
 				
-				if (is_open)
-				&& (!__is_empty__) {
-					var _posX, _posY, _i, _comp;
-					_posX = x + children_x_offset;
-					_posY = y + children_y_offset;
+				var _anchor_point, _comp, _xx, _yy;
+				
+				//move the children
+				var _i=0; repeat(__children_count__) {
+					_comp = __children__[_i];
 					
-					_i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						
-						if (_comp.x != _posX)
-						|| (_comp.y != _posY) {
-							_changed = true;
-						}
-						
-						_comp.x = _posX;
-						_comp.y = _posY;
-						
-						if (_comp.__is_controller__) {
-							
-								_comp.update_component_positions();
-								
-							if (_changed) {
-								//not this isnt needed if the parent is a folder, but if it's another folder inside a controller this is indeed neede
-								_comp.__update_controller_region__();
-							}
-							_posY += _comp.__controller_region__.get_height();
-						}
-						else{
-							_posY += _comp.region.get_height();
-						}
-						
-					_i+=1;}//end repeat loop
+					_xx = __get_controller_archor_x__(_comp.halign);
+					_yy = __get_controller_archor_y__(_comp.valign);
 					
+					_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__;
+					_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__;
+					
+				_i+=1;}//end repeat loop
+				
+				if (is_open) {
+					__controller__.update_component_positions();
 				}
 				
 				__update_controller_region__();
-				
 			}
 			
 		#endregion
@@ -195,13 +151,12 @@ function GUICompFolder() : GUICompController() constructor {
 		
 		#region Variables
 			
-			__is_empty__ = true;
-			__is_controller__ = true;
-			__children__ = [];
-			__children_count__ = 0;
-			
 			__button__ = new GUICompButtonText();
 			adopt_builder_functions(__button__);
+			
+			__controller__ = new GUICompControllerStacked();
+			
+			__SUPER__.add([__button__, __controller__])
 			
 		#endregion
 		
@@ -229,21 +184,14 @@ function GUICompFolder() : GUICompController() constructor {
 					__trigger_event__(self.events.pre_update);
 					
 					begin_step(__user_input__);
+					
 					if (header_shown) {
 						__button__.__begin_step__(_input);
 					}
 					
 					//run the children
-					if (!__is_empty__)
-					&& (is_open) {
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__begin_step__(__user_input__);
-						}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__begin_step__(__user_input__);
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -257,20 +205,9 @@ function GUICompFolder() : GUICompController() constructor {
 					}
 					
 					//run children
-					if (!__is_empty__)
-					&& (is_open) {
-						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__step__(__user_input__);
-						}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__step__(__user_input__);
 					}
-					
-					//__handle_click__(_input);
 					
 					if (__user_input__.consumed) { capture_input(); };
 				}
@@ -283,17 +220,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__end_step__(_input);
 					}
 					
-					if (!__is_empty__)
-					&& (is_open) {
-						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__end_step__(__user_input__);
-						}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__end_step__(__user_input__);
 					}
 					
 					__trigger_event__(self.events.post_update);
@@ -311,18 +239,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__draw_gui_begin__(_input);
 					}
 					
-					if (!__is_empty__)
-					&& (is_open) {
-						
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui_begin__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__draw_gui_begin__(__user_input__);
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -358,20 +276,8 @@ function GUICompFolder() : GUICompController() constructor {
 					};
 					
 					//run children
-					if (!__is_empty__)
-					&& (is_open) {
-						//update childrens possitions
-						//update_component_positions();
-						
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__draw_gui__(__user_input__);
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -384,18 +290,8 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__draw_gui_end__(_input);
 					}
 					
-					if (!__is_empty__)
-					&& (is_open) {
-						
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui_end__(__user_input__);
-						_i+=1;}//end repeat loop
-						
+					if (is_open) {
+						__controller__.__draw_gui_end__(__user_input__);
 					}
 					
 					if (__user_input__.consumed) { capture_input(); };
@@ -411,15 +307,7 @@ function GUICompFolder() : GUICompController() constructor {
 				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
 					cleanup();
 					__button__.__cleanup__();
-					
-					if (!__is_empty__) {
-						var _i=0; repeat(__children_count__) {
-							var _comp = __children__[_i];
-							_comp.__cleanup__();
-							delete _comp;
-						_i+=1;}//end repeat loop
-						
-					}
+					__controller__.__cleanup__();
 				}
 				
 			#endregion
@@ -431,29 +319,42 @@ function GUICompFolder() : GUICompController() constructor {
 				var _bottom = region.bottom;
 				
 				//if it's closed we dont need to add anything extra to this
-				if (!__is_empty__)
-				&& (is_open) {
-					var _component, xoff, yoff;
-					var _i = 0; repeat(__children_count__) {
-						_component = __children__[_i];
-						xoff = _component.x-x;
-						yoff = _component.y-y;
-				
-						if (_component.__is_controller__) {
-							_left   = min(_left,   xoff+_component.__controller_region__.left);
-							_top    = min(_top,    yoff+_component.__controller_region__.top);
-							_right  = max(_right,  xoff+_component.__controller_region__.right);
-							_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
-						}
-						
-						_left   = min(_left,   xoff+_component.region.left);
-						_top    = min(_top,    yoff+_component.region.top);
-						_right  = max(_right,  xoff+_component.region.right);
-						_bottom = max(_bottom, yoff+_component.region.bottom);
-						
-						_i+=1
+				var _component, xoff, yoff;
+				var _i = 0; repeat(__children_count__) {
+					_component = __children__[_i];
+					
+					//skip the controller if the folder is closed
+					if (!is_open)
+					&& (_component.__is_controller__) {
+						_i+=1;
+						continue;
 					}
+					
+					//skip the button if the header is not shown
+					if (!header_shown)
+					&& (!_component.__is_controller__) {
+						_i+=1;
+						continue;
+					}
+					
+					xoff = _component.x-x;
+					yoff = _component.y-y;
+					
+					if (_component.__is_controller__) {
+						_left   = min(_left,   xoff+_component.__controller_region__.left);
+						_top    = min(_top,    yoff+_component.__controller_region__.top);
+						_right  = max(_right,  xoff+_component.__controller_region__.right);
+						_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+					}
+					
+					_left   = min(_left,   xoff+_component.region.left);
+					_top    = min(_top,    yoff+_component.region.top);
+					_right  = max(_right,  xoff+_component.region.right);
+					_bottom = max(_bottom, yoff+_component.region.bottom);
+					
+					_i+=1
 				}
+				
 				
 				__controller_region__.left   = _left;
 				__controller_region__.top    = _top;
@@ -472,6 +373,7 @@ function GUICompFolder() : GUICompController() constructor {
 	#endregion
 	
 	//post init
-	set_children_offsets(8, region.get_height())
 	__update_controller_region__();
 }
+
+

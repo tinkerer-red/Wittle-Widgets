@@ -70,6 +70,7 @@
     {"id":{"name":"s9CPButton","path":"sprites/s9CPButton/s9CPButton.yy",},},
     {"id":{"name":"sCPCheckboxUnChecked","path":"sprites/sCPCheckboxUnChecked/sCPCheckboxUnChecked.yy",},},
     {"id":{"name":"s9GUIPixel","path":"sprites/s9GUIPixel/s9GUIPixel.yy",},},
+    {"id":{"name":"_GUICompControllerStacked","path":"scripts/_GUICompControllerStacked/_GUICompControllerStacked.yy",},},
     {"id":{"name":"s9ScrollbarVertBackground","path":"sprites/s9ScrollbarVertBackground/s9ScrollbarVertBackground.yy",},},
     {"id":{"name":"s9DropDownTop","path":"sprites/s9DropDownTop/s9DropDownTop.yy",},},
     {"id":{"name":"sCPScrollbarHorzButtonLeft","path":"sprites/sCPScrollbarHorzButtonLeft/sCPScrollbarHorzButtonLeft.yy",},},

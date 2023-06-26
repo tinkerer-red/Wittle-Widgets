@@ -12,6 +12,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 	#region Public
 		
 		#region Builder Functions
+			
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets the sprite of the button.
@@ -40,7 +41,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text = _text
+				text.text = _text
 				
 				return self;
 			}
@@ -52,7 +53,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
 			static set_text_font = function(_font=fGUIDefault) {
-				font = _font;								// font
+				text.font = _font;								// font
 				
 				return self;
 			}
@@ -65,10 +66,11 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
-			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
-				text_color_idle = _idle_text_color;
-				text_color_hover = _hover_text_color;
-				text_color_disable = _disable_text_color;
+			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
+				text.color.idle    = _idle;
+				text.color.hover   = _hover;
+				text.color.clicked = _clicked;
+				text.color.disable = _disable;
 				
 				return self;
 			}
@@ -81,8 +83,8 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
 			static set_text_alignment = function(_h=fa_left, _v=fa_top) {
-				text_halign = _h;
-				text_valign = _v;
+				text.halign = _h;
+				text.valign = _v;
 		
 				return self;
 			};
@@ -96,9 +98,9 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
 			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
-				text_x_off = _x;
-				text_y_off = _y;
-				text_click_y_off = _click_y;
+				text.xoff = _x;
+				text.yoff = _y;
+				text.click_y_off = _click_y;
 				
 				return self;
 			};
@@ -112,14 +114,14 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
 				
-				draw_set_font(font);
+				draw_set_font(text.font);
 				var _slice = sprite_get_nineslice(sprite.index);
-				var _width  = string_width(text)  + (_slice.left + _slice.right);
-				var _height = string_height(text) + (_slice.top  + _slice.bottom);
+				var _width  = string_width(text.text)  + (_slice.left + _slice.right);
+				var _height = string_height(text.text) + (_slice.top  + _slice.bottom);
 				
 				//update internal variables
 				set_region(0, 0, _width, _height);
-				set_text_offsets(_slice.left, _slice.top, text_click_y_off);
+				set_text_offsets(_slice.left, _slice.top, text.click_y_off);
 				set_text_alignment(fa_left, fa_top);
 				
 				
@@ -131,20 +133,6 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 		#region Variables
 			
 			set_sprite(s9ButtonText);
-			
-			text = "";
-			font = fGUIDefault;
-			text_halign = fa_left;
-			text_valign = fa_top;
-			
-			text_color_idle = c_white;
-			text_color_hover = c_white;
-			text_color_disable = c_white;
-			
-			text_x_off = 0;
-			text_y_off = 0;
-			text_click_y_off = 0;
-			set_text_alignment(fa_left, fa_top);
 			
 			set_region(0, 0, sprite_get_width(s9ButtonText), sprite_get_height(s9ButtonText)) // imitates bbox, but used to register where the acceptable click regions are
 			
@@ -159,7 +147,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 					
 					if (self.image.alpha != 0)
 					&& (self.visible) {
-					
+						
 						//draw the nineslice
 						if (self.image.alpha == 1)
 						&& (self.image.blend == c_white) {
@@ -184,33 +172,35 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 									self.image.alpha
 							);
 						}
-					
+						
 						draw_set_alpha(self.image.alpha);
-					
+						
 						//set font color
 						switch (_image_index) {
 							case GUI_IMAGE_ENABLED : {
-								draw_set_color(text_color_idle);
+								draw_set_color(text.color.idle);
 								break;}
-							case GUI_IMAGE_HOVER:
+							case GUI_IMAGE_HOVER: {
+								draw_set_color(text.color.hover);
+								break;}
 							case GUI_IMAGE_CLICKED: {
-								draw_set_color(text_color_hover);
+								draw_set_color(text.color.clicked);
 								break;}
 							case GUI_IMAGE_DISABLED: {
-								draw_set_color(text_color_disable);
+								draw_set_color(text.color.disable);
 								break;}
 						}
-					
-						draw_set_font(font);
-						draw_set_halign(text_halign);
-						draw_set_valign(text_valign);
-					
-						var _text_y_off = (image.index == GUI_IMAGE_CLICKED) ? text_click_y_off : 0;
-					
+						
+						draw_set_font(text.font);
+						draw_set_halign(text.halign);
+						draw_set_valign(text.valign);
+						
+						var _text_y_off = (image.index == GUI_IMAGE_CLICKED) ? text.click_y_off : 0;
+						
 						draw_text(
-								(self.x+text_x_off),
-								(self.y+text_y_off+_text_y_off),
-								text
+								(self.x+text.xoff),
+								(self.y+text.yoff+_text_y_off),
+								text.text
 							);
 					}
 				

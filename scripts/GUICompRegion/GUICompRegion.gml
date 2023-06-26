@@ -384,7 +384,35 @@ function GUICompRegion() : GUICompController() constructor {
 				//move the scroll bars
 				__update_scrollbar_positions__();
 				
-				__SUPER__.update_component_positions()
+				if (!__is_empty__) {
+					var _anchor_point, _comp, _xx, _yy;
+					
+					/// NOTE: //////////////////////////////////////////////////////////////////
+					//
+					// This is not the same thing as it's super as it adds in the scroll offsets
+					// stop trying to remove this Red
+					//                                     -Red 06/26/2023 (MM/DD/YYYY)
+					//
+					////////////////////////////////////////////////////////////////////////////
+					
+					
+					//move the children
+					var _i=0; repeat(__children_count__) {
+						_comp = __children__[_i];
+						
+						_xx = __get_controller_archor_x__(_comp.halign);
+						_yy = __get_controller_archor_y__(_comp.valign);
+						
+						_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__ + scroll.x_off;
+						_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__ + scroll.y_off;
+						
+						//if the component is a controller it's self have it update it's children
+						if (_comp.__is_controller__) {
+							_comp.update_component_positions();
+						}
+					_i+=1;}//end repeat loop
+					
+				}
 			}
 			
 		#endregion
@@ -625,9 +653,7 @@ function GUICompRegion() : GUICompController() constructor {
 				xprevious = x;
 				yprevious = y;
 				
-				if (should_draw_debug) {
-					draw_debug();
-				}
+				draw_debug();
 				
 			}
 			
@@ -673,7 +699,8 @@ function GUICompRegion() : GUICompController() constructor {
 	#endregion
 	
 	static draw_debug = function() {
-		return
+		if (!should_draw_debug) return;
+		
 		draw_text(x,y,""
 			+ "\n scroll.y_off = "+string(scroll.y_off)
 			+ "\n scroll.x_off = "+string(scroll.x_off)

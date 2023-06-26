@@ -1327,6 +1327,8 @@ function GUICompSlider() : GUICompCore() constructor {
 	#endregion
 	
 	static draw_debug = function(_input) {//log(["draw_debug", draw_debug])
+		if (!should_draw_debug) return;
+		
 		draw_set_color(c_aqua)
 		draw_text(x,y, ""
 		+ "\n" + "normalized_value = "+string(normalized_value)

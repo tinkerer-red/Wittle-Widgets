@@ -1,6 +1,8 @@
 function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GUICompController() constructor {
 	
-	draw_debug = function(){
+	static draw_debug = function(){
+		if (!should_draw_debug) return;
+		
 		draw_text(x,y,string(["is_open", is_open, "__dropdown__.is_open", __dropdown__.is_open]))
 	}
 	
@@ -11,23 +13,21 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			static set_region = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.font).size) + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_y_off;
 				
 				__SUPER__.set_region(_left, _top, _right, _bottom)
-				
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
 				__dropdown__.set_sprite_to_auto_wrap()
 				var _width = floor((_right  - _info.left - _info.right)*0.5);
 				if (_width > __dropdown__.region.get_width()) {
-					__dropdown__.set_width(_width)
+					//__dropdown__.set_width(_width)
 				}
 				
 				__dropdown__.set_anchor(-_info.right - __dropdown__.region.get_width(), +_info.top)
 				
-				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
 				__scrolling_text__.set_region(
 						0,
 						-_scroll_text_height*0.5,
@@ -47,8 +47,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text = _text
-				__scrolling_text__.set_text(text);
+				text.text = _text;
+				__scrolling_text__.set_text(_text);
 				
 				return self;
 			}
@@ -74,8 +74,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
-			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
-				__button__.set_text_colors(_idle_text_color, _hover_text_color, _disable_text_color)
+			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
+				__button__.set_text_colors(_idle, _hover, _clicked, _disable);
 				
 				return self;
 			}
@@ -120,7 +120,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				.set_dropdown_sprites(s9CPDropDown, s9CPDropDownTop, s9CPDropDownMiddle, s9CPDropDownBottom)
 				.set_dropdown_array(_arr_of_str)
 				.set_sprite_to_auto_wrap()
-			__dropdown__.set_anchor(-_info.right - __dropdown__.region.get_width(), +_info.top)
+			__dropdown__.set_anchor(-_info.right - __dropdown__.__controller_region__.get_width(), +_info.top)
 			
 			__scrolling_text__ = new GUICompScrollingText()
 				.set_anchor(_info.left, 0)
@@ -146,8 +146,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
 			var _bottom = max(
-												font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off,
-												__dropdown__.region.get_height() + _info.top + _info.bottom + __button__.text_click_y_off,
+												font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off,
+												__dropdown__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off,
 										);
 			
 			set_region(_left, _top, _right, _bottom);
@@ -182,24 +182,24 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
-							__scrolling_text__.set_text_color(__button__.text_color_idle);
+							__scrolling_text__.set_text_color(__button__.text.color.idle);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.set_scroll_looping(true, false)
 							__scrolling_text__.reset_scrolling();
 						break;}
 						case GUI_IMAGE_HOVER: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_CLICKED: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text_click_y_off);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {
-							__scrolling_text__.set_text_color(__button__.text_color_disable);
+							__scrolling_text__.set_text_color(__button__.text.color.disable);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.reset_scrolling();
@@ -212,21 +212,21 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
 					is_open = !is_open
 					__dropdown__.is_open = is_open
+					
 					with (__dropdown__){
 						if (is_open) {
-							__trigger_event__(self.events.opened, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+							__trigger_event__(self.events.opened, {index : current_index, text : text.text});
 						}
 						else {
-							__trigger_event__(self.events.closed, {index : current_index, element : (current_index == -1) ? undefined : elements[current_index]});
+							__trigger_event__(self.events.closed, {index : current_index, text : text.text});
 						}
 					}
-					
 				});
 				
 				//callback
 				__dropdown__.__add_event_listener_priv__(__dropdown__.events.changed, function(_data) {
 					//callback(_data.index); //for use with the index as input
-					callback(_data.index, _data.element); //for use with the string as input
+					callback(_data.index, _data.text); //for use with the string as input
 				});
 				
 				__dropdown__.__add_event_listener_priv__(__dropdown__.events.released, function(_data) {

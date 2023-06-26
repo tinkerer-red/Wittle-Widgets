@@ -72,6 +72,7 @@
     {"name":"ControlPanelReal","order":3,"path":"scripts/ControlPanelReal/ControlPanelReal.yy",},
     {"name":"GUICompScrollingText","order":9,"path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},
     {"name":"obj_gui_textbox","order":2,"path":"objects/obj_gui_textbox/obj_gui_textbox.yy",},
+    {"name":"obj_gui_dropbox","order":4,"path":"objects/obj_gui_dropbox/obj_gui_dropbox.yy",},
     {"name":"sCPScrollbarVertButtonUp","order":18,"path":"sprites/sCPScrollbarVertButtonUp/sCPScrollbarVertButtonUp.yy",},
     {"name":"sCPCheckboxChecked","order":12,"path":"sprites/sCPCheckboxChecked/sCPCheckboxChecked.yy",},
     {"name":"ControlPanelFolder","order":6,"path":"scripts/ControlPanelFolder/ControlPanelFolder.yy",},

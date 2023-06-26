@@ -254,27 +254,6 @@ function GUICompFolder() : GUICompController() constructor {
 						__button__.__draw_gui__(_input);
 					}
 					
-					if (should_draw_debug) {
-						draw_set_color(c_red)
-						draw_rectangle(
-							x+__controller_region__.left,
-							y+__controller_region__.top,
-							x+__controller_region__.right,
-							y+__controller_region__.bottom,
-							true
-						);
-						
-						draw_set_color(c_green)
-						draw_rectangle(
-							x+region.left,
-							y+region.top,
-							x+region.right,
-							y+region.bottom,
-							true
-						);
-						
-					};
-					
 					//run children
 					if (is_open) {
 						__controller__.__draw_gui__(__user_input__);
@@ -299,9 +278,7 @@ function GUICompFolder() : GUICompController() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (should_draw_debug) {
-						draw_debug();
-					}
+					draw_debug();
 				}
 				
 				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);

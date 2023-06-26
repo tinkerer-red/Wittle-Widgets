@@ -232,24 +232,50 @@ function GUICompCore() constructor {
 				self.x_anchor = 0;
 				self.y_anchor = 0;
 				
-				self.sprite = {};
-				self.sprite.index   = -1;
-				self.sprite.height  = 0;
-				self.sprite.width   = 0;
-				self.sprite.xoffset = 0;
-				self.sprite.yoffset = 0;
+				self.sprite = {
+					index   : -1,
+					height  : 0,
+					width   : 0,
+					xoffset : 0,
+					yoffset : 0,
+				};
 				
 				self.visible = true;
 				
-				self.image = {};
-				self.image.alpha  = 1;
-				self.image.angle  = 0;
-				self.image.blend  = c_white;
-				self.image.index  = -1;
-				self.image.number = 0;
-				self.image.speed  = 0;
-				self.image.xscale = 1;
-				self.image.yscale = 1;
+				self.image = {
+					alpha  : 1,
+					angle  : 0,
+					blend  : c_white,
+					index  : -1,
+					number : 0,
+					speed  : 0,
+					xscale : 1,
+					yscale : 1,
+				};
+				
+				text = {
+					text : "<undefined>",
+					font : fGUIDefault,
+					
+					xoff : 0,
+					yoff : 0,
+					click_y_off : 0,
+					
+					width  : 0,
+					height : 0,
+					
+					halign : fa_left,
+					valign : fa_top,
+					
+					alpha : 1,
+					color : {
+						idle : c_white,
+						hover : c_white,
+						clicked : c_white,
+						disable : c_white,
+					},
+				}
+				
 			#endregion
 			
 		#endregion
@@ -496,6 +522,8 @@ function GUICompCore() constructor {
 			/// @param   {Undefined}
 			#endregion
 			static draw_debug = function() { //log(["draw_debug", draw_debug]);
+				if (!should_draw_debug) return;
+				
 				draw_set_color(c_red)
 				draw_rectangle(
 						x+region.left,
@@ -621,9 +649,7 @@ function GUICompCore() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (should_draw_debug) {
-						draw_debug();
-					}
+					draw_debug();
 				}
 				
 				#region jsDoc
@@ -1117,6 +1143,7 @@ function GUICompCore() constructor {
 				
 				return self;
 			}
+			
 		#endregion
 		
 	#endregion

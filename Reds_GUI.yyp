@@ -103,6 +103,7 @@
     {"id":{"name":"ControlPanelReal","path":"scripts/ControlPanelReal/ControlPanelReal.yy",},},
     {"id":{"name":"GUICompScrollingText","path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},},
     {"id":{"name":"obj_gui_textbox","path":"objects/obj_gui_textbox/obj_gui_textbox.yy",},},
+    {"id":{"name":"obj_gui_dropbox","path":"objects/obj_gui_dropbox/obj_gui_dropbox.yy",},},
     {"id":{"name":"sCPScrollbarVertButtonUp","path":"sprites/sCPScrollbarVertButtonUp/sCPScrollbarVertButtonUp.yy",},},
     {"id":{"name":"sCPCheckboxChecked","path":"sprites/sCPCheckboxChecked/sCPCheckboxChecked.yy",},},
     {"id":{"name":"ControlPanelFolder","path":"scripts/ControlPanelFolder/ControlPanelFolder.yy",},},

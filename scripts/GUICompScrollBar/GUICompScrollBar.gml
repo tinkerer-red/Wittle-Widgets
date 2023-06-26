@@ -677,9 +677,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (should_draw_debug) {
-						draw_debug();
-					}
+					draw_debug();
 				}
 				
 				static __cleanup__ = function() {//log(["__cleanup__", __cleanup__])
@@ -702,7 +700,8 @@ function GUICompScrollBar() : GUICompController() constructor {
 	#endregion
 	
 	static draw_debug = function(){//log(["draw_debug", draw_debug])
-		return
+		if (!should_draw_debug) return;
+		
 		draw_rectangle(
 				x+region.left,
 				y+region.top,

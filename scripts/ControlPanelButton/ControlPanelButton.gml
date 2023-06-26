@@ -7,13 +7,13 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			static set_region = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
 				
 				__SUPER__.set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
 				__scrolling_text__.set_region(
 						0,
 						-_scroll_text_height*0.5,
@@ -33,8 +33,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text = _text
-				__scrolling_text__.set_text(text);
+				text.text = _text
+				__scrolling_text__.set_text(_text);
 				
 				return self;
 			}
@@ -60,8 +60,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
-			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
-				__button__.set_text_colors(_idle_text_color, _hover_text_color, _disable_text_color)
+			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
+				__button__.set_text_colors(_idle, _hover, _clicked, _disable);
 				
 				return self;
 			}
@@ -103,7 +103,7 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			var _info = sprite_get_nineslice(__button__.sprite.index);
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_anchor(_info.left, _info.top - __button__.text_click_y_off)
+				.set_anchor(_info.left, _info.top - __button__.text.click_y_off)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -124,7 +124,7 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
 			
 			set_region(_left, _top, _right, _bottom);
 			
@@ -156,24 +156,24 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
-							__scrolling_text__.set_text_color(__button__.text_color_idle);
+							__scrolling_text__.set_text_color(__button__.text.color.idle);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.set_scroll_looping(true, false)
 							__scrolling_text__.reset_scrolling();
 						break;}
 						case GUI_IMAGE_HOVER: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_CLICKED: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text_click_y_off);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {
-							__scrolling_text__.set_text_color(__button__.text_color_disable);
+							__scrolling_text__.set_text_color(__button__.text.color.disable);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.reset_scrolling();

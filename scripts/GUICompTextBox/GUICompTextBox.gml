@@ -73,7 +73,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				var _prev_cursor_y = get_cursor_y_pos();
 				var _prev_scroll_x = get_horz_scroll();
 				var _prev_scroll_y = get_vert_scroll();
-				log(["_prev_cursor_x", _prev_cursor_x])
+				
 				clear_text();
 				__textbox_insert_string__(_text);
 				
@@ -1738,9 +1738,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						__SUPER__.__draw_gui__(_input);
 					}
 					
-					if (should_draw_debug) {
-						draw_debug();
-					}
+					draw_debug();
 				}
 				
 			#endregion

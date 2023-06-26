@@ -72,13 +72,15 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				
 				__update_controller_region__();
 				
-				//fixes a bug where when a folder is added at the end of another folder, both folder's regions is incorrect
-				var _i=0; repeat(array_length(_arr)) {
-					_comp = _arr[_i];
-					if (_comp.__is_controller__) {
-						_comp.__update_controller_region__();
-					}
-				_i+=1;}//end repeat loop
+				//dont think this is needed anymore after a refactor of folders
+				
+				////fixes a bug where when a folder is added at the end of another folder, both folder's regions is incorrect
+				//var _i=0; repeat(array_length(_arr)) {
+				//	_comp = _arr[_i];
+				//	if (_comp.__is_controller__) {
+				//		_comp.__update_controller_region__();
+				//	}
+				//_i+=1;}//end repeat loop
 				
 			}
 			#region jsDoc
@@ -314,25 +316,25 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				}
 				
 				static draw_debug = function() {
-					if (should_draw_debug) {
-						draw_set_color(c_red)
-						draw_rectangle(
-							x+__controller_region__.left,
-							y+__controller_region__.top,
-							x+__controller_region__.right,
-							y+__controller_region__.bottom,
-							true
-						);
+					if (!should_draw_debug) return;
 					
-						draw_set_color(c_green)
-						draw_rectangle(
-							x+region.left,
-							y+region.top,
-							x+region.right,
-							y+region.bottom,
-							true
-						);
-					}
+					draw_set_color(c_red)
+					draw_rectangle(
+						x+__controller_region__.left,
+						y+__controller_region__.top,
+						x+__controller_region__.right,
+						y+__controller_region__.bottom,
+						true
+					);
+					
+					draw_set_color(c_green)
+					draw_rectangle(
+						x+region.left,
+						y+region.top,
+						x+region.right,
+						y+region.bottom,
+						true
+					);
 				}
 				
 			#endregion

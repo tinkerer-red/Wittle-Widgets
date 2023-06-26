@@ -1,9 +1,5 @@
 function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompController() constructor {
 	
-	draw_debug = function(){
-		
-	}
-	
 	#region Public
 		
 		#region Builder functions
@@ -11,7 +7,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			static set_region = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite.index)
 				_top    = 0;
-				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text_click_y_off;
+				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off;
 				
 				__SUPER__.set_region(_left, _top, _right, _bottom)
 				
@@ -22,7 +18,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				__textbox__.set_width(_width*0.5)
 				__textbox__.set_anchor(-_info.right - _width*0.5, _info.top)
 				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text_click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
 				__scrolling_text__.set_region(
 						0,
 						-_scroll_text_height*0.5,
@@ -42,7 +38,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text = _text
+				text.text = _text
 				
 				__scrolling_text__.set_text(_text);
 				
@@ -70,8 +66,8 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
-			static set_text_colors = function(_idle_text_color=c_white, _hover_text_color=c_white, _disable_text_color=c_grey) {
-				__button__.set_text_colors(_idle_text_color, _hover_text_color, _disable_text_color)
+			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
+				__button__.set_text_colors(_idle, _hover, _clicked, _disable);
 				
 				return self;
 			}
@@ -81,8 +77,6 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				_str = string_replace_all(_str, "\r", "\\r")
 				
 				__textbox__.set_text(_str)
-				__textbox__.should_draw_debug = true;
-				
 				
 				return self;
 			}
@@ -165,7 +159,9 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			
 			add([__button__, __textbox__, __scrolling_text__]);
 			
-			draw_debug = function() {
+			static draw_debug = function() {
+				if (!should_draw_debug) return;
+				
 				draw_rectangle(
 						x+region.left,
 						y+region.top,
@@ -186,7 +182,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = font_get_info(__button__.font).size + _info.top + _info.bottom + __button__.text_click_y_off;
+			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
 			
 			set_region(_left, _top, _right, _bottom);
 			
@@ -220,24 +216,24 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
-							__scrolling_text__.set_text_color(__button__.text_color_idle);
+							__scrolling_text__.set_text_color(__button__.text.color.idle);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.set_scroll_looping(true, false)
 							__scrolling_text__.reset_scrolling();
 						break;}
 						case GUI_IMAGE_HOVER: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_CLICKED: {
-							__scrolling_text__.set_text_color(__button__.text_color_hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text_click_y_off);
+							__scrolling_text__.set_text_color(__button__.text.color.hover);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {
-							__scrolling_text__.set_text_color(__button__.text_color_disable);
+							__scrolling_text__.set_text_color(__button__.text.color.disable);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.reset_scrolling();
@@ -267,7 +263,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				//callback
 				__textbox__.__add_event_listener_priv__(__textbox__.events.submit, function(_str) {
 					callback(get_value(_str)); //for use with the index as input
-					//callback(_data.element); //for use with the string as input
+					//callback(_data.text); //for use with the string as input
 				});
 				
 			#endregion

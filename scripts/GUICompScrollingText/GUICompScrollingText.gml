@@ -85,7 +85,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			/// @desc    Sets the variables for text drawing
 			/// @self    GUICompScrollingText
 			/// @param   {String} text : The text to write on the button
-			/// @param   {Real} text_click_y_off : How much the text should be moved when the mouse button is held down on the button
+			/// @param   {Real} text.click_y_off : How much the text should be moved when the mouse button is held down on the button
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
@@ -165,8 +165,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
 			static set_text_offsets = function(_x=0, _y=0) {
-				text.x_off = _x;
-				text.y_off = _y;
+				text.xoff = _x;
+				text.yoff = _y;
 				
 				__update_clip_region__()
 				
@@ -178,18 +178,6 @@ function GUICompScrollingText() : GUICompCore() constructor {
 		#region Variables
 			
 			is_open = true; // unused, but left here so buttons can minimize this component in the future
-			
-			text = {};
-			text.text = "<Undefined>";
-			text.font = fGUIDefault;
-			text.width  = 0;
-			text.height = 0;
-			text.color = c_white;
-			text.alpha = 1;
-			text.x_off = 0;
-			text.y_off = 0;
-			text.halign = fa_left;
-			text.valign = fa_top;
 			
 			scroll = {};
 			scroll.y_off = 0;
@@ -220,8 +208,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 					draw_set_valign(text.valign);
 					
 					draw_text(
-							x + scroll.x_off + text.x_off,
-							y + scroll.y_off + text.y_off,
+							x + scroll.x_off + text.xoff,
+							y + scroll.y_off + text.yoff,
 							text.text
 					)
 				}
@@ -260,6 +248,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			};
 			
 			static draw_debug = function(_input) {
+				if (!should_draw_debug) return;
 				
 				draw_line(x-2,y,x+2,y)
 				draw_line(x,y-2,x,y+2)
@@ -426,9 +415,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				xprevious = x;
 				yprevious = y;
 				
-				if (should_draw_debug) {
-					draw_debug(_input);
-				}
+				draw_debug(_input);
 				
 				//__draw_component_surface__(_x, _y);
 			}
@@ -448,32 +435,32 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				switch (text.halign) {
 					default:
 					case fa_left:{
-						_left   = min(_left,   text.x_off);
-						_right  = max(_right,  text.x_off + region.get_width());
+						_left   = min(_left,   text.xoff);
+						_right  = max(_right,  text.xoff + region.get_width());
 					break;}
 					case fa_center:{
-						_left   = min(_left,   text.x_off - region.get_width()*0.5);
-						_right  = max(_right,  text.x_off + region.get_width()*0.5);
+						_left   = min(_left,   text.xoff - region.get_width()*0.5);
+						_right  = max(_right,  text.xoff + region.get_width()*0.5);
 					break;}
 					case fa_right:{
-						_left   = min(_left,   text.x_off - region.get_width());
-						_right  = max(_right,  text.x_off);
+						_left   = min(_left,   text.xoff - region.get_width());
+						_right  = max(_right,  text.xoff);
 					break;}
 				}
 				
 				switch (text.valign) {
 					default:
 					case fa_top:{
-						_top    = min(_top,    text.y_off);
-						_bottom = max(_bottom, text.y_off + region.get_height());
+						_top    = min(_top,    text.yoff);
+						_bottom = max(_bottom, text.yoff + region.get_height());
 					break;}
 					case fa_middle:{
-						_top    = min(_top,    text.y_off - region.get_height()*0.5);
-						_bottom = max(_bottom, text.y_off + region.get_height()*0.5);
+						_top    = min(_top,    text.yoff - region.get_height()*0.5);
+						_bottom = max(_bottom, text.yoff + region.get_height()*0.5);
 					break;}
 					case fa_bottom:{
-						_top    = min(_top,    text.y_off - region.get_height());
-						_bottom = max(_bottom, text.y_off);
+						_top    = min(_top,    text.yoff - region.get_height());
+						_bottom = max(_bottom, text.yoff);
 					break;}
 				}
 				

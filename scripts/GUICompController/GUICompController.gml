@@ -9,24 +9,26 @@ function GUICompController() : GUICompCore() constructor {
 	debug_name = "GUICompController";
 	
 	static draw_debug = function() { //log(["draw_debug", draw_debug]);
-				draw_set_color(c_orange)
-				draw_rectangle(
-						x+__controller_region__.left,
-						y+__controller_region__.top,
-						x+__controller_region__.right,
-						y+__controller_region__.bottom,
-						true
-				);
-				draw_set_color(c_yellow)
-				draw_rectangle(
-						x+region.left,
-						y+region.top,
-						x+region.right,
-						y+region.bottom,
-						true
-				);
+		if (!should_draw_debug) return;
+		
+		draw_set_color(c_orange)
+		draw_rectangle(
+				x+__controller_region__.left,
+				y+__controller_region__.top,
+				x+__controller_region__.right,
+				y+__controller_region__.bottom,
+				true
+		);
+		draw_set_color(c_yellow)
+		draw_rectangle(
+				x+region.left,
+				y+region.top,
+				x+region.right,
+				y+region.bottom,
+				true
+		);
 				
-			}
+	}
 	
 	#region Public
 		
@@ -353,7 +355,7 @@ function GUICompController() : GUICompCore() constructor {
 					__trigger_event__(self.events.pre_update);
 					
 					begin_step(_input);
-		
+					
 					//run the children
 					var _comp, xx, yy;
 					var _i=__children_count__; repeat(__children_count__) { _i--;
@@ -362,7 +364,7 @@ function GUICompController() : GUICompCore() constructor {
 						//yy = _comp.y - y;
 						_comp.__begin_step__(_input);
 					}//end repeat loop
-		
+					
 					//return the consumed inputs
 					if (__user_input__.consumed) { capture_input(); };
 				}
@@ -455,9 +457,7 @@ function GUICompController() : GUICompCore() constructor {
 					xprevious = x;
 					yprevious = y;
 					
-					if (should_draw_debug) {
-						draw_debug();
-					}
+					draw_debug();
 				}
 				
 				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
@@ -709,17 +709,14 @@ function GUICompController() : GUICompCore() constructor {
 						
 						//verify the component doeant appear twice in the supplied array
 						_found_count = 0;
-						_j = 0; repeat(_size) {
+						_j=_i+1; repeat(_size-_i-1) {
 							if (_arr[_j].__cid__ == _cid) {
-								_found_count+=1;
-								if (_found_count > 1) {
-									show_error("Trying to insert an array which contains the same component twice", true)
-								}
+								show_error("Trying to insert an array which contains the same component twice", true)
 							}
 						_j+=1;}//end repeat loop
 						
 						//verify the component is not already in the controller
-						_j = 0; repeat(__children_count__) {
+						_j=0; repeat(__children_count__) {
 							if (__children__[_j].__cid__ == _cid) {
 								show_error("Trying to insert a component which already exists inside this controller", true)
 							}

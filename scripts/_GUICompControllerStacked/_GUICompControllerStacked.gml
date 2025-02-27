@@ -21,7 +21,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 			/// @param   {Real} yoff : The vertical offset distance from the folder's y
 			/// @returns {Struct.GUICompControllerStacked}
 			#endregion
-			static set_children_offsets = function(_xoff=0,_yoff=0){ //log(["set_children_offsets", set_children_offsets]);
+			static set_children_offsets = function(_xoff=0,_yoff=0){
 				//sets the indenting for sub components from the previous component
 				
 				children_x_offset = _xoff;
@@ -58,7 +58,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
 			/// @returns {Undefined}
 			#endregion
-			static add = function(_comp) { //log(["add", add]);
+			static add = function(_comp) {
 				
 				__is_empty__ = false;
 				
@@ -91,7 +91,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
 			/// @returns {Undefined}
 			#endregion
-			static insert = function(_comp, _index) { //log(["insert", insert]);
+			static insert = function(_comp, _index) {
 				__is_empty__ = false;
 				
 				var _count = __children_count__;
@@ -114,7 +114,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 			/// @self    GUICompControllerStacked
 			/// @returns {Real}
 			#endregion
-			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
+			static update_component_positions = function() {
 				var _changed = false;
 				
 				if (!__is_empty__) {
@@ -169,152 +169,6 @@ function GUICompControllerStacked() : GUICompController() constructor {
 			
 			#region GML Events
 				
-				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					__mouse_on_cc__ = __mouse_on_controller__();
-					
-					__trigger_event__(self.events.pre_update);
-					
-					begin_step(__user_input__);
-					
-					//run the children
-					if (!__is_empty__) {
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__begin_step__(__user_input__);
-						}//end repeat loop
-						
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __step__ = function(_input){ //log(["__step__", __step__]);
-					__user_input__ = _input;
-					
-					step(__user_input__);
-					
-					//run children
-					if (!__is_empty__) {
-						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							////xx = _component.x - (x-_x);
-							////yy = _component.y - (y-_y);
-							_component.__step__(__user_input__);
-						}//end repeat loop
-						
-					}
-					
-					//__handle_click__(_input);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
-					__user_input__ = _input;
-					
-					end_step(__user_input__);
-					
-					if (!__is_empty__) {
-						//run the children
-						var _component, xx, yy;
-						var _i=__children_count__; repeat(__children_count__) { _i--;
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__end_step__(__user_input__);
-						}//end repeat loop
-						
-					}
-					
-					__trigger_event__(self.events.post_update);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				
-				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					
-					draw_gui_begin(__user_input__);
-					
-					if (!__is_empty__) {
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui_begin__(__user_input__);
-						_i+=1;}//end repeat loop
-						
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
-					__user_input__ = _input;
-					
-					//this is just imitating the inherited components draw_gui, in this case button
-					draw_gui(__user_input__);
-					
-					//run children
-					if (!__is_empty__) {
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							//xx = _component.x - (x-_x);
-							//yy = _component.y - (y-_y);
-							_component.__draw_gui__(__user_input__);
-						_i+=1;}//end repeat loop
-						
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
-					__user_input__ = _input;
-					
-					draw_gui_end(__user_input__);
-					
-					if (!__is_empty__) {
-						//run the children
-						var _component, xx, yy;
-						var _i=0; repeat(__children_count__) {
-							_component = __children__[_i];
-							_component.__draw_gui_end__(__user_input__);
-						_i+=1;}//end repeat loop
-						
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-					
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
-					cleanup();
-					
-					if (!__is_empty__) {
-						var _i=0; repeat(__children_count__) {
-							var _comp = __children__[_i];
-							_comp.__cleanup__();
-							delete _comp;
-						_i+=1;}//end repeat loop
-						
-					}
-				}
-				
 				static draw_debug = function() {
 					if (!should_draw_debug) return;
 					
@@ -339,7 +193,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				
 			#endregion
 			
-			static __update_controller_region__ = function() { //log(["__update_controller_region__", __update_controller_region__]);
+			static __update_controller_region__ = function() {
 				var _left   = region.left;
 				var _top    = region.top;
 				var _right  = region.right;

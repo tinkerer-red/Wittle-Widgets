@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "ControlPanelFolder",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Components",
-    "path": "folders/_Libraries/ControlPanel UI/Components.yy",
+  "$GMScript":"v1",
+  "%Name":"ControlPanelFolder",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ControlPanelFolder",
+  "parent":{
+    "name":"Components",
+    "path":"folders/_Libraries/ControlPanel/Components.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

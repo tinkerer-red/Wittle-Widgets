@@ -46,7 +46,7 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 				is_checked = _is_checked;
 				
 				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
-				__SUPER__.set_sprite(_sprite);
+				GUICompButtonSprite.set_sprite(_sprite);
 		
 				return self;
 			}
@@ -59,7 +59,8 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 			sprite_checked = s9CheckBoxChecked;
 			sprite_unchecked = s9CheckBoxUnchecked;
 			
-			__SUPER__.set_sprite(sprite_unchecked);
+			var _set_sprite = GUICompButtonSprite.set_sprite;
+			_set_sprite(sprite_unchecked);
 			
 		#endregion
 	
@@ -93,7 +94,7 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 		
 		#region Functions
 			
-			__add_event_listener_priv__(self.events.released, function(){
+			add_event_listener(self.events.released, function(){
 				is_checked = !is_checked;
 				sprite.index = (is_checked) ? sprite_checked : sprite_unchecked;
 			})

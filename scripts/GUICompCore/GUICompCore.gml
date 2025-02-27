@@ -22,7 +22,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} y : The y anchor of the component.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_anchor = function(_x, _y) { //log(["set_anchor", set_anchor]);
+			static set_anchor = function(_x, _y) {
 				self.x_anchor = _x;
 				self.y_anchor = _y;
 				
@@ -36,7 +36,7 @@ function GUICompCore() constructor {
 			/// @param   {Constant.VAlign} valign : Vertical alignment.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_alignment = function(_halign=fa_center, _valign=fa_middle) { //log(["set_alignment", set_alignment]);
+			static set_alignment = function(_halign=fa_center, _valign=fa_middle) {
 				
 				halign = _halign;
 				valign = _valign;
@@ -51,7 +51,7 @@ function GUICompCore() constructor {
 			///// @param   {Real} y : The y of the component.
 			///// @returns {Struct.GUICompCore}
 			//#endregion
-			//static set_position = function(_x, _y) { //log(["set_position", set_position]);
+			//static set_position = function(_x, _y) {
 			//	self.x = _x;
 			//	self.y = _y;
 			//	self.__internal_x__ = _x;
@@ -74,7 +74,7 @@ function GUICompCore() constructor {
 			/// @param   {Asset.GMSprite} sprite : The sprite to apply to the component.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_sprite = function(_sprite) { //log(["set_sprite", set_sprite]);
+			static set_sprite = function(_sprite) {
 				__set_sprite__(_sprite);
 			}
 			#region jsDoc
@@ -84,7 +84,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} angle : The angle of the sprite.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_sprite_angle = function(_angle) { //log(["set_sprite_angle", set_sprite_angle]);
+			static set_sprite_angle = function(_angle) {
 				image.angle = _angle;
 			}
 			#region jsDoc
@@ -94,7 +94,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} color : The color of the sprite.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_sprite_color = function(_col) { //log(["set_sprite_color", set_sprite_color]);
+			static set_sprite_color = function(_col) {
 				image.blend = _col;
 			}
 			#region jsDoc
@@ -104,7 +104,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} alpha : The alpha of the sprite.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_sprite_alpha = function(_alpha) { //log(["set_sprite_alpha", set_sprite_alpha]);
+			static set_sprite_alpha = function(_alpha) {
 				image.alpha = _alpha;
 			}
 			#region jsDoc
@@ -117,7 +117,7 @@ function GUICompCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) { //log(["set_region", set_region]);
+			static set_region = function(_left, _top, _right, _bottom) {
 				region.left   = _left;
 				region.top    = _top;
 				region.right  = _right;
@@ -142,7 +142,7 @@ function GUICompCore() constructor {
 			/// @param   {Bool} is_enabled : If the component should be enabled or not.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_enabled = function(_is_enabled) { //log(["set_enabled", set_enabled]);
+			static set_enabled = function(_is_enabled) {
 				is_enabled = _is_enabled;
 				
 				if (is_enabled) {
@@ -161,7 +161,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} width : The width of the component.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_width = function(_width) { //log(["set_width", set_width]);
+			static set_width = function(_width) {
 				set_region(0, 0, _width, region.get_height())
 				
 				return self;
@@ -173,18 +173,18 @@ function GUICompCore() constructor {
 			/// @param   {Real} height : The height of the component.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_height = function(_height) { //log(["set_height", set_height]);
+			static set_height = function(_height) {
 				set_region(0, 0, region.get_width(), _height)
 				
 				return self;
 			}
 			
-			static set_debug_drawing = function(_bool=false) { //log(["set_debug_drawing", set_debug_drawing]);
+			static set_debug_drawing = function(_bool=false) {
 				should_draw_debug = _bool;
 				
 				return self;
 			}
-			static set_do_safety_check = function(_bool=true) { //log(["set_do_safety_check", set_do_safety_check]);
+			static set_do_safety_check = function(_bool=true) {
 				should_safety_check = _bool
 				
 				return self;
@@ -198,11 +198,17 @@ function GUICompCore() constructor {
 			events.on_focus    = variable_get_hash("on_focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
 			events.on_blur     = variable_get_hash("on_blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
 			events.on_hover    = variable_get_hash("on_hover"); //triggered every frame the mouse is over the regions bounding box
+			
 			events.pre_update  = variable_get_hash("pre_update"); //triggered every frame before the begin step event is activated
 			events.post_update = variable_get_hash("post_update"); //triggered every frame after the end step event is activated
+			
+			events.pre_draw    = variable_get_hash("post_update"); //triggered every frame after the end step event is activated
+			events.post_draw   = variable_get_hash("post_update"); //triggered every frame after the end step event is activated
+			
 			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
-			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			
+			events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 		
@@ -290,7 +296,7 @@ function GUICompCore() constructor {
 			/// @param   {Function} func : The function to run when the event is triggered
 			/// @returns {Real}
 			#endregion
-			static add_event_listener = function(_event_id, _func) { //log(["add_event_listener", add_event_listener]);
+			static add_event_listener = function(_event_id, _func) {
 				var _hash = _event_id;
 				if (struct_get_from_hash(self.__event_listeners__, _hash) == undefined) {
 					struct_set_from_hash(self.__event_listeners__, _hash, [])
@@ -312,7 +318,7 @@ function GUICompCore() constructor {
 			/// @param   {real} uid : The Unique ID of a previously added event function returned by add_event_listener.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static remove_event_listener = function(_uid) { //log(["remove_event_listener", remove_event_listener]);
+			static remove_event_listener = function(_uid) {
 				var _struct, _func;
 				
 				var _hash = _uid;
@@ -342,16 +348,24 @@ function GUICompCore() constructor {
 			/// @self    GUICompCore
 			/// @returns {Array<String>}
 			#endregion
-			static get_events = function() { //log(["get_events", get_events]);
+			static get_events = function() {
 				return variable_struct_get_names(events)
 			}
+			
+			static add_overlay = function(_id, _component, _depth) {
+				
+			}
+			static remove_overlay = function(_id) {
+				
+			}
+			
 			#region jsDoc
 			/// @func    get_functions()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's functions. Useful for learning what available public functions you have access to.
 			/// @self    GUICompCore
 			/// @returns {Array<String>}
 			#endregion
-			static get_functions = function() { //log(["get_functions", get_functions]);
+			static get_functions = function() {
 				var _statics = static_get(self)
 				var _arr = [];
 				var _names = variable_struct_get_names(_statics)
@@ -371,7 +385,7 @@ function GUICompCore() constructor {
 			/// @self    GUICompCore
 			/// @returns {Array<String>}
 			#endregion
-			static get_builder_functions = function() { //log(["get_builder_functions", get_builder_functions]);
+			static get_builder_functions = function() {
 				var _statics = static_get(self)
 				var _arr = [];
 				var _names = variable_struct_get_names(_statics)
@@ -391,7 +405,7 @@ function GUICompCore() constructor {
 			/// @self    GUICompCore
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() { //log(["mouse_on_comp", mouse_on_comp]);
+			static mouse_on_comp = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
@@ -430,7 +444,7 @@ function GUICompCore() constructor {
 			/// @self    GUICompCore
 			/// @returns {Undefined}
 			#endregion
-			static capture_input = function() { //log(["capture_input", capture_input]);
+			static capture_input = function() {
 				if (__is_child__) {
 					__parent__.capture_input()
 				}
@@ -443,7 +457,7 @@ function GUICompCore() constructor {
 			/// @self    GUICompHandler
 			/// @returns {Real}
 			#endregion
-			static update_all_component_positions = function() { 
+			static update_all_component_positions = function() {
 				if (__is_child__) {
 					__parent__.update_component_positions();
 				}
@@ -459,37 +473,13 @@ function GUICompCore() constructor {
 			
 			#region GML Events
 			#region jsDoc
-			/// @func    begin_step()
-			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
-			/// @param   {Struct} input : The input struct components pass around to capture inputs
-			/// @returns {Undefined}
-			#endregion
-			static begin_step = function(_input) {}; log(["begin_step", begin_step]);
-			#region jsDoc
 			/// @func    step()
 			/// @desc    Emulates the GML equivalant event.
 			/// @self    GUICompCore
 			/// @param   {Struct} input : The input struct components pass around to capture inputs
 			/// @returns {Undefined}
 			#endregion
-			static step = function(_input) {}; log(["step", step]);
-			#region jsDoc
-			/// @func    end_step()
-			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
-			/// @param   {Struct} input : The input struct components pass around to capture inputs
-			/// @returns {Undefined}
-			#endregion
-			static end_step = function(_input) {}; log(["end_step", end_step]);
-			#region jsDoc
-			/// @func    draw_gui_begin()
-			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
-			/// @param   {Struct} input : The input struct components pass around to capture inputs
-			/// @returns {Undefined}
-			#endregion
-			static draw_gui_begin = function(_input) {}; log(["draw_gui_begin", draw_gui_begin]);
+			static step = function(_input) {};
 			#region jsDoc
 			/// @func    draw_gui()
 			/// @desc    Emulates the GML equivalant event.
@@ -497,22 +487,7 @@ function GUICompCore() constructor {
 			/// @param   {Struct} input : The input struct components pass around to capture inputs
 			/// @returns {Undefined}
 			#endregion
-			static draw_gui = function(_input) {}; log(["draw_gui", draw_gui]);
-			#region jsDoc
-			/// @func    draw_gui_end()
-			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
-			/// @param   {Struct} input : The input struct components pass around to capture inputs
-			/// @returns {Undefined}
-			#endregion
-			static draw_gui_end = function(_input) {}; log(["draw_gui_end", draw_gui_end]);
-			#region jsDoc
-			/// @func    cleanup()
-			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
-			/// @returns {Undefined}
-			#endregion
-			static cleanup = function(){}; log(["cleanup", cleanup]);
+			static draw_gui = function(_input) {};
 			#endregion
 			
 			#region jsDoc
@@ -521,7 +496,7 @@ function GUICompCore() constructor {
 			/// @self    GUICompCore
 			/// @param   {Undefined}
 			#endregion
-			static draw_debug = function() { //log(["draw_debug", draw_debug]);
+			static draw_debug = function() {
 				if (!should_draw_debug) return;
 				
 				draw_set_color(c_red)
@@ -561,9 +536,6 @@ function GUICompCore() constructor {
 			__event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
 			__event_listener_uid__ = 0 // a unique identifier for event listeners
 			
-			__priv_event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
-			__priv_event_listener_uid__ = 0 // a unique identifier for event listeners
-			
 			__position_set__ = false;
 			
 			__internal_x__ = 0;
@@ -575,96 +547,6 @@ function GUICompCore() constructor {
 		
 		#region Functions
 			
-			#region GML Events
-				#region jsDoc
-				/// @func    __begin_step__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
-					__trigger_event__(self.events.pre_update);
-					begin_step(_input);
-				}
-				#region jsDoc
-				/// @func    __step__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __step__ = function(_input) { //log(["__step__", __step__]);
-					step(_input);
-				}
-				#region jsDoc
-				/// @func    __end_step__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
-					end_step(_input);
-					__trigger_event__(self.events.post_update);
-				}
-				
-				#region jsDoc
-				/// @func    __draw_gui_begin__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
-					draw_gui_begin(_input);
-				}
-				#region jsDoc
-				/// @func    __draw_gui__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
-					draw_gui(_input);
-				}
-				#region jsDoc
-				/// @func    __draw_gui_end__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @param   {Struct} input : The input struct components pass around to capture inputs
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
-		
-					draw_gui_end(_input);
-		
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				#region jsDoc
-				/// @func    __cleanup__()
-				/// @desc    Internal function to help Emulate the GML equivalant event.
-				/// @self    GUICompCore
-				/// @returns {Undefined}
-				/// @ignore
-				#endregion
-				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
-					cleanup();
-				}
-				
-			#endregion
-			
 			#region jsDoc
 			/// @func    __region__()
 			/// @desc    Constructs a new region struct.
@@ -675,7 +557,7 @@ function GUICompCore() constructor {
 			/// @param   {Real} bottom : The reletive bounding box from the component's x/y
 			/// @returns {Struct.Region}
 			#endregion
-			static __region__ = function(_l=0, _t=0, _r=0, _b=0) constructor { //log(["__region__", other.__region__]);
+			static __region__ = function(_l=0, _t=0, _r=0, _b=0) constructor {
 				left   = _l;
 				top    = _t;
 				right  = _r;
@@ -710,17 +592,8 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static __event_exists__ = function(_event_id) { //log(["__event_exists__", __event_exists__]);
-				
-				if (variable_struct_exists(self.__event_listeners__, _event_id)) {
-					return true
-				}
-				
-				if (variable_struct_exists(self.__priv_event_listeners__, _event_id)) {
-					return true
-				}
-				
-				return false;
+			static __event_exists__ = function(_event_id) {
+				return variable_struct_exists(self.__event_listeners__, _event_id)
 			}
 			
 			
@@ -733,7 +606,7 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static __trigger_event__ = function(_event_id, _data) { //log(["__trigger_event__", __trigger_event__]);
+			static __trigger_event__ = function(_event_id, _data) {
 				//leave if the relevant event listener doesnt exist
 				var _struct, _func, _event_arr, _size, _i;
 				var _hash = _event_id;
@@ -751,83 +624,6 @@ function GUICompCore() constructor {
 					}
 					
 				#endregion
-				
-				#region privat event listener
-					
-					_event_arr = struct_get_from_hash(self.__priv_event_listeners__, _hash)
-					if (_event_arr != undefined) {
-						_size = array_length(_event_arr);
-						
-						_i=0; repeat(_size) {
-							_struct = _event_arr[_i];
-							_struct.func(_data);
-						_i+=1;}//end repeat loop
-					}
-					
-				#endregion
-				
-			}
-			
-			#region jsDoc
-			/// @func    __add_event_listener_priv__()
-			/// @desc    Add a private event listener to the component,
-			///          This function will be ran when the event is triggered
-			///          These are internally used events components will rely on.
-			/// @self    GUICompCore
-			/// @param   {String} event_id : The comonent's event you wish to bound this function to.
-			/// @param   {Function} func : The function to run when the event is triggered
-			/// @returns {Real}
-			#endregion
-			static __add_event_listener_priv__ = function(_event_id, _func) { //log(["__add_event_listener_priv__", __add_event_listener_priv__]);
-				var _hash = _event_id;
-				if (struct_get_from_hash(self.__priv_event_listeners__, _hash) == undefined) {
-					struct_set_from_hash(self.__priv_event_listeners__, _hash, [])
-				}
-				
-				var _uid = __event_listener_uid__;
-				__event_listener_uid__+=1;
-				
-				var _arr = struct_get_from_hash(self.__priv_event_listeners__, _hash)
-				array_push(_arr, {func: _func, UID: _uid});
-				struct_set_from_hash(self.__priv_event_listeners__, _hash, _arr)
-				
-				return _uid
-			}
-			
-			//TODO: Fix this function
-			#region jsDoc
-			/// @func    __remove_event_listener_priv__()
-			/// @desc    Remove a private event listener to the component
-			///          These are internally used events components will rely on.
-			/// @self    GUICompCore
-			/// @param   {real} uid : The Unique ID of a previously added event function returned by add_event_listener.
-			/// @returns {Struct.GUICompCore}
-			#endregion
-			static __remove_event_listener_priv__ = function(_uid) { //log(["__remove_event_listener_priv__", __remove_event_listener_priv__]);
-				var _i, _j, _names, _event_arr, _size1, _size2, _struct;
-				
-				_names = variable_struct_get_names(self.__priv_event_listeners__);
-				_size1 = array_length(_names);
-				
-				_i=0; repeat(_size1) {
-					
-					_event_arr = self.__priv_event_listeners__[$ _names[_i]];
-					_size2 = array_length(_event_arr);
-					
-					_j=0; repeat(_size2) {
-						
-						_struct = _event_arr[_j];
-						if (_uid == _struct.UID) {
-							array_delete(_event_arr, _j, 1);
-							self.__priv_event_listeners__[$ _names[_i]] = _event_arr;
-							return self;
-						}
-						
-					_j+=1; }; //end inner repeat
-					
-				_i+=1; }; //end outer repeat
-				
-				show_error("remove_event_listener : Attempting to remove a UID which doesnt exist", true);
 			}
 			
 			#region jsDoc
@@ -837,7 +633,7 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static __reset_focus__ = function() { //log(["__reset_focus__", __reset_focus__]);
+			static __reset_focus__ = function() {
 				__is_on_focus__ = false;
 				__trigger_event__(self.events.on_blur);
 			}
@@ -849,9 +645,9 @@ function GUICompCore() constructor {
 			/// @returns {real}
 			/// @ignore
 			#endregion
-			static __find_index_in_parent__ = function() { //log(["__find_index_in_parent__", __find_index_in_parent__]);
+			static __find_index_in_parent__ = function() {
 				//if we're not a child early out
-				if (!__is_child__) { return -1; };
+				if (!__is_child__) {return -1; };
 				var _comps = __parent__.__children__;
 		
 				var _i = 0; repeat(__parent__.__children_count__) {
@@ -864,7 +660,7 @@ function GUICompCore() constructor {
 			
 			#region Surface
 				
-				static __surface_set_target__ = function() { //log(["__surface_set_target__", __surface_set_target__]);
+				static __surface_set_target__ = function() {
 					
 					surface_region = (__is_controller__) ? __controller_region__ : region;
 		
@@ -898,7 +694,7 @@ function GUICompCore() constructor {
 					draw_clear_alpha(0,0);
 				}
 				
-				static __surface_reset_target__ = function() { //log(["__surface_reset_target__", __surface_reset_target__]);
+				static __surface_reset_target__ = function() {
 					//grab the current surface for all checks to use.
 					var _current_shader = surface_get_target()
 		
@@ -936,7 +732,7 @@ function GUICompCore() constructor {
 		
 				}
 				
-				static __draw_component_surface__ = function(_x=x, _y=y) { //log(["__draw_component_surface__", __draw_component_surface__]);
+				static __draw_component_surface__ = function(_x=x, _y=y) {
 		
 					draw_surface_stretched_ext(
 							__component_surface__,
@@ -960,7 +756,7 @@ function GUICompCore() constructor {
 				/// @returns {Undefined}
 				/// @ignore
 				#endregion
-				static __shader_set__ = function(_custom_region = undefined) { //log(["__shader_set__", __shader_set__]);
+				static __shader_set__ = function(_custom_region = undefined) {
 					//this function is only intended for the component systems internal clipping handling.
 					if (is_undefined(_custom_region)) {
 						__clip_region__ = (__is_controller__) ? __controller_region__ : region;
@@ -1005,7 +801,7 @@ function GUICompCore() constructor {
 				/// @returns {Undefined}
 				/// @ignore
 				#endregion
-				static __shader_reset__ = function() { //log(["__shader_reset__", __shader_reset__]);
+				static __shader_reset__ = function() {
 					
 					//grab the current shader for all checks to use.
 					var _current_shader = shader_current();
@@ -1043,11 +839,11 @@ function GUICompCore() constructor {
 			
 			#region jsDoc
 			/// @func    __handle_click__()
-			/// @desc    This handle all of the monotinous click code which is reused all over the place. If you need a component to do something when a click the component has been clicked, see "add_event_listener" or "__add_event_listener_priv__".
+			/// @desc    This handle all of the monotinous click code which is reused all over the place. If you need a component to do something when a click the component has been clicked, see "add_event_listener" or "add_event_listener".
 			/// @self    GUICompCore
 			/// @param   {Struct.Input} input : The input struct containing passed around data between components.
 			#endregion
-			static __handle_click__ = function(_input) { //log(["__handle_click__", __handle_click__]);
+			static __handle_click__ = function(_input) {
 				
 				var _input_captured = _input.consumed
 				
@@ -1117,7 +913,7 @@ function GUICompCore() constructor {
 			/// @param   {Asset.GMSprite} sprite : The sprite to apply to the component, and to get the values from.
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static __set_sprite__ = function(_sprite) { //log(["__set_sprite__", __set_sprite__]);
+			static __set_sprite__ = function(_sprite) {
 				/// NOTE: These are the default structure of GUI button sprites
 				/// image.index[0] = idle; no interaction;
 				/// image.index[1] = mouse over; the mouse is over it;

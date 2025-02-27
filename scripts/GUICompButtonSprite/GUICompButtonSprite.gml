@@ -26,7 +26,8 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 				/// image.index[2] = mouse down; actively being pressed;
 				/// image.index[3] = disabled; not allowed to interact with;
 				
-				__SUPER__.set_sprite(_sprite);
+				static __set_sprite = GUICompCore.set_sprite;
+				__set_sprite(_sprite);
 				
 				image.speed = 0;
 				set_region(
@@ -84,12 +85,6 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 			
 			#region GML Events
 				
-				static __step__ = function(_input) {
-					step(_input);
-				
-					__handle_click__(_input);
-				
-				}
 				
 			#endregion
 			

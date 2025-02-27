@@ -9,7 +9,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				_top    = 0;
 				_bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				__SUPER__.set_region(_left, _top, _right, _bottom)
+				static __set_region = GUICompCore.set_region;
+				__set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -182,7 +183,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				.set_alignment(fa_left, fa_top)
 			
 			
-			__SUPER__.add([__button__, __folder__, __scrolling_text__]);
+			var _add = GUICompController.add;
+			_add([__button__, __folder__, __scrolling_text__]);
 			
 			set_children_offsets(12, 0)
 			
@@ -213,7 +215,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					__add_event_listener_priv__(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_update, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
@@ -222,7 +224,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				}
 				
 				//adjust the visuals so all components are simillar
-				__add_event_listener_priv__(events.pre_update, function(_data) {
+				add_event_listener(events.pre_update, function(_data) {
 					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
 					
 					__button__.image.index   = _image_index;
@@ -256,7 +258,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				});
 				
 				//callback
-				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
+				__button__.add_event_listener(__button__.events.released, function(_data) {
 					__folder__.set_open(!__folder__.is_open)
 					is_open = __folder__.is_open;
 					

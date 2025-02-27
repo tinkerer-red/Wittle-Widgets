@@ -22,8 +22,9 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region])log(["set_region", set_region])
-				__SUPER__.set_region(_left, _top, _right, _bottom);
+			static set_region = function(_left, _top, _right, _bottom) {
+				static __set_region = GUICompCore.set_region;
+				__set_region(_left, _top, _right, _bottom);
 				
 				//__find_slider_bounds__();
 				
@@ -36,7 +37,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Real} value : The value to set the slider to.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_value = function(_value) {//log(["set_value", set_value])log(["set_value", set_value])
+			static set_value = function(_value) {
 				__set_value__(_value, true)
 				
 				target_value = value;
@@ -50,7 +51,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Real} value : The normalized value to set the slider to.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_normalized_value = function(_value) {//log(["set_normalized_value", set_normalized_value])
+			static set_normalized_value = function(_value) {
 				__set_normalized_value__(_value);
 				
 				target_value = value;
@@ -65,7 +66,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Real} max : The max value of the slider.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_clamp_values = function(_min=0, _max=10) {//log(["set_clamp_values", set_clamp_values])
+			static set_clamp_values = function(_min=0, _max=10) {
 				
 				min_value = _min;
 				max_value = _max;
@@ -81,7 +82,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Bool} should_round : If the slider's value should be rounded. true = round, false = no rounding.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_rounding = function(_round=false) {//log(["set_rounding", set_rounding])
+			static set_rounding = function(_round=false) {
 				
 				round_value = _round
 				set_value(value);
@@ -95,7 +96,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Bool} input_enabled : If the input is enabled or not. true = enabled, false = disabled.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_input_enabled = function(_input_enabled=true) {//log(["set_input_enabled", set_input_enabled])
+			static set_input_enabled = function(_input_enabled=true) {
 				
 				input_enabled = _input_enabled;
 		
@@ -108,7 +109,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Function} func : The tracker function the slider will addapt with.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_tracker = function(_func) {//log(["set_tracker", set_tracker])
+			static set_tracker = function(_func) {
 				//the function should return the value it wishes to set the slider to, useful for methoding an instance to always apply it's variable to the slider as a progress bar.
 				tracker_func = _func;
 				
@@ -121,7 +122,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Bool} is_vertical : If the slider is vertically oriented. true = vertical, false = horizontal
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_vertical = function(_vert) {//log(["set_vertical", set_vertical])
+			static set_vertical = function(_vert) {
 				
 				is_vertical = _vert
 				
@@ -134,7 +135,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Bool} thumb_only_input : If the only available way to change the slider's value is with the thumb. true = thumb only, false = normal slider functionality.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_thumb_only_input = function(_thumb_only_input) {//log(["set_thumb_only_input", set_thumb_only_input])
+			static set_thumb_only_input = function(_thumb_only_input) {
 				
 				thumb_only_input = _thumb_only_input
 				
@@ -147,7 +148,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {Real} target_value : The target value the slider should smooth towards.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_target_value = function(_target_value) {//log(["set_target_value", set_target_value])
+			static set_target_value = function(_target_value) {
 				
 				target_value = clamp(_target_value, min_value, max_value);
 				
@@ -167,7 +168,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} enabled : If the thumb is enabled
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_enabled = function(_enabled=true) {//log(["set_thumb_enabled", set_thumb_enabled])
+				static set_thumb_enabled = function(_enabled=true) {
 					thumb.enabled = _enabled
 					
 					//__find_slider_bounds__();
@@ -181,7 +182,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Asset.GMSprite} sprite : The sprite to use for the thumb.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_sprite = function(_sprite=-1) {//log(["set_thumb_sprite", set_thumb_sprite])
+				static set_thumb_sprite = function(_sprite=-1) {
 					thumb.sprite = _sprite
 					set_thumb_min_colors(c_white, c_white, c_white, c_white)
 					set_thumb_max_colors(c_white, c_white, c_white, c_white)
@@ -197,7 +198,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha value to set for the thumb.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_alpha = function(_alpha=1) {//log(["set_thumb_alpha", set_thumb_alpha])
+				static set_thumb_alpha = function(_alpha=1) {
 					thumb.alpha = _alpha
 					
 					return self;
@@ -212,7 +213,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the thumb.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_thumb_min_colors", set_thumb_min_colors])
+				static set_thumb_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					thumb.min_color.idle     = _idle;
 					thumb.min_color.hover    = _hover;
 					thumb.min_color.clicked  = _clicked;
@@ -230,7 +231,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the thumb.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_thumb_max_colors", set_thumb_max_colors])
+				static set_thumb_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					thumb.max_color.idle     = _idle;
 					thumb.max_color.hover    = _hover;
 					thumb.max_color.clicked  = _clicked;
@@ -246,7 +247,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} yscale : The Y scale to set for the thumb.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_scales = function(_xscale=0, _yscale=0) {//log(["set_thumb_scales", set_thumb_scales])
+				static set_thumb_scales = function(_xscale=0, _yscale=0) {
 					//sets the width and height of the thumb. Note: a value of 0 will always use it's default size. If you wish to prevent the thumbs drawing use "set_thumb_enabled".
 					
 					thumb.xscale = _xscale;
@@ -263,7 +264,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} clamped : If the thumb is clamped in bounds. true = clamped, false = not clamped.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_thumb_clamped_in_bounds = function(_clamped=true) {//log(["set_thumb_clamped_in_bounds", set_thumb_clamped_in_bounds])
+				static set_thumb_clamped_in_bounds = function(_clamped=true) {
 					
 					thumb.clamped = _clamped;
 					
@@ -283,7 +284,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} enabled : If the bar is enabled
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_enabled = function(_enabled=1) {//log(["set_bar_enabled", set_bar_enabled])
+				static set_bar_enabled = function(_enabled=1) {
 					bar.enabled = _enabled
 					
 					return self;
@@ -295,7 +296,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Asset.GMSprite} sprite : The sprite to use for the bar.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_sprite = function(_sprite=-1) {//log(["set_bar_sprite", set_bar_sprite])
+				static set_bar_sprite = function(_sprite=-1) {
 					bar.sprite = _sprite
 					set_bar_min_colors(c_white, c_white, c_white, c_white)
 					set_bar_max_colors(c_white, c_white, c_white, c_white)
@@ -309,7 +310,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha value to set for the bar.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_alpha = function(_alpha=1) {//log(["set_bar_alpha", set_bar_alpha])
+				static set_bar_alpha = function(_alpha=1) {
 					bar.alpha = _alpha
 					
 					return self;
@@ -324,7 +325,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the bar.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_bar_min_colors", set_bar_min_colors])
+				static set_bar_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					bar.min_color.idle     = _idle;
 					bar.min_color.hover    = _hover;
 					bar.min_color.clicked  = _clicked;
@@ -342,7 +343,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the bar.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_bar_max_colors", set_bar_max_colors])
+				static set_bar_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					bar.max_color.idle     = _idle;
 					bar.max_color.hover    = _hover;
 					bar.max_color.clicked  = _clicked;
@@ -357,7 +358,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} margin : The margin to set for the bar. A margin of -1 will make the bar automatically scale to the background's center region of its nineslice if it's enabled.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_margin = function(_margin=1) {//log(["set_bar_margin", set_bar_margin])
+				static set_bar_margin = function(_margin=1) {
 					
 					bar.margin = _margin
 					
@@ -372,7 +373,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Bool} auto_fill : A boolean value indicating whether the bar should automatically fill its background or not.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_bar_auto_fill = function(_auto_fill=true) {//log(["set_bar_auto_fill", set_bar_auto_fill])
+				static set_bar_auto_fill = function(_auto_fill=true) {
 					
 					bar.margin = (_auto_fill) ? -1 : 0;
 					
@@ -390,7 +391,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} enabled : If the background is enabled
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_background_enabled = function(_enabled=1) {//log(["set_background_enabled", set_background_enabled])
+				static set_background_enabled = function(_enabled=1) {
 					background.enabled = _enabled
 					
 					//__find_slider_bounds__();
@@ -404,7 +405,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Asset.GMSprite} sprite : The sprite to use for the background.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_background_sprite = function(_sprite=-1) {//log(["set_background_sprite", set_background_sprite])
+				static set_background_sprite = function(_sprite=-1) {
 					background.sprite = _sprite
 					
 					set_background_min_colors(c_white, c_white, c_white, c_white)
@@ -421,7 +422,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha value to set for the background.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_background_alpha = function(_alpha=1) {//log(["set_background_alpha", set_background_alpha])
+				static set_background_alpha = function(_alpha=1) {
 					background.alpha = _alpha
 					
 					return self;
@@ -436,7 +437,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the background.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_background_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_background_min_colors", set_background_min_colors])
+				static set_background_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					background.min_color.idle     = _idle;
 					background.min_color.hover    = _hover;
 					background.min_color.clicked  = _clicked;
@@ -454,7 +455,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the background.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_background_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_background_max_colors", set_background_max_colors])
+				static set_background_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					background.max_color.idle     = _idle;
 					background.max_color.hover    = _hover;
 					background.max_color.clicked  = _clicked;
@@ -474,7 +475,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} enabled : If the text is enabled
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_enabled = function(_enabled=1) {//log(["set_text_enabled", set_text_enabled])
+				static set_text_enabled = function(_enabled=1) {
 					text.enabled = _enabled
 					
 					return self;
@@ -487,7 +488,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Constant.VAlign} valign : Vertical alignment
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_alignment = function(_alpha=1) {//log(["set_text_alignment", set_text_alignment])
+				static set_text_alignment = function(_alpha=1) {
 					text.alpha = _alpha
 					
 					return self;
@@ -501,7 +502,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} click_y : The additional y offset used when 
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_offsets = function(_x=0, _y=0, _click_y=2) {//log(["set_text_offsets", set_text_offsets])
+				static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
 					text.xoff = _x;
 					text.yoff = _y;
 					text.click_y_off = _click_y;
@@ -518,7 +519,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the text.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_text_min_colors", set_text_min_colors])
+				static set_text_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					text.min_color.idle     = _idle;
 					text.min_color.hover    = _hover;
 					text.min_color.clicked = _clicked;
@@ -536,7 +537,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the text.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_text_max_colors", set_text_max_colors])
+				static set_text_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					text.max_color.idle     = _idle;
 					text.max_color.hover    = _hover;
 					text.max_color.clicked = _clicked;
@@ -551,7 +552,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Asset.GMFont} font : The font to use when drawing the text
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_font = function(_font=1) {//log(["set_text_font", set_text_font])
+				static set_text_font = function(_font=1) {
 					text.font = _font
 					
 					return self;
@@ -563,7 +564,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha to draw the text
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_alpha = function(_alpha=1) {//log(["set_text_alpha", set_text_alpha])
+				static set_text_alpha = function(_alpha=1) {
 					text.alpha = _alpha
 					
 					return self;
@@ -575,7 +576,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha to draw the text
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_to_string = function(_func) {//log(["set_text_to_string", set_text_to_string])
+				static set_text_to_string = function(_func) {
 					
 					text.to_string = _func;
 					
@@ -591,7 +592,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the text outline.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_outline_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_text_outline_min_colors", set_text_outline_min_colors])
+				static set_text_outline_min_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					text.outline.min_color.idle     = _idle;
 					text.outline.min_color.hover    = _hover;
 					text.outline.min_color.clicked  = _clicked;
@@ -609,7 +610,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} disabled_col : The disabled color for the text outline.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_outline_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {//log(["set_text_outline_max_colors", set_text_outline_max_colors])
+				static set_text_outline_max_colors = function(_idle=c_white,_hover=c_white,_clicked=c_white,_disabled=c_gray) {
 					text.outline.max_color.idle     = _idle;
 					text.outline.max_color.hover    = _hover;
 					text.outline.max_color.clicked  = _clicked;
@@ -624,7 +625,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} thickness : The thickness to draw the text outline.
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_outline_thickness = function(_thickness=0) {//log(["set_text_outline_thickness", set_text_outline_thickness])
+				static set_text_outline_thickness = function(_thickness=0) {
 					text.outline.thickness = _thickness;
 					
 					return self;
@@ -636,7 +637,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				/// @param   {Real} alpha : The alpha to draw the text
 				/// @returns {Struct.GUICompSlider}
 				#endregion
-				static set_text_outline_alpha = function(_alpha=0) {//log(["set_text_outline_alpha", set_text_outline_alpha])
+				static set_text_outline_alpha = function(_alpha=0) {
 					text.outline.alpha = _alpha;
 					
 					return self;
@@ -793,11 +794,11 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @self    GUICompSlider
 			/// @returns {Real}
 			#endregion
-			static get_value = function() {//log(["get_value", get_value])
+			static get_value = function() {
 				return value;
 			}
 			
-			static mouse_on_thumb = function() {//log(["mouse_on_thumb", mouse_on_thumb])
+			static mouse_on_thumb = function() {
 				
 				var _x = __slider_bounds__.x;
 				var _y = __slider_bounds__.y;
@@ -832,7 +833,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			
 			#region GML Events
 				
-				static draw_gui = function(_input) {//log(["draw_gui", draw_gui])
+				static draw_gui = function(_input) {
 					//early out if scrollbar is too small
 					if (region.get_width() <= 0)
 					|| (region.get_height() <= 0) {
@@ -1083,7 +1084,7 @@ function GUICompSlider() : GUICompCore() constructor {
 		#region Functions
 			
 			
-			static __set_value__ = function(_value) {//log(["__set_value__", __set_value__])
+			static __set_value__ = function(_value) {
 				__prev_value__ = value;
 				
 				value = clamp(_value, min_value, max_value);
@@ -1095,7 +1096,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				
 			}
 			
-			static __set_normalized_value__ = function(_value) {//log(["__set_normalized_value__", __set_normalized_value__])
+			static __set_normalized_value__ = function(_value) {
 				__prev_value__ = value;
 				
 				normalized_value = clamp(_value, 0, 1);
@@ -1110,7 +1111,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				__trigger_event__(self.events.value_input, self.value);
 			}
 			
-			static __find_slider_bounds__ = function() {//log(["__find_slider_bounds__", __find_slider_bounds__])
+			static __find_slider_bounds__ = function() {
 				var _x, _y, _w, _h;
 				//find out our bounds
 				if (bar.margin == -1)
@@ -1146,7 +1147,7 @@ function GUICompSlider() : GUICompCore() constructor {
 			
 			#region Private Event Hooks
 				
-				__add_event_listener_priv__(self.events.value_input, function() {
+				add_event_listener(self.events.value_input, function() {
 					if (value != __prev_value__) {
 						__trigger_event__(self.events.value_changed, self.value);
 						
@@ -1158,175 +1159,11 @@ function GUICompSlider() : GUICompCore() constructor {
 				
 			#endregion
 			
-			#region GML Events
-				
-				static __step__ = function(_input) {//log(["__step__", __step__])
-				
-					step(_input);
-				
-					//early out if scrollbar is too small
-					if (region.get_width() <= 0)
-					|| (region.get_height() <= 0) {
-						return
-					}
-					
-					//apply smoothing from target value
-					if (target_value != value) {
-						if ( abs(target_value - value) < 0.0025 ) {
-						   __set_value__(target_value);
-							 __trigger_event__(self.events.value_input, self.value);
-						}
-						else {
-							 __set_value__(value + (target_value - value) * 0.175);
-							 __trigger_event__(self.events.value_input, self.value);
-						}
-					}
-					
-					//apply the tracker
-					if (!is_undefined(tracker_func)) {
-						var _tracked_val = tracker_func();
-						//safety check
-						if (should_safety_check) {
-							if (!is_real(_tracked_val)) {
-								show_error("The tracked value returned from the tracker function is not a valid {Real} variable.\nWhen using \"set_tracker\", the applied function must return a {Real}", true);
-							}
-						}
-						//apply new value
-						if (_tracked_val != value) {
-							set_value(_tracked_val);
-							__trigger_event__(self.events.value_input, self.value);
-						}
-					}
-					
-					var _input_captured = _input.consumed
-					
-					//capture input if we still have focus
-					if (__is_on_focus__)
-					&& (is_enabled) {
-						capture_input();
-					}
-					
-					//early out if we're disabled
-					if (!is_enabled)
-					|| (!input_enabled) {
-						__reset_focus__();
-						
-						__trigger_event__(self.events.on_blur);
-						
-						if (!input_enabled) {
-							image.index = GUI_IMAGE_ENABLED;
-						}
-						else { //(!is_enabled)
-							image.index = GUI_IMAGE_DISABLED;
-						}
-						return;
-					}
-					
-					//define a function which will be reused in many places
-					var _apply_value = function() {
-						
-						var _xoff = 0;
-						var _yoff = 0;
-						if (thumb_only_input) {
-							_xoff = __click_xoff__;
-							_yoff = __click_yoff__;
-						}
-						
-						
-						var _min_x = __slider_bounds__.min_x;
-						var _min_y = __slider_bounds__.min_y;
-						
-						var _max_x = __slider_bounds__.max_x;
-						var _max_y = __slider_bounds__.max_y;
-						
-						var _norm_val = (!is_vertical) ? (device_mouse_x_to_gui(0) - _xoff - _min_x) / (_max_x-_min_x) : (device_mouse_y_to_gui(0) - _yoff - _min_y) / (_max_y-_min_y);
-						_norm_val = clamp(_norm_val, 0, 1);
-						
-						set_normalized_value(_norm_val);
-					}
-					
-					//run the internal step
-					if ((!_input_captured) && (mouse_on_comp())) {
-						
-						capture_input();
-					
-						//trigger the event for mouse over
-						__trigger_event__(self.events.mouse_over);
-						
-						image.index = GUI_IMAGE_HOVER;
-						
-						//mouse button checks
-						if (mouse_check_button_pressed(mb_left)) {
-							__is_on_focus__ = true;
-							__trigger_event__(self.events.on_focus);
-							
-							image.index = GUI_IMAGE_CLICKED;
-							
-							if (thumb_only_input) {
-								__find_slider_bounds__();
-							
-								var _orig_x = lerp(
-										__slider_bounds__.min_x,
-										__slider_bounds__.max_x,
-										normalized_value
-								);
-								var _orig_y = lerp(
-										__slider_bounds__.min_y,
-										__slider_bounds__.max_y,
-										normalized_value
-								);
-							
-							
-								__click_xoff__ = device_mouse_x_to_gui(0) - _orig_x;
-								__click_yoff__ = device_mouse_y_to_gui(0) - _orig_y;
-							}
-							
-							_apply_value();
-							__trigger_event__(self.events.pressed, self.value);
-						}
-						else if (__is_on_focus__) && (mouse_check_button(mb_left)) {
-							image.index = GUI_IMAGE_CLICKED;
-							_apply_value();
-							__trigger_event__(self.events.held, self.value);
-						}
-						else if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
-							__reset_focus__();
-							__trigger_event__(self.events.on_blur);
-							image.index = GUI_IMAGE_HOVER;
-							_apply_value();
-							__trigger_event__(self.events.released, self.value);
-						}
-					
-					}
-					else {
-						if (__is_on_focus__) {
-							_apply_value();
-							image.index = GUI_IMAGE_CLICKED;
-							
-							if (mouse_check_button_released(mb_left)) {
-								__reset_focus__();
-								__trigger_event__(self.events.on_blur);
-								image.index = GUI_IMAGE_ENABLED;
-								__trigger_event__(self.events.released, self.value);
-							}
-							else {
-								__trigger_event__(self.events.held, self.value);
-							}
-						}
-						else {
-							image.index = GUI_IMAGE_ENABLED;
-						}
-					}
-				
-				}
-				
-			#endregion
-			
 		#endregion
 		
 	#endregion
 	
-	static draw_debug = function(_input) {//log(["draw_debug", draw_debug])
+	static draw_debug = function(_input) {
 		if (!should_draw_debug) return;
 		
 		draw_set_color(c_aqua)

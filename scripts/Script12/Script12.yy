@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "Script12",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Reds_GUI",
-    "path": "Reds_GUI.yyp",
+  "$GMScript":"v1",
+  "%Name":"Script12",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Script12",
+  "parent":{
+    "name":"Reds_GUI",
+    "path":"Reds_GUI.yyp",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

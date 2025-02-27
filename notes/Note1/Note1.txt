@@ -1,0 +1,86 @@
+Below is an organized list that prioritizes the most essential (core) components first. After that, I’ve listed additional components that are typically implemented as children of other objects or are relatively straightforward to add on later.
+
+---
+
+### **Primary Components (High Importance)**
+
+- **`GUICompWindow`** :: A floating container for dialogs, modals, or application windows.  
+- **`GUICompPanel`** :: A generic container that groups and organizes related UI elements.  
+- **`GUICompTabPanel`** :: A container that organizes content into multiple tabbed views.  
+
+- **`GUICompLabel`** :: Displays static text or labels in the UI.  
+- **`GUICompIcon`** :: Renders an image or icon.  
+- **`GUICompDivider`** :: Provides a visual separator between UI sections.  
+
+- **`GUICompButton`** :: A standard clickable button for triggering actions.  
+- **`GUICompButtonSprite`** :: A button which only uses sprites.  
+- **`GUICompButtonText`** :: A button that uses 9slice sprites for the button, and any supplied text.  
+
+- **`GUICompTextInputSingle`** :: A single-line text box for brief user input.  
+- **`GUICompTextInputMulti`** :: A multi-line text area for extended text input.  
+- **`GUICompCodeEditor`** :: A specialized text box with syntax highlighting for code editing.  
+
+- **`GUICompCheckbox`** :: A binary toggle control for selecting on/off options.  
+- **`GUICompRadioButton`** :: A circular button for selecting one option within a group.  
+- **`GUICompToggleSwitch`** :: A sliding switch for binary state selection.  
+
+- **`GUICompDropdown`** :: A drop-down list for selecting one option from a set.  
+- **`GUICompComboBox`** :: A drop-down list with an editable text field for custom input.  
+- **`GUICompListBox`** :: A component that displays a list of selectable items.  
+
+- **`GUICompSlider`** :: A slider control for selecting a value within a continuous range.  
+- **`GUICompScrollbar`** :: A scrollable slider for navigating content in overflow areas.  
+
+- **`GUICompListView`** :: A component for displaying a collection of items in a list format.  
+- **`GUICompTreeView`** :: A hierarchical view for displaying collapsible tree structures.  
+
+- **`GUICompMenu`** :: A menu for presenting a list of actions.  
+- **`GUICompContextMenu`** :: A context-sensitive menu triggered by user interaction.  
+
+- **`GUICompProgressBar`** :: A visual indicator of task progress.  
+- **`GUICompToast`** :: A transient notification element for brief, unobtrusive messages.  
+- **`GUICompTooltip`** :: A hover-activated helper that displays additional context.  
+
+- **`GUICompDatePicker`** :: A component for selecting dates.  
+- **`GUICompTimePicker`** :: A component for selecting times.  
+- **`GUICompFilePicker`** :: A file selection dialog for choosing files from the system.
+
+---
+
+### **Additional / Child Components (Fast to Implement / Support as Sub-Elements)**
+
+- **Containers & Layouts:**  
+  - **`GUICompGroup`** :: A lightweight container for grouping related UI elements without additional layout overhead.  
+  - **`GUICompGridLayout`** :: A layout manager that organizes components into rows and columns.  
+  - **`GUICompVerticalLayout`** :: A layout that arranges child components vertically.  
+  - **`GUICompHorizontalLayout`** :: A layout that arranges child components horizontally.
+
+- **Custom Rendering & Specialized Grouping:**  
+  - **`GUICompCanvas`** :: A drawing surface for custom rendering and graphics operations.  
+  - **`GUICompRadioGroup`** :: A component for grouping radio buttons into mutually exclusive selections.  
+  - **`GUICompSpinner`** :: A control that serves as either a numeric input spinner or a loading indicator.
+
+- **Advanced/Decorative Elements:**  
+  - **`GUICompRadialMenu`** :: A circular, context-sensitive menu for presenting options in a radial layout.  
+  - **`GUICompBorder`** :: A decorative or functional border element to frame other components.  
+  - **`GUICompPopup`** :: A transient overlay window for displaying additional options or notifications.  
+  - **`GUICompViewport`** :: Defines a visible portion within a larger scrollable region, useful for managing overflow content.
+
+- **Data and Mode Management:**  
+  - **`GUICompDataTemplate`** :: A templating mechanism for dynamically rendering data collections.  
+  - **`GUICompDropdownMenu`** :: A context-sensitive menu presented in a dropdown style.  
+  - **`GUICompMeterBar`** :: A gauge-like indicator for displaying quantitative values (such as capacity or progress).  
+  - **`GUICompSlideToggle`** :: A toggle switch that uses a sliding animation to change states.  
+  - **`GUICompSwitcher`** :: A component that facilitates switching between different views or modes.  
+  - **`GUICompChildWindow`** :: An embedded or subordinate window within a larger application context.
+
+- **Specialized Input & Editing:**  
+  - **`GUICompColorPicker`** :: A user interface element for selecting colors, often featuring a palette or spectrum.  
+  - **`GUICompBitfield`** :: A specialized component for editing bitfield values.  
+  - **`GUICompBitfieldOption`** :: An individual option within a bitfield editor.
+
+- **Event Handling (Often Extended as Needed):**  
+  - **`GUICompEventHandler`** :: A base component for managing user events and delegating actions.
+
+---
+

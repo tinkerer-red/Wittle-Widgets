@@ -9,7 +9,8 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				_top    = 0;
 				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				__SUPER__.set_region(_left, _top, _right, _bottom)
+				static __set_region = GUICompController.set_region;
+				__set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -184,7 +185,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					__add_event_listener_priv__(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_update, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
@@ -193,7 +194,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				}
 				
 				//adjust the visuals so all components are simillar
-				__add_event_listener_priv__(self.events.post_update, function(_data) {
+				add_event_listener(self.events.post_update, function(_data) {
 					
 					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
 					_image_index = max(_image_index, __textbox__.__is_on_focus__)
@@ -229,7 +230,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				});
 				
 				//set the focus to the textbox
-				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
+				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
 						__is_on_focus__ = true;
 						__trigger_event__(self.events.on_focus);
@@ -247,7 +248,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				});
 				
 				//callback
-				__textbox__.__add_event_listener_priv__(__textbox__.events.submit, function(_str) {
+				__textbox__.add_event_listener(__textbox__.events.submit, function(_str) {
 					if (string_digits(_str) == "") {
 						_str = "0";
 						var _value = 0;
@@ -266,7 +267,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				});
 				
 				//remove any second periods, double dashes, or any other missused formatting
-				__textbox__.__add_event_listener_priv__(__textbox__.events.change, function(_str) {
+				__textbox__.add_event_listener(__textbox__.events.change, function(_str) {
 					if (string_count(".", _str)) {
 						_str = string_replace(_str, ".", "#")
 						_str = string_replace_all(_str, ".", "")

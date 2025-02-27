@@ -15,7 +15,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				_top    = 0;
 				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				__SUPER__.set_region(_left, _top, _right, _bottom)
+				static __set_region = GUICompController.set_region;
+				__set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -164,7 +165,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					__add_event_listener_priv__(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_update, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
@@ -173,7 +174,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				}
 				
 				//adjust the visuals so all components are simillar
-				__add_event_listener_priv__(self.events.post_update, function(_data) {
+				add_event_listener(self.events.post_update, function(_data) {
 					
 					var _image_index = (is_enabled) ? max(__dropdown__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
 					
@@ -209,7 +210,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				});
 				
 				//update open state from button click
-				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
+				__button__.add_event_listener(__button__.events.released, function(_data) {
 					is_open = !is_open
 					__dropdown__.is_open = is_open
 					
@@ -224,16 +225,16 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				});
 				
 				//callback
-				__dropdown__.__add_event_listener_priv__(__dropdown__.events.changed, function(_data) {
+				__dropdown__.add_event_listener(__dropdown__.events.changed, function(_data) {
 					//callback(_data.index); //for use with the index as input
 					callback(_data.index, _data.text); //for use with the string as input
 				});
 				
-				__dropdown__.__add_event_listener_priv__(__dropdown__.events.released, function(_data) {
+				__dropdown__.add_event_listener(__dropdown__.events.released, function(_data) {
 					is_open = __dropdown__.is_open;
 				});
 				
-				__dropdown__.__add_event_listener_priv__(__dropdown__.events.selected, function(_data) {
+				__dropdown__.add_event_listener(__dropdown__.events.selected, function(_data) {
 					is_open = __dropdown__.is_open;
 				});
 				

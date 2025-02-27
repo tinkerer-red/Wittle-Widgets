@@ -58,7 +58,6 @@ function __super() constructor {
 				_str = string_delete(_str, 1, _constructor_header_end);
 			}
 		}
-		log(["_str", _str])
 		//there are probably a lot more i could add but they are either really bad practice or not currently possible
 		
 		_parent_struct_name = _str;

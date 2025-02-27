@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "Super",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "_Libraries",
-    "path": "folders/_Libraries.yy",
+  "$GMScript":"v1",
+  "%Name":"Super",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Super",
+  "parent":{
+    "name":"_Libraries",
+    "path":"folders/_Libraries.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

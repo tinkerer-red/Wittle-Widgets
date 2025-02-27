@@ -35,7 +35,7 @@ var _folder = new ControlPanelFolder("Folder 1", function(){log("Folder 1")})
 	var _real2 = new ControlPanelReal("Real 2", 50, function(_real){log(["Real", _real])})
 	var _string2 = new ControlPanelString("String 2", "This is a test", function(_bool){log(["String", _bool])})
 	var _slider2 = new ControlPanelSlider("Slider 2", 0.25, -10, 10, function(_bool){log(["Slider", _bool])})
-	
+
 	_folder.add([_folder2, _button3, _checkbox2, _dropdown2, _real2, _string2, _slider2])
 	
 #endregion

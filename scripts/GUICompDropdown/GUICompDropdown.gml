@@ -25,8 +25,10 @@ function GUICompDropdown() : GUICompController() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-				static set_region = function(_left, _top, _right, _bottom) { //log(["set_region", set_region]);
-					__SUPER__.set_region(_left, _top, _right, _bottom);
+				static set_region = function(_left, _top, _right, _bottom) {
+					static __set_region = GUICompController.set_region;
+					__set_region(_left, _top, _right, _bottom);
+					
 					__button__.set_region(_left, _top, _right, _bottom);
 					
 					__controller__.set_anchor(0, __button__.region.get_height());
@@ -46,7 +48,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @param   {Bool} is_open : if the folder is open or not, true = open, false = closed;
 				/// @returns {Struct.GUICompFolder}
 				#endregion
-				static set_open = function(_is_open=!is_open){ //log(["set_open", set_open]);
+				static set_open = function(_is_open=!is_open){
 					var _prev_open = is_open
 					is_open = _is_open;
 					
@@ -139,7 +141,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @param   {Bool} header_shown : if the folder's should header should be used, true = used, false = not used
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
-				static set_header_shown = function(_header_shown=true){ //log(["set_header_shown", set_header_shown]);
+				static set_header_shown = function(_header_shown=true){
 					header_shown = _header_shown;
 					
 					return self;
@@ -475,7 +477,7 @@ function GUICompDropdown() : GUICompController() constructor {
 					_arr[_i] = new __element__(_string[_i])
 							.set_region(region.left, region.top, region.right, region.bottom)
 					
-					_arr[_i].__add_event_listener_priv__(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
+					_arr[_i].add_event_listener(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
 						var _prev_index = parent.current_index;
 						//update
 						parent.set_value(this.__find_index_in_parent__());
@@ -543,7 +545,7 @@ function GUICompDropdown() : GUICompController() constructor {
 					_arr[_i] = new __element__(_string[_i])
 							.set_region(region.left, region.top, region.right, region.bottom)
 					
-					_arr[_i].__add_event_listener_priv__(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
+					_arr[_i].add_event_listener(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
 						var _prev_index = parent.current_index;
 						//update
 						parent.set_value(this.__find_index_in_parent__());
@@ -600,7 +602,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			/// @self    GUICompHandler
 			/// @returns {Real}
 			#endregion
-			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
+			static update_component_positions = function() {
 				static __update = function(_comp) {
 					var _xx = __get_controller_archor_x__(_comp.halign);
 					var _yy = __get_controller_archor_y__(_comp.valign);
@@ -659,25 +661,25 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			#region Adopt Events
 				
-				__button__.__add_event_listener_priv__(__button__.events.mouse_over, function() {
+				__button__.add_event_listener(__button__.events.mouse_over, function() {
 					__trigger_event__(self.events.mouse_over);
 				})
-				__button__.__add_event_listener_priv__(__button__.events.pressed, function() {
+				__button__.add_event_listener(__button__.events.pressed, function() {
 					__trigger_event__(self.events.pressed);
 				})
-				__button__.__add_event_listener_priv__(__button__.events.held, function() {
+				__button__.add_event_listener(__button__.events.held, function() {
 					__trigger_event__(self.events.held);
 				})
-				__button__.__add_event_listener_priv__(__button__.events.long_press, function() {
+				__button__.add_event_listener(__button__.events.long_press, function() {
 					__trigger_event__(self.events.long_press);
 				})
-				__button__.__add_event_listener_priv__(__button__.events.released, function() {
+				__button__.add_event_listener(__button__.events.released, function() {
 					__trigger_event__(self.events.released);
 				})
 				
 			#endregion
 			
-			__button__.__add_event_listener_priv__(__button__.events.released, function() {
+			__button__.add_event_listener(__button__.events.released, function() {
 				set_open(!is_open);
 				
 				if (is_open) {
@@ -696,7 +698,8 @@ function GUICompDropdown() : GUICompController() constructor {
 					.set_region(0,0,0,0)
 			
 			
-			__SUPER__.add([__button__])
+			var _add = GUICompController.add;
+			_add([__button__])
 			
 		#endregion
 		
@@ -704,143 +707,6 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			#region Events
 				
-				
-			#endregion
-			
-			#region GML Events
-				
-				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					__mouse_on_cc__ = __mouse_on_controller__();
-					
-					__trigger_event__(self.events.pre_update);
-					
-					begin_step(__user_input__);
-					
-					if (header_shown) {
-						__button__.__begin_step__(_input);
-					}
-					
-					//run the children
-					if (is_open) {
-						__controller__.__begin_step__(__user_input__);
-						__controller__.__step__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __step__ = function(_input){ //log(["__step__", __step__]);
-					__user_input__ = _input;
-					
-					step(__user_input__);
-					if (header_shown) {
-						__button__.__step__(_input);
-					}
-					
-					//run children
-					//we actually run the step event for the drop down in the begin step to allow for proper input capturing
-					//if (is_open) {
-					//	__controller__.__step__(__user_input__);
-					//}
-					
-					
-					//close drop down if clicked elsewhere
-					var _mouse_on = __mouse_on_controller__();
-					var _mouse_on_dropdown = __controller__.__mouse_on_controller__()
-					
-					if (is_open)
-					&& (mouse_check_button_released(mb_left))
-					&& (!_mouse_on && !_mouse_on_dropdown) {
-						is_open = false;
-					}
-				
-					//close the drop down if we attempt to scroll (usually because it's inside a scroll region)
-					if (is_open)
-					&& (mouse_wheel_down() || mouse_wheel_up())
-					&& (!_mouse_on_dropdown) {
-						is_open = false;
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
-					__user_input__ = _input;
-					
-					
-					end_step(__user_input__);
-					if (header_shown) {
-						__button__.__end_step__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__end_step__(__user_input__);
-					}
-					
-					__trigger_event__(self.events.post_update);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				
-				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					
-					draw_gui_begin(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui_begin__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__draw_gui_begin__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
-					__user_input__ = _input;
-					
-					//this is just imitating the inherited components draw_gui, in this case button
-					draw_gui(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui__(_input);
-					}
-					
-					//run the drop down in the post draw event
-					//if (is_open) {
-					//	__controller__.__draw_gui__(__user_input__);
-					//}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
-					__user_input__ = _input;
-					
-					draw_gui_end(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui_end__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__draw_gui__(__user_input__);
-						__controller__.__draw_gui_end__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-					
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
-					cleanup();
-					__button__.__cleanup__();
-					__controller__.__cleanup__();
-				}
 				
 			#endregion
 			
@@ -910,19 +776,19 @@ function GUICompDropdown() : GUICompController() constructor {
 			static __adopt_element_events__ = function(_comp) {
 				#region Adopt Events
 					
-					_comp.__add_event_listener_priv__(_comp.events.mouse_over, function() {
+					_comp.add_event_listener(_comp.events.mouse_over, function() {
 						__trigger_event__(self.events.element_mouse_over);
 					})
-					_comp.__add_event_listener_priv__(_comp.events.pressed, function() {
+					_comp.add_event_listener(_comp.events.pressed, function() {
 						__trigger_event__(self.events.element_pressed);
 					})
-					_comp.__add_event_listener_priv__(_comp.events.held, function() {
+					_comp.add_event_listener(_comp.events.held, function() {
 						__trigger_event__(self.events.element_held);
 					})
-					_comp.__add_event_listener_priv__(_comp.events.long_press, function() {
+					_comp.add_event_listener(_comp.events.long_press, function() {
 						__trigger_event__(self.events.element_long_pressed);
 					})
-					_comp.__add_event_listener_priv__(_comp.events.released, function() {
+					_comp.add_event_listener(_comp.events.released, function() {
 						__trigger_event__(self.events.element_released);
 					})
 					

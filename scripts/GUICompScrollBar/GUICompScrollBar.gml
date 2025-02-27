@@ -5,7 +5,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 		
 		#region Builder Functions
 			
-			static set_region = function(_left, _top, _right, _bottom) {//log(["set_region", set_region])
+			static set_region = function(_left, _top, _right, _bottom) {
 				region.left   = _left;
 				region.top    = _top;
 				region.right  = _right;
@@ -28,7 +28,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Bool} is_vertical : If the slider is vertically oriented. true = vertical, false = horizontal
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_vertical = function(_vert) {//log(["set_vertical", set_vertical])
+			static set_vertical = function(_vert) {
 				
 				is_vertical = _vert;
 				__scrollbar__.set_vertical(_vert);
@@ -53,7 +53,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} size : The size of the canvas this scrollbar represents.
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_canvas_size = function(_size) {//log(["set_canvas_size", set_canvas_size])
+			static set_canvas_size = function(_size) {
 				canvas_size = _size;
 				
 				max_scroll = clamp(canvas_size-coverage_size, 0, canvas_size);
@@ -79,7 +79,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} size : The size of the canvas this scrollbar represents.
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_coverage_size = function(_size) {//log(["set_coverage_size", set_coverage_size])
+			static set_coverage_size = function(_size) {
 				coverage_size = _size;
 				max_scroll = clamp(canvas_size-coverage_size, 0, canvas_size);
 				
@@ -96,7 +96,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Bool} btn_used : If the buttons are used or not
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_button_usage = function(_btn_used) {//log(["set_button_usage", set_button_usage])
+			static set_button_usage = function(_btn_used) {
 				__using_buttons__ = _btn_used;
 				
 				return self;
@@ -109,7 +109,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Asset.GMSprite} increment_sprite : The nineslice sprite to use for the incrementer button (right or down).
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_button_sprites = function(_decrement_sprite, _increment_sprite) {//log(["set_button_sprites", set_button_sprites])
+			static set_button_sprites = function(_decrement_sprite, _increment_sprite) {
 				__button_inc__.set_sprite(_increment_sprite);
 				__button_dec__.set_sprite(_decrement_sprite);
 				
@@ -126,7 +126,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Asset.GMSprite} sprite : The nineslice sprite to use for the background.
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_background_sprite = function(_sprite) {//log(["set_background_sprite", set_background_sprite])
+			static set_background_sprite = function(_sprite) {
 				__scrollbar__.set_background_sprite(_sprite);
 				
 				if (__thumb_margin__ == -1) {
@@ -142,7 +142,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Asset.GMSprite} sprite : The nineslice sprite to use for the thumb.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_thumb_sprite = function(_sprite) {//log(["set_thumb_sprite", set_thumb_sprite])
+			static set_thumb_sprite = function(_sprite) {
 				__scrollbar__.set_thumb_sprite(_sprite)
 				
 				__adjust_scrollbar_thumb_size__();
@@ -156,7 +156,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} margin : The margin to set for the thumb. A margin of -1 will make the thumb automatically scale to the background's center region of its nineslice if it's enabled.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_thumb_margin = function(_margin=-1) {//log(["set_thumb_margin", set_thumb_margin])
+			static set_thumb_margin = function(_margin=-1) {
 				
 				if (__thumb_margin__ != _margin) {
 					__thumb_margin__ = _margin;
@@ -175,7 +175,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Bool} smooth : If the scroll bar should be smooth, this only effects how the buttons interact with the slider.
 			/// @returns {Struct.GUICompScrollBar}
 			#endregion
-			static set_smooth_scrolling = function(_smooth=false) {//log(["set_smooth_scrolling", set_smooth_scrolling])
+			static set_smooth_scrolling = function(_smooth=false) {
 				smooth_scrolling = _smooth;
 				
 				return self;
@@ -187,7 +187,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} value : The value to set the slider to.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_value = function(_value) {//log(["set_value", set_value])
+			static set_value = function(_value) {
 				__scrollbar__.set_value(_value)
 				value = __scrollbar__.value;
 				
@@ -200,7 +200,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} value : The normalized value to set the slider to.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_normalized_value = function(_value) {//log(["set_normalized_value", set_normalized_value])
+			static set_normalized_value = function(_value) {
 				__scrollbar__.set_normalized_value(_value);
 				normalized_value = __scrollbar__.normalized_value;
 				
@@ -213,7 +213,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} target_value : The target value the slider should smooth towards.
 			/// @returns {Struct.GUICompSlider}
 			#endregion
-			static set_target_value = function(_target_value) {//log(["set_target_value", set_target_value])
+			static set_target_value = function(_target_value) {
 				__scrollbar__.set_target_value(_target_value)
 				target_value = __scrollbar__.target_value;
 				
@@ -256,7 +256,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @self    GUICompScrollBar
 			/// @returns {Real}
 			#endregion
-			static get_value = function() {//log(["get_value", get_value])
+			static get_value = function() {
 				return value;
 			}
 			
@@ -267,7 +267,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} amount_of_view : The total amount of the view which should be moved, be default this is 0.06 which is a general standard but if you wish to include a faster scroll rate you can increase this value.
 			/// @returns {Undefined}
 			#endregion
-			static increment_scroll = function(_amount_of_view = 0.0666) {//log(["increment_scroll", increment_scroll])
+			static increment_scroll = function(_amount_of_view = 0.0666) {
 				
 				if (smooth_scrolling) {
 					var _loc = __scrollbar__.target_value + coverage_size * _amount_of_view;
@@ -289,7 +289,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			/// @param   {Real} amount_of_view : The total amount of the view which should be moved, be default this is 0.06 which is a general standard but if you wish to include a faster scroll rate you can increase this value.
 			/// @returns {Undefined}
 			#endregion
-			static decrement_scroll = function(_amount_of_view = 0.0666) {//log(["decrement_scroll", decrement_scroll])
+			static decrement_scroll = function(_amount_of_view = 0.0666) {
 				
 				if (smooth_scrolling) {
 					var _loc = __scrollbar__.target_value - coverage_size * _amount_of_view;
@@ -351,7 +351,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 		
 		#region Functions
 			
-			static __mouse_on_controller__ = function() {//log(["__mouse_on_controller__", __mouse_on_controller__])
+			static __mouse_on_controller__ = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
@@ -385,7 +385,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				return __mouse_on_cc__;
 			}
 			
-			static update_component_positions = function() {//log(["update_component_positions", update_component_positions])
+			static update_component_positions = function() {
 				//if we changed the use of buttons re build their anchor points
 				if (__prev_using_buttons__ != __using_buttons__) {
 					if (__using_buttons__) {
@@ -415,10 +415,11 @@ function GUICompScrollBar() : GUICompController() constructor {
 					__prev_using_buttons__ = __using_buttons__;
 				}
 				
-				__SUPER__.update_component_positions();
+				static __update_component_positions = GUICompController.update_component_positions;
+				__update_component_positions();
 			}
 			
-			static __update_scrollbar__ = function() {//log(["__update_scrollbar__", __update_scrollbar__])
+			static __update_scrollbar__ = function() {
 				//adjust the scroll bar
 				if (__using_buttons__) {
 					if (is_vertical) {
@@ -439,7 +440,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				}
 			}
 			
-			static __adjust_scrollbar_thumb_size__ = function() {//log(["__adjust_scrollbar_thumb_size__", __adjust_scrollbar_thumb_size__])
+			static __adjust_scrollbar_thumb_size__ = function() {
 				var _ratio = coverage_size / canvas_size;
 				
 				var _thumb_width, _thumb_height;
@@ -480,7 +481,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				__scrollbar__.set_thumb_scales(_thumb_width/_spr_width, _thumb_height/_spr_height)
 			}
 			
-			static __update_button_enables__ = function() {//log(["__update_button_enables__", __update_button_enables__])
+			static __update_button_enables__ = function() {
 				if (is_enabled) {
 					if (__scrollbar__.value == max_scroll) {
 						__button_inc__.set_enabled(false);
@@ -502,31 +503,31 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 				#region Parent child events
 					
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.long_press, function() {__trigger_event__(self.events.long_press, __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.long_press, function() {__trigger_event__(self.events.long_press, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
 					
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.value_input      , function() {__trigger_event__(self.events.value_input      , __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.value_changed    , function() {__trigger_event__(self.events.value_changed    , __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.value_incremented, function() {__trigger_event__(self.events.value_incremented, __scrollbar__.value)});
-					__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.value_decremented, function() {__trigger_event__(self.events.value_decremented, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_input      , function() {__trigger_event__(self.events.value_input      , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_changed    , function() {__trigger_event__(self.events.value_changed    , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_incremented, function() {__trigger_event__(self.events.value_incremented, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_decremented, function() {__trigger_event__(self.events.value_decremented, __scrollbar__.value)});
 					
-					__button_inc__.__add_event_listener_priv__(__button_inc__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__button_inc__.__add_event_listener_priv__(__button_inc__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__button_inc__.__add_event_listener_priv__(__button_inc__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__button_inc__.__add_event_listener_priv__(__button_inc__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
 					
-					__button_dec__.__add_event_listener_priv__(__button_dec__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__button_dec__.__add_event_listener_priv__(__button_dec__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__button_dec__.__add_event_listener_priv__(__button_dec__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__button_dec__.__add_event_listener_priv__(__button_dec__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
 					
 				#endregion
 				
 				//self
-				__add_event_listener_priv__(self.events.value_input, function(){
+				add_event_listener(self.events.value_input, function(){
 					value            = __scrollbar__.value;
 					normalized_value = __scrollbar__.normalized_value;
 					target_value     = __scrollbar__.target_value;
@@ -535,18 +536,18 @@ function GUICompScrollBar() : GUICompController() constructor {
 				});
 				
 				//scrollbar
-				__scrollbar__.__add_event_listener_priv__(__scrollbar__.events.post_update, function(){
+				__scrollbar__.add_event_listener(__scrollbar__.events.post_update, function(){
 					if (__scrollbar__.__is_on_focus__) {
 						__update_button_enables__();
 					}
 				});
 				
 				//increment button events
-				__button_inc__.__add_event_listener_priv__(__button_inc__.events.pressed, function(){
+				__button_inc__.add_event_listener(__button_inc__.events.pressed, function(){
 					__button_held_time__ = 0;
 					increment_scroll();
 				});
-				__button_inc__.__add_event_listener_priv__(__button_inc__.events.held, function(){
+				__button_inc__.add_event_listener(__button_inc__.events.held, function(){
 					__button_held_time__ += game_get_speed(gamespeed_fps) * 0.000001 * delta_time;
 					
 					if (__button_held_time__ > game_get_speed(gamespeed_fps)*0.333) {
@@ -555,11 +556,11 @@ function GUICompScrollBar() : GUICompController() constructor {
 				});
 				
 				//decrement button events
-				__button_dec__.__add_event_listener_priv__(__button_dec__.events.pressed, function(){
+				__button_dec__.add_event_listener(__button_dec__.events.pressed, function(){
 					__button_held_time__ = 0;
 					decrement_scroll();
 				});
-				__button_dec__.__add_event_listener_priv__(__button_dec__.events.held, function(){
+				__button_dec__.add_event_listener(__button_dec__.events.held, function(){
 					__button_held_time__ += game_get_speed(gamespeed_fps) * 0.000001 * delta_time;
 					
 					if (__button_held_time__ > game_get_speed(gamespeed_fps)*0.333) {
@@ -569,137 +570,11 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 			#endregion
 			
-			#region GML Events
-				
-				static __begin_step__ = function(_input) {//log(["__begin_step__", __begin_step__])
-					if (should_safety_check) {
-						if (is_nan(coverage_size / canvas_size)) {
-							show_error(string("Scroll bar is producing a NaN, make sure to set it's sizes with \"set_coverage_size()\" and \"set_canvas_size()\" \ncoverage_size : {0}\ncanvas_size : {1}", coverage_size, canvas_size), true);
-						}
-					}
-					__post_remove__();
-					
-					__user_input__ = _input;
-					__mouse_on_cc__ = __mouse_on_controller__();
-					__trigger_event__(self.events.pre_update);
-					
-					begin_step(_input);
-					
-					
-					//run the children
-					__scrollbar__.__begin_step__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__begin_step__(_input);
-						__button_dec__.__begin_step__(_input);
-					}
-					
-					//return the consumed inputs
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __step__ = function(_input) {//log(["__step__", __step__])
-					__user_input__ = _input;
-					
-					step(_input);
-					
-					__mouse_on_cc__ = __mouse_on_controller__();
-					
-					//run the children
-					__scrollbar__.__step__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__step__(_input);
-						__button_dec__.__step__(_input);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __end_step__ = function(_input) {//log(["__end_step__", __end_step__])
-					__user_input__ = _input;
-					
-					end_step(_input);
-					
-					//run the children
-					__scrollbar__.__end_step__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__end_step__(_input);
-						__button_dec__.__end_step__(_input);
-					}
-					
-					__trigger_event__(self.events.post_update);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				
-				static __draw_gui_begin__ = function(_input) {//log(["__draw_gui_begin__", __draw_gui_begin__])
-					__post_remove__();
-					
-					__user_input__ = _input;
-					
-					draw_gui_begin(_input);
-					
-					//run the children
-					__scrollbar__.__draw_gui_begin__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__draw_gui_begin__(_input);
-						__button_dec__.__draw_gui_begin__(_input);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui__ = function(_input) {//log(["__draw_gui__", __draw_gui__])
-					__user_input__ = _input;
-					
-					draw_gui(_input);
-					
-					//run the children
-					__scrollbar__.__draw_gui__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__draw_gui__(_input);
-						__button_dec__.__draw_gui__(_input);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-					
-				}
-				static __draw_gui_end__ = function(_input) {//log(["__draw_gui_end__", __draw_gui_end__])
-					__user_input__ = _input;
-					
-					draw_gui_end(_input);
-					
-					//run the children
-					__scrollbar__.__draw_gui_end__(_input);
-					if (__using_buttons__) {
-						__button_inc__.__draw_gui_end__(_input);
-						__button_dec__.__draw_gui_end__(_input);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-					
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				static __cleanup__ = function() {//log(["__cleanup__", __cleanup__])
-					cleanup();
-					
-					//run the children
-					__scrollbar__.__cleanup__();
-					__button_inc__.__cleanup__();
-					__button_dec__.__cleanup__();
-					
-					delete __scrollbar__;
-					delete __button_inc__;
-					delete __button_dec__;
-				}
-				
-			#endregion
-			
 		#endregion
 		
 	#endregion
 	
-	static draw_debug = function(){//log(["draw_debug", draw_debug])
+	static draw_debug = function(){
 		if (!should_draw_debug) return;
 		
 		draw_rectangle(

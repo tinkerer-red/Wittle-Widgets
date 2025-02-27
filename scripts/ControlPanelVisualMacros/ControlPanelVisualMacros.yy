@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "ControlPanelVisualMacros",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "ControlPanel UI",
-    "path": "folders/_Libraries/ControlPanel UI.yy",
+  "$GMScript":"v1",
+  "%Name":"ControlPanelVisualMacros",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ControlPanelVisualMacros",
+  "parent":{
+    "name":"ControlPanel",
+    "path":"folders/_Libraries/ControlPanel.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

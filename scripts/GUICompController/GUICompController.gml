@@ -8,7 +8,7 @@
 function GUICompController() : GUICompCore() constructor {
 	debug_name = "GUICompController";
 	
-	static draw_debug = function() { //log(["draw_debug", draw_debug]);
+	static draw_debug = function() {
 		if (!should_draw_debug) return;
 		
 		draw_set_color(c_orange)
@@ -44,8 +44,9 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) { //log(["set_region", set_region]);
-				__SUPER__.set_region(_left, _top, _right, _bottom);
+			static set_region = function(_left, _top, _right, _bottom) {
+				static __set_region = GUICompCore.set_region;
+				__set_region(_left, _top, _right, _bottom);
 				
 				__update_controller_region__();
 				
@@ -59,7 +60,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Bool} is_enabled : If the component and all sub components should be enabled or not.
 			/// @returns {Struct.GUICompController}
 			#endregion
-			static set_enabled = function(_is_enabled) { //log(["set_enabled", set_enabled]);
+			static set_enabled = function(_is_enabled) {
 				is_enabled = _is_enabled;
 				
 				if (!__is_empty__) {
@@ -100,7 +101,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
-			static add = function(_comp) { //log(["add", add]);
+			static add = function(_comp) {
 				__is_empty__ = false;
 				
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
@@ -124,7 +125,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
-			static insert = function(_index, _comp) { //log(["insert", insert]);
+			static insert = function(_index, _comp) {
 				__is_empty__ = false;
 				
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
@@ -144,7 +145,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index of the component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
-			static remove = function(_index) { //log(["remove", remove]);
+			static remove = function(_index) {
 				array_push(__remove_requests__, _index);
 			}
 			
@@ -155,7 +156,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Struct.GUICompController} component : The component you wish to find the index of.
 			/// @returns {Real}
 			#endregion
-			static find = function(_comp) { //log(["find", find]);
+			static find = function(_comp) {
 				//Find it in the list
 				var _i = 0; repeat(__children_count__) {
 					if (__children__[_i].__cid__ == _comp.__cid__) {
@@ -171,7 +172,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompHandler
 			/// @returns {Real}
 			#endregion
-			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
+			static update_component_positions = function() {
 				if (!__is_empty__) {
 					var _anchor_point, _comp, _xx, _yy;
 					
@@ -200,7 +201,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Real}
 			#endregion
-			static children_count = function() { //log(["children_count", children_count]);
+			static children_count = function() {
 				return __children_count__;
 			}
 			
@@ -210,7 +211,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Real}
 			#endregion
-			static children_count_all = function() { //log(["children_count_all", children_count_all]);
+			static children_count_all = function() {
 				var _comp;
 				var _children_count = 0;
 				
@@ -233,7 +234,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Undefined}
 			#endregion
-			static clear_children = function() { //log(["clear_children", clear_children]);
+			static clear_children = function() {
 				var _i=0; repeat(__children_count__) {
 					__children__[_i].__cleanup__();
 					delete __children__[_i]
@@ -249,7 +250,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Array<Struct>}
 			#endregion
-			static get_children = function() { //log(["get_children", get_children]);
+			static get_children = function() {
 				return __children__
 			}
 			
@@ -259,7 +260,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() { //log(["mouse_on_comp", mouse_on_comp]);
+			static mouse_on_comp = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__)
 				&& (!__parent__.__mouse_on_cc__) {
@@ -303,7 +304,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {type} name : desc
 			/// @returns {type}
 			#endregion
-			static adopt_builder_functions = function(_comp) { //log(["adopt_builder_functions", adopt_builder_functions]);
+			static adopt_builder_functions = function(_comp) {
 				var _arr = _comp.get_builder_functions();
 				
 				//var _key;
@@ -344,138 +345,6 @@ function GUICompController() : GUICompCore() constructor {
 		
 		#region Functions
 			
-			#region GML Events
-				
-				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					__mouse_on_cc__ = __mouse_on_controller__();
-					
-					__trigger_event__(self.events.pre_update);
-					
-					begin_step(_input);
-					
-					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__begin_step__(_input);
-					}//end repeat loop
-					
-					//return the consumed inputs
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __step__ = function(_input) { //log(["__step__", __step__]);
-					__user_input__ = _input;
-		
-					step(_input);
-		
-					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__step__(_input);
-					}//end repeat loop
-		
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
-					__user_input__ = _input;
-		
-					end_step(_input);
-		
-					//run the children
-					var _comp, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__end_step__(_input);
-					}//end repeat loop
-					
-					__trigger_event__(self.events.post_update);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				
-				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
-					__post_remove__();
-		
-					__user_input__ = _input;
-		
-					draw_gui_begin(_input);
-		
-					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui_begin__(_input);
-					_i+=1;}//end repeat loop
-		
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
-					__user_input__ = _input;
-		
-					draw_gui(_input);
-				
-					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui__(_input);
-					_i+=1;}//end repeat loop
-				
-					if (__user_input__.consumed) { capture_input(); };
-					
-				}
-				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
-					__user_input__ = _input;
-		
-					draw_gui_end(_input);
-		
-					//run the children
-					var _comp, xx, yy;
-					var _i=0; repeat(__children_count__) {
-						_comp = __children__[_i];
-						//xx = _comp.x - x;
-						//yy = _comp.y - y;
-						_comp.__draw_gui_end__(_input);
-					_i+=1;}//end repeat loop
-		
-					if (__user_input__.consumed) { capture_input(); };
-		
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
-					cleanup();
-		
-					if (!__is_empty__) {
-						var _comp;
-						var _i=0; repeat(__children_count__) {
-							_comp = __children__[_i];
-							_comp.__cleanup__();
-							delete _comp;
-						_i+=1;}//end repeat loop
-			
-					}
-				}
-				
-			#endregion
-			
 			#region jsDoc
 			/// @func    __remove__()
 			/// @desc    This function is responsable for actually deleting the component from the children.
@@ -483,7 +352,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index of the component to remove.
 			/// @ignore
 			#endregion
-			static __remove__ = function(_index) { //log(["__remove__", __remove__]);
+			static __remove__ = function(_index) {
 				//clean up the component
 				__children__[_index].__cleanup__();
 				delete __children__[_index];
@@ -494,7 +363,7 @@ function GUICompController() : GUICompCore() constructor {
 				
 				update_component_positions();
 				__update_controller_region__();
-				if (__children_count__ == 0) { __is_empty__ = true; };
+				if (__children_count__ == 0) {__is_empty__ = true; };
 			}
 			
 			#region jsDoc
@@ -503,13 +372,13 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @ignore
 			#endregion
-			static __post_remove__ = function() { //log(["__post_remove__", __post_remove__]);
+			static __post_remove__ = function() {
 				//sort the array to contain the largest numbers first, as we will be cycling from back to front
 				array_sort(__remove_requests__, true)
 		
 				var _size = array_length(__remove_requests__);
 				var _index;
-				var _i=_size; repeat(_size) { _i--;
+				var _i=_size; repeat(_size) {_i--;
 					__remove__(array_pop(__remove_requests__));
 				}//end repeat loop
 			}
@@ -520,7 +389,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @self    GUICompController
 			/// @ignore
 			#endregion
-			static __reset_focus_to_false__ = function() { //log(["__reset_focus_to_false__", __reset_focus_to_false__]);
+			static __reset_focus_to_false__ = function() {
 				//this function is used to unfocus all sub components
 				if (!__is_empty__) {
 					var _comp;
@@ -540,7 +409,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Bool}
 			/// @ignore
 			#endregion
-			static __mouse_on_controller__ = function() { //log(["__mouse_on_controller__", __mouse_on_controller__]);
+			static __mouse_on_controller__ = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_cc__) {
@@ -582,7 +451,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Struct.GUICompController}
 			/// @ignore
 			#endregion
-			static __update_controller_region__ = function() { //log(["__update_controller_region__", __update_controller_region__]);
+			static __update_controller_region__ = function() {
 				#region new
 					
 					var _left   = region.left;
@@ -697,7 +566,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
-			static __validate_component_additions__ = function(_arr) { //log(["__validate_component_additions__", __validate_component_additions__]);
+			static __validate_component_additions__ = function(_arr) {
 				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
@@ -743,7 +612,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
-			static __validate_component_positions__ = function(_arr) { //log(["__validate_component_positions__", __validate_component_positions__]);
+			static __validate_component_positions__ = function(_arr) {
 				if (should_safety_check) {
 					var _cid, _j, _found_count, _comp;
 					var _size = array_length(_arr);
@@ -841,7 +710,7 @@ function GUICompController() : GUICompCore() constructor {
 			/// @param   {Real} index : The index the array will be inserted into. Note: a value of -1 will push the array to the end.
 			/// @ignore
 			#endregion
-			static __include_children__ = function(_arr, _index) { //log(["__include_children__", __include_children__]);
+			static __include_children__ = function(_arr, _index) {
 				var _size, _i, _comp;
 				
 				_size = array_length(_arr);

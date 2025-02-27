@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "GUICompCore",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "_Components",
-    "path": "folders/_Libraries/Wittle Widgets/_Components.yy",
+  "$GMScript":"v1",
+  "%Name":"GUICompCore",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"GUICompCore",
+  "parent":{
+    "name":"_Components",
+    "path":"folders/_Libraries/Wittle Widgets/_Components.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

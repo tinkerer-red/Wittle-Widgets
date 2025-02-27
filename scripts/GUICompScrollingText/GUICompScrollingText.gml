@@ -14,7 +14,8 @@ function GUICompScrollingText() : GUICompCore() constructor {
 		#region Builder functions
 			
 			static set_region = function(_left, _top, _right, _bottom) {
-				__SUPER__.set_region(_left, _top, _right, _bottom)
+				static __set_region = GUICompCore.set_region;
+				__set_region(_left, _top, _right, _bottom)
 				
 				__update_clip_region__()
 				

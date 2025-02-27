@@ -21,7 +21,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @param   {Real} yoff : The vertical offset distance from the folder's y
 			/// @returns {Struct.GUICompFolder}
 			#endregion
-			static set_children_offsets = function(_xoff=0,_yoff=0){ //log(["set_children_offsets", set_children_offsets]);
+			static set_children_offsets = function(_xoff=0,_yoff=0){
 				//sets the indenting for sub components from the previous component
 				
 				__controller__.set_children_offsets(_xoff, _yoff);
@@ -35,7 +35,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @param   {Bool} is_open : if the folder is open or not, true = open, false = closed;
 			/// @returns {Struct.GUICompFolder}
 			#endregion
-			static set_open = function(_is_open=true){ //log(["set_open", set_open]);
+			static set_open = function(_is_open=true){
 				is_open = !is_open;
 				update_component_positions();
 				
@@ -48,7 +48,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @param   {Bool} header_shown : if the folder's should header should be used, true = used, false = not used
 			/// @returns {Struct.GUICompFolder}
 			#endregion
-			static set_header_shown = function(_header_shown=true){ //log(["set_header_shown", set_header_shown]);
+			static set_header_shown = function(_header_shown=true){
 				header_shown = _header_shown;
 				
 				return self;
@@ -82,7 +82,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
 			/// @returns {Undefined}
 			#endregion
-			static add = function(_comp) { //log(["add", add]);
+			static add = function(_comp) {
 				
 				var _r = __controller__.add(_comp);
 				
@@ -102,7 +102,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the folder.
 			/// @returns {Undefined}
 			#endregion
-			static insert = function(_comp, _index) { //log(["insert", insert]);
+			static insert = function(_comp, _index) {
 				
 				var _r = __controller__.add(_comp);
 				
@@ -119,7 +119,7 @@ function GUICompFolder() : GUICompController() constructor {
 			/// @self    GUICompFolder
 			/// @returns {Real}
 			#endregion
-			static update_component_positions = function() { //log(["update_component_positions", update_component_positions]);
+			static update_component_positions = function() {
 				var _changed = false;
 				
 				var _anchor_point, _comp, _xx, _yy;
@@ -156,13 +156,14 @@ function GUICompFolder() : GUICompController() constructor {
 			
 			__controller__ = new GUICompControllerStacked();
 			
-			__SUPER__.add([__button__, __controller__])
+			var _add = GUICompController.add;
+			_add([__button__, __controller__]);
 			
 		#endregion
 		
 		#region Functions
 			
-			__button__.__add_event_listener_priv__(__button__.events.released, function() {
+			__button__.add_event_listener(__button__.events.released, function() {
 				set_open(is_open);
 				
 				if (is_open) {
@@ -173,123 +174,7 @@ function GUICompFolder() : GUICompController() constructor {
 				}
 			})
 			
-			#region GML Events
-				
-				static __begin_step__ = function(_input) { //log(["__begin_step__", __begin_step__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					__mouse_on_cc__ = __mouse_on_controller__();
-					
-					__trigger_event__(self.events.pre_update);
-					
-					begin_step(__user_input__);
-					
-					if (header_shown) {
-						__button__.__begin_step__(_input);
-					}
-					
-					//run the children
-					if (is_open) {
-						__controller__.__begin_step__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __step__ = function(_input){ //log(["__step__", __step__]);
-					__user_input__ = _input;
-					
-					step(__user_input__);
-					if (header_shown) {
-						__button__.__step__(_input);
-					}
-					
-					//run children
-					if (is_open) {
-						__controller__.__step__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __end_step__ = function(_input) { //log(["__end_step__", __end_step__]);
-					__user_input__ = _input;
-					
-					
-					end_step(__user_input__);
-					if (header_shown) {
-						__button__.__end_step__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__end_step__(__user_input__);
-					}
-					
-					__trigger_event__(self.events.post_update);
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				
-				static __draw_gui_begin__ = function(_input) { //log(["__draw_gui_begin__", __draw_gui_begin__]);
-					__post_remove__();
-					
-					__user_input__ = _input;
-					
-					draw_gui_begin(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui_begin__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__draw_gui_begin__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui__ = function(_input) { //log(["__draw_gui__", __draw_gui__]);
-					__user_input__ = _input;
-					
-					//this is just imitating the inherited components draw_gui, in this case button
-					draw_gui(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui__(_input);
-					}
-					
-					//run children
-					if (is_open) {
-						__controller__.__draw_gui__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-				}
-				static __draw_gui_end__ = function(_input) { //log(["__draw_gui_end__", __draw_gui_end__]);
-					__user_input__ = _input;
-					
-					draw_gui_end(__user_input__);
-					if (header_shown) {
-						__button__.__draw_gui_end__(_input);
-					}
-					
-					if (is_open) {
-						__controller__.__draw_gui_end__(__user_input__);
-					}
-					
-					if (__user_input__.consumed) { capture_input(); };
-					
-					xprevious = x;
-					yprevious = y;
-					
-					draw_debug();
-				}
-				
-				static __cleanup__ = function() { //log(["__cleanup__", __cleanup__]);
-					cleanup();
-					__button__.__cleanup__();
-					__controller__.__cleanup__();
-				}
-				
-			#endregion
-			
-			static __update_controller_region__ = function() { //log(["__update_controller_region__", __update_controller_region__]);
+			static __update_controller_region__ = function() {
 				var _left   = region.left;
 				var _top    = region.top;
 				var _right  = region.right;

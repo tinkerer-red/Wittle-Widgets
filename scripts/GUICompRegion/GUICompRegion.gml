@@ -16,7 +16,8 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_region = function(_left, _top, _right, _bottom) {
-				__SUPER__.set_region(_left, _top, _right, _bottom);
+				static __set_region = GUICompController.set_region;
+				__set_region(_left, _top, _right, _bottom);
 				
 				__scroll_horz__.set_coverage_size(get_coverage_width());
 				__scroll_vert__.set_coverage_size(get_coverage_height());
@@ -310,7 +311,7 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_horz_scroll = function() {//log(["get_horz_scroll", get_horz_scroll])
+			static get_horz_scroll = function() {
 				return scroll.x_off;
 			}
 			#region jsDoc
@@ -319,7 +320,7 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_vert_scroll = function() {//log(["get_vert_scroll", get_vert_scroll])
+			static get_vert_scroll = function() {
 				return scroll.y_off;
 			}
 			
@@ -477,186 +478,6 @@ function GUICompRegion() : GUICompController() constructor {
 		
 		#region Functions
 			
-			// TODO : Make all of the other gml events which also handle the scrollbars
-			
-			static __step__ = function(_input) {
-				__user_input__ = _input;
-				
-				__mouse_on_cc__ = __mouse_on_controller__();
-				
-				#region update scrollbars
-					
-					update_component_positions();
-					
-					//run the scrollbars
-					if (!__user_input__.consumed) {
-						if (!__scroll_horz_hidden__) __scroll_horz__.__step__(__user_input__);
-						if (!__scroll_vert_hidden__) __scroll_vert__.__step__(__user_input__);
-					}
-					
-				#endregion
-				
-				//run children
-				if (!__is_empty__)
-				&& (is_open) {
-					//run the children
-					var _component, xx, yy;
-					var _i=__children_count__; repeat(__children_count__) { _i--;
-						_component = __children__[_i];
-						
-						//update children location
-						//_component.x -= x - _x);
-						//_component.y -= y - _y);
-						_component.__step__(__user_input__);
-					}//end repeat loop
-				}
-				
-				//note: we run the children after the dragging options but before the click to get accurate click input capturing
-				
-				//mouse wheel scrolling
-				if (__mouse_on_cc__) {
-					//mouse wheel scrolling
-					if (mouse_wheel_up()) {
-						if (scroll.smooth) {
-							if (keyboard_check(vk_shift)) {
-								__scroll_horz__.set_target_value(__scroll_horz__.target_value - 50)
-							}
-							else{
-								__scroll_vert__.set_target_value(__scroll_vert__.target_value - 50)
-							}
-						}
-						else{
-							if (keyboard_check(vk_shift)) {
-								__scroll_horz__.set_value(__scroll_horz__.target_value - 50)
-							}
-							else{
-								__scroll_vert__.set_value(__scroll_vert__.target_value - 50)
-							}
-						}
-						capture_input();
-					}
-					if (mouse_wheel_down()) {
-						if (scroll.smooth) {
-							if (keyboard_check(vk_shift)) {
-								__scroll_horz__.set_target_value(__scroll_horz__.target_value + 50)
-							}
-							else{
-								__scroll_vert__.set_target_value(__scroll_vert__.target_value + 50)
-							}
-						}
-						else{
-							if (keyboard_check(vk_shift)) {
-								__scroll_horz__.set_value(__scroll_horz__.target_value + 50)
-							}
-							else{
-								__scroll_vert__.set_value(__scroll_vert__.target_value + 50)
-							}
-						}
-						capture_input();
-					}
-				}
-				
-				step(__user_input__);
-				
-				if (__user_input__.consumed) { capture_input(); };
-			}
-			
-			static __end_step__ = function(_input) {
-				if (__mouse_on_cc__) {
-					if (mouse_check_button(mb_left))
-					|| (mouse_check_button(mb_right))
-					|| (mouse_check_button_released(mb_left))
-					|| (mouse_check_button_released(mb_right)) {
-						capture_input();
-					}
-				}
-				
-				__trigger_event__(self.events.post_update);
-			}
-			
-			static __draw_gui__ = function(_input) {
-				__user_input__ = _input;
-				
-				var _using_shader = false;
-				if (!__scroll_horz_hidden__)
-				|| (!__scroll_vert_hidden__) {
-					_using_shader = true;
-					__shader_set__();
-				}
-				
-				draw_gui(__user_input__);
-				
-				//run children
-				if (!__is_empty__)
-				&& (is_open) {
-					//run the children
-					var _component;
-					var _i=0; repeat(__children_count__) {
-						_component = __children__[_i];
-						_component.__draw_gui__(__user_input__);
-					_i+=1;}//end repeat loop
-					
-				}
-				
-				if (_using_shader) {
-					__shader_reset__();
-				}
-				
-				//draw the sliders ontop
-				if (!__scroll_horz_hidden__) __scroll_horz__.__draw_gui__(__user_input__);
-				if (!__scroll_vert_hidden__) __scroll_vert__.__draw_gui__(__user_input__);
-				
-				
-				if (__user_input__.consumed) { capture_input(); };
-				
-			}
-			static __draw_gui_end__ = function(_input) {
-				__user_input__ = _input;
-				
-				var _using_shader = false;
-				if (!__scroll_horz_hidden__)
-				|| (!__scroll_vert_hidden__) {
-					_using_shader = true;
-					__shader_set__({
-						left   : region.left,
-						top    : region.top,
-						right  : region.right,
-						bottom : 999999
-					});
-				}
-				
-				
-				draw_gui_end(__user_input__);
-				
-				//run children
-				if (!__is_empty__)
-				&& (is_open) {
-					//run the children
-					var _component;
-					var _i=0; repeat(__children_count__) {
-						_component = __children__[_i];
-						_component.__draw_gui_end__(__user_input__);
-					_i+=1;}//end repeat loop
-					
-				}
-				
-				if (_using_shader) {
-					__shader_reset__();
-				}
-				
-				//draw the sliders ontop of the surface
-				__scroll_vert__.__draw_gui_end__(__user_input__);
-				__scroll_horz__.__draw_gui_end__(__user_input__);
-				
-				if (__user_input__.consumed) { capture_input(); };
-				
-				xprevious = x;
-				yprevious = y;
-				
-				draw_debug();
-				
-			}
-			
 			static __update_controller_region__ = function() {
 				__controller_region__.left   = region.left;
 				__controller_region__.top    = region.top;
@@ -720,4 +541,3 @@ function GUICompRegion() : GUICompController() constructor {
 	//post init
 	__update_controller_region__();
 }
-

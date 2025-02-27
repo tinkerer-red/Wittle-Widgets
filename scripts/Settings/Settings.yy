@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "Settings",
-  "isCompatibility": false,
-  "isDnD": false,
-  "parent": {
-    "name": "Settings",
-    "path": "folders/_Config/Settings.yy",
+  "$GMScript":"v1",
+  "%Name":"Settings",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Settings",
+  "parent":{
+    "name":"Settings",
+    "path":"folders/_Config/Settings.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

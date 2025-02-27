@@ -9,7 +9,8 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				_top    = 0;
 				_bottom = max(__checkbox__.sprite.height, font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				__SUPER__.set_region(_left, _top, _right, _bottom)
+				static __set_region = GUICompController.set_region;
+				__set_region(_left, _top, _right, _bottom)
 				
 				__button__.set_region(_left, _top, _right, _bottom)
 				
@@ -156,7 +157,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					__add_event_listener_priv__(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_update, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(floor(_width))
@@ -165,7 +166,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				}
 				
 				//adjust the visuals so all components are simillar
-				__add_event_listener_priv__(self.events.post_update, function(_data) {
+				add_event_listener(self.events.post_update, function(_data) {
 					
 					var _image_index = (is_enabled) ? max(__checkbox__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
 					
@@ -201,13 +202,13 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				});
 				
 				//callback
-				__button__.__add_event_listener_priv__(__button__.events.released, function(_data) {
+				__button__.add_event_listener(__button__.events.released, function(_data) {
 					__checkbox__.set_value(!__checkbox__.is_checked)
 					callback(__checkbox__.is_checked);
 				});
 				
 				//callback
-				__checkbox__.__add_event_listener_priv__(__checkbox__.events.released, function(_data) {
+				__checkbox__.add_event_listener(__checkbox__.events.released, function(_data) {
 					callback(__checkbox__.is_checked);
 				});
 				

@@ -720,3 +720,4 @@ function GUICompRegion() : GUICompController() constructor {
 	//post init
 	__update_controller_region__();
 }
+

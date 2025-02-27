@@ -49,7 +49,7 @@
   "origin": 0,
   "parent": {
     "name": "Assets",
-    "path": "folders/_Libraries/ControlPanel/Assets.yy",
+    "path": "folders/_Libraries/ControlPanel UI/Assets.yy",
   },
   "preMultiplyAlpha": false,
   "sequence": {

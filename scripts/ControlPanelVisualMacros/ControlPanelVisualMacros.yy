@@ -5,7 +5,7 @@
   "isCompatibility": false,
   "isDnD": false,
   "parent": {
-    "name": "ControlPanel",
-    "path": "folders/_Libraries/ControlPanel.yy",
+    "name": "ControlPanel UI",
+    "path": "folders/_Libraries/ControlPanel UI.yy",
   },
 }

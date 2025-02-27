@@ -6,6 +6,6 @@
   "isDnD": false,
   "parent": {
     "name": "Components",
-    "path": "folders/_Libraries/ControlPanel/Components.yy",
+    "path": "folders/_Libraries/ControlPanel UI/Components.yy",
   },
 }

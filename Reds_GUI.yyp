@@ -15,9 +15,9 @@
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Settings","folderPath":"folders/_Config/Settings.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_internal","folderPath":"folders/_Config/Settings/_internal.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_Libraries","folderPath":"folders/_Libraries.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel","folderPath":"folders/_Libraries/ControlPanel.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/_Libraries/ControlPanel/Assets.yy",},
-    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/_Libraries/ControlPanel/Components.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ControlPanel UI","folderPath":"folders/_Libraries/ControlPanel UI.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Assets","folderPath":"folders/_Libraries/ControlPanel UI/Assets.yy",},
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Components","folderPath":"folders/_Libraries/ControlPanel UI/Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"Wittle Widgets","folderPath":"folders/_Libraries/Wittle Widgets.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_Components","folderPath":"folders/_Libraries/Wittle Widgets/_Components.yy",},
     {"resourceType":"GMFolder","resourceVersion":"1.0","name":"_system","folderPath":"folders/_Libraries/Wittle Widgets/_Components/_system.yy",},
@@ -42,7 +42,7 @@
   "isEcma": false,
   "LibraryEmitters": [],
   "MetaData": {
-    "IDEVersion": "2023.600.0.368",
+    "IDEVersion": "2023.6.0.92",
   },
   "resources": [
     {"id":{"name":"_WittleWidgetsGUIConfig","path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},},

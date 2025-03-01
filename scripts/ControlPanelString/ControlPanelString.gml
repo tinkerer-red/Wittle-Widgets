@@ -4,23 +4,23 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 		
 		#region Builder functions
 			
-			static set_region = function(_left, _top, _right, _bottom) {
-				var _info = sprite_get_nineslice(__button__.sprite.index)
+			static set_size = function(_left, _top, _right, _bottom) {
+				var _info = sprite_get_nineslice(__button__.sprite_index)
 				_top    = 0;
 				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				static __set_region = GUICompController.set_region;
-				__set_region(_left, _top, _right, _bottom)
+				static __set_size = GUICompController.set_size;
+				__set_size(_left, _top, _right, _bottom)
 				
-				__button__.set_region(_left, _top, _right, _bottom)
+				__button__.set_size(_left, _top, _right, _bottom)
 				
 				var _width = _right - _info.left - _info.right;
 				
 				__textbox__.set_width(_width*0.5)
-				__textbox__.set_anchor(-_info.right - _width*0.5, _info.top)
+				__textbox__.set_offset(-_info.right - _width*0.5, _info.top)
 				
 				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
-				__scrolling_text__.set_region(
+				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
 						_width*0.5 - _info.right,
@@ -119,24 +119,24 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 		#region Variables
 			
 			__button__ = new GUICompButtonText()
-				.set_anchor(0,0)
+				.set_offset(0,0)
 				.set_text("")
 				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
-			var _info = sprite_get_nineslice(__button__.sprite.index);
+			var _info = sprite_get_nineslice(__button__.sprite_index);
 			
 			var _ideal_h = font_get_info(__CP_FONT).size + _info.top + _info.bottom;
 			
-			__button__.set_region(0,0,0,_ideal_h)
+			__button__.set_size(0,0,0,_ideal_h)
 			
 			__textbox__ = new GUICompTextbox()
 				.set_multiline(false)
-				.set_anchor(-_info.right, _info.top)
+				.set_offset(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
-				.set_region(0, 0, 0, _ideal_h)
+				.set_size(0, 0, 0, _ideal_h)
 				.set_scrollbar_sizes(0, 0)
 				.set_text(string(_str))
 				.set_text_font(__CP_FONT)
@@ -150,7 +150,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_anchor(_info.left, 0)
+				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -179,13 +179,13 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
 			
-			var _info = sprite_get_nineslice(__button__.sprite.index)
+			var _info = sprite_get_nineslice(__button__.sprite_index)
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
 			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
 			
-			set_region(_left, _top, _right, _bottom);
+			set_size(_left, _top, _right, _bottom);
 			
 		#endregion
 		
@@ -199,7 +199,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					add_event_listener(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_step, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
@@ -208,12 +208,12 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				}
 				
 				//adjust the visuals so all components are simillar
-				add_event_listener(self.events.post_update, function(_data) {
+				add_event_listener(self.events.post_step, function(_data) {
 					
-					var _image_index = (is_enabled) ? __button__.image.index : GUI_IMAGE_DISABLED;
+					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
 					_image_index = max(_image_index, __textbox__.__is_on_focus__)
 					
-					__button__.image.index   = _image_index;
+					__button__.image_index   = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
@@ -247,7 +247,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
 						__is_on_focus__ = true;
-						__trigger_event__(self.events.on_focus);
+						trigger_event(self.events.on_focus);
 						
 						var _line_last = curt.length - 1;
 						var _line_last_length = string_length(curt.lines[_line_last]);

@@ -130,8 +130,8 @@
   "resourceType":"GMProject",
   "resourceVersion":"2.0",
   "RoomOrderNodes":[
-    {"roomId":{"name":"rmControlPanel","path":"rooms/rmControlPanel/rmControlPanel.yy",},},
     {"roomId":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
+    {"roomId":{"name":"rmControlPanel","path":"rooms/rmControlPanel/rmControlPanel.yy",},},
     {"roomId":{"name":"rm_stand_alone_xamples","path":"rooms/rm_stand_alone_xamples/rm_stand_alone_xamples.yy",},},
   ],
   "templateType":null,

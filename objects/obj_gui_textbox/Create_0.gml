@@ -4,7 +4,7 @@ var _ideal_h = font_get_info(__CP_FONT).size
 widget = new GUICompTextbox()
 	.set_alignment(fa_right, fa_top)
 	.set_text_placeholder("String...")
-	.set_region(0, 0, 300, 100)
+	.set_size(0, 0, 300, 100)
 	.set_text("")
 	.set_text_font(__CP_FONT)
 	//.set_text_color(c_white)

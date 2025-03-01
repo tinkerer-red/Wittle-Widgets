@@ -6,7 +6,7 @@ function GUICompRegion() : GUICompController() constructor {
 		#region Builder functions
 			
 			#region jsDoc
-			/// @func    set_region()
+			/// @func    set_size()
 			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
 			/// @self    GUICompCore
 			/// @param   {real} left : The left side of the bounding box
@@ -15,9 +15,9 @@ function GUICompRegion() : GUICompController() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {
-				static __set_region = GUICompController.set_region;
-				__set_region(_left, _top, _right, _bottom);
+			static set_size = function(_left, _top, _right, _bottom) {
+				static __set_size = GUICompController.set_size;
+				__set_size(_left, _top, _right, _bottom);
 				
 				__scroll_horz__.set_coverage_size(get_coverage_width());
 				__scroll_vert__.set_coverage_size(get_coverage_height());
@@ -25,17 +25,17 @@ function GUICompRegion() : GUICompController() constructor {
 				update_component_positions();
 				
 				__update_scrollbar_thumbs__();
-				__update_controller_region__();
+				__update_group_region__();
 				
 				set_scrollbar_sizes(__scroll_horz_size__, __scroll_vert_size__)
 				
 				//update click regions
 				if (__is_controller__) {
-					__update_controller_region__();
+					__update_group_region__();
 				}
 				else {
 					if (__is_child__) {
-						__parent__.__update_controller_region__()
+						__parent__.__update_group_region__()
 					}
 				}
 				
@@ -137,10 +137,10 @@ function GUICompRegion() : GUICompController() constructor {
 					
 					if (_component.__is_controller__)
 					&& (_component.is_open) {
-						_left   = min(_left,   xoff+_component.__controller_region__.left);
-						_top    = min(_top,    yoff+_component.__controller_region__.top);
-						_right  = max(_right,  xoff+_component.__controller_region__.right);
-						_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+						_left   = min(_left,   xoff+_component.__group_region__.left);
+						_top    = min(_top,    yoff+_component.__group_region__.top);
+						_right  = max(_right,  xoff+_component.__group_region__.right);
+						_bottom = max(_bottom, yoff+_component.__group_region__.bottom);
 					}
 					else {
 						_left   = min(_left,   xoff+_component.region.left);
@@ -240,8 +240,8 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				__scroll_horz_size__ = _horz_height;
 				__scroll_vert_size__ = _vert_width;
-				__scroll_horz__.set_region(0, 0, region.get_width() - _vert_width, _horz_height)
-				__scroll_vert__.set_region(0, 0, _vert_width, region.get_height() - _horz_height)
+				__scroll_horz__.set_size(0, 0, region.get_width() - _vert_width, _horz_height)
+				__scroll_vert__.set_size(0, 0, _vert_width, region.get_height() - _horz_height)
 				
 				__scroll_horz__.set_coverage_size(get_coverage_width());
 				__scroll_vert__.set_coverage_size(get_coverage_height());
@@ -268,12 +268,12 @@ function GUICompRegion() : GUICompController() constructor {
 				//horz
 				__scroll_horz_hidden__ = (is_undefined(_horz_hidden)) ? __scroll_horz_hidden__ : _horz_hidden
 				var _view_width  = (__scroll_vert_hidden__) ? region.get_width()  : region.get_width()  - __scroll_vert_size__
-				__scroll_horz__.set_region(0, 0, _view_width, __scroll_horz_size__)
+				__scroll_horz__.set_size(0, 0, _view_width, __scroll_horz_size__)
 				
 				//vert
 				__scroll_vert_hidden__ = (is_undefined(_vert_hidden)) ? __scroll_vert_hidden__ : _vert_hidden
 				var _view_height = (__scroll_horz_hidden__) ? region.get_height() : region.get_height() - __scroll_horz_size__
-				__scroll_vert__.set_region(0, 0, __scroll_vert_size__, _view_height)
+				__scroll_vert__.set_size(0, 0, __scroll_vert_size__, _view_height)
 				
 				update_component_positions();
 				
@@ -369,10 +369,10 @@ function GUICompRegion() : GUICompController() constructor {
 			}
 			
 			static draw_gui = function(_input) {
-				if (sprite.index != -1) {
+				if (sprite_index != -1) {
 					draw_sprite_stretched(
-							sprite.index,
-							image.index,
+							sprite_index,
+							image_index,
 							x+region.left,
 							y+region.top,
 							region.get_width(),
@@ -404,8 +404,8 @@ function GUICompRegion() : GUICompController() constructor {
 						_xx = __get_controller_archor_x__(_comp.halign);
 						_yy = __get_controller_archor_y__(_comp.valign);
 						
-						_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__ + scroll.x_off;
-						_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__ + scroll.y_off;
+						_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__ + scroll.x_off;
+						_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__ + scroll.y_off;
 						
 						//if the component is a controller it's self have it update it's children
 						if (_comp.__is_controller__) {
@@ -438,11 +438,11 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				//init both before we start building as they are codependant
 				__scroll_vert__ = new GUICompScrollBar()
-					.set_anchor(0,0)
+					.set_offset(0,0)
 					.set_alignment(fa_right, fa_top)
 					.set_vertical(true)
 				__scroll_horz__ = new GUICompScrollBar()
-					.set_anchor(0,0)
+					.set_offset(0,0)
 					.set_alignment(fa_left, fa_bottom)
 					.set_button_sprites(s9ScrollbarHorzButtonLeft, s9ScrollbarHorzButtonRight)
 					.set_background_sprite(s9ScrollbarHorzBackground)
@@ -450,7 +450,7 @@ function GUICompRegion() : GUICompController() constructor {
 				//vertical
 				__scroll_vert__.__is_child__ = true;
 				__scroll_vert__.__parent__ = self;
-				__scroll_vert__.set_anchor(__scroll_vert__.region.get_width(), 0)
+				__scroll_vert__.set_offset(__scroll_vert__.region.get_width(), 0)
 				__scroll_vert__.add_event_listener(__scroll_vert__.events.value_changed, function(_val) {
 					scroll.y_off = -_val;
 				});
@@ -458,19 +458,19 @@ function GUICompRegion() : GUICompController() constructor {
 				//horizontal
 				__scroll_horz__.__is_child__ = true;
 				__scroll_horz__.__parent__ = self;
-				__scroll_horz__.set_anchor(0, __scroll_horz__.region.get_height())
+				__scroll_horz__.set_offset(0, __scroll_horz__.region.get_height())
 				__scroll_horz__.add_event_listener(__scroll_horz__.events.value_changed, function(_val) {
 					scroll.x_off = -_val;
 				});
 				
 				//set the regions
-				//__scroll_vert__.old_set_region = __scroll_vert__.set_region
-				//__scroll_vert__.set_region = method(self, function(_left, _top, _right, _bottom){
-				//	__scroll_vert__.old_set_region(_left, _top, _right, _bottom)
+				//__scroll_vert__.old_set_size = __scroll_vert__.set_size
+				//__scroll_vert__.set_size = method(self, function(_left, _top, _right, _bottom){
+				//	__scroll_vert__.old_set_size(_left, _top, _right, _bottom)
 				//});
 				
-				__scroll_vert__.set_region(0, region.top, 16, region.bottom);
-				__scroll_horz__.set_region(region.left, 0, region.right, 16);
+				__scroll_vert__.set_size(0, region.top, 16, region.bottom);
+				__scroll_horz__.set_size(region.left, 0, region.right, 16);
 				
 			#endregion
 			
@@ -478,17 +478,17 @@ function GUICompRegion() : GUICompController() constructor {
 		
 		#region Functions
 			
-			static __update_controller_region__ = function() {
-				__controller_region__.left   = region.left;
-				__controller_region__.top    = region.top;
-				__controller_region__.right  = region.right;
-				__controller_region__.bottom = region.bottom;
+			static __update_group_region__ = function() {
+				__group_region__.left   = region.left;
+				__group_region__.top    = region.top;
+				__group_region__.right  = region.right;
+				__group_region__.bottom = region.bottom;
 				
 				__update_scrollbar_thumbs__();
 				
 				//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 				if (__is_child__) {
-					__parent__.__update_controller_region__();
+					__parent__.__update_group_region__();
 				}
 			}
 			
@@ -539,5 +539,5 @@ function GUICompRegion() : GUICompController() constructor {
 	}
 	
 	//post init
-	__update_controller_region__();
+	__update_group_region__();
 }

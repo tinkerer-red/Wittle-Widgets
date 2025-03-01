@@ -9,7 +9,7 @@ function GUICompHandler() : GUICompController() constructor {
 	debug_name = "GUICompHandler";
 	
 	#region Init
-		set_region(0,0,display_get_gui_width(), display_get_gui_height());
+		set_size(0,0,display_get_gui_width(), display_get_gui_height());
 	#endregion
 	
 	#region Public
@@ -71,20 +71,20 @@ function GUICompHandler() : GUICompController() constructor {
 		#region Variables
 			
 			//this must always be here to ensure the global controller knows to always return true
-			__mouse_on_cc__ = true;
+			__mouse_on_comp__ = true;
 			
 		#endregion
 		
 		#region Functions
 			
 			static __mouse_on_controller__ = function() {
-				return __mouse_on_cc__;
+				return __mouse_on_comp__;
 			}
 			
-			static __update_controller_region__ = function() {
+			static __update_group_region__ = function() {
 				//this is a global component controller, so anything placed directly into it should always be active
 				//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
-				__controller_region__ = new __region__(
+				__group_region__ = new __region__(
 					0,
 					0,
 					display_get_gui_width(),
@@ -114,7 +114,7 @@ function GUICompHandler() : GUICompController() constructor {
 			
 		#endregion
 		
-		__update_controller_region__();
+		__update_group_region__();
 		
 	#endregion
 	

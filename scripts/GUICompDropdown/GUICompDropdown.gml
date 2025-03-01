@@ -16,7 +16,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			#region General
 				
 				#region jsDoc
-			/// @func    set_region()
+			/// @func    set_size()
 			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
 			/// @self    GUICompCore
 			/// @param   {real} left : The left side of the bounding box
@@ -25,17 +25,17 @@ function GUICompDropdown() : GUICompController() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-				static set_region = function(_left, _top, _right, _bottom) {
-					static __set_region = GUICompController.set_region;
-					__set_region(_left, _top, _right, _bottom);
+				static set_size = function(_left, _top, _right, _bottom) {
+					static __set_size = GUICompController.set_size;
+					__set_size(_left, _top, _right, _bottom);
 					
-					__button__.set_region(_left, _top, _right, _bottom);
+					__button__.set_size(_left, _top, _right, _bottom);
 					
-					__controller__.set_anchor(0, __button__.region.get_height());
+					__controller__.set_offset(0, __button__.region.get_height());
 					__controller__.set_width(_right-_left);
-					__controller__.set_region(__controller__.region.left, __controller__.region.top, __controller__.region.right, __controller__.region.bottom)
+					__controller__.set_size(__controller__.region.left, __controller__.region.top, __controller__.region.right, __controller__.region.bottom)
 					
-					__update_controller_region__();
+					__update_group_region__();
 					
 					__update_dropdown_scrollbars__();
 					
@@ -55,10 +55,10 @@ function GUICompDropdown() : GUICompController() constructor {
 					//run events if needed
 					if (_prev_open != is_open) {
 						if (is_open) {
-							__trigger_event__(self.events.opened, {index : current_index, text : text.text});
+							trigger_event(self.events.opened, {index : current_index, text : text.text});
 						}
 						else {
-							__trigger_event__(self.events.closed, {index : current_index, text : text.text});
+							trigger_event(self.events.closed, {index : current_index, text : text.text});
 						}
 					}
 					
@@ -114,15 +114,15 @@ function GUICompDropdown() : GUICompController() constructor {
 						_largest_text_height = max(_largest_text_height, string_height(_elements[_i].text.text) );
 					_i+=1;}//end repeat loop
 					
-					var _slice = sprite_get_nineslice(__button__.sprite.index);
+					var _slice = sprite_get_nineslice(__button__.sprite_index);
 					var _width  = _largest_text_width  + (_slice.left + _slice.right);
 					var _height = _largest_text_height + (_slice.top  + _slice.bottom);
 					
 					//update internal variables
-					set_region(0, 0, _width, _height);
+					set_size(0, 0, _width, _height);
 					
 					var _dropdown_height = __controller__.__children_count__*_height
-					__controller__.set_region(0, 0, _width, _dropdown_height);
+					__controller__.set_size(0, 0, _width, _dropdown_height);
 					__controller__.set_scrollbar_hidden(true, true);
 					
 					set_text_offsets(_slice.left, _slice.top, text.click_y_off);
@@ -155,10 +155,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				#endregion
 				static set_sprite = function(_sprite=s9ButtonText) {
 					/// NOTE: These are the default structure of GUI button sprites
-					/// image.index[0] = idle; no interaction;
-					/// image.index[1] = mouse over; the mouse is over it;
-					/// image.index[2] = mouse down; actively being pressed;
-					/// image.index[3] = disabled; not allowed to interact with;
+					/// image_index[0] = idle; no interaction;
+					/// image_index[1] = mouse over; the mouse is over it;
+					/// image_index[2] = mouse down; actively being pressed;
+					/// image_index[3] = disabled; not allowed to interact with;
 					
 					__button__.set_sprite(_sprite);
 					
@@ -266,10 +266,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				#endregion
 				static set_dropdown_sprites = function(_spr_header, _spr_top, _spr_mid, _spr_bot) {
 					/// NOTE: These are the default structure of GUI sprites
-					/// image.index[0] = idle; no interaction;
-					/// image.index[1] = mouse over; the mouse is over it;
-					/// image.index[2] = mouse down; actively being pressed;
-					/// image.index[3] = disabled; not allowed to interact with;
+					/// image_index[0] = idle; no interaction;
+					/// image_index[1] = mouse over; the mouse is over it;
+					/// image_index[2] = mouse down; actively being pressed;
+					/// image_index[3] = disabled; not allowed to interact with;
 				
 					sprite_header = _spr_header;
 					sprite_top    = _spr_top;
@@ -344,7 +344,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_dropdown_size = function(_left, _top, _right, _bottom) {
-					__controller__.set_region(_left, _top, _right, _bottom)
+					__controller__.set_size(_left, _top, _right, _bottom)
 					
 					return self;
 				}
@@ -357,7 +357,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_dropdown_anchor = function(_xoff, _yoff) {
-					__controller__.set_anchor(_xoff, _yoff);
+					__controller__.set_offset(_xoff, _yoff);
 					
 					return self;
 				}
@@ -370,7 +370,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				#endregion
 				static set_dropdown_height = function(_height) {
 					__controller__.set_height(_height);
-					__controller__.set_region(__controller__.region.left, __controller__.region.top, __controller__.region.right, __controller__.region.bottom)
+					__controller__.set_size(__controller__.region.left, __controller__.region.top, __controller__.region.right, __controller__.region.bottom)
 					
 					__update_dropdown_scrollbars__();
 					
@@ -475,7 +475,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				var _arr = array_create(_length);
 				var _i=0; repeat(_length) {
 					_arr[_i] = new __element__(_string[_i])
-							.set_region(region.left, region.top, region.right, region.bottom)
+							.set_size(region.left, region.top, region.right, region.bottom)
 					
 					_arr[_i].add_event_listener(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
 						var _prev_index = parent.current_index;
@@ -483,9 +483,9 @@ function GUICompDropdown() : GUICompController() constructor {
 						parent.set_value(this.__find_index_in_parent__());
 						parent.set_open(false);
 						//events
-						parent.__trigger_event__(parent.events.selected, {index : parent.current_index, text : parent.text.text});
+						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.text});
 						if (_prev_index != parent.current_index) {
-							parent.__trigger_event__(parent.events.changed, {index : parent.current_index, text : parent.text.text});
+							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.text});
 						}
 					}));
 					
@@ -543,7 +543,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				var _arr = array_create(_length);
 				var _i=0; repeat(_length) {
 					_arr[_i] = new __element__(_string[_i])
-							.set_region(region.left, region.top, region.right, region.bottom)
+							.set_size(region.left, region.top, region.right, region.bottom)
 					
 					_arr[_i].add_event_listener(_arr[_i].events.released, method({this: _arr[_i], parent: other}, function(){
 						var _prev_index = parent.current_index;
@@ -551,9 +551,9 @@ function GUICompDropdown() : GUICompController() constructor {
 						parent.set_value(this.__find_index_in_parent__());
 						parent.set_open(false);
 						//events
-						parent.__trigger_event__(parent.events.selected, {index : parent.current_index, text : parent.text.text});
+						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.text});
 						if (_prev_index != parent.current_index) {
-							parent.__trigger_event__(parent.events.changed, {index : parent.current_index, text : parent.text.text});
+							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.text});
 						}
 					}));
 					
@@ -607,8 +607,8 @@ function GUICompDropdown() : GUICompController() constructor {
 					var _xx = __get_controller_archor_x__(_comp.halign);
 					var _yy = __get_controller_archor_y__(_comp.valign);
 					
-					_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__;
-					_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__;
+					_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__;
+					_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__;
 					
 					//if the component is a controller it's self have it update it's children
 					if (_comp.__is_controller__) {
@@ -662,19 +662,19 @@ function GUICompDropdown() : GUICompController() constructor {
 			#region Adopt Events
 				
 				__button__.add_event_listener(__button__.events.mouse_over, function() {
-					__trigger_event__(self.events.mouse_over);
+					trigger_event(self.events.mouse_over);
 				})
 				__button__.add_event_listener(__button__.events.pressed, function() {
-					__trigger_event__(self.events.pressed);
+					trigger_event(self.events.pressed);
 				})
 				__button__.add_event_listener(__button__.events.held, function() {
-					__trigger_event__(self.events.held);
+					trigger_event(self.events.held);
 				})
 				__button__.add_event_listener(__button__.events.long_press, function() {
-					__trigger_event__(self.events.long_press);
+					trigger_event(self.events.long_press);
 				})
 				__button__.add_event_listener(__button__.events.released, function() {
-					__trigger_event__(self.events.released);
+					trigger_event(self.events.released);
 				})
 				
 			#endregion
@@ -683,10 +683,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				set_open(!is_open);
 				
 				if (is_open) {
-					__trigger_event__(self.events.opened);
+					trigger_event(self.events.opened);
 				}
 				else {
-					__trigger_event__(self.events.closed);
+					trigger_event(self.events.closed);
 				}
 			})
 			
@@ -695,7 +695,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			__controller__ = new GUICompRegion()
 					.set_alignment(fa_left, fa_top)
-					.set_region(0,0,0,0)
+					.set_size(0,0,0,0)
 			
 			
 			var _add = GUICompController.add;
@@ -717,14 +717,14 @@ function GUICompDropdown() : GUICompController() constructor {
 				
 				var _i=0; repeat(__controller__.__children_count__) {
 					var _comp = __controller__.__children__[_i];
-					_comp.sprite.index = sprite_middle;
-					_comp.set_anchor(_x, _y);
+					_comp.sprite_index = sprite_middle;
+					_comp.set_offset(_x, _y);
 					_y += _comp.region.get_height();
 				_i+=1;}//end repeat loop
 				
 				if (__controller__.__children_count__) {
-					__controller__.__children__[0].sprite.index = sprite_top;
-					__controller__.__children__[__controller__.__children_count__-1].sprite.index = sprite_bottom;
+					__controller__.__children__[0].sprite_index = sprite_top;
+					__controller__.__children__[__controller__.__children_count__-1].sprite_index = sprite_bottom;
 				}
 				
 			}
@@ -760,12 +760,12 @@ function GUICompDropdown() : GUICompController() constructor {
 				valign = fa_top;
 				
 				set_sprite(other.sprite_middle);
-				image.index = 0;
+				image_index = 0;
 				
 				text = variable_clone(other.text);
 				set_text(_string);
 				
-				set_region(
+				set_size(
 					other.region.left,
 					other.region.top,
 					other.region.right,
@@ -777,19 +777,19 @@ function GUICompDropdown() : GUICompController() constructor {
 				#region Adopt Events
 					
 					_comp.add_event_listener(_comp.events.mouse_over, function() {
-						__trigger_event__(self.events.element_mouse_over);
+						trigger_event(self.events.element_mouse_over);
 					})
 					_comp.add_event_listener(_comp.events.pressed, function() {
-						__trigger_event__(self.events.element_pressed);
+						trigger_event(self.events.element_pressed);
 					})
 					_comp.add_event_listener(_comp.events.held, function() {
-						__trigger_event__(self.events.element_held);
+						trigger_event(self.events.element_held);
 					})
 					_comp.add_event_listener(_comp.events.long_press, function() {
-						__trigger_event__(self.events.element_long_pressed);
+						trigger_event(self.events.element_long_pressed);
 					})
 					_comp.add_event_listener(_comp.events.released, function() {
-						__trigger_event__(self.events.element_released);
+						trigger_event(self.events.element_released);
 					})
 					
 				#endregion

@@ -10,15 +10,15 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 		
 		#region Builder functions
 			
-			static set_region = function(_left, _top, _right, _bottom) {
-				var _info = sprite_get_nineslice(__button__.sprite.index)
+			static set_size = function(_left, _top, _right, _bottom) {
+				var _info = sprite_get_nineslice(__button__.sprite_index)
 				_top    = 0;
 				_bottom = max(__dropdown__.region.get_height(), font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_y_off;
 				
-				static __set_region = GUICompController.set_region;
-				__set_region(_left, _top, _right, _bottom)
+				static __set_size = GUICompController.set_size;
+				__set_size(_left, _top, _right, _bottom)
 				
-				__button__.set_region(_left, _top, _right, _bottom)
+				__button__.set_size(_left, _top, _right, _bottom)
 				
 				__dropdown__.set_sprite_to_auto_wrap()
 				var _width = floor((_right  - _info.left - _info.right)*0.5);
@@ -26,10 +26,10 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					//__dropdown__.set_width(_width)
 				}
 				
-				__dropdown__.set_anchor(-_info.right - __dropdown__.region.get_width(), +_info.top)
+				__dropdown__.set_offset(-_info.right - __dropdown__.region.get_width(), +_info.top)
 				
 				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
-				__scrolling_text__.set_region(
+				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
 						_right  - _info.left - _info.right - __dropdown__.region.get_width(),
@@ -107,24 +107,24 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 		#region Variables
 			
 			__button__ = new GUICompButtonText()
-				.set_anchor(0,0)
+				.set_offset(0,0)
 				.set_text("")
 				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
-			var _info = sprite_get_nineslice(__button__.sprite.index);
+			var _info = sprite_get_nineslice(__button__.sprite_index);
 			
 			__dropdown__ = new GUICompDropdown() //the x/y doesnt matter as the set region will move this
-				.set_anchor(-_info.right, _info.top)
+				.set_offset(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_dropdown_sprites(s9CPDropDown, s9CPDropDownTop, s9CPDropDownMiddle, s9CPDropDownBottom)
 				.set_dropdown_array(_arr_of_str)
 				.set_sprite_to_auto_wrap()
-			__dropdown__.set_anchor(-_info.right - __dropdown__.__controller_region__.get_width(), +_info.top)
+			__dropdown__.set_offset(-_info.right - __dropdown__.__group_region__.get_width(), +_info.top)
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_anchor(_info.left, 0)
+				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -142,7 +142,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			var _width = string_width(_label);
 			draw_set_font(_prev_font);
 			
-			var _info = sprite_get_nineslice(__button__.sprite.index);
+			var _info = sprite_get_nineslice(__button__.sprite_index);
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
@@ -151,7 +151,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 												__dropdown__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off,
 										);
 			
-			set_region(_left, _top, _right, _bottom);
+			set_size(_left, _top, _right, _bottom);
 			
 		#endregion
 		
@@ -165,7 +165,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					add_event_listener(self.events.pre_update, function(_data) {
+					add_event_listener(self.events.pre_step, function(_data) {
 						var _width = floor(window_get_width()-self.x);
 						if (region.get_width() != _width) {
 							set_width(_width)
@@ -174,12 +174,12 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				}
 				
 				//adjust the visuals so all components are simillar
-				add_event_listener(self.events.post_update, function(_data) {
+				add_event_listener(self.events.post_step, function(_data) {
 					
-					var _image_index = (is_enabled) ? max(__dropdown__.image.index, __button__.image.index) : GUI_IMAGE_DISABLED;
+					var _image_index = (is_enabled) ? max(__dropdown__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
 					
-					__button__.image.index   = _image_index;
-					__dropdown__.image.index = _image_index;
+					__button__.image_index   = _image_index;
+					__dropdown__.image_index = _image_index;
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
@@ -216,10 +216,10 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					
 					with (__dropdown__){
 						if (is_open) {
-							__trigger_event__(self.events.opened, {index : current_index, text : text.text});
+							trigger_event(self.events.opened, {index : current_index, text : text.text});
 						}
 						else {
-							__trigger_event__(self.events.closed, {index : current_index, text : text.text});
+							trigger_event(self.events.closed, {index : current_index, text : text.text});
 						}
 					}
 				});

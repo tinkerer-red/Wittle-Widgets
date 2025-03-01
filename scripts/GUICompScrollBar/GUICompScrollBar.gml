@@ -5,7 +5,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 		
 		#region Builder Functions
 			
-			static set_region = function(_left, _top, _right, _bottom) {
+			static set_size = function(_left, _top, _right, _bottom) {
 				region.left   = _left;
 				region.top    = _top;
 				region.right  = _right;
@@ -13,7 +13,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 				//update click regions
 				if (__is_child__) {
-					__parent__.__update_controller_region__()
+					__parent__.__update_group_region__()
 				}
 				
 				__update_scrollbar__();
@@ -113,7 +113,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				__button_inc__.set_sprite(_increment_sprite);
 				__button_dec__.set_sprite(_decrement_sprite);
 				
-				__button_inc__.set_anchor(-__button_inc__.region.get_width(), -__button_inc__.region.get_height())
+				__button_inc__.set_offset(-__button_inc__.region.get_width(), -__button_inc__.region.get_height())
 				
 				update_component_positions();
 				
@@ -276,7 +276,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				else {
 					var _loc = __scrollbar__.value + coverage_size * _amount_of_view;
 					__scrollbar__.set_value(_loc);
-					__trigger_event__(self.events.value_changed, __scrollbar__.value)
+					trigger_event(self.events.value_changed, __scrollbar__.value)
 				}
 				
 				__update_button_enables__()
@@ -298,7 +298,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				else {
 					var _loc = __scrollbar__.value - coverage_size * _amount_of_view;
 					__scrollbar__.set_value(_loc);
-					__trigger_event__(self.events.value_changed, __scrollbar__.value)
+					trigger_event(self.events.value_changed, __scrollbar__.value)
 				}
 				
 				__update_button_enables__();
@@ -319,7 +319,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			
 			//pieces of the scrollbar
 			__scrollbar__ = new GUICompSlider()
-				.set_anchor(0,0)
+				.set_offset(0,0)
 				.set_alignment(fa_left, fa_top)
 				.set_clamp_values(0, 1)
 				.set_thumb_enabled(true)
@@ -330,17 +330,17 @@ function GUICompScrollBar() : GUICompController() constructor {
 				.set_thumb_only_input(true)
 			
 			__button_inc__ = new GUICompButtonSprite()
-				.set_anchor(0,0)
+				.set_offset(0,0)
 				.set_alignment(fa_right, fa_bottom)
 			__button_dec__ = new GUICompButtonSprite()
-				.set_anchor(0,0)
+				.set_offset(0,0)
 				.set_alignment(fa_left, fa_top)
 			
 			//set the sprites and adjust the components over
 			__button_inc__.set_sprite(s9ScrollbarVertButtonDown);
 			__button_dec__.set_sprite(s9ScrollbarVertButtonUp);
 			
-			__button_inc__.set_anchor(-__button_inc__.region.get_width(), -__button_inc__.region.get_height())
+			__button_inc__.set_offset(-__button_inc__.region.get_width(), -__button_inc__.region.get_height())
 			
 			__update_scrollbar__();
 			
@@ -354,7 +354,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 			static __mouse_on_controller__ = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
-					if (!__parent__.__mouse_on_cc__) {
+					if (!__parent__.__mouse_on_comp__) {
 						return false;
 					}
 				}
@@ -364,12 +364,12 @@ function GUICompScrollBar() : GUICompController() constructor {
 				//if (is_desktop) {
 				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
 				//	|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-				//		__mouse_on_cc__ = false;
+				//		__mouse_on_comp__ = false;
 				//		return false;
 				//	}
 				//}
 				
-				__mouse_on_cc__ = point_in_rectangle(
+				__mouse_on_comp__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),
 						x+region.left,
@@ -378,11 +378,11 @@ function GUICompScrollBar() : GUICompController() constructor {
 						y+region.bottom
 				)
 				
-				if (__mouse_on_cc__) {
-					__trigger_event__(self.events.on_hover);
+				if (__mouse_on_comp__) {
+					trigger_event(self.events.on_hover);
 				}
 				
-				return __mouse_on_cc__;
+				return __mouse_on_comp__;
 			}
 			
 			static update_component_positions = function() {
@@ -391,25 +391,25 @@ function GUICompScrollBar() : GUICompController() constructor {
 					if (__using_buttons__) {
 						
 						//move buttons into possition
-						__button_dec__.set_anchor(0,0)
-						__button_inc__.set_anchor(
+						__button_dec__.set_offset(0,0)
+						__button_inc__.set_offset(
 								-__button_inc__.region.get_width(),
 								-__button_inc__.region.get_height()
 						)
 						
 						//adjust the scroll bar
 						if (is_vertical) {
-							__scrollbar__.set_anchor(0, __button_dec__.region.get_height())
+							__scrollbar__.set_offset(0, __button_dec__.region.get_height())
 						}
 						else {
-							__scrollbar__.set_anchor(__button_dec__.region.get_width(), 0);
+							__scrollbar__.set_offset(__button_dec__.region.get_width(), 0);
 						}
 						
 					}
 					else {
 						//adjust the scroll bar
-						__scrollbar__.set_region(0, 0, region.get_width(), region.get_height());
-						__scrollbar__.set_anchor(0, 0);
+						__scrollbar__.set_size(0, 0, region.get_width(), region.get_height());
+						__scrollbar__.set_offset(0, 0);
 					}
 					
 					__prev_using_buttons__ = __using_buttons__;
@@ -425,18 +425,18 @@ function GUICompScrollBar() : GUICompController() constructor {
 					if (is_vertical) {
 						var _btn_height = __button_inc__.region.get_height() + __button_dec__.region.get_height();
 						var _bar_height = region.get_height() - _btn_height;
-						__scrollbar__.set_region(0, 0, region.get_width(), _bar_height);
-						__scrollbar__.set_anchor(0, __button_dec__.region.get_height())
+						__scrollbar__.set_size(0, 0, region.get_width(), _bar_height);
+						__scrollbar__.set_offset(0, __button_dec__.region.get_height())
 					}
 					else {
 						var _btn_width = __button_inc__.region.get_width() + __button_dec__.region.get_width();
 						var _bar_width = region.get_width() - _btn_width;
-						__scrollbar__.set_region(0, 0, _bar_width, region.get_height());
-						__scrollbar__.set_anchor(__button_dec__.region.get_width(), 0)
+						__scrollbar__.set_size(0, 0, _bar_width, region.get_height());
+						__scrollbar__.set_offset(__button_dec__.region.get_width(), 0)
 					}
 				}
 				else {
-					__scrollbar__.set_region(0, 0, region.get_width(), region.get_height());
+					__scrollbar__.set_size(0, 0, region.get_width(), region.get_height());
 				}
 			}
 			
@@ -503,26 +503,26 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 				#region Parent child events
 					
-					__scrollbar__.add_event_listener(__scrollbar__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.long_press, function() {__trigger_event__(self.events.long_press, __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.mouse_over, function() {trigger_event(self.events.mouse_over, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.pressed   , function() {trigger_event(self.events.pressed   , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.held      , function() {trigger_event(self.events.held      , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.long_press, function() {trigger_event(self.events.long_press, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.released  , function() {trigger_event(self.events.released  , __scrollbar__.value)});
 					
-					__scrollbar__.add_event_listener(__scrollbar__.events.value_input      , function() {__trigger_event__(self.events.value_input      , __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.value_changed    , function() {__trigger_event__(self.events.value_changed    , __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.value_incremented, function() {__trigger_event__(self.events.value_incremented, __scrollbar__.value)});
-					__scrollbar__.add_event_listener(__scrollbar__.events.value_decremented, function() {__trigger_event__(self.events.value_decremented, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_input      , function() {trigger_event(self.events.value_input      , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_changed    , function() {trigger_event(self.events.value_changed    , __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_incremented, function() {trigger_event(self.events.value_incremented, __scrollbar__.value)});
+					__scrollbar__.add_event_listener(__scrollbar__.events.value_decremented, function() {trigger_event(self.events.value_decremented, __scrollbar__.value)});
 					
-					__button_inc__.add_event_listener(__button_inc__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__button_inc__.add_event_listener(__button_inc__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__button_inc__.add_event_listener(__button_inc__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__button_inc__.add_event_listener(__button_inc__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.mouse_over, function() {trigger_event(self.events.mouse_over, __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.pressed   , function() {trigger_event(self.events.pressed   , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.held      , function() {trigger_event(self.events.held      , __scrollbar__.value)});
+					__button_inc__.add_event_listener(__button_inc__.events.released  , function() {trigger_event(self.events.released  , __scrollbar__.value)});
 					
-					__button_dec__.add_event_listener(__button_dec__.events.mouse_over, function() {__trigger_event__(self.events.mouse_over, __scrollbar__.value)});
-					__button_dec__.add_event_listener(__button_dec__.events.pressed   , function() {__trigger_event__(self.events.pressed   , __scrollbar__.value)});
-					__button_dec__.add_event_listener(__button_dec__.events.held      , function() {__trigger_event__(self.events.held      , __scrollbar__.value)});
-					__button_dec__.add_event_listener(__button_dec__.events.released  , function() {__trigger_event__(self.events.released  , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.mouse_over, function() {trigger_event(self.events.mouse_over, __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.pressed   , function() {trigger_event(self.events.pressed   , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.held      , function() {trigger_event(self.events.held      , __scrollbar__.value)});
+					__button_dec__.add_event_listener(__button_dec__.events.released  , function() {trigger_event(self.events.released  , __scrollbar__.value)});
 					
 				#endregion
 				
@@ -536,7 +536,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				});
 				
 				//scrollbar
-				__scrollbar__.add_event_listener(__scrollbar__.events.post_update, function(){
+				__scrollbar__.add_event_listener(__scrollbar__.events.post_step, function(){
 					if (__scrollbar__.__is_on_focus__) {
 						__update_button_enables__();
 					}

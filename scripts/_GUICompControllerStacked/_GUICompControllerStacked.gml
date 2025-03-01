@@ -70,7 +70,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				
 				update_component_positions();
 				
-				__update_controller_region__();
+				__update_group_region__();
 				
 				//dont think this is needed anymore after a refactor of folders
 				
@@ -78,7 +78,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				//var _i=0; repeat(array_length(_arr)) {
 				//	_comp = _arr[_i];
 				//	if (_comp.__is_controller__) {
-				//		_comp.__update_controller_region__();
+				//		_comp.__update_group_region__();
 				//	}
 				//_i+=1;}//end repeat loop
 				
@@ -104,7 +104,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				
 				update_component_positions();
 				
-				__update_controller_region__();
+				__update_group_region__();
 				
 				return __children_count__;
 			}
@@ -139,9 +139,9 @@ function GUICompControllerStacked() : GUICompController() constructor {
 								
 							if (_changed) {
 								//not this isnt needed if the parent is a folder, but if it's another folder inside a controller this is indeed neede
-								_comp.__update_controller_region__();
+								_comp.__update_group_region__();
 							}
-							_posY += _comp.__controller_region__.get_height();
+							_posY += _comp.__group_region__.get_height();
 						}
 						else{
 							_posY += _comp.region.get_height();
@@ -151,7 +151,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 					
 				}
 				
-				__update_controller_region__();
+				__update_group_region__();
 				
 			}
 			
@@ -174,10 +174,10 @@ function GUICompControllerStacked() : GUICompController() constructor {
 					
 					draw_set_color(c_red)
 					draw_rectangle(
-						x+__controller_region__.left,
-						y+__controller_region__.top,
-						x+__controller_region__.right,
-						y+__controller_region__.bottom,
+						x+__group_region__.left,
+						y+__group_region__.top,
+						x+__group_region__.right,
+						y+__group_region__.bottom,
 						true
 					);
 					
@@ -193,7 +193,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 				
 			#endregion
 			
-			static __update_controller_region__ = function() {
+			static __update_group_region__ = function() {
 				var _left   = region.left;
 				var _top    = region.top;
 				var _right  = region.right;
@@ -208,10 +208,10 @@ function GUICompControllerStacked() : GUICompController() constructor {
 						yoff = _component.y-y;
 				
 						if (_component.__is_controller__) {
-							_left   = min(_left,   xoff+_component.__controller_region__.left);
-							_top    = min(_top,    yoff+_component.__controller_region__.top);
-							_right  = max(_right,  xoff+_component.__controller_region__.right);
-							_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+							_left   = min(_left,   xoff+_component.__group_region__.left);
+							_top    = min(_top,    yoff+_component.__group_region__.top);
+							_right  = max(_right,  xoff+_component.__group_region__.right);
+							_bottom = max(_bottom, yoff+_component.__group_region__.bottom);
 						}
 						
 						_left   = min(_left,   xoff+_component.region.left);
@@ -223,14 +223,14 @@ function GUICompControllerStacked() : GUICompController() constructor {
 					}
 				}
 				
-				__controller_region__.left   = _left;
-				__controller_region__.top    = _top;
-				__controller_region__.right  = _right;
-				__controller_region__.bottom = _bottom;
+				__group_region__.left   = _left;
+				__group_region__.top    = _top;
+				__group_region__.right  = _right;
+				__group_region__.bottom = _bottom;
 				
 				//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 				if (__is_child__) {
-					__parent__.__update_controller_region__();
+					__parent__.__update_group_region__();
 				}
 			}
 			
@@ -240,7 +240,7 @@ function GUICompControllerStacked() : GUICompController() constructor {
 	
 	//post init
 	set_children_offsets(8, 0)
-	__update_controller_region__();
+	__update_group_region__();
 }
 
 

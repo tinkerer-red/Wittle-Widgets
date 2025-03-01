@@ -1,0 +1,1 @@
+root.draw(undefined, true);

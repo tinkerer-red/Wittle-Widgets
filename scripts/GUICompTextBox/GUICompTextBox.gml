@@ -13,7 +13,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 		#region Builder functions
 			
 			#region jsDoc
-			/// @func    set_region()
+			/// @func    set_size()
 			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
 			/// @self    GUICompCore
 			/// @param   {real} left : The left side of the bounding box
@@ -22,9 +22,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {
-				static __set_region = GUICompRegion.set_region;
-				__set_region(_left, _top, _right, _bottom);
+			static set_size = function(_left, _top, _right, _bottom) {
+				static __set_size = GUICompRegion.set_size;
+				__set_size(_left, _top, _right, _bottom);
 				
 				__update_scroll__();
 				
@@ -703,7 +703,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			static mouse_on_comp = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
-					if (!__parent__.__mouse_on_cc__) {
+					if (!__parent__.__mouse_on_comp__) {
 						return false;
 					}
 				}
@@ -713,12 +713,12 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				//if (is_desktop) {
 				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
 				//	|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-				//		__mouse_on_cc__ = false;
+				//		__mouse_on_comp__ = false;
 				//		return false;
 				//	}
 				//}
 				
-				__mouse_on_cc__ = point_in_rectangle(
+				__mouse_on_comp__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),
 						x+region.left,
@@ -727,11 +727,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						y+get_coverage_height()
 				)
 				
-				if (__mouse_on_cc__) {
-					__trigger_event__(self.events.on_hover);
+				if (__mouse_on_comp__) {
+					trigger_event(self.events.on_hover);
 				}
 				
-				return __mouse_on_cc__;
+				return __mouse_on_comp__;
 			}
 			
 		#endregion
@@ -826,7 +826,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									if (__is_on_focus__) {
 										if (__event_exists__(self.events.submit)) {
 											var _text = __textbox_lines_to_text__(curt.lines);
-											__trigger_event__(self.events.submit, _text);
+											trigger_event(self.events.submit, _text);
 										}
 									}
 									curt.focus = false;
@@ -835,10 +835,10 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								if (curt.accepting_inputs) {
 									__is_on_focus__ = _mouse_on_comp;
 									if (__is_on_focus__){
-										__trigger_event__(self.events.on_focus);
+										trigger_event(self.events.on_focus);
 									}
 									else{
-										__trigger_event__(self.events.on_blur);
+										trigger_event(self.events.on_blur);
 									}
 									
 									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
@@ -1081,7 +1081,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					}
 					
 					if (_mouse_on_comp) {
-						capture_input();
+						consume_input();
 					}
 					
 					if (!__is_on_focus__)
@@ -1104,8 +1104,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								}
 								__is_on_focus__ = false;
 								curt.focus = false;
-								__trigger_event__(self.events.submit, _text);
-								__trigger_event__(self.events.on_blur);
+								trigger_event(self.events.submit, _text);
+								trigger_event(self.events.on_blur);
 								break;
 							}
 
@@ -1119,7 +1119,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									trigger_event(self.events.change, _text);
 								}
 								
 								break;
@@ -1293,7 +1293,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									trigger_event(self.events.change, _text);
 								}
 							}
 	
@@ -1306,7 +1306,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										trigger_event(self.events.change, _text);
 									}
 								}
 								break;
@@ -1398,7 +1398,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										trigger_event(self.events.change, _text);
 									}
 									
 									break;
@@ -1418,7 +1418,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										trigger_event(self.events.change, _text);
 									}
 									
 									break;
@@ -1438,7 +1438,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										trigger_event(self.events.change, _text);
 									}
 									
 									break;
@@ -1458,7 +1458,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										trigger_event(self.events.change, _text);
 									}
 									
 									break;
@@ -1518,7 +1518,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									trigger_event(self.events.change, _text);
 								}
 								
 								break;

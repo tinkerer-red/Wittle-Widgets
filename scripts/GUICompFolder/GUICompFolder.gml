@@ -88,7 +88,7 @@ function GUICompFolder() : GUICompController() constructor {
 				
 				if (is_open) {
 					update_component_positions();
-					__update_controller_region__();
+					__update_group_region__();
 				}
 				
 				return _r;
@@ -108,7 +108,7 @@ function GUICompFolder() : GUICompController() constructor {
 				
 				if (is_open) {
 					update_component_positions();
-					__update_controller_region__();
+					__update_group_region__();
 				}
 				
 				return _r;
@@ -131,8 +131,8 @@ function GUICompFolder() : GUICompController() constructor {
 					_xx = __get_controller_archor_x__(_comp.halign);
 					_yy = __get_controller_archor_y__(_comp.valign);
 					
-					_comp.x = self.x + _xx + _comp.x_anchor + _comp.__internal_x__;
-					_comp.y = self.y + _yy + _comp.y_anchor + _comp.__internal_y__;
+					_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__;
+					_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__;
 					
 				_i+=1;}//end repeat loop
 				
@@ -140,7 +140,7 @@ function GUICompFolder() : GUICompController() constructor {
 					__controller__.update_component_positions();
 				}
 				
-				__update_controller_region__();
+				__update_group_region__();
 			}
 			
 		#endregion
@@ -167,14 +167,14 @@ function GUICompFolder() : GUICompController() constructor {
 				set_open(is_open);
 				
 				if (is_open) {
-					__trigger_event__(self.events.opened);
+					trigger_event(self.events.opened);
 				}
 				else {
-					__trigger_event__(self.events.closed);
+					trigger_event(self.events.closed);
 				}
 			})
 			
-			static __update_controller_region__ = function() {
+			static __update_group_region__ = function() {
 				var _left   = region.left;
 				var _top    = region.top;
 				var _right  = region.right;
@@ -203,10 +203,10 @@ function GUICompFolder() : GUICompController() constructor {
 					yoff = _component.y-y;
 					
 					if (_component.__is_controller__) {
-						_left   = min(_left,   xoff+_component.__controller_region__.left);
-						_top    = min(_top,    yoff+_component.__controller_region__.top);
-						_right  = max(_right,  xoff+_component.__controller_region__.right);
-						_bottom = max(_bottom, yoff+_component.__controller_region__.bottom);
+						_left   = min(_left,   xoff+_component.__group_region__.left);
+						_top    = min(_top,    yoff+_component.__group_region__.top);
+						_right  = max(_right,  xoff+_component.__group_region__.right);
+						_bottom = max(_bottom, yoff+_component.__group_region__.bottom);
 					}
 					
 					_left   = min(_left,   xoff+_component.region.left);
@@ -218,15 +218,15 @@ function GUICompFolder() : GUICompController() constructor {
 				}
 				
 				
-				__controller_region__.left   = _left;
-				__controller_region__.top    = _top;
-				__controller_region__.right  = _right;
-				__controller_region__.bottom = _bottom;
+				__group_region__.left   = _left;
+				__group_region__.top    = _top;
+				__group_region__.right  = _right;
+				__group_region__.bottom = _bottom;
 				
 				//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 				if (__is_child__) {
 					//__parent__.update_component_positions();
-					__parent__.__update_controller_region__();
+					__parent__.__update_group_region__();
 				}
 			}
 			
@@ -235,7 +235,7 @@ function GUICompFolder() : GUICompController() constructor {
 	#endregion
 	
 	//post init
-	__update_controller_region__();
+	__update_group_region__();
 }
 
 

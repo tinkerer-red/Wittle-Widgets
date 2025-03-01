@@ -8,13 +8,13 @@ widget = new GUICompDropdown() //the x/y doesnt matter as the set region will mo
 	.set_dropdown_sprites(s9CPDropDown, s9CPDropDownTop, s9CPDropDownMiddle, s9CPDropDownBottom)
 	.set_dropdown_array(_arr_of_str)
 	.set_sprite_to_auto_wrap()
-//widget.set_anchor(-_info.right - __dropdown__.__controller_region__.get_width(), +_info.top)
+//widget.set_offset(-_info.right - __dropdown__.__group_region__.get_width(), +_info.top)
 
 /*
 widget = new GUICompDropdown()
 	.set_alignment(fa_right, fa_top)
 	.set_text_placeholder("String...")
-	.set_region(0, 0, 300, 100)
+	.set_size(0, 0, 300, 100)
 	.set_text("")
 	.set_text_font(__CP_FONT)
 	//.set_text_color(c_white)

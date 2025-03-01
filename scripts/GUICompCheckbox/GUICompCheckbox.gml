@@ -22,10 +22,10 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 			#endregion
 			static set_checkbox_sprites = function(_checked_sprite=s9CheckBoxChecked, _unchecked_sprite=s9CheckBoxUnchecked) {
 				/// NOTE: These are the default structure of GUI button sprites
-				/// image.index[0] = idle; no interaction;
-				/// image.index[1] = mouse over; the mouse is over it;
-				/// image.index[2] = mouse down; actively being pressed;
-				/// image.index[3] = disabled; not allowed to interact with;
+				/// image_index[0] = idle; no interaction;
+				/// image_index[1] = mouse over; the mouse is over it;
+				/// image_index[2] = mouse down; actively being pressed;
+				/// image_index[3] = disabled; not allowed to interact with;
 				
 				sprite_checked = _checked_sprite;
 				sprite_unchecked = _unchecked_sprite;
@@ -79,7 +79,7 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 			}
 			
 			static draw_gui = function(_input) {
-				draw_sprite(sprite.index, image.index, x, y);
+				draw_sprite(sprite_index, image_index, x, y);
 			}
 			
 		#endregion
@@ -96,7 +96,7 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 			
 			add_event_listener(self.events.released, function(){
 				is_checked = !is_checked;
-				sprite.index = (is_checked) ? sprite_checked : sprite_unchecked;
+				sprite_index = (is_checked) ? sprite_checked : sprite_unchecked;
 			})
 			
 		#endregion

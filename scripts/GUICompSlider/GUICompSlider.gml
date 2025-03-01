@@ -13,7 +13,7 @@ function GUICompSlider() : GUICompCore() constructor {
 		#region Builder Functions
 			
 			#region jsDoc
-			/// @func    set_region()
+			/// @func    set_size()
 			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
 			/// @self    GUICompCore
 			/// @param   {real} left : The left side of the bounding box
@@ -22,9 +22,9 @@ function GUICompSlider() : GUICompCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.GUICompCore}
 			#endregion
-			static set_region = function(_left, _top, _right, _bottom) {
-				static __set_region = GUICompCore.set_region;
-				__set_region(_left, _top, _right, _bottom);
+			static set_size = function(_left, _top, _right, _bottom) {
+				static __set_size = GUICompCore.set_size;
+				__set_size(_left, _top, _right, _bottom);
 				
 				//__find_slider_bounds__();
 				
@@ -865,7 +865,7 @@ function GUICompSlider() : GUICompCore() constructor {
 					#region Calculate Colors
 						var _state;
 						
-						switch (image.index) {
+						switch (image_index) {
 							default:
 							case GUI_IMAGE_ENABLED: {
 									_state = "idle";
@@ -899,7 +899,7 @@ function GUICompSlider() : GUICompCore() constructor {
 						if (sprite_exists(background.sprite)) {
 							draw_sprite_stretched_ext(
 									background.sprite,
-									image.index,
+									image_index,
 									x+region.left,
 									y+region.top,
 									region.get_width(),
@@ -941,7 +941,7 @@ function GUICompSlider() : GUICompCore() constructor {
 						if (sprite_exists(bar.sprite)) {
 							draw_sprite_stretched_ext(
 									bar.sprite,
-									image.index,
+									image_index,
 									_x,
 									_y,
 									_bar_w,
@@ -981,7 +981,7 @@ function GUICompSlider() : GUICompCore() constructor {
 							
 							draw_sprite_ext(
 									thumb.sprite,
-									image.index,
+									image_index,
 									_thumb_x,
 									_thumb_y,
 									thumb.xscale,
@@ -1108,7 +1108,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				}
 				normalized_value = (value-min_value) / (max_value-min_value);
 				
-				__trigger_event__(self.events.value_input, self.value);
+				trigger_event(self.events.value_input, self.value);
 			}
 			
 			static __find_slider_bounds__ = function() {
@@ -1149,10 +1149,10 @@ function GUICompSlider() : GUICompCore() constructor {
 				
 				add_event_listener(self.events.value_input, function() {
 					if (value != __prev_value__) {
-						__trigger_event__(self.events.value_changed, self.value);
+						trigger_event(self.events.value_changed, self.value);
 						
-						if (value > __prev_value__) __trigger_event__(self.events.value_incremented, self.value);
-						if (value < __prev_value__) __trigger_event__(self.events.value_decremented, self.value);
+						if (value > __prev_value__) trigger_event(self.events.value_incremented, self.value);
+						if (value < __prev_value__) trigger_event(self.events.value_decremented, self.value);
 					}
 				});
 				

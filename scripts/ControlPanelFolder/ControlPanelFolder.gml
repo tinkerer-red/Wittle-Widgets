@@ -7,7 +7,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			static set_size = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite_index)
 				_top    = 0;
-				_bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
+				_bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff;
 				
 				static __set_size = GUICompCore.set_size;
 				__set_size(_left, _top, _right, _bottom)
@@ -19,7 +19,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				__folder__.__update_group_region__();
 				//__folder__.set_size(_left, _top, _right, _bottom)
 				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_yoff;
 				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
@@ -174,7 +174,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			
 			
 			__scrolling_text__ = new GUICompScrollingText()
-				.set_offset(_info.left, _info.top - __button__.text.click_y_off)
+				.set_offset(_info.left, _info.top - __button__.text.click_yoff)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
 				.set_scroll_looping(true, false)
@@ -199,7 +199,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
+			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff;
 			
 			set_size(_left, _top, _right, _bottom);
 			
@@ -244,7 +244,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 						break;}
 						case GUI_IMAGE_CLICKED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {

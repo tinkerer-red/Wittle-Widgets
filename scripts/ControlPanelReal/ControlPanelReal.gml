@@ -7,7 +7,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			static set_size = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite_index)
 				_top    = 0;
-				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text.click_y_off;
+				_bottom = __textbox__.region.get_height() + _info.top + _info.bottom + __button__.text.click_yoff;
 				
 				static __set_size = GUICompController.set_size;
 				__set_size(_left, _top, _right, _bottom)
@@ -17,7 +17,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				var _width = _right  - _info.left - _info.right - __textbox__.region.get_width();
 				
 				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_yoff;
 				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
@@ -169,7 +169,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
+			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff;
 			
 			set_size(_left, _top, _right, _bottom);
 			
@@ -216,7 +216,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 						break;}
 						case GUI_IMAGE_CLICKED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {

@@ -210,7 +210,7 @@ function GUICompCore() constructor {
 			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
 				text.xoff = _x;
 				text.yoff = _y;
-				text.click_y_off = _click_y;
+				text.click_yoff = _click_y;
 				
 				return self;
 			};
@@ -326,7 +326,7 @@ function GUICompCore() constructor {
 					
 					xoff : 0,
 					yoff : 0,
-					click_y_off : 0,
+					click_yoff : 0,
 					
 					width  : 0,
 					height : 0,

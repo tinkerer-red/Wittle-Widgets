@@ -86,7 +86,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			/// @desc    Sets the variables for text drawing
 			/// @self    GUICompScrollingText
 			/// @param   {String} text : The text to write on the button
-			/// @param   {Real} text.click_y_off : How much the text should be moved when the mouse button is held down on the button
+			/// @param   {Real} text.click_yoff : How much the text should be moved when the mouse button is held down on the button
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
 			static set_text = function(_text="DefaultText") {

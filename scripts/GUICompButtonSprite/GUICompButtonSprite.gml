@@ -50,9 +50,35 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 				__handle_click__(_input);
 			})
 			on_pre_draw(function(_input) {
-				if (visible) {
+				if (visible)
+				&& (self.image_alpha != 0) {
+					
 					var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
-					draw_sprite_stretched(sprite_index, _image_index, x, y, region.get_width(), region.get_height())
+					
+					//draw the nineslice
+					if (self.image_alpha == 1)
+					&& (self.image_blend == c_white) {
+						draw_sprite_stretched(
+								self.sprite_index,
+								_image_index,
+								x,
+								y,
+								region.get_width(),
+								region.get_height()
+						);
+					}
+					else {
+						draw_sprite_stretched_ext(
+								self.sprite_index, 
+								_image_index, 
+								x, 
+								y, 
+								region.get_width(), 
+								region.get_height(), 
+								self.image_blend, 
+								self.image_alpha
+						);
+					}
 				}
 			})
 			

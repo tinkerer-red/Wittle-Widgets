@@ -7,7 +7,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			static set_size = function(_left, _top, _right, _bottom) {
 				var _info = sprite_get_nineslice(__button__.sprite_index)
 				_top    = 0;
-				_bottom = max(__checkbox__.sprite_height, font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_y_off;
+				_bottom = max(__checkbox__.sprite_height, font_get_info(__button__.text.font).size) + _info.top + _info.bottom + __button__.text.click_yoff;
 				
 				static __set_size = GUICompController.set_size;
 				__set_size(_left, _top, _right, _bottom)
@@ -16,7 +16,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				
 				//__checkbox__.x = -_info.right;
 				//__checkbox__.y = _info.top;
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_yoff
 				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
@@ -139,8 +139,8 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
 			var _bottom = max(
-												font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off,
-												__checkbox__.sprite_height + _info.top + _info.bottom + __button__.text.click_y_off,
+												font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff,
+												__checkbox__.sprite_height + _info.top + _info.bottom + __button__.text.click_yoff,
 										);
 				
 			set_size(_left, _top, _right, _bottom);
@@ -188,7 +188,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 						break;}
 						case GUI_IMAGE_CLICKED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {

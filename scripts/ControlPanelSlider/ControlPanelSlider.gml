@@ -19,7 +19,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				__button__.set_size(_left, _top, _right, _bottom)
 				
 				
-				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_y_off;
+				var _scroll_text_height = _bottom - _info.top  - _info.bottom + __button__.text.click_yoff;
 				__scrolling_text__.set_size(
 						0,
 						-_scroll_text_height*0.5,
@@ -44,7 +44,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						0,
 						0,
 						_textbox_width,
-						_bottom - _info.top  - _info.bottom + __button__.text.click_y_off
+						_bottom - _info.top  - _info.bottom + __button__.text.click_yoff
 				)
 				__textbox__.set_offset(-_info.right - _textbox_width, _info.top)
 				
@@ -54,7 +54,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						0,
 						0,
 						_width - _textbox_width - _info.right,
-						_bottom - _info.top  - _info.bottom + __button__.text.click_y_off
+						_bottom - _info.top  - _info.bottom + __button__.text.click_yoff
 				)
 				__slider__.set_offset(-_info.right - _textbox_width - _spacing - __button_inc__.region.get_width() - _spacing - __slider__.region.get_width(), _info.top)
 				
@@ -230,7 +230,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 			var _left   = 0;
 			var _top    = 0;
 			var _right  = min(__CP_DEFAULT_WIDTH, _width + _info.left + _info.right);
-			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_y_off;
+			var _bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff;
 			
 			set_size(_left, _top, _right, _bottom);
 			
@@ -277,7 +277,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 						break;}
 						case GUI_IMAGE_CLICKED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
-							__scrolling_text__.set_text_offsets(0, __button__.text.click_y_off);
+							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {

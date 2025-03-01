@@ -14,26 +14,6 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 		#region Builder Functions
 			
 			#region jsDoc
-			/// @func    set_sprite()
-			/// @desc    Sets the sprite of the button.
-			/// @self    GUICompButtonText
-			/// @param   {Asset.GMSprite} sprite : The sprite the button will use.
-			/// @returns {Struct.GUICompButtonText}
-			#endregion
-			static set_sprite = function(_sprite=s9ButtonText) {
-				/// NOTE: These are the default structure of GUI button sprites
-				/// image_index[0] = idle; no interaction;
-				/// image_index[1] = mouse over; the mouse is over it;
-				/// image_index[2] = mouse down; actively being pressed;
-				/// image_index[3] = disabled; not allowed to interact with;
-				
-				//Component Core's set_sprite
-				__set_sprite__(_sprite);
-				self.image_speed = 0;
-				
-				return self;
-			}
-			#region jsDoc
 			/// @func    set_sprite_to_auto_wrap()
 			/// @desc    Automatically wrap the sprite around the suplied text. This will change the click region for you. Note: This should be called after calling the sprite and text builder functions.
 			/// @self    GUICompButtonText
@@ -50,7 +30,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 				
 				//update internal variables
 				set_size(0, 0, _width, _height);
-				set_text_offsets(_slice.left, _slice.top, text.click_y_off);
+				set_text_offsets(_slice.left, _slice.top, text.click_yoff);
 				set_text_alignment(fa_left, fa_top);
 				
 				
@@ -59,10 +39,76 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			
 		#endregion
 		
+		#region Events
+			on_pre_draw(function(_input) {
+			var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
+					
+			if (self.image_alpha != 0)
+			&& (self.visible) {
+						
+				//draw the nineslice
+				if (self.image_alpha == 1)
+				&& (self.image_blend == c_white) {
+					draw_sprite_stretched(
+							self.sprite_index,
+							_image_index,
+							x,
+							y,
+							region.get_width(),
+							region.get_height()
+					);
+				}
+				else{
+					draw_sprite_stretched_ext(
+							self.sprite_index, 
+							_image_index, 
+							x, 
+							y, 
+							region.get_width(), 
+							region.get_height(), 
+							self.image_blend, 
+							self.image_alpha
+					);
+				}
+						
+				draw_set_alpha(self.image_alpha);
+						
+				//set font color
+				switch (_image_index) {
+					case GUI_IMAGE_ENABLED : {
+						draw_set_color(text.color.idle);
+						break;}
+					case GUI_IMAGE_HOVER: {
+						draw_set_color(text.color.hover);
+						break;}
+					case GUI_IMAGE_CLICKED: {
+						draw_set_color(text.color.clicked);
+						break;}
+					case GUI_IMAGE_DISABLED: {
+						draw_set_color(text.color.disable);
+						break;}
+				}
+						
+				draw_set_font(text.font);
+				draw_set_halign(text.halign);
+				draw_set_valign(text.valign);
+						
+				var _text_y_off = (image_index == GUI_IMAGE_CLICKED) ? text.click_yoff : 0;
+						
+				draw_text(
+						(self.x+text.xoff),
+						(self.y+text.yoff+_text_y_off),
+						text.text
+					);
+			}
+				
+		})
+		#endregion
+		
 		#region Variables
 			
 			set_sprite(s9ButtonText);
-			
+			set_sprite_to_auto_wrap();
 			set_size(0, 0, sprite_get_width(s9ButtonText), sprite_get_height(s9ButtonText))
 			
 		#endregion
@@ -71,69 +117,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			
 			#region GML Events
 				
-				static draw_gui = function() {
-					var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
-					
-					if (self.image_alpha != 0)
-					&& (self.visible) {
-						
-						//draw the nineslice
-						if (self.image_alpha == 1)
-						&& (self.image_blend == c_white) {
-							draw_sprite_stretched(
-									self.sprite_index,
-									_image_index,
-									x,
-									y,
-									region.get_width(),
-									region.get_height()
-							);
-						}
-						else{
-							draw_sprite_stretched_ext(
-									self.sprite_index, 
-									_image_index, 
-									x, 
-									y, 
-									region.get_width(), 
-									region.get_height(), 
-									self.image_blend, 
-									self.image_alpha
-							);
-						}
-						
-						draw_set_alpha(self.image_alpha);
-						
-						//set font color
-						switch (_image_index) {
-							case GUI_IMAGE_ENABLED : {
-								draw_set_color(text.color.idle);
-								break;}
-							case GUI_IMAGE_HOVER: {
-								draw_set_color(text.color.hover);
-								break;}
-							case GUI_IMAGE_CLICKED: {
-								draw_set_color(text.color.clicked);
-								break;}
-							case GUI_IMAGE_DISABLED: {
-								draw_set_color(text.color.disable);
-								break;}
-						}
-						
-						draw_set_font(text.font);
-						draw_set_halign(text.halign);
-						draw_set_valign(text.valign);
-						
-						var _text_y_off = (image_index == GUI_IMAGE_CLICKED) ? text.click_y_off : 0;
-						
-						draw_text(
-								(self.x+text.xoff),
-								(self.y+text.yoff+_text_y_off),
-								text.text
-							);
-					}
 				
-				}
 				
 			#endregion
 			

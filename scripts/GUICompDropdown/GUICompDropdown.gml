@@ -125,7 +125,7 @@ function GUICompDropdown() : GUICompController() constructor {
 					__controller__.set_size(0, 0, _width, _dropdown_height);
 					__controller__.set_scrollbar_hidden(true, true);
 					
-					set_text_offsets(_slice.left, _slice.top, text.click_y_off);
+					set_text_offsets(_slice.left, _slice.top, text.click_yoff);
 					
 					return self;
 				}
@@ -245,7 +245,7 @@ function GUICompDropdown() : GUICompController() constructor {
 					
 					text.xoff = _x;
 					text.yoff = _y;
-					text.click_y_off = _click_y;
+					text.click_yoff = _click_y;
 					
 					return self;
 				};

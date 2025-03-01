@@ -1,25 +1,27 @@
-// Root component at (100,100)
+// Create the root GUI component at (0, 0) with a size of 400x300
 root = new GUICompCore()
     .set_position(0, 0)
     .set_size(0, 0, 400, 300)
     .set_enabled(true)
-	.on_pre_step(function(_input) {
-        // Move comp2 one pixel to the right each frame.
+    .on_pre_step(function(_input) {
+        // Move root one pixel to the right each frame.
         root.set_position(root.x + 1, root.y);
-	})
-    
-// Child component (automatically placed relative to root at offset (20,20))
-child = new GUICompButtonSprite()
-    .set_offset(0, 0)
-    .set_size(0, 0, 50, 50)
+    });
+
+// Create a button with text, positioned relative to root
+button = new GUICompButtonText()
+    .set_offset(20, 20) // Positioned 20px right and 20px down from root
+    .set_size(0, 0, 120, 40) // Set button size (width: 120px, height: 40px)
+    .set_text("Click Me") // Set text for button
+    .set_text_alignment(fa_center, fa_middle) // Center text
     .set_enabled(true)
-	.on_pre_step(function(_input) {
-        // Move comp2 one pixel to the right each frame.
-        child.set_offset(child.x_offset - 1, child.y_offset);
-	})
+    .on_pre_step(function(_input) {
+        // Move button left one pixel relative to parent
+        button.set_offset(button.x_offset - 1, button.y_offset);
+    });
 
-// Add child to root (it is automatically placed at 120,120)
-root.add(child);
+// Add the button to the root component
+root.add(button);
 
-// Move root (child moves with it)
-root.set_position(200, 200); // Child now moves to (220,220)
+// Test: Change root position and ensure child follows
+root.set_position(200, 150); // Moves root to (200,150), button moves to (220,170)

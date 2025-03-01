@@ -505,7 +505,7 @@ function GUICompSlider() : GUICompCore() constructor {
 				static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
 					text.xoff = _x;
 					text.yoff = _y;
-					text.click_y_off = _click_y;
+					text.click_yoff = _click_y;
 					
 					return self;
 				}
@@ -1070,8 +1070,6 @@ function GUICompSlider() : GUICompCore() constructor {
 		#region Variables
 			
 			__prev_value__ = value
-			__click_xoff__ = 0;
-			__click_yoff__ = 0;
 			__slider_bounds__ = {
 				min_x : 0,
 				min_y : 0,

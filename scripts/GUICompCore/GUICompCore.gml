@@ -43,6 +43,7 @@ function GUICompCore() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_size = function(_left, _top, _right, _bottom) {
+				log(json_stringify(debug_get_callstack(10), true))
 				__size_set__ = true;
 				__set_size__(_left, _top, _right, _bottom);
 				return self;
@@ -111,6 +112,7 @@ function GUICompCore() constructor {
 			#endregion
 			static set_sprite = function(_sprite) {
 				__set_sprite__(_sprite);
+				return self;
 			}
 			#region jsDoc
 			/// @func    set_sprite_angle()
@@ -121,6 +123,7 @@ function GUICompCore() constructor {
 			#endregion
 			static set_sprite_angle = function(_angle) {
 				image_angle = _angle;
+				return self;
 			}
 			#region jsDoc
 			/// @func    set_sprite_color()
@@ -131,6 +134,7 @@ function GUICompCore() constructor {
 			#endregion
 			static set_sprite_color = function(_col) {
 				image_blend = _col;
+				return self;
 			}
 			#region jsDoc
 			/// @func    set_sprite_alpha()
@@ -141,6 +145,7 @@ function GUICompCore() constructor {
 			#endregion
 			static set_sprite_alpha = function(_alpha) {
 				image_alpha = _alpha;
+				return self;
 			}
 			#endregion
 			#region Text
@@ -253,9 +258,16 @@ function GUICompCore() constructor {
 			
 			events = {};
 			
-			events.on_focus    = variable_get_hash("on_focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			events.on_blur     = variable_get_hash("on_blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
-			events.on_hover    = variable_get_hash("on_hover"); //triggered every frame the mouse is over the regions bounding box
+			events.focus    = variable_get_hash("focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.blur     = variable_get_hash("blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
+			static on_focus = function(_func) {
+				add_event_listener(events.pre_step, _func);
+				return self;
+			}
+			static on_blur = function(_func) {
+				add_event_listener(events.post_step, _func);
+				return self;
+			}
 			
 			events.mouse_over = variable_get_hash("mouse_over");
 			events.pressed    = variable_get_hash("pressed");
@@ -263,21 +275,75 @@ function GUICompCore() constructor {
 			events.long_press = variable_get_hash("long_press");
 			events.released   = variable_get_hash("released");
 			events.double_click = variable_get_hash("double_click");
+			static on_mouse_over = function(_func) {
+				add_event_listener(events.mouse_over, _func);
+				return self;
+			}
+			static on_pressed = function(_func) {
+				add_event_listener(events.pressed, _func);
+				return self;
+			}
+			static on_held = function(_func) {
+				add_event_listener(events.held, _func);
+				return self;
+			}
+			static on_long_press = function(_func) {
+				add_event_listener(events.long_press, _func);
+				return self;
+			}
+			static on_released = function(_func) {
+				add_event_listener(events.released, _func);
+				return self;
+			}
+			static on_double_click = function(_func) {
+				add_event_listener(events.double_click, _func);
+				return self;
+			}
 			
 			events.pre_step  = variable_get_hash("pre_step"); //triggered every frame before the begin step event is activated
 			events.post_step = variable_get_hash("post_step"); //triggered every frame after the end step event is activated
+			static on_pre_step = function(_func) {
+				add_event_listener(events.pre_step, _func);
+				return self;
+			}
+			static on_post_step = function(_func) {
+				add_event_listener(events.post_step, _func);
+				return self;
+			}
 			
 			events.pre_draw    = variable_get_hash("pre_draw"); //triggered every frame after the end step event is activated
 			events.post_draw   = variable_get_hash("post_draw"); //triggered every frame after the end step event is activated
+			static on_pre_draw = function(_func) {
+				add_event_listener(events.pre_draw, _func);
+				return self;
+			}
+			static on_post_draw = function(_func) {
+				add_event_listener(events.post_draw, _func);
+				return self;
+			}
 			
 			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
+			static on_enable = function(_func) {
+				add_event_listener(events.enabled, _func);
+				return self;
+			}
+			static on_disabled = function(_func) {
+				add_event_listener(events.disabled, _func);
+				return self;
+			}
 			
-			events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			static on_mouse_over_group = function(_func) {
+				add_event_listener(events.mouse_over_group, _func);
+				return self;
+			}
 			
 		#endregion
 		
 		#region Variables
+			
+			my_data = {};
 			
 			is_enabled = true;
 			
@@ -360,7 +426,7 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static trigger_event = function(_event_id, _data=undefined) {
+			static trigger_event = function(_event_id, _data=my_data) {
 				
 				var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id)
 				if (_event_arr != undefined) {
@@ -396,7 +462,29 @@ function GUICompCore() constructor {
 				
 				return _uid
 			}
-			//TODO: Fix this function
+			#region jsDoc
+			/// @func    insert_event_listener()
+			/// @desc    Insert an event listener to the component,
+			///          This function will be ran when the event is triggered
+			/// @self    GUICompCore
+			/// @param   {String} event_id : The comonent's event you wish to bound this function to.
+			/// @param   {Function} func : The function to run when the event is triggered
+			/// @returns {Real}
+			#endregion
+			static insert_event_listener = function(_index, _event_id, _func) {
+				var _hash = _event_id;
+				if (struct_get_from_hash(self.__event_listeners__, _hash) == undefined) {
+					struct_set_from_hash(self.__event_listeners__, _hash, [])
+				}
+				
+				var _uid = __event_listener_uid__;
+				__event_listener_uid__+=1;
+				var _arr = struct_get_from_hash(self.__event_listeners__, _hash)
+				array_insert(_arr, _index, {func: _func, UID: _uid});
+				struct_set_from_hash(self.__event_listeners__, _hash, _arr)
+				
+				return _uid
+			}
 			#region jsDoc
 			/// @func    remove_event_listener()
 			/// @desc    Remove an event listener to the component
@@ -449,23 +537,6 @@ function GUICompCore() constructor {
 			#endregion
 			static event_exists = function(_event_id) {
 				return struct_exists_from_hash(self.__event_listeners__, _event_id)
-			}
-			
-			static on_pre_step = function(_func) {
-				add_event_listener(events.pre_step, _func);
-				return self;
-			}
-			static on_post_step = function(_func) {
-				add_event_listener(events.post_step, _func);
-				return self;
-			}
-			static on_pre_draw = function(_func) {
-				add_event_listener(events.pre_draw, _func);
-				return self;
-			}
-			static on_post_draw = function(_func) {
-				add_event_listener(events.post_draw, _func);
-				return self;
 			}
 			
 			#endregion
@@ -587,7 +658,7 @@ function GUICompCore() constructor {
 				)
 				
 				if (__mouse_on_comp__) {
-					trigger_event(self.events.on_hover);
+					trigger_event(self.events.mouse_over);
 				}
 				
 				return __mouse_on_comp__;
@@ -617,7 +688,7 @@ function GUICompCore() constructor {
 				);
 				
 				if (__mouse_on_group__) {
-					trigger_event(self.events.on_hover_controller);
+					trigger_event(self.events.mouse_over_group);
 				}
 				
 				return __mouse_on_group__;
@@ -900,7 +971,7 @@ function GUICompCore() constructor {
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0;
-			__is_on_focus__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
+			__is_focused__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
 			
 			#endregion
 			#region Sub Component Variables
@@ -929,8 +1000,8 @@ function GUICompCore() constructor {
 			/// @ignore
 			#endregion
 			static __reset_focus__ = function() {
-				__is_on_focus__ = false;
-				trigger_event(self.events.on_blur);
+				__is_focused__ = false;
+				trigger_event(self.events.blur);
 			}
 			#region jsDoc
 			/// @func    __handle_click__()
@@ -941,7 +1012,7 @@ function GUICompCore() constructor {
 			static __handle_click__ = function(_input) {
 				//early out if we're disabled
 				if (!is_enabled) {
-					if (__is_on_focus__) {
+					if (__is_focused__) {
 						__reset_focus__();
 					}
 					return;
@@ -950,7 +1021,7 @@ function GUICompCore() constructor {
 				var _input_captured = _input.consumed
 				
 				//capture input if we still have focus
-				if (__is_on_focus__)
+				if (__is_focused__)
 				&& (is_enabled) {
 					consume_input();
 				}
@@ -967,13 +1038,13 @@ function GUICompCore() constructor {
 					
 					//mouse button checks
 					if (mouse_check_button_pressed(mb_left)) {
-						__is_on_focus__ = true;
+						__is_focused__ = true;
 						image_index = GUI_IMAGE_CLICKED;
 						__click_held_timer__ = 0;
 						trigger_event(self.events.pressed);
-						trigger_event(self.events.on_focus);
+						trigger_event(self.events.focus);
 					}
-					else if (__is_on_focus__) && (mouse_check_button(mb_left)) {
+					else if (__is_focused__) && (mouse_check_button(mb_left)) {
 						image_index = GUI_IMAGE_CLICKED;
 						trigger_event(self.events.held);
 						
@@ -983,20 +1054,20 @@ function GUICompCore() constructor {
 							trigger_event(self.events.long_press);
 						}
 					}
-					else if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
+					else if (__is_focused__) && (mouse_check_button_released(mb_left)) {
 						__reset_focus__();
 						__click_held_timer__ = 0;
 						image_index = GUI_IMAGE_HOVER;
 						trigger_event(self.events.released);
-						trigger_event(self.events.on_blur);
+						trigger_event(self.events.blur);
 					}
 					
 				}
 				else {
 					image_index = GUI_IMAGE_ENABLED;
-					if (__is_on_focus__) && (mouse_check_button_released(mb_left)) {
+					if (__is_focused__) && (mouse_check_button_released(mb_left)) {
 						__reset_focus__();
-						trigger_event(self.events.on_blur);
+						trigger_event(self.events.blur);
 					}
 				}
 				

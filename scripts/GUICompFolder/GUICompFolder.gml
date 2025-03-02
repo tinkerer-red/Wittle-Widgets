@@ -60,7 +60,7 @@ function GUICompFolder() : GUICompController() constructor {
 		
 			self.events.opened = variable_get_hash("opened");
 			self.events.closed = variable_get_hash("closed");
-			self.events.on_hover_controller = variable_get_hash("on_hover_controller"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			self.events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			
 		#endregion
 		

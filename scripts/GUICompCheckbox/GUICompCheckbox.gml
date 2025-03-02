@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompCheckbox}
 #endregion
-function GUICompCheckbox() : GUICompButtonSprite() constructor {
+function GUICompCheckbox() : GUICompButton() constructor {
 	debug_name = "GUICompCheckbox";
 	
 	#region Public
@@ -30,7 +30,7 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 				sprite_checked = _checked_sprite;
 				sprite_unchecked = _unchecked_sprite;
 				
-				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
+				var _sprite = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
 				set_sprite(_sprite);
 				
 				return self;
@@ -43,44 +43,54 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 			/// @returns {Struct.GUICompCheckbox}
 			#endregion
 			static set_value = function(_is_checked) {
-				is_checked = _is_checked;
+				my_data.is_checked = _is_checked;
 				
-				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
-				GUICompButtonSprite.set_sprite(_sprite);
-		
+				var _sprite = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
+				set_sprite(_sprite);
+				
 				return self;
 			}
 			
 		#endregion
-	
+		
+		#region Events
+			
+			insert_event_listener(0, self.events.released, function(){
+				my_data.is_checked = !my_data.is_checked;
+				sprite_index = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
+			})
+			
+			
+		#endregion
+		
 		#region Variables
-			is_checked = false;
+			
+			my_data.is_checked = false;
 			
 			sprite_checked = s9CheckBoxChecked;
 			sprite_unchecked = s9CheckBoxUnchecked;
 			
-			var _set_sprite = GUICompButtonSprite.set_sprite;
-			_set_sprite(sprite_unchecked);
+			set_sprite(sprite_unchecked);
 			
 		#endregion
 	
 		#region Functions
 			
 			#region jsDoc
-			/// @func    get_is_checked()
+			/// @func    get_checked()
 			/// @desc    Returns if the checkbox is checked
 			/// @self    GUICompCheckbox
 			/// @returns {Bool}
 			#endregion
-			static get_is_checked = function() {
+			static get_checked = function() {
 				//the only reason this is a function is so it shows up better in feather
 				
-				return is_checked;
+				return my_data.is_checked;
 			}
 			
-			static draw_gui = function(_input) {
-				draw_sprite(sprite_index, image_index, x, y);
-			}
+			static toggle = function() {
+				return set_value(!my_data.is_checked);
+			};
 			
 		#endregion
 	
@@ -94,10 +104,6 @@ function GUICompCheckbox() : GUICompButtonSprite() constructor {
 		
 		#region Functions
 			
-			add_event_listener(self.events.released, function(){
-				is_checked = !is_checked;
-				sprite_index = (is_checked) ? sprite_checked : sprite_unchecked;
-			})
 			
 		#endregion
 		

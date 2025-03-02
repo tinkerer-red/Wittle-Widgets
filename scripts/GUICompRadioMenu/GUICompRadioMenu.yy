@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompCheckbox",
+  "%Name":"GUICompRadioMenu",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompCheckbox",
+  "name":"GUICompRadioMenu",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

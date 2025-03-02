@@ -379,7 +379,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				)
 				
 				if (__mouse_on_comp__) {
-					trigger_event(self.events.on_hover);
+					trigger_event(self.events.mouse_over);
 				}
 				
 				return __mouse_on_comp__;
@@ -537,7 +537,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 				//scrollbar
 				__scrollbar__.add_event_listener(__scrollbar__.events.post_step, function(){
-					if (__scrollbar__.__is_on_focus__) {
+					if (__scrollbar__.__is_focused__) {
 						__update_button_enables__();
 					}
 				});

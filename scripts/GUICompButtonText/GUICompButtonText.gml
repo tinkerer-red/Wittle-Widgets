@@ -41,75 +41,75 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 		
 		#region Events
 			on_pre_draw(function(_input) {
-			var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
+				var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
 					
-			if (self.image_alpha != 0)
-			&& (self.visible) {
+				if (self.image_alpha != 0)
+				&& (self.visible) {
 						
-				//draw the nineslice
-				if (self.image_alpha == 1)
-				&& (self.image_blend == c_white) {
-					draw_sprite_stretched(
-							self.sprite_index,
-							_image_index,
-							x,
-							y,
-							region.get_width(),
-							region.get_height()
-					);
+					//draw the nineslice
+					if (self.image_alpha == 1)
+					&& (self.image_blend == c_white) {
+						draw_sprite_stretched(
+								self.sprite_index,
+								_image_index,
+								x,
+								y,
+								region.get_width(),
+								region.get_height()
+						);
+					}
+					else{
+						draw_sprite_stretched_ext(
+								self.sprite_index, 
+								_image_index, 
+								x, 
+								y, 
+								region.get_width(), 
+								region.get_height(), 
+								self.image_blend, 
+								self.image_alpha
+						);
+					}
+						
+					draw_set_alpha(self.image_alpha);
+						
+					//set font color
+					switch (_image_index) {
+						case GUI_IMAGE_ENABLED : {
+							draw_set_color(text.color.idle);
+							break;}
+						case GUI_IMAGE_HOVER: {
+							draw_set_color(text.color.hover);
+							break;}
+						case GUI_IMAGE_CLICKED: {
+							draw_set_color(text.color.clicked);
+							break;}
+						case GUI_IMAGE_DISABLED: {
+							draw_set_color(text.color.disable);
+							break;}
+					}
+						
+					draw_set_font(text.font);
+					draw_set_halign(text.halign);
+					draw_set_valign(text.valign);
+						
+					var _text_y_off = (image_index == GUI_IMAGE_CLICKED) ? text.click_yoff : 0;
+						
+					draw_text(
+							(self.x+text.xoff),
+							(self.y+text.yoff+_text_y_off),
+							text.text
+						);
 				}
-				else{
-					draw_sprite_stretched_ext(
-							self.sprite_index, 
-							_image_index, 
-							x, 
-							y, 
-							region.get_width(), 
-							region.get_height(), 
-							self.image_blend, 
-							self.image_alpha
-					);
-				}
-						
-				draw_set_alpha(self.image_alpha);
-						
-				//set font color
-				switch (_image_index) {
-					case GUI_IMAGE_ENABLED : {
-						draw_set_color(text.color.idle);
-						break;}
-					case GUI_IMAGE_HOVER: {
-						draw_set_color(text.color.hover);
-						break;}
-					case GUI_IMAGE_CLICKED: {
-						draw_set_color(text.color.clicked);
-						break;}
-					case GUI_IMAGE_DISABLED: {
-						draw_set_color(text.color.disable);
-						break;}
-				}
-						
-				draw_set_font(text.font);
-				draw_set_halign(text.halign);
-				draw_set_valign(text.valign);
-						
-				var _text_y_off = (image_index == GUI_IMAGE_CLICKED) ? text.click_yoff : 0;
-						
-				draw_text(
-						(self.x+text.xoff),
-						(self.y+text.yoff+_text_y_off),
-						text.text
-					);
-			}
 				
-		})
+			})
 		#endregion
 		
 		#region Variables
 			
 			set_sprite(s9ButtonText);
 			set_sprite_to_auto_wrap();
-			set_size(0, 0, sprite_get_width(s9ButtonText), sprite_get_height(s9ButtonText))
+			__set_size__(0, 0, sprite_get_width(s9ButtonText), sprite_get_height(s9ButtonText))
 			
 		#endregion
 		

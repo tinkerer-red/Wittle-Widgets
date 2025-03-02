@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompCheckbox",
+  "%Name":"__GUICompTemplate",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompCheckbox",
+  "name":"__GUICompTemplate",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

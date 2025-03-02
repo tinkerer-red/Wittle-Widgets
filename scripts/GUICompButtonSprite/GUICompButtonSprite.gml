@@ -1,11 +1,9 @@
 #region jsDoc
-/// @func    GUICompButtonSprite()
+/// @func    GUICompButton()
 /// @desc    Creates a button component
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.GUICompButtonSprite}
+/// @return {Struct.GUICompButton}
 #endregion
-function GUICompButtonSprite() : GUICompCore() constructor {
+function GUICompButton() : GUICompCore() constructor {
 	debug_name = "GUICompButtonSprite";
 	
 	#region Public
@@ -41,11 +39,17 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 				}
 				return self;
 			}
-			
+			static set_callback = function(_callback) {
+				callback = _callback;
+				return self;
+			}
 		#endregion
 		
 		#region Events
 			
+			on_released(function(_data)  {
+				callback(_data)
+			})
 			on_pre_step(function(_input) {
 				__handle_click__(_input);
 			})
@@ -87,6 +91,7 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 		#region Variables
 			
 			set_sprite(sButton); // init the sprite variables
+			callback = function(_data){};
 			
 		#endregion
 		
@@ -95,6 +100,65 @@ function GUICompButtonSprite() : GUICompCore() constructor {
 			#region GML Events
 				
 				
+			#endregion
+			
+		#endregion
+		
+	#endregion
+	
+	#region Private Library
+		
+		#region Variables
+			
+		#endregion
+		
+		#region Functions
+			
+			#region GML Events
+				
+				
+			#endregion
+			
+		#endregion
+	
+	#endregion
+	
+}
+
+#region jsDoc
+/// @func    GUICompButtonSprite()
+/// @desc    Creates a button component
+/// @return {Struct.GUICompButtonSprite}
+#endregion
+function GUICompButtonSprite() : GUICompButton() constructor {
+	debug_name = "GUICompButton";
+	
+	#region Public
+		
+		#region Builder Functions
+			
+			
+			
+		#endregion
+		
+		#region Events
+			
+			
+			
+		#endregion
+		
+		#region Variables
+			
+			
+			
+		#endregion
+		
+		#region Functions
+			
+			#region GML Events
+			
+			
+			
 			#endregion
 			
 		#endregion

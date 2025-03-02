@@ -58,7 +58,7 @@ function GUICompController() : GUICompCore() constructor {
 					);
 					
 					if (_r) {
-						trigger_event(self.events.on_hover);
+						trigger_event(self.events.mouse_over);
 					}
 					
 					return _r;

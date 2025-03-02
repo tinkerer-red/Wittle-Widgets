@@ -258,7 +258,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				add_event_listener(self.events.post_step, function(_data) {
 					
 					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
-					_image_index = max(_image_index, __textbox__.__is_on_focus__)
+					_image_index = max(_image_index, __textbox__.__is_focused__)
 					
 					__button__.image_index   = _image_index;
 					
@@ -293,8 +293,8 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				//set the focus to the textbox
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
-						__is_on_focus__ = true;
-						trigger_event(self.events.on_focus);
+						__is_focused__ = true;
+						trigger_event(self.events.focus);
 						
 						var _line_last = curt.length - 1;
 						var _line_last_length = string_length(curt.lines[_line_last]);

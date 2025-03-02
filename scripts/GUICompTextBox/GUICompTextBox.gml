@@ -728,7 +728,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				)
 				
 				if (__mouse_on_comp__) {
-					trigger_event(self.events.on_hover);
+					trigger_event(self.events.mouse_over);
 				}
 				
 				return __mouse_on_comp__;
@@ -823,7 +823,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 							if (mouse_check_button_pressed(keys.mouse_left)) {
 								if (!_mouse_on_comp) {
-									if (__is_on_focus__) {
+									if (__is_focused__) {
 										if (__event_exists__(self.events.submit)) {
 											var _text = __textbox_lines_to_text__(curt.lines);
 											trigger_event(self.events.submit, _text);
@@ -833,12 +833,12 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								}
 					
 								if (curt.accepting_inputs) {
-									__is_on_focus__ = _mouse_on_comp;
-									if (__is_on_focus__){
-										trigger_event(self.events.on_focus);
+									__is_focused__ = _mouse_on_comp;
+									if (__is_focused__){
+										trigger_event(self.events.focus);
 									}
 									else{
-										trigger_event(self.events.on_blur);
+										trigger_event(self.events.blur);
 									}
 									
 									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
@@ -1084,7 +1084,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						consume_input();
 					}
 					
-					if (!__is_on_focus__)
+					if (!__is_focused__)
 					|| (!keyboard_check(vk_anykey)) {
 						return;
 					}
@@ -1102,10 +1102,10 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								if (curt.adaptive_width) {
 									_text = __textbox_close_lines__(_text, 0);
 								}
-								__is_on_focus__ = false;
+								__is_focused__ = false;
 								curt.focus = false;
 								trigger_event(self.events.submit, _text);
-								trigger_event(self.events.on_blur);
+								trigger_event(self.events.blur);
 								break;
 							}
 
@@ -1693,7 +1693,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						
 						#region draw cursor
 						
-							if (__is_on_focus__)
+							if (__is_focused__)
 							&& (draw.display_cursor > 0)
 							&& (is_enabled) {
 								var _cursor_xoff = (__using_cached_drawing__) ? -x : 0

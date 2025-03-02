@@ -9,12 +9,11 @@ root = new GUICompCore()
     });
 
 // Create a button with text, positioned relative to root
-button = new GUICompButtonText()
+button = new GUICompCheckbox()
     .set_offset(20, 20) // Positioned 20px right and 20px down from root
     .set_size(0, 0, 120, 40) // Set button size (width: 120px, height: 40px)
-    .set_text("Click Me") // Set text for button
-    .set_text_alignment(fa_center, fa_middle) // Center text
     .set_enabled(true)
+    .set_callback(function(_data){ log(_data.is_checked) })
     .on_pre_step(function(_input) {
         // Move button left one pixel relative to parent
         button.set_offset(button.x_offset - 1, button.y_offset);

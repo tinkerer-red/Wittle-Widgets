@@ -43,7 +43,6 @@ function GUICompCore() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_size = function(_left, _top, _right, _bottom) {
-				log(json_stringify(debug_get_callstack(10), true))
 				__size_set__ = true;
 				__set_size__(_left, _top, _right, _bottom);
 				return self;
@@ -157,7 +156,7 @@ function GUICompCore() constructor {
 			/// @returns {Struct.GUICompButtonText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.text = _text
+				text.content = _text
 				
 				return self;
 			}
@@ -343,8 +342,6 @@ function GUICompCore() constructor {
 		
 		#region Variables
 			
-			my_data = {};
-			
 			is_enabled = true;
 			
 			halign = fa_left;
@@ -387,7 +384,7 @@ function GUICompCore() constructor {
 				self.image_yscale = 1;
 				
 				text = {
-					text : "<undefined>",
+					content : "<undefined>",
 					font : fGUIDefault,
 					
 					xoff : 0,
@@ -426,8 +423,8 @@ function GUICompCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static trigger_event = function(_event_id, _data=my_data) {
-				
+			static trigger_event = function(_event_id, _data) {
+				//log(debug_name + " " + event_name(_event_id))
 				var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id)
 				if (_event_arr != undefined) {
 					var _size = array_length(_event_arr);
@@ -467,6 +464,7 @@ function GUICompCore() constructor {
 			/// @desc    Insert an event listener to the component,
 			///          This function will be ran when the event is triggered
 			/// @self    GUICompCore
+			/// @param   {Real} index : The index to insert the event handler
 			/// @param   {String} event_id : The comonent's event you wish to bound this function to.
 			/// @param   {Function} func : The function to run when the event is triggered
 			/// @returns {Real}
@@ -537,6 +535,16 @@ function GUICompCore() constructor {
 			#endregion
 			static event_exists = function(_event_id) {
 				return struct_exists_from_hash(self.__event_listeners__, _event_id)
+			}
+			static event_name = function(_event_id) {
+				var _names = struct_get_names(events);
+				var _len = array_length(_names)
+				var _i=0; repeat(_len) {
+					var _name = _names[_i];
+					if (struct_get(events, _name) == _event_id) {
+						return _name;
+					}
+				_i++}
 			}
 			
 			#endregion
@@ -673,7 +681,10 @@ function GUICompCore() constructor {
 			static mouse_on_group = function() {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
-					if (!__parent__.__mouse_on_comp__) {
+					if (!__parent__.__mouse_on_group__) {
+						return false;
+					}
+					if (__parent__.__mouse_on_comp__) {
 						return false;
 					}
 				}
@@ -919,7 +930,7 @@ function GUICompCore() constructor {
 						)
 					}
 					#endregion
-					
+					#region Group Region
 					draw_set_color(c_yellow)
 					draw_rectangle(
 							x+__group_region__.left,
@@ -940,6 +951,8 @@ function GUICompCore() constructor {
 						x+__group_region__.left,
 						y+__group_region__.bottom
 					)
+					#endregion
+					//draw_text(x,y, $"__mouse_on_group__ :: {__mouse_on_group__}\n__mouse_on_comp__ :: {__mouse_on_comp__}")
 					draw_set_alpha(1)
 				}
 				

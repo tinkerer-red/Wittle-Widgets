@@ -48,7 +48,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.text = _text;
+				text.content = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;
@@ -216,10 +216,10 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					
 					with (__dropdown__){
 						if (is_open) {
-							trigger_event(self.events.opened, {index : current_index, text : text.text});
+							trigger_event(self.events.opened, {index : current_index, text : text.content});
 						}
 						else {
-							trigger_event(self.events.closed, {index : current_index, text : text.text});
+							trigger_event(self.events.closed, {index : current_index, text : text.content});
 						}
 					}
 				});

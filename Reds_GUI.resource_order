@@ -57,6 +57,7 @@
     {"name":"GUICompScrollBar","order":13,"path":"scripts/GUICompScrollBar/GUICompScrollBar.yy",},
     {"name":"GUICompScrollingText","order":9,"path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},
     {"name":"GUICompSlider","order":11,"path":"scripts/GUICompSlider/GUICompSlider.yy",},
+    {"name":"GUICompText","order":6,"path":"scripts/GUICompText/GUICompText.yy",},
     {"name":"GUICompTextBox","order":12,"path":"scripts/GUICompTextBox/GUICompTextBox.yy",},
     {"name":"Script12","order":7,"path":"scripts/Script12/Script12.yy",},
     {"name":"Settings","order":2,"path":"scripts/Settings/Settings.yy",},

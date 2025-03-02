@@ -85,6 +85,7 @@
     {"id":{"name":"GUICompScrollBar","path":"scripts/GUICompScrollBar/GUICompScrollBar.yy",},},
     {"id":{"name":"GUICompScrollingText","path":"scripts/GUICompScrollingText/GUICompScrollingText.yy",},},
     {"id":{"name":"GUICompSlider","path":"scripts/GUICompSlider/GUICompSlider.yy",},},
+    {"id":{"name":"GUICompText","path":"scripts/GUICompText/GUICompText.yy",},},
     {"id":{"name":"GUICompTextBox","path":"scripts/GUICompTextBox/GUICompTextBox.yy",},},
     {"id":{"name":"Script12","path":"scripts/Script12/Script12.yy",},},
     {"id":{"name":"Settings","path":"scripts/Settings/Settings.yy",},},

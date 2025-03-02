@@ -25,8 +25,8 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 				
 				draw_set_font(text.font);
 				var _slice = sprite_get_nineslice(sprite_index);
-				var _width  = string_width(text.text)  + (_slice.left + _slice.right);
-				var _height = string_height(text.text) + (_slice.top  + _slice.bottom);
+				var _width  = string_width(text.content)  + (_slice.left + _slice.right);
+				var _height = string_height(text.content) + (_slice.top  + _slice.bottom);
 				
 				//update internal variables
 				set_size(0, 0, _width, _height);
@@ -98,7 +98,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 					draw_text(
 							(self.x+text.xoff),
 							(self.y+text.yoff+_text_y_off),
-							text.text
+							text.content
 						);
 				}
 				

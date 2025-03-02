@@ -90,10 +90,10 @@ function GUICompScrollingText() : GUICompCore() constructor {
 			/// @returns {Struct.GUICompScrollingText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.text = _text;
+				text.content = _text;
 				
 				draw_set_font(text.font);
-				text.width  = string_width(text.text);
+				text.width  = string_width(text.content);
 				text.height = font_get_info(text.font).size;
 				
 				return self;
@@ -109,7 +109,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 				text.font = _font;								// font
 				
 				draw_set_font(text.font);
-				text.width  = string_width(text.text);
+				text.width  = string_width(text.content);
 				text.height = font_get_info(text.font).size;
 				
 				
@@ -211,7 +211,7 @@ function GUICompScrollingText() : GUICompCore() constructor {
 					draw_text(
 							x + scroll.x_off + text.xoff,
 							y + scroll.y_off + text.yoff,
-							text.text
+							text.content
 					)
 				}
 				

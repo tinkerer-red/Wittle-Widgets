@@ -55,10 +55,10 @@ function GUICompDropdown() : GUICompController() constructor {
 					//run events if needed
 					if (_prev_open != is_open) {
 						if (is_open) {
-							trigger_event(self.events.opened, {index : current_index, text : text.text});
+							trigger_event(self.events.opened, {index : current_index, text : text.content});
 						}
 						else {
-							trigger_event(self.events.closed, {index : current_index, text : text.text});
+							trigger_event(self.events.closed, {index : current_index, text : text.content});
 						}
 					}
 					
@@ -76,14 +76,14 @@ function GUICompDropdown() : GUICompController() constructor {
 					var _prev_index = current_index;
 					
 					if (_index == -1) {
-						text.text = __default_text__;
+						text.content = __default_text__;
 					}
 					else{
 						var _elements = __controller__.__children__;
-						text.text = _elements[_index].text.text;
+						text.content = _elements[_index].text.content;
 					}
 					
-					__button__.set_text(text.text);
+					__button__.set_text(text.content);
 					
 					is_open = false;
 					current_index = _index;
@@ -105,13 +105,13 @@ function GUICompDropdown() : GUICompController() constructor {
 				static set_sprite_to_auto_wrap = function() {
 					
 					draw_set_font(text.font);
-					var _largest_text_width  = string_width(text.text);
-					var _largest_text_height = string_height(text.text);
+					var _largest_text_width  = string_width(text.content);
+					var _largest_text_height = string_height(text.content);
 					
 					var _elements = __controller__.__children__;
 					var _i=0; repeat(__controller__.__children_count__) {
-						_largest_text_width  = max(_largest_text_width,  string_width(_elements[_i].text.text) );
-						_largest_text_height = max(_largest_text_height, string_height(_elements[_i].text.text) );
+						_largest_text_width  = max(_largest_text_width,  string_width(_elements[_i].text.content) );
+						_largest_text_height = max(_largest_text_height, string_height(_elements[_i].text.content) );
 					_i+=1;}//end repeat loop
 					
 					var _slice = sprite_get_nineslice(__button__.sprite_index);
@@ -176,7 +176,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				static set_text = function(_text="DefaultText") {
 					__button__.set_text(_text);
 					
-					text.text = _text;
+					text.content = _text;
 					__default_text__ = _text;
 					
 					return self;
@@ -465,7 +465,7 @@ function GUICompDropdown() : GUICompController() constructor {
 						
 						//verify the component is not already in the controller
 						_j=0; repeat(_current_length) {
-							if (_elements[_j].text.text == _elm_str) {
+							if (_elements[_j].text.content == _elm_str) {
 								show_error("Trying to insert a string which already exists inside this dropdown", true)
 							}
 						_j+=1;}//end repeat loop
@@ -483,9 +483,9 @@ function GUICompDropdown() : GUICompController() constructor {
 						parent.set_value(this.__find_index_in_parent__());
 						parent.set_open(false);
 						//events
-						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.text});
+						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.content});
 						if (_prev_index != parent.current_index) {
-							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.text});
+							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.content});
 						}
 					}));
 					
@@ -533,7 +533,7 @@ function GUICompDropdown() : GUICompController() constructor {
 						
 						//verify the component is not already in the controller
 						_j=0; repeat(_current_length) {
-							if (_elements[_j].text.text == _elm_str) {
+							if (_elements[_j].text.content == _elm_str) {
 								show_error("Trying to insert a string which already exists inside this dropdown", true)
 							}
 						_j+=1;}//end repeat loop
@@ -551,9 +551,9 @@ function GUICompDropdown() : GUICompController() constructor {
 						parent.set_value(this.__find_index_in_parent__());
 						parent.set_open(false);
 						//events
-						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.text});
+						parent.trigger_event(parent.events.selected, {index : parent.current_index, text : parent.text.content});
 						if (_prev_index != parent.current_index) {
-							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.text});
+							parent.trigger_event(parent.events.changed, {index : parent.current_index, text : parent.text.content});
 						}
 					}));
 					
@@ -589,7 +589,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				var _current_length = __controller__.__children_count__;
 				var _elements = __controller__.__children__;
 				var _i=0; repeat(_current_length) {
-					if (_elements[_i].text.text == _string) {
+					if (_elements[_i].text.content == _string) {
 						break;
 					}
 				_i+=1;}//end repeat loop
@@ -653,7 +653,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			__is_empty__ = true;
 			
-			__default_text__ = text.text;
+			__default_text__ = text.content;
 			
 			__button__ = new GUICompButtonText()
 					.set_sprite(sprite_header)

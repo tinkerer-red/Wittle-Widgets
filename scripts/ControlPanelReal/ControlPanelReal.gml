@@ -37,7 +37,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.text = _text;
+				text.content = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;

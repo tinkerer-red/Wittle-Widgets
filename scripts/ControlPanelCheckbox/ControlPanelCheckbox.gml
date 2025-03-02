@@ -36,7 +36,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.text = _text;
+				text.content = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;

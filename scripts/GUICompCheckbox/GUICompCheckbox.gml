@@ -30,7 +30,7 @@ function GUICompCheckbox() : GUICompButton() constructor {
 				sprite_checked = _checked_sprite;
 				sprite_unchecked = _unchecked_sprite;
 				
-				var _sprite = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
+				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
 				set_sprite(_sprite);
 				
 				return self;
@@ -43,21 +43,27 @@ function GUICompCheckbox() : GUICompButton() constructor {
 			/// @returns {Struct.GUICompCheckbox}
 			#endregion
 			static set_value = function(_is_checked) {
-				my_data.is_checked = _is_checked;
+				is_checked = _is_checked;
 				
-				var _sprite = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
+				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
 				set_sprite(_sprite);
 				
 				return self;
 			}
-			
+			static set_callback = function(_callback) {
+				var _self = self;
+				on_released(method({this: _self, callback: _callback}, function(){
+					callback(this.is_checked);
+				}));
+				return self;
+			}
 		#endregion
 		
 		#region Events
 			
-			insert_event_listener(0, self.events.released, function(){
-				my_data.is_checked = !my_data.is_checked;
-				sprite_index = (my_data.is_checked) ? sprite_checked : sprite_unchecked;
+			on_released(function(){
+				is_checked = !is_checked;
+				sprite_index = (is_checked) ? sprite_checked : sprite_unchecked;
 			})
 			
 			
@@ -65,7 +71,7 @@ function GUICompCheckbox() : GUICompButton() constructor {
 		
 		#region Variables
 			
-			my_data.is_checked = false;
+			is_checked = false;
 			
 			sprite_checked = s9CheckBoxChecked;
 			sprite_unchecked = s9CheckBoxUnchecked;
@@ -85,11 +91,11 @@ function GUICompCheckbox() : GUICompButton() constructor {
 			static get_checked = function() {
 				//the only reason this is a function is so it shows up better in feather
 				
-				return my_data.is_checked;
+				return is_checked;
 			}
 			
 			static toggle = function() {
-				return set_value(!my_data.is_checked);
+				return set_value(!is_checked);
 			};
 			
 		#endregion

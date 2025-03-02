@@ -40,16 +40,13 @@ function GUICompButton() : GUICompCore() constructor {
 				return self;
 			}
 			static set_callback = function(_callback) {
-				callback = _callback;
+				on_released(_callback);
 				return self;
 			}
 		#endregion
 		
 		#region Events
 			
-			on_released(function(_data)  {
-				callback(_data)
-			})
 			on_pre_step(function(_input) {
 				__handle_click__(_input);
 			})
@@ -91,7 +88,6 @@ function GUICompButton() : GUICompCore() constructor {
 		#region Variables
 			
 			set_sprite(sButton); // init the sprite variables
-			callback = function(_data){};
 			
 		#endregion
 		

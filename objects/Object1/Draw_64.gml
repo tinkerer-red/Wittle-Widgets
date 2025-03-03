@@ -1,1 +1,1 @@
-root.draw(undefined, false);
+root.draw(undefined, true);

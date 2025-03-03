@@ -1149,6 +1149,9 @@ function WWCore() constructor {
 						_comp = _arr[_i];
 						
 						//safety checks
+						if (_comp == undefined) {
+							log("")
+						}
 						_cid = _comp.__comp_id__;
 						
 						//verify the component doeant appear twice in the supplied array
@@ -1270,7 +1273,42 @@ function WWCore() constructor {
 		
 				return _i;
 			}
-			
+			static __adopt_children_events__ = function() {
+				for (var _i=0; _i<array_length(__children__); _i++) {
+					var _child = __children__[_i];
+					__adopt_child_events__(_child);
+				}
+				
+			}
+			static __adopt_child_events__ = function(_comp) {
+				var _self = self;
+				var _events = _comp.get_events();
+				for (var _j=0; _j<array_length(_events); _j++) {
+					
+					var _event_id = _events[_j];
+					var hash = _comp.events[$ _event_id];
+					
+					//set up the events
+					_comp.add_event_listener(
+						hash,
+						method(
+							{this: _self, event_id: hash},
+							function(data){
+								with (this) trigger_event(other.event_id, data)
+							}
+						)
+					)
+					
+					//set up the functions
+					self[$ $"on_{_event_id}"] = method(
+						{this: _self, event_id: hash},
+						function(_func){
+							with (this) add_event_listener(other.event_id, _func)
+							return this;
+						}
+					)
+				}
+			}
 			#endregion
 			#region Render Clipping
 			#region jsDoc

@@ -47,8 +47,8 @@ function WWText() : WWCore() constructor {
 				
 				return self;
 			}
+			static set_color = set_text_color;
 			#endregion
-			
 			
 		#endregion
 		

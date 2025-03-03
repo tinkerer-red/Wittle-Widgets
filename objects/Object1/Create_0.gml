@@ -1,232 +1,279 @@
-// 🌟 Root GUI (Discord Window)
+// ============================================================
+// ROOT GUI (Main Application Window)
 root = new WWCore()
     .set_offset(0, 0)
     .set_size(1280, 720)
+    .set_background_color(c_black)
     .set_enabled(true);
 
-// 🌟 Left Sidebar: Servers
-serverSidebar = new WWCore()
-    .set_offset(0, 0)
-    .set_size(80, 720)
-    .set_background_color(c_dkgray);
+// ============================================================
+// SETTINGS WINDOW
+// ============================================================
+settingsWindow = new WWWindow()
+    .set_offset(50, 50)
+    .set_size(600, 500)
+    .set_title("Settings")
+    .set_background_color(c_dkgray)
+    .center();
 
-// Add several server icons (using button sprites for interactivity)
-var serverIcons = ["🟣", "🟢", "🔵", "🟠", "🔴"];
-var srvY = 20;
-for (var i = 0; i < array_length(serverIcons); i++) {
-    var serverButton = new WWButtonText()
-        .set_offset(10, srvY)
-        .set_size(60, 60)
-        .set_text(serverIcons[i])
-        .set_callback(function() { log("Server clicked!"); });
-    serverSidebar.add(serverButton);
-    srvY += 80;
-}
-root.add(serverSidebar);
-
-// 🌟 Body Left Sidebar: Channels and Categories
-channelSidebar = new WWCore()
-    .set_offset(80, 0)
-    .set_size(240, 720)
+// -- General Settings Panel --
+generalPanel = new WWPanel()
+    .set_offset(20, 60)
+    .set_size(560, 180)
     .set_background_color(c_gray);
 
-// Category: Text Channels
-var textCategory = new WWText()
-    .set_offset(10, 20)
-    .set_text("TEXT CHANNELS")
-    .set_text_color(c_ltgray);
-channelSidebar.add(textCategory);
-
-// Add some text channels
-var textChannels = ["general", "random", "music", "coding"];
-var chanY = 50;
-for (var i = 0; i < array_length(textChannels); i++) {
-    var chanButton = new WWButtonText()
-        .set_offset(10, chanY)
-        .set_size(220, 30)
-        .set_text("# " + textChannels[i])
-        .set_callback(function() { log("Channel selected!"); });
-    channelSidebar.add(chanButton);
-    chanY += 40;
-}
-
-// Category: Voice Channels
-var voiceCategory = new WWText()
-    .set_offset(10, chanY + 10)
-    .set_text("VOICE CHANNELS")
-    .set_text_color(c_ltgray);
-channelSidebar.add(voiceCategory);
-chanY += 50;
-var voiceChannels = ["General", "Gaming", "Study"];
-for (var i = 0; i < array_length(voiceChannels); i++) {
-    var voiceButton = new WWButtonText()
-        .set_offset(10, chanY)
-        .set_size(220, 30)
-        .set_text("🔊 " + voiceChannels[i])
-        .set_callback(function() { log("Voice channel selected!"); });
-    channelSidebar.add(voiceButton);
-    chanY += 40;
-}
-root.add(channelSidebar);
-
-// 🌟 Header (Top Bar of Chat Area)
-header = new WWCore()
-    .set_offset(320, 0)
-    .set_size(680, 60)
-    .set_background_color(c_dkgray);
-
-// Channel name
-channelName = new WWText()
-    .set_offset(20, 15)
-    .set_text("# general")
-    .set_text_color(c_white);
-header.add(channelName);
-
-// Pinned post icon
-pinnedIcon = new WWButtonText()
-    .set_offset(300, 15)
-    .set_size(30, 30)
-    .set_text("📌")
-    .set_callback(function() { log("Pinned clicked"); });
-header.add(pinnedIcon);
-
-// Threads icon
-threadsIcon = new WWButtonText()
-    .set_offset(340, 15)
-    .set_size(30, 30)
-    .set_text("🧵")
-    .set_callback(function() { log("Threads clicked"); });
-header.add(threadsIcon);
-
-// Notification icon
-notificationIcon = new WWButtonText()
-    .set_offset(380, 15)
-    .set_size(30, 30)
-    .set_text("🔔")
-    .set_callback(function() { log("Notifications clicked"); });
-header.add(notificationIcon);
-
-// Pin icon
-pinIcon = new WWButtonText()
-    .set_offset(420, 15)
-    .set_size(30, 30)
-    .set_text("📌")
-    .set_callback(function() { log("Pin toggled"); });
-header.add(pinIcon);
-
-// Hide member list icon
-hideMembersIcon = new WWButtonText()
-    .set_offset(460, 15)
-    .set_size(30, 30)
-    .set_text("👤")
-    .set_callback(function() { log("Member list toggled"); });
-header.add(hideMembersIcon);
-
-root.add(header);
-
-// 🌟 Main Document: Chat Messages Area
-chatArea = new WWCore()
-    .set_offset(320, 60)
-    .set_size(680, 540)
-    .set_background_color(c_black);
-
-// Add some sample messages
-var messages = [
-    { user: "Alice", time: "10:01 AM", content: "Hello everyone!" },
-    { user: "Bob", time: "10:02 AM", content: "Hi Alice! How's it going?" },
-    { user: "Charlie", time: "10:03 AM", content: "Good morning all!" }
-];
-var msgY = 10;
-for (var i = 0; i < array_length(messages); i++) {
-    var msgBox = new WWCore()
-        .set_offset(10, msgY)
-        .set_size(660, 80)
-        .set_background_color(c_dkgray);
-    
-    // User picture (placeholder)
-    var userPic = new WWCore()
-        .set_offset(10, 10)
-        .set_size(60, 60)
-        .set_background_color(c_gray);
-    msgBox.add(userPic);
-    
-    // Username and time
-    var userInfo = new WWText()
-        .set_offset(80, 10)
-        .set_text(messages[i].user + "  •  " + messages[i].time)
-        .set_text_color(c_white);
-    msgBox.add(userInfo);
-    
-    // Message content
-    var msgContent = new WWText()
-        .set_offset(80, 40)
-        .set_text(messages[i].content)
-        .set_text_color(c_ltgray);
-    msgBox.add(msgContent);
-    
-    chatArea.add(msgBox);
-    msgY += 90;
-}
-root.add(chatArea);
-
-// 🌟 Right Sidebar: Activities & Online Members
-rightSidebar = new WWCore()
-    .set_offset(1000, 60)
-    .set_size(280, 540)
-    .set_background_color(c_dkgray);
-
-// Header for online members
-membersHeader = new WWText()
+// Header Label
+generalLabel = new WWLabel()
     .set_offset(10, 10)
-    .set_text("ONLINE")
-    .set_text_color(c_white);
-rightSidebar.add(membersHeader);
+    .set_text("General Settings")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+generalPanel.add(generalLabel);
 
-// List of members (sample)
-var members = [
-    { name: "Alice", status: "Online" },
-    { name: "Bob", status: "Idle" },
-    { name: "Charlie", status: "Do Not Disturb" }
-];
-var memY = 40;
-for (var i = 0; i < array_length(members); i++) {
-    var memberEntry = new WWButtonText()
-        .set_offset(10, memY)
-        .set_size(260, 40)
-        .set_text(members[i].name + " - " + members[i].status)
-        .set_callback(function() { log("Member clicked"); });
-    rightSidebar.add(memberEntry);
-    memY += 50;
-}
-root.add(rightSidebar);
+// Divider for visual separation
+generalDivider = new WWDivider()
+    .set_offset(10, 40)
+    .set_size(540, 2)
+    .set_thickness(2)
+    .set_color(c_ltgray);
+generalPanel.add(generalDivider);
 
-// 🌟 Footer: Message Input & Emotes
-footer = new WWCore()
-    .set_offset(320, 600)
-    .set_size(960, 120)
+// Progress Bar (simulate installation or load progress)
+progressBar = new WWProgressBar()
+    .set_offset(10, 130)
+    .set_size(540, 20)
+    .set_background_color(c_ltgray)
+    .set_value(0.65);  // 65% complete
+generalPanel.add(progressBar);
+
+// Clickable Button (using WWButtonText) to reset settings.
+resetButton = new WWButtonText()
+    .set_offset(10, 80)
+    .set_size(200, 30)
+    .set_background_color(c_blue)
+    .set_text("Reset Settings")
+    .set_callback(function() {
+        // When clicked, show a toast notification on the Settings window.
+        toast = new WWToast()
+            .set_offset(200, 300)
+            .set_background_color(c_dkgray)
+            .set_message("Settings have been reset!")
+            .set_duration(120);
+        settingsWindow.add(toast);
+    });
+// Attach a tooltip to the reset button.
+resetTooltip = new WWTooltip()
+    .set_offset(0, -30)  // Position above the button
+    .set_background_color(c_ltgray)
+    .set_text("Click to reset settings to defaults")
+    .set_delay(30);
+resetButton.add(resetTooltip);
+generalPanel.add(resetButton);
+
+// Add General Panel to Settings Window
+settingsWindow.add(generalPanel);
+
+// -- Advanced Settings Panel --
+advancedPanel = new WWPanel()
+    .set_offset(20, 260)
+    .set_size(560, 200)
+    .set_background_color(c_gray);
+
+// Header Label for Advanced Settings
+advancedLabel = new WWLabel()
+    .set_offset(10, 10)
+    .set_text("Advanced Settings")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+advancedPanel.add(advancedLabel);
+
+// Divider
+advancedDivider = new WWDivider()
+    .set_offset(10, 40)
+    .set_size(540, 2)
+    .set_thickness(2)
+    .set_color(c_ltgray);
+advancedPanel.add(advancedDivider);
+
+// Add some descriptive labels
+descLabel1 = new WWLabel()
+    .set_offset(10, 60)
+    .set_text("Feature X: Enabled")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+advancedPanel.add(descLabel1);
+
+descLabel2 = new WWLabel()
+    .set_offset(10, 90)
+    .set_text("Feature Y: Disabled")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+advancedPanel.add(descLabel2);
+
+// Add Advanced Panel to Settings Window
+settingsWindow.add(advancedPanel);
+
+// Add Settings Window to Root
+root.add(settingsWindow);
+
+// ============================================================
+// DASHBOARD WINDOW
+// ============================================================
+dashboardWindow = new WWWindow()
+    .set_offset(700, 50)
+    .set_size(500, 600)
+    .set_title("Dashboard")
+    .set_background_color(c_dkgray)
+    .center();
+
+// -- Statistics Panel --
+statsPanel = new WWPanel()
+    .set_offset(20, 60)
+    .set_size(460, 150)
+    .set_background_color(c_gray);
+
+// Header Label for Stats
+statsLabel = new WWLabel()
+    .set_offset(10, 10)
+    .set_text("Statistics")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+statsPanel.add(statsLabel);
+
+// Divider
+statsDivider = new WWDivider()
+    .set_offset(10, 40)
+    .set_size(440, 2)
+    .set_thickness(2)
+    .set_color(c_ltgray);
+statsPanel.add(statsDivider);
+
+// Multiple statistic labels
+stat1 = new WWLabel()
+    .set_offset(10, 60)
+    .set_text("Users Online: 123")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+statsPanel.add(stat1);
+
+stat2 = new WWLabel()
+    .set_offset(10, 90)
+    .set_text("Messages Today: 456")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+statsPanel.add(stat2);
+
+stat3 = new WWLabel()
+    .set_offset(10, 120)
+    .set_text("Server Load: 75%")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+statsPanel.add(stat3);
+
+// Add Stats Panel to Dashboard Window
+dashboardWindow.add(statsPanel);
+
+// -- Activity Panel --
+activityPanel = new WWPanel()
+    .set_offset(20, 230)
+    .set_size(460, 200)
+    .set_background_color(c_gray);
+
+// Header Label for Activity
+activityLabel = new WWLabel()
+    .set_offset(10, 10)
+    .set_text("Recent Activity")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+activityPanel.add(activityLabel);
+
+// Divider
+activityDivider = new WWDivider()
+    .set_offset(10, 40)
+    .set_size(440, 2)
+    .set_thickness(2)
+    .set_color(c_ltgray);
+activityPanel.add(activityDivider);
+
+// Simulated activity messages
+activityMsg1 = new WWLabel()
+    .set_offset(10, 60)
+    .set_text("Server rebooted at 12:01 PM")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+activityPanel.add(activityMsg1);
+
+activityMsg2 = new WWLabel()
+    .set_offset(10, 90)
+    .set_text("New user registered: JohnDoe")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+activityPanel.add(activityMsg2);
+
+activityMsg3 = new WWLabel()
+    .set_offset(10, 120)
+    .set_text("Backup completed at 11:45 AM")
+    .set_color(c_white)
+    .set_background_color(c_gray);
+activityPanel.add(activityMsg3);
+
+// Add Activity Panel to Dashboard Window
+dashboardWindow.add(activityPanel);
+
+// -- Item List Panel with Scrollbar Buttons --
+// This panel simulates a list of items that exceeds the viewport height.
+itemListViewport = new WWPanel()
+    .set_offset(20, 450)
+    .set_size(420, 150)
+    .set_background_color(c_gray);
+
+// The content panel (with a larger height than the viewport)
+itemListContent = new WWPanel()
+    .set_offset(0, 0)
+    .set_size(420, 300)  // Content is taller than viewport
     .set_background_color(c_dkgray);
 
-// Message input box
-messageInput = new WWCore()
-    .set_offset(20, 20)
-    .set_size(700, 40)
-    .set_background_color(c_white);
-footer.add(messageInput);
+// Populate the content with items.
+var itemY = 10;
+for (var i = 0; i < 10; i++) {
+    var itemLabel = new WWLabel()
+        .set_offset(10, itemY)
+        .set_text("Item " + string(i + 1))
+        .set_color(c_white)
+        .set_background_color(c_dkgray);
+    itemListContent.add(itemLabel);
+    itemY += 30;
+}
+itemListViewport.add(itemListContent);
 
-// Gift button
-giftButton = new WWButtonText()
-    .set_offset(740, 20)
-    .set_size(40, 40)
-    .set_text("🎁")
-    .set_callback(function() { log("Gift sent!"); });
-footer.add(giftButton);
+// Create the scrollbar with buttons.
+itemListScrollbar = new WWScrollbarButtons()
+    .set_offset(440, 450)  // Positioned to the right of the viewport
+    .set_size(40, 150)
+    .set_background_color(c_gray)
+    .set_canvas_size(300)      // Full content height of itemListContent
+    .set_coverage_size(150)    // Visible area equals viewport height
+    .on_interact(function() {
+        // Map the slider's normalized value (0 to 1) to a scroll offset.
+        var normalized = itemListScrollbar.slider.get_value();
+        var maxScroll = 300 - 150; // Content height - viewport height.
+        var newOffset = -normalized * maxScroll;
+        itemListContent.set_offset(0, newOffset);
+    });
 
-// Emotes button
-emotesButton = new WWButtonText()
-    .set_offset(790, 20)
-    .set_size(40, 40)
-    .set_text("😀")
-    .set_callback(function() { log("Emotes opened!"); });
-footer.add(emotesButton);
+// Add the item list viewport and scrollbar to the Dashboard Window.
+dashboardWindow.add(itemListViewport);
+dashboardWindow.add(itemListScrollbar);
 
-root.add(footer);
+// Add Dashboard Window to Root
+root.add(dashboardWindow);
+
+// ============================================================
+// GLOBAL STARTUP TOAST NOTIFICATION
+// ============================================================
+startupToast = new WWToast()
+    .set_offset(600, 10)
+    .set_background_color(c_dkgray)
+    .set_message("Welcome to the Application Dashboard!")
+    .set_duration(180);
+root.add(startupToast);

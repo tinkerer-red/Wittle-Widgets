@@ -8,12 +8,12 @@ function WWScrollbarHorz() : WWScrollbarBase() constructor {
 
     // Overrides
     __get_mouse_pos__      = function() { return device_mouse_x_to_gui(0); };
-    __get_available_size__ = function() { return region.get_width() - thumb.region.get_width(); };
-    __get_thumb_pos__      = function() { return x + (region.get_width() - thumb.region.get_width()) * normalized_value; };
-    __get_thumb_size__     = function() { return thumb.region.get_width(); };
+    __get_available_size__ = function() { return width - thumb.width; };
+    __get_thumb_pos__      = function() { return x + (width - thumb.width) * normalized_value; };
+    __get_thumb_size__     = function() { return thumb.width; };
     __get_scroll_origin__  = function() { return x; };
     __set_thumb_offset__   = function(_pos) { thumb.set_offset(_pos, 0); };
-	__set_thumb_size__ = function(_size) { thumb.set_size(_size, region.get_height()); };
+	__set_thumb_size__ = function(_size) { thumb.set_size(_size, height); };
 }
 #region jsDoc
 /// @func    WWScrollbarVert()
@@ -25,12 +25,12 @@ function WWScrollbarVert() : WWScrollbarBase() constructor {
 
     // Overrides
     __get_mouse_pos__ = function() { return device_mouse_y_to_gui(0); };
-    __get_available_size__ = function() { return region.get_height() - thumb.region.get_height(); };
-    __get_thumb_pos__ = function() { return y + (region.get_height() - thumb.region.get_height()) * normalized_value; };
-    __get_thumb_size__ = function() { return thumb.region.get_height(); };
+    __get_available_size__ = function() { return height - thumb.height; };
+    __get_thumb_pos__ = function() { return y + (height - thumb.height) * normalized_value; };
+    __get_thumb_size__ = function() { return thumb.height; };
     __get_scroll_origin__ = function() { return y; };
     __set_thumb_offset__ = function(_pos) { thumb.set_offset(0, _pos); };
-	__set_thumb_size__ = function(_size) { thumb.set_size(region.get_width(), _size); };
+	__set_thumb_size__ = function(_size) { thumb.set_size(width, _size); };
 }
 
 #region jsDoc
@@ -56,23 +56,13 @@ function WWScrollbarBase() : WWSliderBase() constructor {
             /// @param   {real} bottom : The bottom side of the bounding box.
             /// @returns {Struct.WWScrollbarBase}
             #endregion
-            static set_size = function(_left, _top, _right=undefined, _bottom=undefined) {
-                // Support width/height shorthand
-                if (_right == undefined && _bottom == undefined) {
-                    _right  = _left;
-                    _bottom = _top;
-                    _left   = 0;
-                    _top    = 0;
-                }
-
+            static set_size = function(_width, _height) {
                 __size_set__ = true;
-                __set_size__(_left, _top, _right, _bottom);
+                __set_size__(_width, _height);
 
                 if (!thumb.__size_set__) {
-                    var _w = _right - _left;
-                    var _h = _bottom - _top;
-                    var _square = min(_w, _h);
-                    thumb.__set_size__(0, 0, _square, _square);
+                    var _square = min(_width, _height);
+                    thumb.__set_size__(_square, _square);
                 }
 
                 return self;
@@ -80,7 +70,7 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 			#region jsDoc
             /// @func    set_canvas_size()
             /// @desc    Sets the total size of the scrollable canvas.
-            ///          This determines how large the thumb should be relative to the visible region.
+            ///          This determines how large the thumb should be relative to the visible region, usually for scroll bar support.
             /// @self    WWScrollbarBase
             /// @param   {Real} size : The size of the scrollable content.
             /// @returns {Struct.WWScrollbarBase}

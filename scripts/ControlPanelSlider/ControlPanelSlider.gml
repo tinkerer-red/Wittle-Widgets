@@ -154,7 +154,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 					sprite_get_height(_sprite_button_inc),
 			)
 			
-			__button__.set_size(0,0,0,_ideal_h)
+			__button__.set_size(0,_ideal_h)
 			
 			__button_inc__ = new WWButtonSprite()
 				//.set_offset(-_info.right, _info.top)
@@ -182,7 +182,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_offset(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("Value...")
-				.set_size(0, 0, 0, _ideal_h)
+				.set_size(0, _ideal_h)
 				.set_scrollbar_sizes(0, 0)
 				.set_text(string(_value))
 				.set_text_font(__CP_FONT)

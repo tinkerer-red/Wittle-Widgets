@@ -240,8 +240,8 @@ function GUICompRegion() : GUICompController() constructor {
 				
 				__scroll_horz_size__ = _horz_height;
 				__scroll_vert_size__ = _vert_width;
-				__scroll_horz__.set_size(0, 0, region.get_width() - _vert_width, _horz_height)
-				__scroll_vert__.set_size(0, 0, _vert_width, region.get_height() - _horz_height)
+				__scroll_horz__.set_size(region.get_width() - _vert_width, _horz_height)
+				__scroll_vert__.set_size(_vert_width, region.get_height() - _horz_height)
 				
 				__scroll_horz__.set_coverage_size(get_coverage_width());
 				__scroll_vert__.set_coverage_size(get_coverage_height());
@@ -268,12 +268,12 @@ function GUICompRegion() : GUICompController() constructor {
 				//horz
 				__scroll_horz_hidden__ = (is_undefined(_horz_hidden)) ? __scroll_horz_hidden__ : _horz_hidden
 				var _view_width  = (__scroll_vert_hidden__) ? region.get_width()  : region.get_width()  - __scroll_vert_size__
-				__scroll_horz__.set_size(0, 0, _view_width, __scroll_horz_size__)
+				__scroll_horz__.set_size(_view_width, __scroll_horz_size__)
 				
 				//vert
 				__scroll_vert_hidden__ = (is_undefined(_vert_hidden)) ? __scroll_vert_hidden__ : _vert_hidden
 				var _view_height = (__scroll_horz_hidden__) ? region.get_height() : region.get_height() - __scroll_horz_size__
-				__scroll_vert__.set_size(0, 0, __scroll_vert_size__, _view_height)
+				__scroll_vert__.set_size(__scroll_vert_size__, _view_height)
 				
 				update_component_positions();
 				

@@ -29,12 +29,10 @@ function WWSprite() : WWCore() constructor {
 				
 				image_speed = 0;
 				if (!__size_set__) {
-					__set_size__(
-						-sprite_xoffset,
-						-sprite_yoffset,
-						-sprite_xoffset + sprite_width,
-						-sprite_yoffset + sprite_height
-					)
+					__set_size__(sprite_width * image_xscale, sprite_height * image_yscale)
+				}
+				if (!__offset_set__) {
+					__set_offset__(-sprite_xoffset, -sprite_yoffset)
 				}
 				return self;
 			}
@@ -52,14 +50,6 @@ function WWSprite() : WWCore() constructor {
 				
 				var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
 				
-				//var _x1 = x+region.left;
-				//var _y1 = y+region.top;
-				//var _x2 = x+region.right;
-				//var _y2 = y+region.bottom;
-				
-				//var _w = 
-				//var _h = _y2
-				
 				//draw the nineslice
 				if (self.image_alpha == 1)
 				&& (self.image_blend == c_white)
@@ -68,20 +58,20 @@ function WWSprite() : WWCore() constructor {
 					draw_sprite_stretched(
 							self.sprite_index,
 							_image_index,
-							x+region.left,
-							y+region.top,
-							region.get_width(),
-							region.get_height()
+							x,
+							y,
+							width,
+							height
 					);
 				}
 				else {
 					draw_sprite_stretched_ext(
 							self.sprite_index, 
 							_image_index, 
-							x+region.left,
-							y+region.top,
-							region.get_width() * image_xscale, 
-							region.get_height() * image_yscale, 
+							x,
+							y,
+							width  * image_xscale,
+							height * image_yscale,
 							self.image_blend, 
 							self.image_alpha
 					);

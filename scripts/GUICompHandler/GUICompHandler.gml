@@ -9,7 +9,7 @@ function GUICompHandler() : GUICompController() constructor {
 	debug_name = "GUICompHandler";
 	
 	#region Init
-		set_size(0,0,display_get_gui_width(), display_get_gui_height());
+		set_size(display_get_gui_width(), display_get_gui_height());
 	#endregion
 	
 	#region Public

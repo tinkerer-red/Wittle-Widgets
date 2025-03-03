@@ -48,18 +48,18 @@ function WWScrollRegion() : WWCore() constructor {
     #region Components
     
     viewport = new WWCore()
-        .set_size(0, 0, viewport_width, viewport_height)
+        .set_size(viewport_width, viewport_height)
         .set_clipping(true); // Ensures content outside the viewport is hidden.
 		
 		//ad sub-child canvas
 		canvas = new WWCore()
-	        .set_size(0, 0, canvas_width, canvas_height);
+	        .set_size(canvas_width, canvas_height);
 		
 	    viewport.add(canvas);
 		
 	
     scrollbar_horz = new WWScrollbarHorz()
-        .set_size(0, 0, viewport_width, 16)
+        .set_size(viewport_width, 16)
         .set_canvas_size(canvas_width)
         .set_coverage_size(viewport_width)
         .set_callback(function() {
@@ -67,7 +67,7 @@ function WWScrollRegion() : WWCore() constructor {
         });
     
     scrollbar_vert = new WWScrollbarVert()
-        .set_size(0, 0, 16, viewport_height)
+        .set_size(16, viewport_height)
         .set_canvas_size(canvas_height)
         .set_coverage_size(viewport_height)
         .set_callback(function() {
@@ -108,7 +108,7 @@ function WWScrollRegion() : WWCore() constructor {
     static set_viewport_size = function(_width, _height) {
         viewport_width = _width;
         viewport_height = _height;
-        viewport.set_size(0, 0, viewport_width, viewport_height);
+        viewport.set_size(viewport_width, viewport_height);
         update_scrollbars();
         return self;
     };
@@ -117,7 +117,7 @@ function WWScrollRegion() : WWCore() constructor {
     static set_canvas_size = function(_width, _height) {
         canvas_width = _width;
         canvas_height = _height;
-        canvas.set_size(0, 0, canvas_width, canvas_height);
+        canvas.set_size(canvas_width, canvas_height);
         update_scrollbars();
         return self;
     };

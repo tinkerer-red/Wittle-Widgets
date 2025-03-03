@@ -129,14 +129,14 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 			
 			var _ideal_h = font_get_info(__CP_FONT).size + _info.top + _info.bottom;
 			
-			__button__.set_size(0,0,0,_ideal_h)
+			__button__.set_size(0,_ideal_h)
 			
 			__textbox__ = new GUICompTextbox()
 				.set_multiline(false)
 				.set_offset(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_text_placeholder("String...")
-				.set_size(0, 0, 0, _ideal_h)
+				.set_size(0, _ideal_h)
 				.set_scrollbar_sizes(0, 0)
 				.set_text(string(_str))
 				.set_text_font(__CP_FONT)

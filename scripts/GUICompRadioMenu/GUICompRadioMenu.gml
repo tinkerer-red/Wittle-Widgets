@@ -22,7 +22,7 @@ function GUICompRadioMenu() : WWCore() constructor {
 					.set_callback(_callback ?? function(){})
 				
 				if (__size_set__) {
-					option.set_size(0, 0, 100, 20)
+					option.set_size(100, 20)
 				}
                     
                     
@@ -83,7 +83,7 @@ function GUICompRadioMenu() : WWCore() constructor {
         #endregion
         
         #region Variables
-            set_size(0, 0, 120, 200);
+            set_size(120, 200);
         #endregion
 
     #endregion

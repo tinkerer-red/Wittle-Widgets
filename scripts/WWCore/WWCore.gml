@@ -42,18 +42,9 @@ function WWCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.WWCore}
 			#endregion
-			static set_size = function(_left, _top, _right=undefined, _bottom=undefined) {
-				
-				//it is often a problem users assume width/height, this just suuports that
-				if (_right == undefined && _bottom == undefined) {
-					_right  = _left;
-					_bottom = _top;
-					_left   = 0;
-					_top    = 0;
-				}
-				
+			static set_size = function(_width, _height) {
 				__size_set__ = true;
-				__set_size__(_left, _top, _right, _bottom);
+				__set_size__(_width, _height);
 				return self;
 			}
 			#region jsDoc
@@ -77,7 +68,7 @@ function WWCore() constructor {
 			/// @param   {Constant.VAlign} valign : Vertical alignment.
 			/// @returns {Struct.WWCore}
 			#endregion
-			static set_alignment = function(_halign=fa_center, _valign=fa_middle) {
+			static set_alignment = function(_halign=fa_left, _valign=fa_top) {
 				
 				halign = _halign;
 				valign = _valign;
@@ -86,25 +77,25 @@ function WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    set_width()
-			/// @desc    Sets the width of the component, this is just a short cut for doing `set_size(0, 0, _width, region.get_height())`
+			/// @desc    Sets the width of the component
 			/// @self    WWCore
 			/// @param   {Real} width : The width of the component.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_width = function(_width) {
-				self.set_size(0, 0, _width, region.get_height())
+				self.set_size(_width, height)
 				
 				return self;
 			}
 			#region jsDoc
 			/// @func    set_height()
-			/// @desc    Sets the height of the component, this is just a short cut for doing `set_size(0, 0, region.get_width(), _height)`
+			/// @desc    Sets the height of the component
 			/// @self    WWCore
 			/// @param   {Real} height : The height of the component.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_height = function(_height) {
-				self.set_size(0, 0, region.get_width(), _height)
+				self.set_size(width, _height)
 				
 				return self;
 			}
@@ -368,8 +359,6 @@ function WWCore() constructor {
 			halign = fa_left;
 			valign = fa_top;
 			
-			region = new __region__();
-			
 			background_color_set = false;
 			background_color = c_black;
 			
@@ -380,6 +369,8 @@ function WWCore() constructor {
 				
 				self.x = 0;
 				self.y = 0;
+				self.width = 0;
+				self.height = 0;
 				
 				self.xstart = 0;
 				self.ystart = 0;
@@ -659,10 +650,10 @@ function WWCore() constructor {
 				__mouse_on_comp__ = point_in_rectangle(
 					device_mouse_x_to_gui(0),
 					device_mouse_y_to_gui(0),
-					x+region.left,
-					y+region.top,
-					x+region.right,
-					y+region.bottom
+					x,
+					y,
+					x+width,
+					y+height
 				)
 				
 				if (__mouse_on_comp__) {
@@ -695,10 +686,10 @@ function WWCore() constructor {
 				__mouse_on_group__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),
-						x+__group_region__.left,
-						y+__group_region__.top,
-						x+__group_region__.right,
-						y+__group_region__.bottom
+						x,
+						y,
+						x+__group__.width,
+						y+__group__.height
 				);
 				
 				if (__mouse_on_group__) {
@@ -904,10 +895,10 @@ function WWCore() constructor {
 					draw_sprite_stretched_ext(
 						s9GUIPixel,
 						0,
-						x+region.left,
-						y+region.top,
-						region.get_width(),
-						region.get_height(),
+						x,
+						y,
+						width,
+						height,
 						background_color,
 						1
 					);
@@ -927,62 +918,62 @@ function WWCore() constructor {
 					#region Comp Region
 					draw_set_color(c_red)
 					draw_rectangle(
-						x+region.left,
-						y+region.top,
-						x+region.right,
-						y+region.bottom,
+						x,
+						y,
+						x + width,
+						y + height,
 						true
 					);
 					draw_line(
-						x+region.left,
-						y+region.top,
-						x+region.right,
-						y+region.bottom
+						x,
+						y,
+						x + width,
+						y + height
 					)
 					draw_line(
-						x+region.right,
-						y+region.top,
-						x+region.left,
-						y+region.bottom
+						x + width,
+						y,
+						x,
+						y + height
 					)
 					#endregion
 					#region Pointers
 					draw_set_color(c_orange)
 					//connect comp and group corners
-					draw_line(x+__group_region__.left,  y+__group_region__.top,    x+region.left,  y+region.top);
-					draw_line(x+__group_region__.right, y+__group_region__.top,    x+region.right, y+region.top);
-					draw_line(x+__group_region__.left,  y+__group_region__.bottom, x+region.left,  y+region.bottom);
-					draw_line(x+__group_region__.right, y+__group_region__.bottom, x+region.right, y+region.bottom);
+					draw_line(x,       y,                    x,       y);
+					draw_line(x+width, y,                    x+width, y);
+					draw_line(x,       y + __group__.height, x,       y + height);
+					draw_line(x+width, y + __group__.height, x+width, y + height);
 					//connect children to parent
 					if (__is_child__) {
 						draw_line(
-							__parent__.x+region.left,
-							__parent__.y+region.top,
-							x+region.left,
-							y+region.top
+							__parent__.x,
+							__parent__.y,
+							x,
+							y
 						)
 					}
 					#endregion
 					#region Group Region
 					draw_set_color(c_yellow)
 					draw_rectangle(
-							x+__group_region__.left,
-							y+__group_region__.top,
-							x+__group_region__.right,
-							y+__group_region__.bottom,
+							x,
+							y,
+							x+__group__.width,
+							y+__group__.height,
 							true
 					);
 					draw_line(
-						x+__group_region__.left,
-						y+__group_region__.top,
-						x+__group_region__.right,
-						y+__group_region__.bottom
+						x,
+						y,
+						x+__group__.width,
+						y+__group__.height
 					)
 					draw_line(
-						x+__group_region__.right,
-						y+__group_region__.top,
-						x+__group_region__.left,
-						y+__group_region__.bottom
+						x+__group__.width,
+						y,
+						x,
+						y+__group__.height
 					)
 					#endregion
 					//draw_text(x,y, $"__mouse_on_group__ :: {__mouse_on_group__}\n__mouse_on_comp__ :: {__mouse_on_comp__}")
@@ -1029,7 +1020,7 @@ function WWCore() constructor {
 			__children__ = [];
 			__is_child__ = false; // if the component is a child of another component
 			__parent__ = noone; // a reference to the parent controller
-			__group_region__ = new __region__(); // used for component controllers to know the bounds of all children and self
+			__group__ = {width : 0, height : 0};
 			#endregion
 			#region Misc
 			__position_set__ = false;
@@ -1183,79 +1174,6 @@ function WWCore() constructor {
 					_i+=1;}//end repeat loop
 			}
 			#region jsDoc
-			/// @func    __validate_component_positions__()
-			/// @desc    Validates that the newly added components are with in range of the controller's range,
-			///            this safety check is implicetly to prevent an object being set out of range of the
-			///            controler, which leads to the controller updating it's controller region size, which
-			///            would anchor the component further out into an infinate loop.
-			///
-			/// @self    WWController
-			/// @param   {Array<Struct>} arr : The array of structs to validate
-			/// @returns {Undefined}
-			/// @ignore
-			#endregion
-			static __validate_component_positions__ = function(_arr) {
-				var _cid, _j, _found_count, _comp;
-				var _size = array_length(_arr);
-				var _i=0; repeat(_size) {
-					_comp = _arr[_i];
-						
-					//verify the component does not reach out of bounds of the controller
-					switch (_comp.halign) {
-						case fa_left:{
-							//make sure the child component's region does not reach outside of the controller's left side
-							var _offset = self.__group_region__.left - _comp.x_offset - _comp.__group_region__.left;
-								
-							if (_offset > 0) {
-								show_error("Newly added component : "+string(_comp.debug_name)+" : is anchored to the left, but is outside of the controller's left region."
-									+"\nThe component was "+string(_offset)+" pixels too far to the left."
-									+"\nmake sure to move the component to the right before adding, or change the halign of the component.\n\n", true)
-							}
-						break;}
-						case fa_center:{
-							//nothing is needed here
-						break;}
-						case fa_right:{
-							//make sure the child component's region does not reach outside of the controller's right side
-							var _offset = _comp.x_offset + _comp.__group_region__.right - self.__group_region__.right;
-								
-							if (_offset > 0) {
-								show_error("Newly added component : "+string(_comp.debug_name)+" : is anchored to the right, but is outside of the controller's right region."
-									+"\nThe component was "+string(_offset)+" pixels too far to the right."
-									+"\nmake sure to move the component to the left before adding, or change the halign of the component.\n\n", true)
-							}
-						break;}
-					}
-						
-					switch (_comp.valign) {
-						case fa_top:{
-							//make sure the child component's region does not reach outside of the controller's top side
-							var _offset = self.__group_region__.top - _comp.y_offset - _comp.__group_region__.top;
-								
-							if (_offset > 0) {
-								show_error("Newly added component : "+string(_comp.debug_name)+" : is anchored to the top, but is outside of the controller's top region."
-									+"\nThe component was "+string(_offset)+" pixels too far up."
-									+"\nmake sure to move the component to the down before adding, or change the valign of the component.\n\n", true)
-							}
-						break;}
-						case fa_middle:{
-							//nothing is needed here
-						break;}
-						case fa_bottom:{
-							//make sure the child component's region does not reach outside of the controller's bottom side
-							var _offset = _comp.y_offset + _comp.__group_region__.bottom - self.__group_region__.bottom;
-								
-							if (_offset > 0) {
-								show_error("Newly added component : "+string(_comp.debug_name)+" : is anchored to the bottom, but is outside of the controller's bottom region."
-										+"\nThe component was "+string(_offset)+" pixels too far down."
-										+"\nmake sure to move the component to the up before adding, or change the valign of the component.\n\n", true)
-							}
-						break;}
-					}
-						
-				_i+=1;}//end repeat loop
-			}
-			#region jsDoc
 			/// @func    __include_children__()
 			/// @desc    Includes the children by either pushing them into the list or inserting them into the list. Any index under 0 will push the component.
 			/// @self    WWController
@@ -1303,44 +1221,34 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
-				var _left   = region.left;
-				var _top    = region.top;
-				var _right  = region.right;
-				var _bottom = region.bottom;
+				var _w = width;
+				var _h = height;
 				
-				var _prev_left   = __group_region__.left;
-				var _prev_top    = __group_region__.top;
-				var _prev_right  = __group_region__.right;
-				var _prev_bottom = __group_region__.bottom;
+				var _prev_w = __group__.width;
+				var _prev_h = __group__.height;
 				
 				
 				var _comp, xoff, yoff;
 				var i = 0; repeat(__children_count__) {
 					_comp = __children__[i];
-					xoff = _comp.x-x;
-					yoff = _comp.y-y;
+					xoff = _comp.x_offset;
+					yoff = _comp.y_offset;
 					
-					_left   = min(_left,   xoff+_comp.__group_region__.left);
-					_right  = max(_right,  xoff+_comp.__group_region__.right);
-					_top    = min(_top,    yoff+_comp.__group_region__.top);
-					_bottom = max(_bottom, yoff+_comp.__group_region__.bottom);
+					_w = max(_w, xoff + _comp.__group__.width);
+					_h = max(_h, yoff + _comp.__group__.height);
 				i+=1}
-			
+				
 				//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
-				__group_region__.left   = _left;
-				__group_region__.top    = _top;
-				__group_region__.right  = _right;
-				__group_region__.bottom = _bottom;
+				__group__.width = _w;
+				__group__.height = _h;
 				
 				//if this controller is a child of another controller, update the parent controller, this will loop all the way to the top most parent
 				if (__is_child__) {
-						if (_prev_left   != _left)
-						|| (_prev_top    != _top)
-						|| (_prev_right  != _right)
-						|| (_prev_bottom != _bottom) {
-							__parent__.__update_group_region__();
-						}
+					if (_prev_w != _w)
+					|| (_prev_h != _h) {
+						__parent__.__update_group_region__();
 					}
+				}
 				
 			}
 			#region jsDoc
@@ -1374,10 +1282,10 @@ function WWCore() constructor {
 			static __apply_clipping_region__ = function() {
 				previous_scissor = gpu_get_scissor();
 
-				var _new_x = x + region.left;
-				var _new_y = y + region.top;
-				var _new_w = region.get_width();
-				var _new_h = region.get_height();
+				var _new_x = x;
+				var _new_y = y;
+				var _new_w = width;
+				var _new_h = height;
 
 				// Adjust clipping to stay within the existing scissor bounds
 				_new_x = max(previous_scissor.x, _new_x);
@@ -1400,43 +1308,6 @@ function WWCore() constructor {
 			};
 			#endregion
 			#region Misc
-			#region jsDoc
-			/// @func    __region__()
-			/// @desc    Constructs a new region struct.
-			/// @self    WWCore
-			/// @param   {Real} left   : The reletive bounding box from the component's x/y
-			/// @param   {Real} top    : The reletive bounding box from the component's x/y
-			/// @param   {Real} right  : The reletive bounding box from the component's x/y
-			/// @param   {Real} bottom : The reletive bounding box from the component's x/y
-			/// @returns {Struct.Region}
-			#endregion
-			static __region__ = function(_l=0, _t=0, _r=0, _b=0) constructor {
-				left   = _l;
-				top    = _t;
-				right  = _r;
-				bottom = _b;
-				
-				#region jsDoc
-				/// @func    get_width()
-				/// @desc    Returns the width of the region
-				/// @self    Struct.region
-				/// @returns {Real}
-				#endregion
-				static get_width = function() {
-					return right-left;
-				};
-				
-				#region jsDoc
-				/// @func    get_height()
-				/// @desc    Returns the height of the region
-				/// @self    Struct.region
-				/// @returns {Real}
-				#endregion
-				static get_height = function() {
-					return bottom-top;
-				};
-			}
-			
 			#region jsDoc
 			/// @func    __set_sprite__()
 			/// @desc    Define all of the built in GML object variables for the supplied sprite
@@ -1485,20 +1356,9 @@ function WWCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.WWCore}
 			#endregion
-			static __set_size__ = function(_left, _top, _right=undefined, _bottom=undefined) {
-				
-				//it is often a problem users assume width/height, this just suuports that
-				if (_right == undefined && _bottom == undefined) {
-					_right  = _left;
-					_bottom = _top;
-					_left   = 0;
-					_top    = 0;
-				}
-				
-				region.left   = _left;
-				region.top    = _top;
-				region.right  = _right;
-				region.bottom = _bottom;
+			static __set_size__ = function(_width, _height) {
+				width  = _width ;
+				height = _height;
 				
 				//update click regions
 				__update_group_region__();
@@ -1528,7 +1388,7 @@ function WWCore() constructor {
 				
 				update_component_positions();
 				
-				// If this component is a child, trigger an update on the parent’s group region.
+				// If this component is a child, trigger an update on the parent’s group size.
 			    if (__is_child__) {
 			        __parent__.__update_group_region__();
 			    }

@@ -89,10 +89,10 @@ function WWViewport() : WWCore() constructor {
 				__mouse_on_comp__ = point_in_rectangle(
 					device_mouse_x_to_gui(0),
 					device_mouse_y_to_gui(0),
-					x+region.left,
-					y+region.top,
-					x+region.right,
-					y+region.bottom
+					x,
+					y,
+					x+width,
+					y+height
 				)
 				
 				if (__mouse_on_comp__) {
@@ -122,10 +122,10 @@ function WWViewport() : WWCore() constructor {
 				__mouse_on_group__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),
-						x+region.left,
-						y+region.top,
-						x+region.right,
-						y+region.bottom
+						x,
+						y,
+						x+width,
+						y+height
 				);
 				
 				if (__mouse_on_group__) {
@@ -159,10 +159,8 @@ function WWViewport() : WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
-				__group_region__.left   = region.left;
-				__group_region__.top    = region.top;
-				__group_region__.right  = region.right;
-				__group_region__.bottom = region.bottom;
+				__group__.width  = x+width;
+				__group__.height = y+height;
 				
 			}
 			

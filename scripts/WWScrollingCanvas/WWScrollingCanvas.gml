@@ -94,33 +94,40 @@ function WWScrollingCanvas() : WWViewport() constructor {
 				scroll.x_off += scroll.x_speed;
 				scroll.y_off += scroll.y_speed;
 				
-				var _w = region.get_width();
-				var _h = region.get_height();
-				var _canvas_w = canvas.region.get_width();
-				var _canvas_h = canvas.region.get_height();
+				var _w = width;
+				var _h = height;
+				var _canvas_w = canvas.width;
+				var _canvas_h = canvas.height;
 				
 				
 				// Horizontal Looping
 				if (scroll.x_looping) {
 					scroll.x_off = __wrap(
 						scroll.x_off,
-						region.left - canvas.region.right,
-						region.left + _w + canvas.region.left
+						-_canvas_w,
+						_w
 					);
 				} else {
-			        // Bouncing behavior: Reverse direction when hitting edges
-			        if (scroll.x_off + _canvas_w <= _w || scroll.x_off >= 0) {
-			            scroll.x_speed *= -1;
-			        }
-			        scroll.x_off = clamp(scroll.x_off, -_canvas_w + _w, 0);
+			        //if moving down
+					if (scroll.x_speed > 0) {
+						if (scroll.x_off + _canvas_w >= _w) {
+							scroll.x_speed = -abs(scroll.x_speed);
+						}
+					}
+					//if moving up
+					else if (scroll.x_speed < 0) {
+						if (scroll.x_off < 0) {
+							scroll.x_speed = abs(scroll.x_speed);
+						}
+					}
 			    }
 				
 				// Vertical Looping
 				if (scroll.y_looping) {
 					scroll.y_off = __wrap(
 						scroll.y_off,
-						region.top - canvas.region.bottom,
-						region.top + _h + canvas.region.top
+						-_canvas_h,
+						_h
 					);
 				} else {
 			        //if moving down
@@ -182,7 +189,7 @@ function WWScrollingCanvas() : WWViewport() constructor {
 			};
 			
 			static __update_viewport_from_canvas__ = function() {
-				__set_size__(0, 0, canvas.region.get_width(), canvas.region.get_height());
+				__set_size__(canvas.width, canvas.height);
 			}
 			
 		#endregion

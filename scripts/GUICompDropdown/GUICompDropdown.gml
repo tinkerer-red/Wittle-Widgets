@@ -119,10 +119,10 @@ function GUICompDropdown() : GUICompController() constructor {
 					var _height = _largest_text_height + (_slice.top  + _slice.bottom);
 					
 					//update internal variables
-					set_size(0, 0, _width, _height);
+					set_size(_width, _height);
 					
 					var _dropdown_height = __controller__.__children_count__*_height
-					__controller__.set_size(0, 0, _width, _dropdown_height);
+					__controller__.set_size(_width, _dropdown_height);
 					__controller__.set_scrollbar_hidden(true, true);
 					
 					set_text_offsets(_slice.left, _slice.top, text.click_yoff);
@@ -695,7 +695,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			__controller__ = new GUICompRegion()
 					.set_alignment(fa_left, fa_top)
-					.set_size(0,0,0,0)
+					.set_size(0,0)
 			
 			
 			var _add = GUICompController.add;

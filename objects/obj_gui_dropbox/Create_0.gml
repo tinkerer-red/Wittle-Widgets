@@ -14,7 +14,7 @@ widget = new GUICompDropdown() //the x/y doesnt matter as the set region will mo
 widget = new GUICompDropdown()
 	.set_alignment(fa_right, fa_top)
 	.set_text_placeholder("String...")
-	.set_size(0, 0, 300, 100)
+	.set_size(300, 100)
 	.set_text("")
 	.set_text_font(__CP_FONT)
 	//.set_text_color(c_white)

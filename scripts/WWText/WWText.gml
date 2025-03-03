@@ -62,8 +62,8 @@ function WWText() : WWCore() constructor {
 					draw_set_alpha(text.alpha);
 					
 					draw_text(
-						x + text.xoff,
-						y + text.yoff,
+						x,
+						y,
 						text.content
 					)
 					
@@ -77,14 +77,6 @@ function WWText() : WWCore() constructor {
 			text = {
 					content : "<undefined>",
 					font : fGUIDefault,
-					
-					xoff : 0,
-					yoff : 0,
-					click_yoff : 0,
-					
-					width  : 0,
-					height : 0,
-					
 					alpha : 1,
 					color : c_white,
 				}
@@ -100,7 +92,7 @@ function WWText() : WWCore() constructor {
 			static __update_region_from_text__ = function() {
 				var _prev = draw_get_font();
 				draw_set_font(text.font);
-				__set_size__(0,0,string_width(text.content), string_height(text.content));
+				__set_size__(string_width(text.content), string_height(text.content));
 				draw_set_font(_prev);
 			}
 			
@@ -176,8 +168,6 @@ function WWTextScribble() : WWCore() constructor {
 			
 			static __update_region_from_text__ = function() {
 				__set_size__(
-					0,
-					0,
 					my_scribble.get_right() - my_scribble.get_left(),
 					my_scribble.get_bottom() - my_scribble.get_top()
 				);

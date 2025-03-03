@@ -21,20 +21,20 @@ function WWSliderHorz() : WWSliderBase() constructor {
 		
 		var _norm_val;
         if (is_inverted) {
-            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
+            _norm_val = (x + width - device_mouse_x_to_gui(0)) / width;
         } else {
-			_norm_val = (device_mouse_x_to_gui(0) - x+region.left) / region.get_width();
+			_norm_val = (device_mouse_x_to_gui(0) - x) / width;
 		}
 		_norm_val = clamp(_norm_val, 0, 1);
 				
 		set_normalized_value(_norm_val);
     });
 	on_pre_draw(function(_input) {
-		var _bar_width = region.get_width() * normalized_value;
+		var _bar_width = width * normalized_value;
 		if (is_inverted) {
-            bar.set_size(region.get_width() - _bar_width, 0, region.get_width(), region.get_height());
+            bar.set_size(width - _bar_width, 0, width, height);
         } else {
-			bar.set_size(0, 0, _bar_width, region.get_height());
+			bar.set_size(_bar_width, height);
 		}
     });
 	
@@ -54,9 +54,9 @@ function WWSliderVert() : WWSliderBase() constructor {
 		
         var _norm_val;
 		if (is_inverted) {
-            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
+            _norm_val = (device_mouse_y_to_gui(0) - y) / height;
         } else {
-            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
+            _norm_val = (y + height - device_mouse_y_to_gui(0)) / height;
         }
 		
 		_norm_val = clamp(_norm_val, 0, 1);
@@ -64,11 +64,11 @@ function WWSliderVert() : WWSliderBase() constructor {
 		set_normalized_value(_norm_val);
     });
 	on_pre_draw(function(_input) {
-		var _bar_height = region.get_height() * normalized_value;
+		var _bar_height = height * normalized_value;
 		if (is_inverted) {
-            bar.set_size(0, 0, region.get_width(), _bar_height);
+            bar.set_size(width, _bar_height);
         } else {
-            bar.set_size(0, region.get_height() - _bar_height, region.get_width(), region.get_height());
+            bar.set_size(0, height - _bar_height, width, height);
         }
     });
 }
@@ -93,19 +93,19 @@ function WWSliderHorzThumb() : WWSliderHorz() constructor {
     on_post_step(function(_input) {
 		var _thumb_x;
 		if (is_inverted) {
-			_thumb_x = region.get_width() * (1 - normalized_value) - thumb.region.get_width() / 2;
+			_thumb_x = width * (1 - normalized_value) - thumb.width / 2;
 		} else {
-			_thumb_x = region.get_width() * normalized_value - thumb.region.get_width() / 2;
+			_thumb_x = width * normalized_value - thumb.width / 2;
 		}
-		thumb.set_offset(_thumb_x, (region.get_height() - thumb.region.get_height()) / 2);
+		thumb.set_offset(_thumb_x, (height - thumb.height) / 2);
     });
 
     thumb.on_interact(function(_input) {
         var _norm_val;
         if (is_inverted) {
-            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
+            _norm_val = (x + width - device_mouse_x_to_gui(0)) / width;
         } else {
-            _norm_val = (device_mouse_x_to_gui(0) - x + region.left) / region.get_width();
+            _norm_val = (device_mouse_x_to_gui(0) - x) / width;
         }
         _norm_val = clamp(_norm_val, 0, 1);
         set_normalized_value(_norm_val);
@@ -131,19 +131,19 @@ function WWSliderVertThumb() : WWSliderVert() constructor {
     on_post_step(function(_input) {
         var _thumb_y;
         if (is_inverted) {
-            _thumb_y = region.get_height() * normalized_value - thumb.region.get_height() / 2;
+            _thumb_y = height * normalized_value - thumb.height / 2;
         } else {
-            _thumb_y = region.get_height() * (1 - normalized_value) - thumb.region.get_height() / 2;
+            _thumb_y = height * (1 - normalized_value) - thumb.height / 2;
         }
-        thumb.set_offset((region.get_width() - thumb.region.get_width()) / 2, _thumb_y);
+        thumb.set_offset((width - thumb.width) / 2, _thumb_y);
     });
 
     thumb.on_interact(function(_input) {
         var _norm_val;
 		if (is_inverted) {
-            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
+            _norm_val = (device_mouse_y_to_gui(0) - y) / height;
         } else {
-            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
+            _norm_val = (y+height - device_mouse_y_to_gui(0)) / height;
         }
 		
 		_norm_val = clamp(_norm_val, 0, 1);
@@ -175,19 +175,12 @@ function WWSliderBase() : WWButton() constructor {
 		/// @param   {real} bottom : The bottom side of the bounding box
 		/// @returns {Struct.WWCore}
 		#endregion
-		static set_size = function(_left, _top, _right=undefined, _bottom=undefined) {
-			
-			//it is often a problem users assume width/height, this just suuports that
-			if (_right == undefined && _bottom == undefined) {
-				_right  = _left;
-				_bottom = _top;
-				_left   = 0;
-				_top    = 0;
-			}
-			
+		static set_size = function(_width, _height) {
 			static __set_size = WWCore.set_size;
-			__set_size(_left, _top, _right, _bottom)
-			background.__set_size__(_left, _top, _right, _bottom);
+			__set_size(_width, _height)
+			if (!background.__size_set__) {
+				background.__set_size__(_width, _height);
+			}
 			return self;
 		}
 		#region jsDoc

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompButtonText",
+  "%Name":"WWText",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompButtonText",
+  "name":"WWText",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

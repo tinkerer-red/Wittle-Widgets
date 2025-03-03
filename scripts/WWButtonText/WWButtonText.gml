@@ -1,13 +1,13 @@
 #region jsDoc
-/// @func    GUICompButtonText()
+/// @func    WWButtonText()
 /// @desc    Creates a button component
-/// @self    GUICompButtonText
+/// @self    WWButtonText
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.GUICompButtonText}
+/// @return {Struct.WWButtonText}
 #endregion
-function GUICompButtonText() : GUICompButtonSprite() constructor {
-	debug_name = "GUICompButtonText";
+function WWButtonText() : WWButtonSprite() constructor {
+	debug_name = "WWButtonText";
 	
 	#region Public
 		
@@ -16,10 +16,10 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 			#region jsDoc
 			/// @func    set_sprite_to_auto_wrap()
 			/// @desc    Automatically wrap the sprite around the suplied text. This will change the click region for you. Note: This should be called after calling the sprite and text builder functions.
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {Real} x : The x offset
 			/// @param   {Real} y : The y offset
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
 				
@@ -81,7 +81,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 						case GUI_IMAGE_HOVER: {
 							draw_set_color(text.color.hover);
 							break;}
-						case GUI_IMAGE_CLICKED: {
+						case GUI_IMAGE_PRESSED: {
 							draw_set_color(text.color.clicked);
 							break;}
 						case GUI_IMAGE_DISABLED: {
@@ -93,7 +93,7 @@ function GUICompButtonText() : GUICompButtonSprite() constructor {
 					draw_set_halign(text.halign);
 					draw_set_valign(text.valign);
 						
-					var _text_y_off = (image_index == GUI_IMAGE_CLICKED) ? text.click_yoff : 0;
+					var _text_y_off = (image_index == GUI_IMAGE_PRESSED) ? text.click_yoff : 0;
 						
 					draw_text(
 							(self.x+text.xoff),

@@ -48,7 +48,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.content = _text;
+				text.text = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;
@@ -106,7 +106,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText()
+			__button__ = new WWButtonText()
 				.set_offset(0,0)
 				.set_text("")
 				.set_sprite(s9CPButton)
@@ -123,7 +123,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				.set_sprite_to_auto_wrap()
 			__dropdown__.set_offset(-_info.right - __dropdown__.__group_region__.get_width(), +_info.top)
 			
-			__scrolling_text__ = new GUICompScrollingText()
+			__scrolling_text__ = new GUICompTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
@@ -194,7 +194,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
-						case GUI_IMAGE_CLICKED: {
+						case GUI_IMAGE_PRESSED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
@@ -216,10 +216,10 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					
 					with (__dropdown__){
 						if (is_open) {
-							trigger_event(self.events.opened, {index : current_index, text : text.content});
+							trigger_event(self.events.opened, {index : current_index, text : text.text});
 						}
 						else {
-							trigger_event(self.events.closed, {index : current_index, text : text.content});
+							trigger_event(self.events.closed, {index : current_index, text : text.text});
 						}
 					}
 				});

@@ -655,7 +655,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			
 			__default_text__ = text.content;
 			
-			__button__ = new GUICompButtonText()
+			__button__ = new WWButtonText()
 					.set_sprite(sprite_header)
 					.set_alignment(fa_left, fa_top)
 			
@@ -753,7 +753,7 @@ function GUICompDropdown() : GUICompController() constructor {
 			/// @param   {String} string : The text which will be drawn by the element.
 			/// @ignore
 			#endregion
-			static __element__ = function(_string) : GUICompButtonText()  constructor {
+			static __element__ = function(_string) : WWButtonText()  constructor {
 				debug_name = "GUICompDropdown__element__"
 				
 				halign = fa_left;

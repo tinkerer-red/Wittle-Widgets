@@ -1,10 +1,10 @@
 #region jsDoc
-/// @func    GUICompText()
+/// @func    WWText()
 /// @desc    A basic text rendering component with support for alignment, colors, and multi-line text.
-/// @return  {Struct.GUICompText}
+/// @return  {Struct.WWText}
 #endregion
-function GUICompText() : GUICompCore() constructor {
-    debug_name = "GUICompText";
+function WWText() : WWCore() constructor {
+    debug_name = "WWText";
 
     #region Public
 		
@@ -13,9 +13,9 @@ function GUICompText() : GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text_color()
 			/// @desc    Sets the colors for the text.
-			/// @self    GUICompScrollingText
+			/// @self    WWScrollingText
 			/// @param   {Real} color : The color to draw the text
-			/// @returns {Struct.GUICompScrollingText}
+			/// @returns {Struct.WWScrollingText}
 			#endregion
 			static set_text_color = function(_color=c_white) {
 				text.color = _color;
@@ -58,12 +58,12 @@ function GUICompText() : GUICompCore() constructor {
 }
 
 #region jsDoc
-/// @func    GUICompTextScribble()
+/// @func    WWTextScribble()
 /// @desc    A basic text rendering component with support for alignment, colors, and multi-line text.
-/// @return  {Struct.GUICompTextScribble}
+/// @return  {Struct.WWTextScribble}
 #endregion
-function GUICompTextScribble() : GUICompCore() constructor {
-    debug_name = "GUICompTextScribble";
+function WWTextScribble() : WWCore() constructor {
+    debug_name = "WWTextScribble";
 
     #region Public
 		
@@ -116,3 +116,5 @@ function GUICompTextScribble() : GUICompCore() constructor {
 		
     #endregion
 }
+
+

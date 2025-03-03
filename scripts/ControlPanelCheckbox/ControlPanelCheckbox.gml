@@ -36,7 +36,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.content = _text;
+				text.text = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;
@@ -102,7 +102,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText()
+			__button__ = new WWButtonText()
 				.set_offset(0,0)
 				.set_text("")
 				.set_sprite(s9CPButton)
@@ -111,12 +111,12 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 			
 			var _info = sprite_get_nineslice(__button__.sprite_index);
 			
-			__checkbox__ = new GUICompCheckbox() //the x/y doesnt matter as the set region will move this
+			__checkbox__ = new WWCheckbox() //the x/y doesnt matter as the set region will move this
 				.set_alignment(fa_right, fa_top)
 				.set_checkbox_sprites(sCPCheckboxChecked, sCPCheckboxUnChecked)
 			__checkbox__.set_offset(-_info.right - __checkbox__.sprite_width, _info.top)
 			
-			__scrolling_text__ = new GUICompScrollingText()
+			__scrolling_text__ = new GUICompTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_alignment(fa_left, fa_middle)
 				.set_text(_label)
@@ -186,7 +186,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
-						case GUI_IMAGE_CLICKED: {
+						case GUI_IMAGE_PRESSED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);

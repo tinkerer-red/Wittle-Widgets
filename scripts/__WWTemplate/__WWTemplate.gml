@@ -1,11 +1,11 @@
 ///@ignore
 #region jsDoc
-/// @func    GUICompTemplate()
+/// @func    WWTemplate()
 /// @desc    This is a template for building a new component from scratch, this should never be called by the user
-/// @returns {Struct.GUICompTemplate}
+/// @returns {Struct.WWTemplate}
 #endregion
-function GUICompTemplate() : GUICompCore() constructor {
-	debug_name = "GUICompTemplate";
+function WWTemplate() : WWCore() constructor {
+	debug_name = "WWTemplate";
 	
 	#region Public
 		

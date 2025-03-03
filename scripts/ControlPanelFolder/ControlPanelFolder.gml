@@ -9,7 +9,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				_top    = 0;
 				_bottom = font_get_info(__button__.text.font).size + _info.top + _info.bottom + __button__.text.click_yoff;
 				
-				static __set_size = GUICompCore.set_size;
+				static __set_size = WWCore.set_size;
 				__set_size(_left, _top, _right, _bottom)
 				
 				__button__.set_size(_left, _top, _right, _bottom)
@@ -39,7 +39,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.content = _text
+				text.text = _text
 				__scrolling_text__.set_text(text);
 				
 				return self;
@@ -139,7 +139,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText()
+			__button__ = new WWButtonText()
 				.set_offset(0,0)
 				.set_sprite(s9CPFolderClosed)
 				.set_text("")
@@ -173,7 +173,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			});
 			
 			
-			__scrolling_text__ = new GUICompScrollingText()
+			__scrolling_text__ = new GUICompTextScrolling()
 				.set_offset(_info.left, _info.top - __button__.text.click_yoff)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
@@ -242,7 +242,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
-						case GUI_IMAGE_CLICKED: {
+						case GUI_IMAGE_PRESSED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);

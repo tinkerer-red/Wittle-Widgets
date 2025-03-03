@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__GUICompTemplate",
+  "%Name":"WWButtonSprite",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__GUICompTemplate",
+  "name":"WWButtonSprite",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

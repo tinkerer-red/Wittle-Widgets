@@ -3,7 +3,7 @@
 /// @desc    A menu that manages a group of radio buttons, ensuring only one is selected.
 /// @return  {Struct.GUICompRadioMenu}
 #endregion
-function GUICompRadioMenu() : GUICompCore() constructor {
+function GUICompRadioMenu() : WWCore() constructor {
     debug_name = "GUICompRadioMenu";
 
     #region Public
@@ -17,7 +17,7 @@ function GUICompRadioMenu() : GUICompCore() constructor {
 			/// @returns {Struct.GUICompCheckbox}
             #endregion
             static add_option = function(_label, _callback) {
-                var option = new GUICompCheckbox()
+                var option = new WWCheckbox()
 					.set_text(_label)
 					.set_callback(_callback ?? function(){})
 				
@@ -95,7 +95,7 @@ function GUICompRadioMenu() : GUICompCore() constructor {
 /// @desc    A menu that manages a group of radio buttons, ensuring only one is selected.
 /// @return  {Struct.GUICompRadioOption}
 #endregion
-function GUICompRadioOption() : GUICompCore() constructor {
+function GUICompRadioOption() : WWCore() constructor {
 	debug_name = "GUICompRadioOption";
 	
 	#region Public
@@ -230,9 +230,9 @@ function GUICompRadioOption() : GUICompCore() constructor {
 		
 		#region Variables
 			
-			button = new GUICompCheckbox()
+			button = new WWCheckbox()
 			
-			label = new GUICompText()
+			label = new GUICompTextScrolling()
 				.set_text_alignment(fa_left, fa_center)
 				.set_offset(button.region.get_width(), button.region.get_height()/2)
 			

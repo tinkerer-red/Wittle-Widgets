@@ -1,12 +1,12 @@
 #region jsDoc
-/// @func    GUICompCore()
+/// @func    WWCore()
 /// @desc    This is the root most component, only use this if you need a very basic component for drawing purposes or if you're creating a new component.
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.GUICompCore}
+/// @returns {Struct.WWCore}
 #endregion
-function GUICompCore() constructor {
-	debug_name = "GUICompCore";
+function WWCore() constructor {
+	debug_name = "WWCore";
 	
 	#region Public
 		
@@ -17,10 +17,10 @@ function GUICompCore() constructor {
 			/// @func    set_position()
 			/// @desc    Publicly sets the position of the component, recording the user's preferred position.
 			///          The component’s x and y coordinates are updated relative to the parent controller and its anchor.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} x : The x of the component.
 			/// @param   {Real} y : The y of the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_position = function(_x, _y) {
 				if (__position_set__ == false) {
@@ -35,14 +35,23 @@ function GUICompCore() constructor {
 			/// @func    set_size()
 			/// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.  
 			///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {real} left : The left side of the bounding box
 			/// @param   {real} top : The top side of the bounding box
 			/// @param   {real} right : The right side of the bounding box
 			/// @param   {real} bottom : The bottom side of the bounding box
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
-			static set_size = function(_left, _top, _right, _bottom) {
+			static set_size = function(_left, _top, _right=undefined, _bottom=undefined) {
+				
+				//it is often a problem users assume width/height, this just suuports that
+				if (_right == undefined && _bottom == undefined) {
+					_right  = _left;
+					_bottom = _top;
+					_left   = 0;
+					_top    = 0;
+				}
+				
 				__size_set__ = true;
 				__set_size__(_left, _top, _right, _bottom);
 				return self;
@@ -50,10 +59,10 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_offset()
 			/// @desc    Sets the anchor of the component, This anchor will depict how the component is attached to the parent controller when resizing
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} x : The x anchor of the component.
 			/// @param   {Real} y : The y anchor of the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_offset = function(_x, _y) {
 				__offset_set__ = true;
@@ -63,10 +72,10 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_alignment()
 			/// @desc    Sets how the component will anchor to it's parent. Note: Some parent controllers will ignore this value if they see fit.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Constant.HAlign} halign : Horizontal alignment.
 			/// @param   {Constant.VAlign} valign : Vertical alignment.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_alignment = function(_halign=fa_center, _valign=fa_middle) {
 				
@@ -78,9 +87,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_width()
 			/// @desc    Sets the width of the component, this is just a short cut for doing `set_size(0, 0, _width, region.get_height())`
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} width : The width of the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_width = function(_width) {
 				self.set_size(0, 0, _width, region.get_height())
@@ -90,9 +99,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_height()
 			/// @desc    Sets the height of the component, this is just a short cut for doing `set_size(0, 0, region.get_width(), _height)`
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} height : The height of the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_height = function(_height) {
 				self.set_size(0, 0, region.get_width(), _height)
@@ -105,9 +114,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_sprite()
 			/// @desc    Sets all default GML object's sprite variables with a given sprite.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Asset.GMSprite} sprite : The sprite to apply to the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite = function(_sprite) {
 				__set_sprite__(_sprite);
@@ -116,9 +125,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_sprite_angle()
 			/// @desc    Sets the angle of the sprite to be drawn.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} angle : The angle of the sprite.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite_angle = function(_angle) {
 				image_angle = _angle;
@@ -127,9 +136,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_sprite_color()
 			/// @desc    Sets the color of the sprite to be drawn.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} color : The color of the sprite.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite_color = function(_col) {
 				image_blend = _col;
@@ -138,9 +147,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_sprite_alpha()
 			/// @desc    Sets the alpha of the sprite to be drawn.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} alpha : The alpha of the sprite.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite_alpha = function(_alpha) {
 				image_alpha = _alpha;
@@ -151,9 +160,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text()
 			/// @desc    Sets the variables for text drawing
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {String} text : The text to write on the button.
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
 				text.content = _text
@@ -163,9 +172,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text_font()
 			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {Asset.GMFont} font : The font to use when drawing the text
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text_font = function(_font=fGUIDefault) {
 				text.font = _font;
@@ -174,11 +183,11 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text_colors()
 			/// @desc    Sets the colors for the text of the button.
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {Real} idle_color     : The color to draw the text when the component is idle
 			/// @param   {Real} hover_color    : The color to draw the text when the component is hovered or clicked
 			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
 				text.color.idle    = _idle;
@@ -191,10 +200,10 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text_alignment()
 			/// @desc    Sets how the text is aligned when drawing
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {Constant.HAlign} halign : Horizontal alignment
 			/// @param   {Constant.VAlign} valign : Vertical alignment
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text_alignment = function(_h=fa_left, _v=fa_top) {
 				text.halign = _h;
@@ -205,11 +214,11 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    set_text_offsets()
 			/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
-			/// @self    GUICompButtonText
+			/// @self    WWButtonText
 			/// @param   {Real} x : The x offset
 			/// @param   {Real} y : The y offset
 			/// @param   {Real} click_y : The additional y offset used when 
-			/// @returns {Struct.GUICompButtonText}
+			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
 				text.xoff = _x;
@@ -222,10 +231,10 @@ function GUICompCore() constructor {
 			
 			#region jsDoc
 			/// @func    set_enabled()
-			/// @desc    Enable or Disable the Component, This usually effects how some components are handled
-			/// @self    GUICompCore
+			/// @desc    Enable or Disable the Component, This usually effects how some components are handled in terms of greying out a component.
+			/// @self    WWCore
 			/// @param   {Bool} is_enabled : If the component should be enabled or not.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_enabled = function(_is_enabled) {
 				if (is_enabled == _is_enabled) return self;
@@ -249,6 +258,27 @@ function GUICompCore() constructor {
 				
 				return self;
 			}
+			#region jsDoc
+			/// @func    set_active()
+			/// @desc    Activate of Deactivate the Component from executing any of it's code. This will also prevent all subcomponets code from running.
+			/// @self    WWCore
+			/// @param   {Bool} is_enabled : If the component should be enabled or not.
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_active = function(_is_active) {
+				if (is_active == _is_active) return self;
+				
+				is_active = _is_active;
+				
+				if (is_active) {
+					trigger_event(self.events.activated);
+				}
+				else {
+					trigger_event(self.events.deactivated);
+				}
+				
+				return self;
+			}
 			
 			
 		#endregion
@@ -257,27 +287,35 @@ function GUICompCore() constructor {
 			
 			events = {};
 			
-			events.focus    = variable_get_hash("focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			events.blur     = variable_get_hash("blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
+			#region Focus/Blur
+			events.focus     = variable_get_hash("focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.is_focused = variable_get_hash("is_focused"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.blur      = variable_get_hash("blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
+			events.is_blurred = variable_get_hash("is_blurred"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
 			static on_focus = function(_func) {
-				add_event_listener(events.pre_step, _func);
+				add_event_listener(events.focus, _func);
+				return self;
+			}
+			static on_is_focused = function(_func) {
+				add_event_listener(events.is_focused, _func);
 				return self;
 			}
 			static on_blur = function(_func) {
-				add_event_listener(events.post_step, _func);
+				add_event_listener(events.blur, _func);
 				return self;
 			}
+			static on_is_blurred = function(_func) {
+				add_event_listener(events.is_blurred, _func);
+				return self;
+			}
+			#endregion
 			
-			events.mouse_over = variable_get_hash("mouse_over");
+			#region Click Handling
 			events.pressed    = variable_get_hash("pressed");
 			events.held       = variable_get_hash("held");
 			events.long_press = variable_get_hash("long_press");
 			events.released   = variable_get_hash("released");
 			events.double_click = variable_get_hash("double_click");
-			static on_mouse_over = function(_func) {
-				add_event_listener(events.mouse_over, _func);
-				return self;
-			}
 			static on_pressed = function(_func) {
 				add_event_listener(events.pressed, _func);
 				return self;
@@ -298,7 +336,8 @@ function GUICompCore() constructor {
 				add_event_listener(events.double_click, _func);
 				return self;
 			}
-			
+			#endregion
+			#region Step/Draw
 			events.pre_step  = variable_get_hash("pre_step"); //triggered every frame before the begin step event is activated
 			events.post_step = variable_get_hash("post_step"); //triggered every frame after the end step event is activated
 			static on_pre_step = function(_func) {
@@ -320,6 +359,34 @@ function GUICompCore() constructor {
 				add_event_listener(events.post_draw, _func);
 				return self;
 			}
+			#endregion
+			
+			#region Mouse Over/Off
+			events.mouse_over = variable_get_hash("mouse_over");
+			events.mouse_off = variable_get_hash("mouse_off");
+			static on_mouse_over = function(_func) {
+				add_event_listener(events.mouse_over, _func);
+				return self;
+			}
+			static on_mouse_off = function(_func) {
+				add_event_listener(events.mouse_off, _func);
+				return self;
+			}
+			
+			events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			events.mouse_off_group = variable_get_hash("mouse_off_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			static on_mouse_off_group = function(_func) {
+				add_event_listener(events.mouse_off_group, _func);
+				return self;
+			}
+			
+			#endregion
+			
+			events.interact    = variable_get_hash("interact"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			static on_interact = function(_func) {
+				add_event_listener(events.interact, _func);
+				return self;
+			}
 			
 			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
@@ -332,17 +399,24 @@ function GUICompCore() constructor {
 				return self;
 			}
 			
-			events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
-			static on_mouse_over_group = function(_func) {
-				add_event_listener(events.mouse_over_group, _func);
+			events.activated   = variable_get_hash("activated"); //triggered when the component is enabled (this is done by the developer)
+			events.deactivated = variable_get_hash("deactivated"); //triggered when the component is disabled (this is done by the developer)
+			static on_activated = function(_func) {
+				add_event_listener(events.activated, _func);
 				return self;
 			}
+			static on_deactivated = function(_func) {
+				add_event_listener(events.deactivated, _func);
+				return self;
+			}
+			
 			
 		#endregion
 		
 		#region Variables
 			
-			is_enabled = true;
+			is_enabled = true; //if the component is in a enabled/disabled state, typically if you want to grey out a button
+			is_active  = true; //is the component's code is being executed
 			
 			halign = fa_left;
 			valign = fa_top;
@@ -417,7 +491,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    trigger_event()
 			/// @desc    Run the callbacks for the given event lister id. 
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
 			/// @param   {Struct} data : The data supplied from the struct, dependant on the component.
 			/// @returns {undefined}
@@ -440,7 +514,7 @@ function GUICompCore() constructor {
 			/// @func    add_event_listener()
 			/// @desc    Add an event listener to the component,
 			///          This function will be ran when the event is triggered
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {String} event_id : The comonent's event you wish to bound this function to.
 			/// @param   {Function} func : The function to run when the event is triggered
 			/// @returns {Real}
@@ -463,7 +537,7 @@ function GUICompCore() constructor {
 			/// @func    insert_event_listener()
 			/// @desc    Insert an event listener to the component,
 			///          This function will be ran when the event is triggered
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} index : The index to insert the event handler
 			/// @param   {String} event_id : The comonent's event you wish to bound this function to.
 			/// @param   {Function} func : The function to run when the event is triggered
@@ -486,9 +560,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    remove_event_listener()
 			/// @desc    Remove an event listener to the component
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {real} uid : The Unique ID of a previously added event function returned by add_event_listener.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static remove_event_listener = function(_uid) {
 				
@@ -519,7 +593,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_events()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's events.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {Array<String>}
 			#endregion
 			static get_events = function() {
@@ -528,7 +602,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    event_exists()
 			/// @desc    Lightweight check to see if an event exists.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
 			/// @returns {undefined}
 			/// @ignore
@@ -565,7 +639,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_functions()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's functions. Useful for learning what available public functions you have access to.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {Array<String>}
 			#endregion
 			static get_functions = function() {
@@ -585,7 +659,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_builder_functions()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's builder functions. Useful for learning what functions you can make use of when initializing a the component.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {Array<String>}
 			#endregion
 			static get_builder_functions = function() {
@@ -605,7 +679,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_children_count()
 			/// @desc    Returns the number of children this component directly controls. This will not include children of children.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @returns {Real}
 			#endregion
 			static get_children_count = function() {
@@ -614,7 +688,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_sub_children_count()
 			/// @desc    Returns the number of all children. This will include all children of children.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @returns {Real}
 			#endregion
 			static get_sub_children_count = function() {
@@ -631,7 +705,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    get_children()
 			/// @desc    Returns an array of the children
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @returns {Array<Struct>}
 			#endregion
 			static get_children = function() {
@@ -645,7 +719,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    mouse_on_comp()
 			/// @desc    Checks to see if the mouse is currently on the component. Used for optimization when hundreds of components are available.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {Bool}
 			#endregion
 			static mouse_on_comp = function() {
@@ -668,13 +742,16 @@ function GUICompCore() constructor {
 				if (__mouse_on_comp__) {
 					trigger_event(self.events.mouse_over);
 				}
+				else {
+					trigger_event(self.events.mouse_off);
+				}
 				
 				return __mouse_on_comp__;
 			}
 			#region jsDoc
 			/// @func    mouse_on_group()
 			/// @desc    This function is internally used to help assist early outing collision checks.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @returns {Bool}
 			/// @ignore
 			#endregion
@@ -701,13 +778,16 @@ function GUICompCore() constructor {
 				if (__mouse_on_group__) {
 					trigger_event(self.events.mouse_over_group);
 				}
+				else {
+					trigger_event(self.events.mouse_off_group);
+				}
 				
 				return __mouse_on_group__;
 			}
 			#region jsDoc
 			/// @func    consume_input()
 			/// @desc    Used to capture the input so no other components try to use an already consumed input.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {Undefined}
 			#endregion
 			static consume_input = function() {
@@ -721,8 +801,8 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    add()
 			/// @desc    Add a Component to the controller.
-			/// @self    GUICompController
-			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
+			/// @self    WWController
+			/// @param   {Struct.WWCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
 			static add = function(_comp) {
@@ -741,9 +821,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    insert()
 			/// @desc    Inserts a Component into the controller's children array.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Real} index : The index (possition) you wish to insert the component into the children array
-			/// @param   {Struct.GUICompCore|Array} comp : The component you wish to add to the controller.
+			/// @param   {Struct.WWCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
 			static insert = function(_index, _comp) {
@@ -762,7 +842,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    remove()
 			/// @desc    Remove a Component from the controller's children array. Removal is done at the next event automatically and is not instantaneous.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Real} index : The index of the component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
@@ -782,8 +862,8 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    find()
 			/// @desc    Find the index of the given component. Will return -1 if the component was not found.
-			/// @self    GUICompController
-			/// @param   {Struct.GUICompController} component : The component you wish to find the index of.
+			/// @self    WWController
+			/// @param   {Struct.WWController} component : The component you wish to find the index of.
 			/// @returns {Real}
 			#endregion
 			static find = function(_comp) {
@@ -798,7 +878,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    update_component_positions()
 			/// @desc    Updates the locations of all sub components of the top most controller
-			/// @self    GUICompHandler
+			/// @self    WWHandler
 			/// @returns {Real}
 			#endregion
 			static update_component_positions = function() {
@@ -823,7 +903,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    clear_children()
 			/// @desc    Clears all children from the children array, deleting their structs and running their cleanup events. Use this when you are deleting components.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @returns {Undefined}
 			#endregion
 			static clear_children = function() {
@@ -844,7 +924,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    step()
 			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Struct} input : The input struct components pass around to capture inputs
 			/// @returns {Undefined}
 			#endregion
@@ -869,7 +949,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    draw()
 			/// @desc    Emulates the GML equivalant event.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Struct} input : The input struct components pass around to capture inputs
 			/// @returns {Undefined}
 			#endregion
@@ -984,7 +1064,8 @@ function GUICompCore() constructor {
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0;
-			__is_focused__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
+			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
+			__is_focused__ = false; // is currently the component capturing the input
 			
 			#endregion
 			#region Sub Component Variables
@@ -1008,83 +1089,100 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __reset_focus__()
 			/// @desc    Resets the component from being currently interacted with
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
 			static __reset_focus__ = function() {
-				__is_focused__ = false;
-				trigger_event(self.events.blur);
+				if (__is_interacting__) {
+					__is_interacting__ = false;
+					trigger_event(self.events.blur);
+				}
 			}
+			
 			#region jsDoc
-			/// @func    __handle_click__()
-			/// @desc    This handle all of the monotinous click code which is reused all over the place. If you need a component to do something when a click the component has been clicked, see "add_event_listener" or "add_event_listener".
-			/// @self    GUICompCore
-			/// @param   {Struct.Input} input : The input struct containing passed around data between components.
+			/// @func    __handle_interaction__()
+			/// @desc    Handles input interactions for buttons and sliders.
+			/// @self    WWCore
+			/// @param   {Struct.Input} _input : The input struct containing shared data.
+			/// @param   {Bool} _keep_focus : If true, retains focus even if the mouse moves off (for sliders).
+			/// @param   {Bool} _use_value : If true, passes `self.value` to the held/released events (for sliders).
 			#endregion
-			static __handle_click__ = function(_input) {
-				//early out if we're disabled
-				if (!is_enabled) {
-					if (__is_focused__) {
-						__reset_focus__();
-					}
-					return;
-				}
-				
-				var _input_captured = _input.consumed
-				
-				//capture input if we still have focus
-				if (__is_focused__)
-				&& (is_enabled) {
-					consume_input();
-				}
-				
-				//run the internal step
-				if (!_input_captured)
-				&& (mouse_on_comp()) {
-					consume_input();
+			static __handle_interaction__ = function(_input) {
+				// Early exit if disabled
+			    if (is_enabled) {
+			        
+				    var _input_captured = _input.consumed;
+					var _mouse_on_comp = mouse_on_comp();
 					
-					//trigger the event for mouse over
-					trigger_event(self.events.mouse_over);
 					
-					image_index = GUI_IMAGE_HOVER;
-					
-					//mouse button checks
-					if (mouse_check_button_pressed(mb_left)) {
-						__is_focused__ = true;
-						image_index = GUI_IMAGE_CLICKED;
-						__click_held_timer__ = 0;
-						trigger_event(self.events.pressed);
-						trigger_event(self.events.focus);
-					}
-					else if (__is_focused__) && (mouse_check_button(mb_left)) {
-						image_index = GUI_IMAGE_CLICKED;
-						trigger_event(self.events.held);
+					//handle focus/bluring
+					if (_mouse_on_comp) {
+						consume_input();
 						
-						__click_held_timer__ += 1;
-						if (__click_held_timer__ > game_get_speed(gamespeed_fps)/3)
-						&& (__click_held_timer__  % floor(game_get_speed(gamespeed_fps)/30) == 0) {
-							trigger_event(self.events.long_press);
+						if (!__is_focused__) {
+							__is_focused__ = true;
+							trigger_event(self.events.focus);
+						}
+						trigger_event(self.events.is_focused);
+					}
+					else {
+						if (__is_focused__) {
+							__is_focused__ = false;
+							trigger_event(self.events.blur);
+						}
+						trigger_event(self.events.is_blurred);
+					}
+					
+					
+					//handle input
+					if (!_input_captured) {
+						if (_mouse_on_comp) {
+							
+							if (mouse_check_button_pressed(mb_left)) {
+					            __is_interacting__ = true;
+					            __click_held_timer__ = current_time;
+					            trigger_event(self.events.pressed);
+					        }
+							
+							else if (__is_interacting__ && mouse_check_button(mb_left)) {
+					            trigger_event(self.events.held);
+						
+					            // Handle long press timing
+					            __click_held_timer__ += 1;
+					            if (current_time-__click_held_timer__ > 1_000/3) {
+					                trigger_event(self.events.long_press);
+					            }
+					        }
+							
+							else if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+					            __reset_focus__();
+					            trigger_event(self.events.released);
+					        }
+						}
+						else {
+							if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+					            __reset_focus__();
+					        }
 						}
 					}
-					else if (__is_focused__) && (mouse_check_button_released(mb_left)) {
-						__reset_focus__();
-						__click_held_timer__ = 0;
-						image_index = GUI_IMAGE_HOVER;
-						trigger_event(self.events.released);
-						trigger_event(self.events.blur);
+					else {
+						if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+				            __reset_focus__();
+				        }
 					}
-					
 				}
 				else {
-					image_index = GUI_IMAGE_ENABLED;
-					if (__is_focused__) && (mouse_check_button_released(mb_left)) {
-						__reset_focus__();
-						trigger_event(self.events.blur);
-					}
+					if (__is_interacting__) {
+			            __reset_focus__();
+			        }
 				}
 				
+				if (__is_interacting__) {
+					trigger_event(self.events.interact);
+				}
 			}
+			
 			#endregion
 			#region Event Priv Functions
 			
@@ -1093,7 +1191,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __validate_component_additions__()
 			/// @desc    Validates that we are not adding existing components to our controller, or that a supplied array of components does not contain duplicates.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Array<Struct>} arr : The array of structs to validate
 			/// @returns {Undefined}
 			/// @ignore
@@ -1136,7 +1234,7 @@ function GUICompCore() constructor {
 			///            controler, which leads to the controller updating it's controller region size, which
 			///            would anchor the component further out into an infinate loop.
 			///
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Array<Struct>} arr : The array of structs to validate
 			/// @returns {Undefined}
 			/// @ignore
@@ -1205,7 +1303,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __include_children__()
 			/// @desc    Includes the children by either pushing them into the list or inserting them into the list. Any index under 0 will push the component.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Array<Struct>} arr_of_comp : The array of components you wish to include into the children.
 			/// @param   {Real} index : The index the array will be inserted into. Note: a value of -1 will push the array to the end.
 			/// @ignore
@@ -1216,6 +1314,7 @@ function GUICompCore() constructor {
 				_size = array_length(_arr);
 				_i=0; repeat(_size) {
 					_comp = _arr[_i];
+					
 					_comp.__is_child__ = true;
 					_comp.__parent__ = self;
 					
@@ -1226,8 +1325,13 @@ function GUICompCore() constructor {
 						array_insert(__children__, _index, _comp);
 					}
 					
+					
 					if (!_comp.__position_set__) {
 						_comp.__set_position__(x+_comp.x_offset, y+_comp.y_offset);
+					}
+					
+					if (!_comp.__offset_set__) {
+						_comp.__set_offset__(_comp.x-x, _comp.y-y);
 					}
 					
 				_i+=1;}//end repeat loop
@@ -1238,9 +1342,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __update_group_region__()
 			/// @desc    This function is internally used to help assist updating the bounding box of controllers. This bounding box is used for many things but primarily used for collision check optimizations.
-			/// @self    GUICompController
+			/// @self    WWController
 			/// @param   {Real} index : The index of the component to remove.
-			/// @returns {Struct.GUICompController}
+			/// @returns {Struct.WWController}
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
@@ -1248,6 +1352,10 @@ function GUICompCore() constructor {
 				var _top    = region.top;
 				var _right  = region.right;
 				var _bottom = region.bottom;
+				
+				log("\n\n\n\n\n")
+				log(debug_name)
+				log(json_stringify(region, true))
 				
 				var _prev_left   = __group_region__.left;
 				var _prev_top    = __group_region__.top;
@@ -1287,7 +1395,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __find_index_in_parent__()
 			/// @desc    Find the child's index inside it's parent. Typically used for updating the Achor point
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @returns {real}
 			/// @ignore
 			#endregion
@@ -1309,7 +1417,7 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __region__()
 			/// @desc    Constructs a new region struct.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} left   : The reletive bounding box from the component's x/y
 			/// @param   {Real} top    : The reletive bounding box from the component's x/y
 			/// @param   {Real} right  : The reletive bounding box from the component's x/y
@@ -1346,9 +1454,9 @@ function GUICompCore() constructor {
 			#region jsDoc
 			/// @func    __set_sprite__()
 			/// @desc    Define all of the built in GML object variables for the supplied sprite
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Asset.GMSprite} sprite : The sprite to apply to the component, and to get the values from.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static __set_sprite__ = function(_sprite) {
 				/// NOTE: These are the default structure of GUI button sprites
@@ -1362,6 +1470,8 @@ function GUICompCore() constructor {
 				// and linux YYC builds throw errors on compile
 				
 				self.sprite_index = _sprite;
+				
+				if (sprite_exists(_sprite)) return self;
 				
 				self.sprite_height  = self.image_yscale * sprite_get_height(_sprite);
 				self.sprite_width   = self.image_xscale * sprite_get_width(_sprite);
@@ -1382,12 +1492,12 @@ function GUICompCore() constructor {
 			/// @desc    Internally updates the component's region without marking the size as user–preferred.  
 			///          This function is used by internal layout routines so that they can adjust the component's dimensions  
 			///          without overwriting an explicit user setting.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {real} left : The left side of the bounding box
 			/// @param   {real} top : The top side of the bounding box
 			/// @param   {real} right : The right side of the bounding box
 			/// @param   {real} bottom : The bottom side of the bounding box
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static __set_size__ = function(_left, _top, _right, _bottom) {
 				region.left   = _left;
@@ -1407,10 +1517,10 @@ function GUICompCore() constructor {
 			/// @desc    Internally updates the component's position without marking the position as user–preferred.  
 			///          This function is used by internal layout routines so that they can adjust the component's position
 			///          without overwriting an explicit user setting.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} x : The x of the component.
 			/// @param   {Real} y : The y of the component.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static __set_position__ = function(_x, _y) {
 				if (_x == self.x && _y == self.y) return self; // Avoid redundant updates
@@ -1433,10 +1543,10 @@ function GUICompCore() constructor {
 			/// @func    __set_offset__
 			/// @desc    Internal function that updates the offset without marking it as user-defined.  
 			///          This keeps the component positioned relative to the parent dynamically.
-			/// @self    GUICompCore
+			/// @self    WWCore
 			/// @param   {Real} x : The x offset.
 			/// @param   {Real} y : The y offset.
-			/// @returns {Struct.GUICompCore}
+			/// @returns {Struct.WWCore}
 			#endregion
 			static __set_offset__ = function(_x, _y) {
 			    if (_x == self.x_offset && _y == self.y_offset) return self; // Avoid redundant updates
@@ -1450,13 +1560,10 @@ function GUICompCore() constructor {
 					self.yprevious = self.y;
 					self.x = __parent__.x + self.x_offset;
 					self.y = __parent__.y + self.y_offset;
-			    }
-				
-				update_component_positions();
-				
-				// If this component is a child, trigger an update on the parent’s group region.
-			    if (__is_child__) {
-					__parent__.__update_group_region__();
+					
+					update_component_positions();
+					
+			    	__parent__.__update_group_region__();
 			    }
 				
 			    return self;

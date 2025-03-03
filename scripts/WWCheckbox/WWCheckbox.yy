@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompCore",
+  "%Name":"WWCheckbox",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompCore",
+  "name":"WWCheckbox",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

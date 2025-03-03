@@ -329,10 +329,10 @@ function GUICompScrollBar() : GUICompController() constructor {
 				.set_background_sprite(s9ScrollbarVertBackground)
 				.set_thumb_only_input(true)
 			
-			__button_inc__ = new GUICompButtonSprite()
+			__button_inc__ = new WWButtonSprite()
 				.set_offset(0,0)
 				.set_alignment(fa_right, fa_bottom)
-			__button_dec__ = new GUICompButtonSprite()
+			__button_dec__ = new WWButtonSprite()
 				.set_offset(0,0)
 				.set_alignment(fa_left, fa_top)
 			
@@ -537,7 +537,7 @@ function GUICompScrollBar() : GUICompController() constructor {
 				
 				//scrollbar
 				__scrollbar__.add_event_listener(__scrollbar__.events.post_step, function(){
-					if (__scrollbar__.__is_focused__) {
+					if (__scrollbar__.__is_interacting__) {
 						__update_button_enables__();
 					}
 				});

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompButtonSprite",
+  "%Name":"GUICompTextScrolling",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompButtonSprite",
+  "name":"GUICompTextScrolling",
   "parent":{
     "name":"Finished Components",
     "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",

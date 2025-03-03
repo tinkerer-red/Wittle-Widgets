@@ -37,7 +37,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			/// @returns {Struct.ControlPanelButton}
 			#endregion
 			static set_text = function(_text="DefaultText") {
-				text.content = _text;
+				text.text = _text;
 				__scrolling_text__.set_text(_text);
 				
 				return self;
@@ -100,7 +100,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText()
+			__button__ = new WWButtonText()
 				.set_offset(0,0)
 				.set_text("")
 				.set_sprite(s9CPButton)
@@ -135,7 +135,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_accepting_inputs(true)
 			
 			
-			__scrolling_text__ = new GUICompScrollingText()
+			__scrolling_text__ = new GUICompTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
@@ -197,7 +197,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				add_event_listener(self.events.post_step, function(_data) {
 					
 					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
-					_image_index = max(_image_index, __textbox__.__is_focused__)
+					_image_index = max(_image_index, __textbox__.__is_interacting__)
 					
 					__button__.image_index   = _image_index;
 					
@@ -214,7 +214,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
-						case GUI_IMAGE_CLICKED: {
+						case GUI_IMAGE_PRESSED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
@@ -232,7 +232,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				//set the focus to the textbox
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
-						__is_focused__ = true;
+						__is_interacting__ = true;
 						trigger_event(self.events.focus);
 						
 						var _line_last = curt.length - 1;

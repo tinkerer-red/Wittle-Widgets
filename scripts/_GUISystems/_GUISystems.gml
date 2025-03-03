@@ -1,6 +1,6 @@
 #macro GUI_IMAGE_ENABLED 0
 #macro GUI_IMAGE_HOVER 1
-#macro GUI_IMAGE_CLICKED 2
+#macro GUI_IMAGE_PRESSED 2
 #macro GUI_IMAGE_DISABLED 3
 
 function __surface_rebuild__(_surface, _w, _h) {

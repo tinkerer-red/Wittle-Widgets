@@ -151,7 +151,7 @@ function GUICompFolder() : GUICompController() constructor {
 		
 		#region Variables
 			
-			__button__ = new GUICompButtonText();
+			__button__ = new WWButtonText();
 			adopt_builder_functions(__button__);
 			
 			__controller__ = new GUICompControllerStacked();

@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.GUICompController}
 #endregion
-function GUICompController() : GUICompCore() constructor {
+function GUICompController() : WWCore() constructor {
 	debug_name = "GUICompController";
 	
 	static draw_debug = function() {

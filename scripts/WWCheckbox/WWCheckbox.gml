@@ -1,12 +1,12 @@
 #region jsDoc
-/// @func    GUICompCheckbox()
+/// @func    WWCheckbox()
 /// @desc    Creates a Checkbox Component
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.GUICompCheckbox}
+/// @returns {Struct.WWCheckbox}
 #endregion
-function GUICompCheckbox() : GUICompButton() constructor {
-	debug_name = "GUICompCheckbox";
+function WWCheckbox() : WWButton() constructor {
+	debug_name = "WWCheckbox";
 	
 	#region Public
 	
@@ -15,10 +15,10 @@ function GUICompCheckbox() : GUICompButton() constructor {
 			#region jsDoc
 			/// @func    set_checkbox_sprites()
 			/// @desc    Sets the sprites which will be used for the checkbox's checked and unchecked states
-			/// @self    GUICompCheckbox
+			/// @self    WWCheckbox
 			/// @param   {Asset.GMSprite} checked_sprite : The sprite used to draw the check box when checked
 			/// @param   {Asset.GMSprite} unchecked_sprite : The sprite used to draw the check box when unchecked
-			/// @returns {Struct.GUICompCheckbox}
+			/// @returns {Struct.WWCheckbox}
 			#endregion
 			static set_checkbox_sprites = function(_checked_sprite=s9CheckBoxChecked, _unchecked_sprite=s9CheckBoxUnchecked) {
 				/// NOTE: These are the default structure of GUI button sprites
@@ -38,9 +38,9 @@ function GUICompCheckbox() : GUICompButton() constructor {
 			#region jsDoc
 			/// @func    set_value()
 			/// @desc    Sets the checkbox to checked or unchecked
-			/// @self    GUICompCheckbox
+			/// @self    WWCheckbox
 			/// @param   {Bool} is_checked : If the checkbox should be changed to checked.
-			/// @returns {Struct.GUICompCheckbox}
+			/// @returns {Struct.WWCheckbox}
 			#endregion
 			static set_value = function(_is_checked) {
 				is_checked = _is_checked;
@@ -50,6 +50,7 @@ function GUICompCheckbox() : GUICompButton() constructor {
 				
 				return self;
 			}
+			static set_checked = set_value;
 			static set_callback = function(_callback) {
 				var _self = self;
 				on_released(method({this: _self, callback: _callback}, function(){
@@ -85,7 +86,7 @@ function GUICompCheckbox() : GUICompButton() constructor {
 			#region jsDoc
 			/// @func    get_checked()
 			/// @desc    Returns if the checkbox is checked
-			/// @self    GUICompCheckbox
+			/// @self    WWCheckbox
 			/// @returns {Bool}
 			#endregion
 			static get_checked = function() {

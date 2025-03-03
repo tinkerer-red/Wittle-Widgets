@@ -52,6 +52,14 @@ function WWSprite() : WWCore() constructor {
 				
 				var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
 				
+				//var _x1 = x+region.left;
+				//var _y1 = y+region.top;
+				//var _x2 = x+region.right;
+				//var _y2 = y+region.bottom;
+				
+				//var _w = 
+				//var _h = _y2
+				
 				//draw the nineslice
 				if (self.image_alpha == 1)
 				&& (self.image_blend == c_white)
@@ -60,8 +68,8 @@ function WWSprite() : WWCore() constructor {
 					draw_sprite_stretched(
 							self.sprite_index,
 							_image_index,
-							x-region.left,
-							y-region.top,
+							x+region.left,
+							y+region.top,
 							region.get_width(),
 							region.get_height()
 					);
@@ -70,8 +78,8 @@ function WWSprite() : WWCore() constructor {
 					draw_sprite_stretched_ext(
 							self.sprite_index, 
 							_image_index, 
-							x-region.left,
-							y-region.top,
+							x+region.left,
+							y+region.top,
 							region.get_width() * image_xscale, 
 							region.get_height() * image_yscale, 
 							self.image_blend, 

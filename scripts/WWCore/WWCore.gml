@@ -280,7 +280,6 @@ function WWCore() constructor {
 				return self;
 			}
 			
-			
 		#endregion
 		
 		#region Events
@@ -498,7 +497,6 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static trigger_event = function(_event_id, _data) {
-				//log(debug_name + " " + event_name(_event_id))
 				var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id)
 				if (_event_arr != undefined) {
 					var _size = array_length(_event_arr);
@@ -809,6 +807,12 @@ function WWCore() constructor {
 				__is_empty__ = false;
 				
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
+				
+				if (argument_count > 1) {
+					for(var _i=1; _i<argument_count; _i++) {
+						array_push(_arr, argument[_i])
+					}
+				}
 				
 				__validate_component_additions__(_arr);
 				
@@ -1353,10 +1357,6 @@ function WWCore() constructor {
 				var _right  = region.right;
 				var _bottom = region.bottom;
 				
-				log("\n\n\n\n\n")
-				log(debug_name)
-				log(json_stringify(region, true))
-				
 				var _prev_left   = __group_region__.left;
 				var _prev_top    = __group_region__.top;
 				var _prev_right  = __group_region__.right;
@@ -1471,7 +1471,7 @@ function WWCore() constructor {
 				
 				self.sprite_index = _sprite;
 				
-				if (sprite_exists(_sprite)) return self;
+				if (!sprite_exists(_sprite)) return self;
 				
 				self.sprite_height  = self.image_yscale * sprite_get_height(_sprite);
 				self.sprite_width   = self.image_xscale * sprite_get_width(_sprite);
@@ -1499,7 +1499,16 @@ function WWCore() constructor {
 			/// @param   {real} bottom : The bottom side of the bounding box
 			/// @returns {Struct.WWCore}
 			#endregion
-			static __set_size__ = function(_left, _top, _right, _bottom) {
+			static __set_size__ = function(_left, _top, _right=undefined, _bottom=undefined) {
+				
+				//it is often a problem users assume width/height, this just suuports that
+				if (_right == undefined && _bottom == undefined) {
+					_right  = _left;
+					_bottom = _top;
+					_left   = 0;
+					_top    = 0;
+				}
+				
 				region.left   = _left;
 				region.top    = _top;
 				region.right  = _right;

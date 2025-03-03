@@ -1,3 +1,82 @@
+
+#region jsDoc
+/// @func    WWSliderHorzThumb()
+/// @desc    Creates a horizontal slider with a draggable thumb.
+/// @param   {Real} x : The x position of the component on screen.
+/// @param   {Real} y : The y position of the component on screen.
+/// @returns {Struct.WWSliderHorzThumb}
+#endregion
+function WWSliderHorzThumb() : WWSliderHorz() constructor {
+    debug_name = "WWSliderHorzThumb";
+
+    thumb = new WWSliderThumb()
+        .set_sprite(s9GUIPixel)
+        .set_sprite_color(c_white)
+        .set_size(16, 16);
+
+    add(thumb);
+
+    on_post_step(function(_input) {
+		var _thumb_x;
+		if (is_inverted) {
+			_thumb_x = region.get_width() * (1 - normalized_value) - thumb.region.get_width() / 2;
+		} else {
+			_thumb_x = region.get_width() * normalized_value - thumb.region.get_width() / 2;
+		}
+		thumb.set_offset(_thumb_x, (region.get_height() - thumb.region.get_height()) / 2);
+    });
+
+    thumb.on_interact(function(_input) {
+        var _norm_val;
+        if (is_inverted) {
+            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
+        } else {
+            _norm_val = (device_mouse_x_to_gui(0) - x + region.left) / region.get_width();
+        }
+        _norm_val = clamp(_norm_val, 0, 1);
+        set_normalized_value(_norm_val);
+    });
+}
+#region jsDoc
+/// @func    WWSliderVertThumb()
+/// @desc    Creates a horizontal slider with a draggable thumb.
+/// @param   {Real} x : The x position of the component on screen.
+/// @param   {Real} y : The y position of the component on screen.
+/// @returns {Struct.WWSliderVertThumb}
+#endregion
+function WWSliderVertThumb() : WWSliderVert() constructor {
+    debug_name = "WWSliderVertThumb";
+
+    thumb = new WWSliderThumb()
+        .set_sprite(s9GUIPixel)
+        .set_sprite_color(c_white)
+        .set_size(16, 16);
+
+    add(thumb);
+
+    on_post_step(function(_input) {
+        var _thumb_y;
+        if (is_inverted) {
+            _thumb_y = region.get_height() * normalized_value - thumb.region.get_height() / 2;
+        } else {
+            _thumb_y = region.get_height() * (1 - normalized_value) - thumb.region.get_height() / 2;
+        }
+        thumb.set_offset((region.get_width() - thumb.region.get_width()) / 2, _thumb_y);
+    });
+
+    thumb.on_interact(function(_input) {
+        var _norm_val;
+		if (is_inverted) {
+            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
+        } else {
+            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
+        }
+		
+		_norm_val = clamp(_norm_val, 0, 1);
+		set_normalized_value(_norm_val);
+    });
+}
+
 #region jsDoc
 /// @func    WWSlider()
 /// @desc    Creates a slider.
@@ -16,37 +95,27 @@ function WWSlider() : WWSliderHorz() constructor {}
 function WWSliderHorz() : WWSliderBase() constructor {
 	debug_name = "WWSliderHorz";
 	
-	#region Public
+	on_interact(function(_input) {
+		if (!input_enabled) return;
 		
-		#region Events
-			
-			
-			
-		#endregion
-		
-	#endregion
-	
-	#region Private Library
-		
-		#region Variables
-			
-			
-		#endregion
-		
-		#region Functions
-			
-			static __apply_value = function() {
+		var _norm_val;
+        if (is_inverted) {
+            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
+        } else {
+			_norm_val = (device_mouse_x_to_gui(0) - x+region.left) / region.get_width();
+		}
+		_norm_val = clamp(_norm_val, 0, 1);
 				
-				var _norm_val = (device_mouse_x_to_gui(0) - x+region.left) / region.get_width()
-				_norm_val = clamp(_norm_val, 0, 1);
-						
-				set_normalized_value(_norm_val);
-				
-			}
-			
-		#endregion
-		
-	#endregion
+		set_normalized_value(_norm_val);
+    });
+	on_pre_draw(function(_input) {
+		var _bar_width = region.get_width() * normalized_value;
+		if (is_inverted) {
+            bar.set_size(region.get_width() - _bar_width, 0, region.get_width(), region.get_height());
+        } else {
+			bar.set_size(0, 0, _bar_width, region.get_height());
+		}
+    });
 	
 }
 #region jsDoc
@@ -59,241 +128,31 @@ function WWSliderHorz() : WWSliderBase() constructor {
 function WWSliderVert() : WWSliderBase() constructor {
 	debug_name = "WWSliderVert";
 	
-	#region Public
+	on_interact(function(_input) {
+		if (!input_enabled) return;
 		
-		#region Events
-			
+        var _norm_val;
+		if (is_inverted) {
+            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
+        } else {
+            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
+        }
+		
+		_norm_val = clamp(_norm_val, 0, 1);
 				
-		#endregion
-		
-	#endregion
-	
-	#region Private Library
-		
-		#region Variables
-			
-			
-		#endregion
-		
-		#region Functions
-			
-			static __apply_value = function() {
-				
-				var _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
-				_norm_val = clamp(_norm_val, 0, 1);
-						
-				set_normalized_value(_norm_val);
-			}
-			
-		#endregion
-		
-	#endregion
-	
+		set_normalized_value(_norm_val);
+    });
+	on_pre_draw(function(_input) {
+		var _bar_height = region.get_height() * normalized_value;
+		if (is_inverted) {
+            bar.set_size(0, 0, region.get_width(), _bar_height);
+        } else {
+            bar.set_size(0, region.get_height() - _bar_height, region.get_width(), region.get_height());
+        }
+    });
 }
 
-
-
-#region jsDoc
-/// @func    WWSliderWithThumbBase()
-/// @desc    Creates a horizontal slider with an interactive thumb button.
-/// @returns {Struct.WWSliderWithThumbBase}
-#endregion
-function WWSliderWithThumbBase() : WWCore() constructor {
-	debug_name = "WWSliderHorzWithThumb";
-	
-	#region Public
-
-		// Create the thumb as a button
-		thumb = new WWButton()
-			.set_sprite(s9SliderThumb)
-			.set_alignment(fa_center, fa_middle)
-		
-		add(thumb);
-		
-		#region Events
-			
-			// Update the thumb position dynamically
-			on_post_step(function(_input) {
-				var _x = x + region.left + (region.get_width() * normalized_value);
-				var _y = y + region.top + (region.get_height() * 0.5);
-				thumb.set_position(_x, _y);
-			});
-
-		#endregion
-
-	#endregion
-}
-
-
-#region jsDoc
-/// @func    WWSliderWithThumbBase()
-/// @desc    This is a template for building a new component from scratch, this should never be called by the user
-/// @returns {Struct.WWSliderWithThumbBase}
-#endregion
-function WWSliderHorzWithThumb() : WWSliderHorz() constructor {
-	debug_name = "WWSliderHorzWithThumb";
-	
-	#region Public
-		
-		#region Builder Functions
-			
-			#region jsDoc
-			/// @func    set_thumb_only_input()
-			/// @desc    Sets the slider to only accept inputs from the thumb. Normally used for when you which to have a scroll bar or lever style input.
-			/// @self    WWSlider
-			/// @param   {Bool} thumb_only_input : If the only available way to change the slider's value is with the thumb. true = thumb only, false = normal slider functionality.
-			/// @returns {Struct.WWSlider}
-			#endregion
-			static set_thumb_only_input = function(_thumb_only_input) {
-				input_enabled = !_thumb_only_input;
-				
-				return self;
-			}
-			
-			#region Thumb
-				
-				#region jsDoc
-				/// @func    set_thumb_enabled()
-				/// @desc    Sets the thumb to be enabled
-				/// @self    WWSlider
-				/// @param   {Real} enabled : If the thumb is enabled
-				/// @returns {Struct.WWSlider}
-				#endregion
-				static set_thumb_enabled = function(_enabled=true) {
-					thumb.set_enabled(_enabled);
-					
-					return self;
-				}
-				#region jsDoc
-				/// @func    set_thumb_sprite()
-				/// @desc    Sets the thumb sprite to be used in the slider component.
-				/// @self    WWSlider
-				/// @param   {Asset.GMSprite} sprite : The sprite to use for the thumb.
-				/// @returns {Struct.WWSlider}
-				#endregion
-				static set_thumb_sprite = function(_sprite=-1) {
-					thumb.set_sprite(_sprite)
-					
-					return self;
-				}
-				#region jsDoc
-				/// @func    set_thumb_alpha()
-				/// @desc    Sets the alpha value of the thumb sprite in the slider component.
-				/// @self    WWSlider
-				/// @param   {Real} alpha : The alpha value to set for the thumb.
-				/// @returns {Struct.WWSlider}
-				#endregion
-				static set_thumb_alpha = function(_alpha=1) {
-					thumb.set_alpha(_alpha);
-					
-					return self;
-				}
-				#region jsDoc
-				/// @func    set_thumb_scales()
-				/// @desc    Sets the scales of the thumb sprite in the slider component.
-				/// @self    WWSlider
-				/// @param   {Real} width : The width to set for the thumb.
-				/// @param   {Real} height : The height to set for the thumb.
-				/// @returns {Struct.WWSlider}
-				#endregion
-				static set_thumb_size = function(_width=0, _height=0) {
-					thumb.set_size(0, 0, _width, _height);
-					
-					return self;
-				}
-				#region jsDoc
-				/// @func    set_thumb_clamped_in_bounds()
-				/// @desc    Sets whether the thumb sprite is clamped within the bounds of the slider component or not. This is usually only used if you are attempting to create a scroll bar
-				/// @self    WWSlider
-				/// @param   {Real} clamped : If the thumb is clamped in bounds. true = clamped, false = not clamped.
-				/// @returns {Struct.WWSlider}
-				#endregion
-				static set_thumb_clamped_in_bounds = function(_clamped=true) {
-					thumb.clamped = _clamped;
-					
-					return self;
-				}
-				
-			#endregion
-			
-		#endregion
-		
-		#region Events
-			
-			
-			
-		#endregion
-		
-		#region Variables
-			
-			
-		#endregion
-	
-		#region Functions
-			
-		#endregion
-		
-	#endregion
-	
-	#region Private
-		
-		#region Variables
-			
-			__prev_value__ = value
-			
-		#endregion
-		
-		#region Functions
-			
-			add_event_listener(self.events.value_input, function() {
-				if (value != __prev_value__) {
-					trigger_event(self.events.value_changed, self.value);
-						
-					if (value > __prev_value__) trigger_event(self.events.value_incremented, self.value);
-					if (value < __prev_value__) trigger_event(self.events.value_decremented, self.value);
-				}
-			});
-			
-		#endregion
-		
-	#endregion
-	
-}
-#region jsDoc
-/// @func    WWSliderVertWithThumb()
-/// @desc    Creates a horizontal slider with an interactive thumb button.
-/// @returns {Struct.WWSliderVertWithThumb}
-#endregion
-function WWSliderVertWithThumb() : WWSliderVert() constructor {
-	debug_name = "WWSliderHorzWithThumb";
-	
-	#region Public
-
-		// Create the thumb as a button
-		thumb = new WWButton()
-			.set_sprite(s9SliderThumb)
-			.set_alignment(fa_center, fa_middle)
-		
-		add(thumb);
-		
-		#region Events
-			
-			// Update the thumb position dynamically
-			on_post_step(function(_input) {
-				var _x = x + region.left + (region.get_width() * normalized_value);
-				var _y = y + region.top + (region.get_height() * 0.5);
-				thumb.set_position(_x, _y);
-			});
-
-		#endregion
-
-	#endregion
-}
-
-
-
-
-
+///@ignore
 #region jsDoc
 /// @func    WWSliderBase()
 /// @desc    Creates a simple slider component.
@@ -308,7 +167,7 @@ function WWSliderBase() : WWButton() constructor {
 		
 		#region jsDoc
 		/// @func    set_size()
-		/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
+		/// @desc    Set the reletive region for the bar sub component. Reletive to the x,y of the component.
 		/// @self    WWCore
 		/// @param   {real} left : The left side of the bounding box
 		/// @param   {real} top : The top side of the bounding box
@@ -316,9 +175,19 @@ function WWSliderBase() : WWButton() constructor {
 		/// @param   {real} bottom : The bottom side of the bounding box
 		/// @returns {Struct.WWCore}
 		#endregion
-		static set_size = function(_left, _top, _right, _bottom) {
+		static set_size = function(_left, _top, _right=undefined, _bottom=undefined) {
+			
+			//it is often a problem users assume width/height, this just suuports that
+			if (_right == undefined && _bottom == undefined) {
+				_right  = _left;
+				_bottom = _top;
+				_left   = 0;
+				_top    = 0;
+			}
+			
 			static __set_size = WWCore.set_size;
-			__set_size(_left, _top, _right, _bottom);
+			__set_size(_left, _top, _right, _bottom)
+			background.__set_size__(_left, _top, _right, _bottom);
 			return self;
 		}
 		#region jsDoc
@@ -406,6 +275,47 @@ function WWSliderBase() : WWButton() constructor {
 			return self;
 		}
 		
+		#region jsDoc
+		/// @func set_inverted()
+		/// @desc Flips the bar's growth direction (top-to-bottom vs bottom-to-top)
+		/// @self WWSliderVert
+		/// @param {Bool} _invert : If true, the slider will scale from top-to-bottom instead.
+		/// @returns {Struct.WWSliderVert}
+		#endregion
+		static set_inverted = function(_invert) {
+			is_inverted = _invert;
+			return self;
+		}
+		
+		#region jsDoc
+		/// @func    set_bar_size()
+		/// @desc    Set the reletive region for the bar sub component. Reletive to the x,y of the component.
+		/// @self    WWCore
+		/// @param   {real} left : The left side of the bounding box
+		/// @param   {real} top : The top side of the bounding box
+		/// @param   {real} right : The right side of the bounding box
+		/// @param   {real} bottom : The bottom side of the bounding box
+		/// @returns {Struct.WWCore}
+		#endregion
+		static set_bar_size = function(_left, _top, _right, _bottom) {
+			bar.set_size(_left, _top, _right, _bottom)
+			return self;
+		}
+		#region jsDoc
+		/// @func    set_background_size()
+		/// @desc    Set the reletive region for the background. Reletive to the x,y of the component.
+		/// @self    WWCore
+		/// @param   {real} left : The left side of the bounding box
+		/// @param   {real} top : The top side of the bounding box
+		/// @param   {real} right : The right side of the bounding box
+		/// @param   {real} bottom : The bottom side of the bounding box
+		/// @returns {Struct.WWCore}
+		#endregion
+		static set_background_size = function(_left, _top, _right, _bottom) {
+			background.set_size(_left, _top, _right, _bottom)
+			return self;
+		}
+		
 		#endregion
         
         #region Events
@@ -415,8 +325,18 @@ function WWSliderBase() : WWButton() constructor {
 			self.events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
 			self.events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
 			
-			on_interact(function(_input){
-				__apply_value();
+			on_post_step(function(_input) {
+				//apply smoothing from target value
+				if (lerp_target != value) {
+					if ( abs(lerp_target - value) < 0.0025 ) {
+						__set_value__(lerp_target);
+						trigger_event(self.events.value_input, self.value);
+					}
+					else {
+						__set_value__(value + (lerp_target - value) * 0.175);
+						trigger_event(self.events.value_input, self.value);
+					}
+				}
 			})
 			
         #endregion
@@ -429,13 +349,21 @@ function WWSliderBase() : WWButton() constructor {
 			lerp_target = value;
 			normalized_value = (0.5-min_value) / (max_value-min_value);
 			round_value = false;
-			input_enabled = false;
+			input_enabled = true;
+			is_inverted = false;
 			
+			//dont render
 			set_sprite(undefined)
-			set_visible
-			background = new WWSliderBackgroud();
-			bar = new WWSliderBar();
+			visible = false;
 			
+			background = new WWSliderBackgroud()
+				.set_sprite(s9GUIPixel)
+				.set_sprite_color(c_grey)
+			bar = new WWSliderBar()
+				.set_sprite(s9GUIPixel)
+				.set_sprite_color(c_orange)
+			
+			add([background, bar]);
         #endregion
 
         #region Functions
@@ -484,42 +412,10 @@ function WWSliderBase() : WWButton() constructor {
 				trigger_event(self.events.value_input, self.value);
 			}
 			
-		    static __calculate_color__ = function(_struct) {
-		        switch (image_index) {
-		            case GUI_IMAGE_HOVER:    return (!_struct.enabled)      ? 0 : __color_blend__(_struct.min_color.hover,    _struct.max_color.hover,    normalized_value);
-		            case GUI_IMAGE_PRESSED:  return (!_struct.enabled)      ? 0 : __color_blend__(_struct.min_color.clicked,  _struct.max_color.clicked,  normalized_value);
-		            case GUI_IMAGE_DISABLED: return (!_struct.enabled)      ? 0 : __color_blend__(_struct.min_color.disabled, _struct.max_color.disabled, normalized_value);
-		            default:                 return (!_struct.enabled)      ? 0 : __color_blend__(_struct.min_color.idle,     _struct.max_color.idle,     normalized_value);;
-		        }
-		    },
-			
-			static __color_blend__ = function(_c1, _c2, _amt) {
-				// Extract the red, green, and blue components of each color
-				var _r1 = _c1 >> 16;
-				var _g1 = (_c1 >> 8) & 0xFF;
-				var _b1 = _c1 & 0xFF;
-				
-				var _r2 = _c2 >> 16;
-				var _g2 = (_c2 >> 8) & 0xFF;
-				var _b2 = _c2 & 0xFF;
-				
-				// Calculate the average RGB values of the two colors
-				var _lerpedR = floor((1 - _amt) * _r1 + _amt * _r2);
-				var _lerpedG = floor((1 - _amt) * _g1 + _amt * _g2);
-				var _lerpedB = floor((1 - _amt) * _b1 + _amt * _b2);
-				
-				// Combine the RGB components into a single color integer
-				var _blend = (_lerpedR << 16) | (_lerpedG << 8) | _lerpedB;
-				
-				return _blend;
-			}
-			
 		#endregion
 		
 	#endregion
 }
-
-///@ignore
 #region jsDoc
 /// @func    WWSliderBackgroud()
 /// @desc    The bar used inside of sliders

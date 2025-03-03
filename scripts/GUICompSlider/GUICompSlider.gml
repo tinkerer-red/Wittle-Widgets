@@ -1,3 +1,77 @@
+#region jsDoc
+/// @func    WWSlider()
+/// @desc    Creates a slider.
+/// @param   {Real} x : The x possition of the component on screen.
+/// @param   {Real} y : The y possition of the component on screen.
+/// @returns {Struct.WWSlider}
+#endregion
+function WWSlider() : WWSliderHorz() constructor {}
+#region jsDoc
+/// @func    WWSliderHorz()
+/// @desc    Creates a slider.
+/// @param   {Real} x : The x possition of the component on screen.
+/// @param   {Real} y : The y possition of the component on screen.
+/// @returns {Struct.WWSliderHorz}
+#endregion
+function WWSliderHorz() : WWSliderBase() constructor {
+	debug_name = "WWSliderHorz";
+	
+	on_interact(function(_input) {
+		if (!input_enabled) return;
+		
+		var _norm_val;
+        if (is_inverted) {
+            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
+        } else {
+			_norm_val = (device_mouse_x_to_gui(0) - x+region.left) / region.get_width();
+		}
+		_norm_val = clamp(_norm_val, 0, 1);
+				
+		set_normalized_value(_norm_val);
+    });
+	on_pre_draw(function(_input) {
+		var _bar_width = region.get_width() * normalized_value;
+		if (is_inverted) {
+            bar.set_size(region.get_width() - _bar_width, 0, region.get_width(), region.get_height());
+        } else {
+			bar.set_size(0, 0, _bar_width, region.get_height());
+		}
+    });
+	
+}
+#region jsDoc
+/// @func    WWSliderVert()
+/// @desc    Creates a slider.
+/// @param   {Real} x : The x possition of the component on screen.
+/// @param   {Real} y : The y possition of the component on screen.
+/// @returns {Struct.WWSliderVert}
+#endregion
+function WWSliderVert() : WWSliderBase() constructor {
+	debug_name = "WWSliderVert";
+	
+	on_interact(function(_input) {
+		if (!input_enabled) return;
+		
+        var _norm_val;
+		if (is_inverted) {
+            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
+        } else {
+            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
+        }
+		
+		_norm_val = clamp(_norm_val, 0, 1);
+				
+		set_normalized_value(_norm_val);
+    });
+	on_pre_draw(function(_input) {
+		var _bar_height = region.get_height() * normalized_value;
+		if (is_inverted) {
+            bar.set_size(0, 0, region.get_width(), _bar_height);
+        } else {
+            bar.set_size(0, region.get_height() - _bar_height, region.get_width(), region.get_height());
+        }
+    });
+}
 
 #region jsDoc
 /// @func    WWSliderHorzThumb()
@@ -77,80 +151,6 @@ function WWSliderVertThumb() : WWSliderVert() constructor {
     });
 }
 
-#region jsDoc
-/// @func    WWSlider()
-/// @desc    Creates a slider.
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.WWSlider}
-#endregion
-function WWSlider() : WWSliderHorz() constructor {}
-#region jsDoc
-/// @func    WWSliderHorz()
-/// @desc    Creates a slider.
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.WWSliderHorz}
-#endregion
-function WWSliderHorz() : WWSliderBase() constructor {
-	debug_name = "WWSliderHorz";
-	
-	on_interact(function(_input) {
-		if (!input_enabled) return;
-		
-		var _norm_val;
-        if (is_inverted) {
-            _norm_val = (x + region.right - device_mouse_x_to_gui(0)) / region.get_width();
-        } else {
-			_norm_val = (device_mouse_x_to_gui(0) - x+region.left) / region.get_width();
-		}
-		_norm_val = clamp(_norm_val, 0, 1);
-				
-		set_normalized_value(_norm_val);
-    });
-	on_pre_draw(function(_input) {
-		var _bar_width = region.get_width() * normalized_value;
-		if (is_inverted) {
-            bar.set_size(region.get_width() - _bar_width, 0, region.get_width(), region.get_height());
-        } else {
-			bar.set_size(0, 0, _bar_width, region.get_height());
-		}
-    });
-	
-}
-#region jsDoc
-/// @func    WWSliderVert()
-/// @desc    Creates a slider.
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.WWSliderVert}
-#endregion
-function WWSliderVert() : WWSliderBase() constructor {
-	debug_name = "WWSliderVert";
-	
-	on_interact(function(_input) {
-		if (!input_enabled) return;
-		
-        var _norm_val;
-		if (is_inverted) {
-            _norm_val = (device_mouse_y_to_gui(0) - y + region.top) / region.get_height();
-        } else {
-            _norm_val = (y+region.bottom - device_mouse_y_to_gui(0)) / region.get_height();
-        }
-		
-		_norm_val = clamp(_norm_val, 0, 1);
-				
-		set_normalized_value(_norm_val);
-    });
-	on_pre_draw(function(_input) {
-		var _bar_height = region.get_height() * normalized_value;
-		if (is_inverted) {
-            bar.set_size(0, 0, region.get_width(), _bar_height);
-        } else {
-            bar.set_size(0, region.get_height() - _bar_height, region.get_width(), region.get_height());
-        }
-    });
-}
 
 ///@ignore
 #region jsDoc

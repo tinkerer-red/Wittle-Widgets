@@ -168,7 +168,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				.set_sprite(_sprite_button_dec)
 			__button_dec__.set_offset(-_info.right - __button_dec__.region.get_width(), _info.top)
 			
-			__slider__ = new GUICompSlider()
+			__slider__ = new WWSlider()
 				.set_offset(-_info.right, _info.top)
 				.set_alignment(fa_right, fa_top)
 				.set_value(clamp(_value, _min, _max))
@@ -196,7 +196,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				//.set_shift_only_new_line(false)
 				.set_accepting_inputs(true)
 			
-			__scrolling_text__ = new GUICompTextScrolling()
+			__scrolling_text__ = new WWTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)
@@ -258,7 +258,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				add_event_listener(self.events.post_step, function(_data) {
 					
 					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
-					_image_index = max(_image_index, __textbox__.__is_interacting__)
+					_image_index = max(_image_index, __textbox__.__is_focused__)
 					
 					__button__.image_index   = _image_index;
 					
@@ -275,7 +275,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
-						case GUI_IMAGE_PRESSED: {
+						case GUI_IMAGE_CLICKED: {
 							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
@@ -293,7 +293,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				//set the focus to the textbox
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
-						__is_interacting__ = true;
+						__is_focused__ = true;
 						trigger_event(self.events.focus);
 						
 						var _line_last = curt.length - 1;

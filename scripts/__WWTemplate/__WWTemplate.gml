@@ -13,6 +13,10 @@ function WWTemplate() : WWCore() constructor {
 			
 		#endregion
 		
+		#region Components
+			
+		#endregion
+		
 		#region Events
 			
 		#endregion
@@ -20,7 +24,7 @@ function WWTemplate() : WWCore() constructor {
 		#region Variables
 			
 		#endregion
-	
+		
 		#region Functions
 			
 		#endregion

@@ -116,7 +116,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				.set_checkbox_sprites(sCPCheckboxChecked, sCPCheckboxUnChecked)
 			__checkbox__.set_offset(-_info.right - __checkbox__.sprite_width, _info.top)
 			
-			__scrolling_text__ = new GUICompTextScrolling()
+			__scrolling_text__ = new WWTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_alignment(fa_left, fa_middle)
 				.set_text(_label)

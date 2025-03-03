@@ -437,11 +437,11 @@ function GUICompRegion() : GUICompController() constructor {
 				//create the children sliders
 				
 				//init both before we start building as they are codependant
-				__scroll_vert__ = new GUICompScrollBar()
+				__scroll_vert__ = new WWScrollBar()
 					.set_offset(0,0)
 					.set_alignment(fa_right, fa_top)
 					.set_vertical(true)
-				__scroll_horz__ = new GUICompScrollBar()
+				__scroll_horz__ = new WWScrollBar()
 					.set_offset(0,0)
 					.set_alignment(fa_left, fa_bottom)
 					.set_button_sprites(s9ScrollbarHorzButtonLeft, s9ScrollbarHorzButtonRight)

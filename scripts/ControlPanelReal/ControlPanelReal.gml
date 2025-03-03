@@ -135,7 +135,7 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_accepting_inputs(true)
 			
 			
-			__scrolling_text__ = new GUICompTextScrolling()
+			__scrolling_text__ = new WWTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)

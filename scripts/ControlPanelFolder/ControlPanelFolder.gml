@@ -173,7 +173,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 			});
 			
 			
-			__scrolling_text__ = new GUICompTextScrolling()
+			__scrolling_text__ = new WWTextScrolling()
 				.set_offset(_info.left, _info.top - __button__.text.click_yoff)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)

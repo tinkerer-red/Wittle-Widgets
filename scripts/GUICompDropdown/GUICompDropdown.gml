@@ -804,3 +804,4 @@ function GUICompDropdown() : GUICompController() constructor {
 }
 
 
+function GUICompController() constructor{}

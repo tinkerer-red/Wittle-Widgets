@@ -123,7 +123,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				.set_sprite_to_auto_wrap()
 			__dropdown__.set_offset(-_info.right - __dropdown__.__group_region__.get_width(), +_info.top)
 			
-			__scrolling_text__ = new GUICompTextScrolling()
+			__scrolling_text__ = new WWTextScrolling()
 				.set_offset(_info.left, 0)
 				.set_text(_label)
 				.set_text_font(__CP_FONT)

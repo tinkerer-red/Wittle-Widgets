@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y position of the component on screen.
 /// @return {Struct.GUICompTextbox}
 #endregion
-function GUICompTextbox() : GUICompRegion() constructor {
+function WWInputField() : GUICompRegion() constructor {
 	debug_name = "GUICompTextbox";
 	
 	#region Public

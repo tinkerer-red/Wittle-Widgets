@@ -36,6 +36,22 @@ function WWButtonText() : WWButtonSprite() constructor {
 				
 				return self;
 			}
+			#region jsDoc
+			/// @func    set_text_offsets()
+			/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
+			/// @self    WWButtonText
+			/// @param   {Real} x : The x offset
+			/// @param   {Real} y : The y offset
+			/// @param   {Real} click_y : The additional y offset used when 
+			/// @returns {Struct.WWButtonText}
+			#endregion
+			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
+				text.x_offset = _x;
+				text.y_offset = _y;
+				text.click_yoff = _click_y;
+				
+				return self;
+			};
 			
 		#endregion
 		

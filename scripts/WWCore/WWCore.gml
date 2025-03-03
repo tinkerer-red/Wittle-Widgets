@@ -155,79 +155,21 @@ function WWCore() constructor {
 				image_alpha = _alpha;
 				return self;
 			}
-			#endregion
-			#region Text
 			#region jsDoc
-			/// @func    set_text()
-			/// @desc    Sets the variables for text drawing
-			/// @self    WWButtonText
-			/// @param   {String} text : The text to write on the button.
-			/// @returns {Struct.WWButtonText}
+			/// @func    set_background_color()
+			/// @desc    Sets the color of the background.
+			/// @self    WWCore
+			/// @param   {Real} color : The color of the background.
+			/// @returns {Struct.WWCore}
 			#endregion
-			static set_text = function(_text="DefaultText") {
-				text.content = _text
-				
+			static set_background_color = function(_col) {
+				background_color_set = true;
+				background_color = _col;
 				return self;
 			}
-			#region jsDoc
-			/// @func    set_text_font()
-			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    WWButtonText
-			/// @param   {Asset.GMFont} font : The font to use when drawing the text
-			/// @returns {Struct.WWButtonText}
+			
 			#endregion
-			static set_text_font = function(_font=fGUIDefault) {
-				text.font = _font;
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text_colors()
-			/// @desc    Sets the colors for the text of the button.
-			/// @self    WWButtonText
-			/// @param   {Real} idle_color     : The color to draw the text when the component is idle
-			/// @param   {Real} hover_color    : The color to draw the text when the component is hovered or clicked
-			/// @param   {Real} disabled_color : The color to draw the text when the component is disabled
-			/// @returns {Struct.WWButtonText}
-			#endregion
-			static set_text_colors = function(_idle=c_white, _hover=c_white, _clicked=c_white, _disable=c_grey) {
-				text.color.idle    = _idle;
-				text.color.hover   = _hover;
-				text.color.clicked = _clicked;
-				text.color.disable = _disable;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text_alignment()
-			/// @desc    Sets how the text is aligned when drawing
-			/// @self    WWButtonText
-			/// @param   {Constant.HAlign} halign : Horizontal alignment
-			/// @param   {Constant.VAlign} valign : Vertical alignment
-			/// @returns {Struct.WWButtonText}
-			#endregion
-			static set_text_alignment = function(_h=fa_left, _v=fa_top) {
-				text.halign = _h;
-				text.valign = _v;
-		
-				return self;
-			};
-			#region jsDoc
-			/// @func    set_text_offsets()
-			/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
-			/// @self    WWButtonText
-			/// @param   {Real} x : The x offset
-			/// @param   {Real} y : The y offset
-			/// @param   {Real} click_y : The additional y offset used when 
-			/// @returns {Struct.WWButtonText}
-			#endregion
-			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
-				text.xoff = _x;
-				text.yoff = _y;
-				text.click_yoff = _click_y;
-				
-				return self;
-			};
-			#endregion
+			
 			
 			#region jsDoc
 			/// @func    set_enabled()
@@ -285,6 +227,12 @@ function WWCore() constructor {
 		#region Events
 			
 			events = {};
+			static on_event = function(_event, _func) {
+				var _hash = is_string(_event) ? variable_get_hash(_event) : _event;
+				add_event_listener(_hash, _func);
+				return self;
+			}
+			
 			
 			#region Focus/Blur
 			events.focus     = variable_get_hash("focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
@@ -422,6 +370,9 @@ function WWCore() constructor {
 			
 			region = new __region__();
 			
+			background_color_set = false;
+			background_color = c_black;
+			
 			//each component will have it's own events these will always be listed in this region
 			
 			#region GML Variables
@@ -456,29 +407,6 @@ function WWCore() constructor {
 				self.image_xscale = 1;
 				self.image_yscale = 1;
 				
-				text = {
-					content : "<undefined>",
-					font : fGUIDefault,
-					
-					xoff : 0,
-					yoff : 0,
-					click_yoff : 0,
-					
-					width  : 0,
-					height : 0,
-					
-					halign : fa_left,
-					valign : fa_top,
-					
-					alpha : 1,
-					color : {
-						idle : c_white,
-						hover : c_white,
-						clicked : c_white,
-						disable : c_white,
-					},
-				}
-				
 			#endregion
 			
 		#endregion
@@ -496,7 +424,7 @@ function WWCore() constructor {
 			/// @returns {undefined}
 			/// @ignore
 			#endregion
-			static trigger_event = function(_event_id, _data) {
+			static trigger_event = function(_event_id, _data=undefined) {
 				var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id)
 				if (_event_arr != undefined) {
 					var _size = array_length(_event_arr);
@@ -845,16 +773,24 @@ function WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    remove()
-			/// @desc    Remove a Component from the controller's children array. Removal is done at the next event automatically and is not instantaneous.
+			/// @desc    Remove a Child Component from the children array.
+			/// @self    WWController
+			/// @param   {Real} comp : The component you wish to remove from the controller's children array.
+			/// @returns {Undefined}
+			#endregion
+			static remove = function(_comp) {
+				var _index = array_get_index(__children__, _comp);
+				if (_index == -1) return;
+				remove_index(_index);
+			}
+			#region jsDoc
+			/// @func    remove_index()
+			/// @desc    Remove a Child Component from the children array by it's index.
 			/// @self    WWController
 			/// @param   {Real} index : The index of the component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
-			static remove = function(_index) {
-				//clean up the component
-				__children__[_index].__cleanup__();
-				delete __children__[_index];
-				
+			static remove_index = function(_index) {
 				//remove the component
 				array_delete(__children__, _index, 1);
 				__children_count__--;
@@ -964,6 +900,19 @@ function WWCore() constructor {
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group();
 				
+				if (background_color_set) {
+					draw_sprite_stretched_ext(
+						s9GUIPixel,
+						0,
+						x+region.left,
+						y+region.top,
+						region.get_width(),
+						region.get_height(),
+						background_color,
+						1
+					);
+				}
+				
 				trigger_event(self.events.pre_draw, _input);
 				
 				//run the children
@@ -1055,6 +1004,8 @@ function WWCore() constructor {
 			
 			static __GLOBAL_ID__ = 100000; // internally used to keep track of component indexes
 			__comp_id__ = __GLOBAL_ID__++; // used to make sure we dont re add the same component to a controller
+			__previous_scissor__ = undefined;
+			
 			
 			#region Event Variables
 			__event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
@@ -1413,6 +1364,41 @@ function WWCore() constructor {
 			}
 			
 			#endregion
+			#region Render Clipping
+			#region jsDoc
+			/// @func    __apply_clipping_region__()
+			/// @desc    Sets the GPU scissor region to limit rendering to the viewport bounds.
+			/// @self    WWViewport
+			/// @returns {Undefined}
+			#endregion
+			static __apply_clipping_region__ = function() {
+				previous_scissor = gpu_get_scissor();
+
+				var _new_x = x + region.left;
+				var _new_y = y + region.top;
+				var _new_w = region.get_width();
+				var _new_h = region.get_height();
+
+				// Adjust clipping to stay within the existing scissor bounds
+				_new_x = max(previous_scissor.x, _new_x);
+				_new_y = max(previous_scissor.y, _new_y);
+				_new_w = min(previous_scissor.x + previous_scissor.w, _new_x + _new_w) - _new_x;
+				_new_h = min(previous_scissor.y + previous_scissor.h, _new_y + _new_h) - _new_y;
+				
+				gpu_set_scissor(_new_x, _new_y, _new_w, _new_h);
+			};
+
+			#region jsDoc
+			/// @func    __restore_clipping_region__()
+			/// @desc    Restores the previous GPU scissor region after drawing.
+			/// @self    WWViewport
+			/// @returns {Undefined}
+			#endregion
+			static __restore_clipping_region__ = function() {
+				gpu_set_scissor(previous_scissor);
+				previous_scissor = undefined;
+			};
+			#endregion
 			#region Misc
 			#region jsDoc
 			/// @func    __region__()
@@ -1520,6 +1506,7 @@ function WWCore() constructor {
 					__parent__.__update_group_region__()
 				}
 				
+				return self;
 			}
 			#region jsDoc
 			/// @func    __set_position__()

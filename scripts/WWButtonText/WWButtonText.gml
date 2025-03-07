@@ -95,7 +95,7 @@ function WWButtonText() : WWButtonSprite() constructor {
 		
 		#region Components
 			
-			text_component = new WWText();
+			text_component = new WWLabel();
 			add(text_component);
 			
 		#endregion
@@ -217,7 +217,7 @@ function WWButtonTextScribble() : WWButtonSprite() constructor {
 		
 		#region Components
 			
-			text_component = new WWTextScribble();
+			text_component = new WWLabelScribble();
 			add(text_component);
 			
 		#endregion

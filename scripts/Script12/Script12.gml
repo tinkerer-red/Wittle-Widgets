@@ -62,3 +62,4 @@ function __struct_inherited() {
 	}
 	return _dummy;
 }
+

@@ -348,6 +348,11 @@ function WWCore() constructor {
 				return self;
 			}
 			
+			events.resize = variable_get_hash("resize"); //triggered when the component is disabled (this is done by the developer)
+			static on_resize = function(_func) {
+				add_event_listener(events.resize, _func);
+				return self;
+			}
 			
 		#endregion
 		
@@ -741,6 +746,81 @@ function WWCore() constructor {
 				__update_group_region__();
 				
 			}
+			static add_inline = function(componentsArray, horizontalSpacing=0, verticalSpacing=0, scaleInline=true) {
+			    var lines = [];
+			    var currentLine = [];
+			    for (var i = 0; i < array_length(componentsArray); i++) {
+			        var comp = componentsArray[i];
+			        // Check if this element is our inline operator.
+			        if (instanceof(comp) == "WWInline") {
+			            continue;
+			        }
+			        // If the previous element was an inline operator, add this component to the current line.
+			        if (i > 0 && (instanceof(componentsArray[i - 1]) == "WWInline")) {
+			            array_push(currentLine, comp);
+			        } else {
+			            // If currentLine is not empty, push it into lines.
+			            if (array_length(currentLine) > 0) {
+			                array_push(lines, currentLine);
+			            }
+			            // Start a new line with the current component.
+			            currentLine = [comp];
+			        }
+			    }
+			    if (array_length(currentLine) > 0) {
+			        array_push(lines, currentLine);
+			    }
+				
+			    // Layout each line.
+			    var cumulativeY = 0;
+			    for (var l = 0; l < array_length(lines); l++) {
+			        var line = lines[l];
+			        // Determine maximum height among components in this line.
+			        var lineHeight = 0;
+			        for (var j = 0; j < array_length(line); j++) {
+			            var comp = line[j];
+			            var compHeight = (comp.height != undefined) ? comp.height : 30;
+			            if (compHeight > lineHeight) {
+			                lineHeight = compHeight;
+			            }
+			        }
+					
+			        // If scaling inline, calculate a common width for all components.
+			        var numComponents = array_length(line);
+			        var compWidthScaled = 0;
+			        if (scaleInline) {
+			            compWidthScaled = (self.width - (numComponents - 1) * horizontalSpacing) / numComponents;
+			        }
+					
+			        // Layout components horizontally in this line.
+			        var currentX = 0;
+			        for (var j = 0; j < numComponents; j++) {
+			            var comp = line[j];
+			            var compWidth = scaleInline ? compWidthScaled : ((comp.width != undefined) ? comp.width : 100);
+			            // Set component's offset relative to the container.
+			            comp.set_offset(currentX, cumulativeY);
+			            // If scaling, update the component's width accordingly.
+			            if (scaleInline) {
+			                comp.set_size(compWidth, (comp.height != undefined) ? comp.height : 30);
+			            }
+			            currentX += compWidth;
+			            // Add horizontal spacing if not the last component in the line.
+			            if (j < numComponents - 1) {
+			                currentX += horizontalSpacing;
+			            }
+			            // Add the component to the container.
+			            add(comp);
+			        }
+			        // Increase cumulativeY by the line's height plus vertical spacing (if not the last line).
+			        cumulativeY += lineHeight;
+			        if (l < array_length(lines) - 1) {
+			            cumulativeY += verticalSpacing;
+			        }
+			    }
+				
+			    return self;
+			}
+
 			#region jsDoc
 			/// @func    insert()
 			/// @desc    Inserts a Component into the controller's children array.
@@ -1148,10 +1228,6 @@ function WWCore() constructor {
 				var _i=0; repeat(_size) {
 						_comp = _arr[_i];
 						
-						//safety checks
-						if (_comp == undefined) {
-							log("")
-						}
 						_cid = _comp.__comp_id__;
 						
 						//verify the component doeant appear twice in the supplied array

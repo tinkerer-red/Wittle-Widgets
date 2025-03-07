@@ -5,7 +5,7 @@
 /// @param   {Real} y : The y position of the component on screen.
 /// @return {Struct.GUICompTextbox}
 #endregion
-function WWInputField() : GUICompRegion() constructor {
+function GUICompTextbox() : GUICompRegion() constructor {
 	debug_name = "GUICompTextbox";
 	
 	#region Public
@@ -13,256 +13,13 @@ function WWInputField() : GUICompRegion() constructor {
 		#region Builder functions
 			
 			#region jsDoc
-			/// @func    set_size()
-			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
-			/// @self    GUICompCore
-			/// @param   {real} left : The left side of the bounding box
-			/// @param   {real} top : The top side of the bounding box
-			/// @param   {real} right : The right side of the bounding box
-			/// @param   {real} bottom : The bottom side of the bounding box
-			/// @returns {Struct.GUICompCore}
-			#endregion
-			static set_size = function(_left, _top, _right, _bottom) {
-				static __set_size = GUICompRegion.set_size;
-				__set_size(_left, _top, _right, _bottom);
-				
-				__update_scroll__();
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_enabled()
-			/// @desc    Enable or Disable the Component, This usually effects how some components are handled
-			/// @self    GUICompTextbox
-			/// @param   {Bool} is_enabled : If the component should be enabled or not.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_enabled = function(_enabled) {
-				if (_enabled) {
-					enabled = true;
-					enabled_step = 0;
-					keyboard_string = "";
-					keys.last_key_time = 0;	
-					keys.last_key = undefined;
-				}
-				else {
-					enabled = false;
-					__selection_start__ = 0;
-				}
-			}
-			#region jsDoc
-			/// @func    set_text_placeholder()
-			/// @desc    Sets the display text to draw when no user input text has been entered. This text is not selectable, if you would like to have selectable text your self then use "set_text()".
-			/// @self    GUICompTextbox
-			/// @param   {String} str : The text to populate an empty text region
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text_placeholder = function(_placeholder="Enter Text") {
-				curt.placeholder = _placeholder;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text()
-			/// @desc    Sets the string inside the text box. This text will be selectable by the user, if you wish to have not selectable text use "set_text_placeholder()".
-			/// @self    GUICompTextbox
-			/// @param   {String} str : The text to write on the button
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text = function(_text="") {
-				var _prev_cursor_x = get_cursor_x_pos();
-				var _prev_cursor_y = get_cursor_y_pos();
-				var _prev_scroll_x = get_horz_scroll();
-				var _prev_scroll_y = get_vert_scroll();
-				
-				clear_text();
-				__textbox_insert_string__(_text);
-				
-				set_cursor_x_pos(_prev_cursor_x);
-				set_cursor_y_pos(_prev_cursor_y);
-				set_horz_scroll(_prev_scroll_x);
-				set_vert_scroll(_prev_scroll_y);
-				
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text_font()
-			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextbox
-			/// @param   {Asset.GMFont} font : The font to use when drawing the text
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text_font = function(_font=fGUIDefault) {
-				draw.font = _font;								// font
-				
-				if (!__char_enforcement_defined__) {
-					__allowed_char__ = __build_allowed_char__(_font);
-				}
-				
-				if (!__line_height_defined__) {
-					draw.line_height = font_get_info(draw.font).size + 1;
-				}
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_font_color()
-			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} font : The font to use when drawing the text
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text_color = function(_color=#D9D9D9) {
-				draw.font_color = _color;					// font color
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text_line_height()
-			/// @desc    Sets the height for lines of text. setting this to -1 will make the height auto addapt to the currently used font. So be sure to call this after you 
-			/// @self    GUICompTextbox
-			/// @param   {Real} height : The height of the courser and line spaces, this included the font, usually best as font height.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text_line_height = function(_height=-1) {
-				__line_height_defined__ = true;
-				draw.line_height = (_height != -1) ? _height : font_get_info(draw.font).size + 1;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_text_offsets()
-			/// @desc    Sets the font which will be used for drawing the text
-			/// @self    GUICompTextbox
-			/// @param   {Real} xoff : The x offset of the text from the start of a line.
-			/// @param   {Real} yoff : The y offset of the text from the start of a line.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_text_offsets = function(_x_off=0, _y_off=1) {
-				scroll.x_off = _x_off;
-				scroll.y_off = _y_off;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_highlight_color()
-			/// @desc    Sets the colors of the box which surrounds the highlighted selection.
-			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} color : The highlight color
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_highlight_color = function(_color=#0A68D8) {
-				draw.highlight_region_color = _color;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_background_color()
-			/// @desc    Sets the color of the background.
-			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} color : The background color
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_background_color = function(_color=#363F39) {
-				draw.text_background_color = _color;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_background_alpha()
-			/// @desc    Sets the alpha of the background.
-			/// @self    GUICompTextbox
-			/// @param   {Constant.Colour} color : The background color
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_background_alpha = function(_color=#363F39) {
-				draw.text_background_alpha = _color;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_max_length()
-			/// @desc    Sets the max character limit.
-			/// @self    GUICompTextbox
-			/// @param   {Real} max_length : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_max_length = function(_max_length=infinity) {
-				if (should_safety_check) {
-					if (_max_length < 0) {
-						show_error(string("Can not use a negative value for \"set_max_length()\" : {0}", _max_length), true);
-					}
-				}
-				curt.max_length = _max_length;
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_records_limit()
-			/// @desc    Sets how many undo and redo the component will remember. This is really only used if you are having memory issues with your game.
-			/// @self    GUICompTextbox
-			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_records_limit = function(_memory_limit=64) {
-				if (should_safety_check) {
-					if (_memory_limit < 0) {
-						show_error(string("Can not use a negative value for \"set_records_limit()\" : {0}", _memory_limit), true);
-					}
-				}
-				
-				curt.records_upper_limit = _memory_limit;
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_char_enforcement()
-			/// @desc    Set what characters the textbox should allow. You can either input a string of allowed characters for input boxes like passwords, or leaving the argument empty will generage the characters from the current font.
-			/// @self    GUICompTextbox
-			/// @param   {Real} memory_limit : The max number of characters to support. NOTE: A value of infinity will allow for any number of characters.
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_char_enforcement = function(_allowed_char=undefined) {
-				
-				if (is_undefined(_allowed_char)) {
-					__allowed_char__ = __build_allowed_char__(draw.font);
-				}
-				else {
-					__allowed_char__ = {};
-					__char_enforcement_defined__ = true;
-					string_foreach(_allowed_char, function(_char, _pos) {
-						__allowed_char__[$ _char] = true;
-					})
-				}
-				
-				return self;
-			}
-			#region jsDoc
-			/// @func    set_multiline()
-			/// @desc    Set the textbox to accept line breaks from user input.
-			/// @self    GUICompTextbox
-			/// @param   {Bool} multiline : If the textbox allows the inputting of "\n"
-			/// @returns {Struct.GUICompTextbox}
-			#endregion
-			static set_multiline = function(_multiline=true) {
-				curt.multiline = _multiline;
-				
-				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
-				
-				if (!_multiline) {
-					set_vert_scroll(0)
-				}
-				
-				return self;
-			}
-			#region jsDoc
 			/// @func    set_force_wrapping()
 			/// @desc    Sets the textbox to break to a new line when reaching the width. This will still enforce new lines even for single line text boxes.
 			/// @self    GUICompTextbox
 			/// @param   {Bool} memory_limit : If the text box will break to a new line when reaching the width.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_force_wrapping = function(_force_wrapping=true) {
+			static set_force_wrapping = function(_force_wrapping=true) { static __run_once__ = trace(["set_force_wrapping", set_force_wrapping]);
 				curt.adaptive_width = _force_wrapping;
 				
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
@@ -276,7 +33,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Bool} memory_limit : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_shift_only_new_line = function(_shift_only_nl=true) {
+			static set_shift_only_new_line = function(_shift_only_nl=true) { static __run_once__ = trace(["set_shift_only_new_line", set_shift_only_new_line]);
 				curt.shift_only_new_line = _shift_only_nl;
 		
 				curt.no_wrap = !(curt.adaptive_width || curt.shift_only_new_line || curt.multiline);
@@ -290,7 +47,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Bool} accepting_inputs : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_accepting_inputs = function(_bool=true) {
+			static set_accepting_inputs = function(_bool=true) { static __run_once__ = trace(["set_accepting_inputs", set_accepting_inputs]);
 				curt.accepting_inputs = _bool;
 		
 				return self;
@@ -302,7 +59,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Function} func : The return of this function will be what gets copied into the user's clipboard.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_copy_override = function(_func) {
+			static set_copy_override = function(_func) { static __run_once__ = trace(["set_copy_override", set_copy_override]);
 				copy_function = _func;
 				
 				return self;
@@ -314,7 +71,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Function} func : The return of this function will be what gets pasted into the user's clipboard.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_paste_override = function(_func) {
+			static set_paste_override = function(_func) { static __run_once__ = trace(["set_paste_override", set_paste_override]);
 				paste_function = _func;
 				
 				return self;
@@ -326,7 +83,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Real} xpos : The x position of the cursor
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_x_pos = function(_x_pos) {
+			static set_cursor_x_pos = function(_x_pos) { static __run_once__ = trace(["set_cursor_x_pos", set_cursor_x_pos]);
 				if (_x_pos == curt.cursor) {
 					return self;
 				}
@@ -355,7 +112,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Real} ypos : The y position of the cursor.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_y_pos = function(_y_pos) {
+			static set_cursor_y_pos = function(_y_pos) { static __run_once__ = trace(["set_cursor_y_pos", set_cursor_y_pos]);
 				if (_y_pos == curt.current_line) {
 					return self;
 				}
@@ -375,7 +132,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @param   {Real} ypos : The y position of the cursor.
 			/// @returns {Struct.GUICompTextbox}
 			#endregion
-			static set_cursor_gui_loc = function(_x, _y) {
+			static set_cursor_gui_loc = function(_x, _y) { static __run_once__ = trace(["set_cursor_gui_loc", set_cursor_gui_loc]);
 				draw_set_font(draw.font);
 				
 				var _cursor_x, _cursor_y;
@@ -559,7 +316,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {String}
 			#endregion
-			static get_text = function() {
+			static get_text = function() { static __run_once__ = trace(["get_text", get_text]);
 				return __textbox_return__();
 			}
 			#region jsDoc
@@ -568,7 +325,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Undefined}
 			#endregion
-			static clear_text = function() {
+			static clear_text = function() { static __run_once__ = trace(["clear_text", clear_text]);
 				var _last_line_index = curt.length - 1;
 				var _last_line_length = string_length(curt.lines[_last_line_index]);
 				if (_last_line_index < 1 && _last_line_length < 1) return;
@@ -584,7 +341,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_coverage_width = function() {
+			static get_coverage_width = function() { static __run_once__ = trace(["get_coverage_width", get_coverage_width]);
 				if (__scroll_vert_hidden__) {
 					return region.get_width()
 				}
@@ -598,7 +355,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_coverage_height = function() {
+			static get_coverage_height = function() { static __run_once__ = trace(["get_coverage_height", get_coverage_height]);
 				if (__scroll_horz_hidden__) {
 					return region.get_height()
 				}
@@ -612,7 +369,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_canvas_width = function() {
+			static get_canvas_width = function() { static __run_once__ = trace(["get_canvas_width", get_canvas_width]);
 				draw_set_font(draw.font);
 				var _width, _max_width, _lines, _size;
 				var _struct = {
@@ -634,7 +391,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_canvas_height = function() {
+			static get_canvas_height = function() { static __run_once__ = trace(["get_canvas_height", get_canvas_height]);
 				return curt.length * draw.line_height;
 			}
 			#region jsDoc
@@ -643,7 +400,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_x_pos = function() {
+			static get_cursor_x_pos = function() { static __run_once__ = trace(["get_cursor_x_pos", get_cursor_x_pos]);
 				return curt.cursor;
 			}
 			#region jsDoc
@@ -652,7 +409,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_y_pos = function() {
+			static get_cursor_y_pos = function() { static __run_once__ = trace(["get_cursor_y_pos", get_cursor_y_pos]);
 				return curt.current_line;
 			}
 			#region jsDoc
@@ -661,7 +418,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_x_pos_gui = function() {
+			static get_cursor_x_pos_gui = function() { static __run_once__ = trace(["get_cursor_x_pos_gui", get_cursor_x_pos_gui]);
 				var _derivative_x = string_width(string_copy(curt.lines[curt.current_line], 1, curt.cursor)) + scroll.x_off;
 				return x + _derivative_x;
 			}
@@ -671,7 +428,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_y_pos_gui = function() {
+			static get_cursor_y_pos_gui = function() { static __run_once__ = trace(["get_cursor_y_pos_gui", get_cursor_y_pos_gui]);
 				var _center_y = (curt.multiline) ? 0 : ceil((draw.line_height-get_coverage_height())/2);
 				var _derivative_y = curt.current_line * draw.line_height + scroll.y_off + _center_y;
 				return y + _derivative_y;
@@ -682,7 +439,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_width = function() {
+			static get_cursor_width = function() { static __run_once__ = trace(["get_cursor_width", get_cursor_width]);
 				return draw.cursor_width;
 			}
 			#region jsDoc
@@ -691,7 +448,7 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompTextbox
 			/// @returns {Real}
 			#endregion
-			static get_cursor_height = function() {
+			static get_cursor_height = function() { static __run_once__ = trace(["get_cursor_height", get_cursor_height]);
 				return (draw.cursor_height < 0) ? draw.line_height : draw.cursor_height;;
 			}
 			#region jsDoc
@@ -700,10 +457,10 @@ function WWInputField() : GUICompRegion() constructor {
 			/// @self    GUICompCore
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() {
+			static mouse_on_comp = function() { static __run_once__ = trace(["mouse_on_comp", mouse_on_comp]);
 				//check if parent even has a mouse over it
 				if (__is_child__) {
-					if (!__parent__.__mouse_on_comp__) {
+					if (!__parent__.__mouse_on_cc__) {
 						return false;
 					}
 				}
@@ -713,12 +470,12 @@ function WWInputField() : GUICompRegion() constructor {
 				//if (is_desktop) {
 				//	if (window_mouse_get_x() != display_mouse_get_x() - window_get_x())
 				//	|| (window_mouse_get_y() != display_mouse_get_y() - window_get_y()) {
-				//		__mouse_on_comp__ = false;
+				//		__mouse_on_cc__ = false;
 				//		return false;
 				//	}
 				//}
 				
-				__mouse_on_comp__ = point_in_rectangle(
+				__mouse_on_cc__ = point_in_rectangle(
 						device_mouse_x_to_gui(0),
 						device_mouse_y_to_gui(0),
 						x+region.left,
@@ -727,11 +484,11 @@ function WWInputField() : GUICompRegion() constructor {
 						y+get_coverage_height()
 				)
 				
-				if (__mouse_on_comp__) {
-					trigger_event(self.events.mouse_over);
+				if (__mouse_on_cc__) {
+					__trigger_event__(self.events.on_hover);
 				}
 				
-				return __mouse_on_comp__;
+				return __mouse_on_cc__;
 			}
 			
 		#endregion
@@ -754,7 +511,7 @@ function WWInputField() : GUICompRegion() constructor {
 			
 			#region GML Events
 				
-				static __cleanup__ = function() {
+				static __cleanup__ = function() { static __run_once__ = trace(["__cleanup__", __cleanup__]);
 					
 					cleanup();
 					
@@ -775,7 +532,7 @@ function WWInputField() : GUICompRegion() constructor {
 					
 				}
 				
-				static __step__ = function(_input) {
+				static __step__ = function(_input) { static __run_once__ = trace(["__step__", __step__]);
 					step(_input);
 					
 					if (is_disabled) return;
@@ -823,22 +580,22 @@ function WWInputField() : GUICompRegion() constructor {
 					
 							if (mouse_check_button_pressed(keys.mouse_left)) {
 								if (!_mouse_on_comp) {
-									if (__is_interacting__) {
+									if (__is_on_focus__) {
 										if (__event_exists__(self.events.submit)) {
 											var _text = __textbox_lines_to_text__(curt.lines);
-											trigger_event(self.events.submit, _text);
+											__trigger_event__(self.events.submit, _text);
 										}
 									}
 									curt.focus = false;
 								}
 					
 								if (curt.accepting_inputs) {
-									__is_interacting__ = _mouse_on_comp;
-									if (__is_interacting__){
-										trigger_event(self.events.focus);
+									__is_on_focus__ = _mouse_on_comp;
+									if (__is_on_focus__){
+										__trigger_event__(self.events.on_focus);
 									}
 									else{
-										trigger_event(self.events.blur);
+										__trigger_event__(self.events.on_blur);
 									}
 									
 									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
@@ -1077,14 +834,14 @@ function WWInputField() : GUICompRegion() constructor {
 					}
 					
 					if (curt.multiline) {
-						GUICompRegion.__step__(_input);
+						__SUPER__.__step__(_input);
 					}
 					
 					if (_mouse_on_comp) {
-						consume_input();
+						capture_input();
 					}
 					
-					if (!__is_interacting__)
+					if (!__is_on_focus__)
 					|| (!keyboard_check(vk_anykey)) {
 						return;
 					}
@@ -1102,10 +859,10 @@ function WWInputField() : GUICompRegion() constructor {
 								if (curt.adaptive_width) {
 									_text = __textbox_close_lines__(_text, 0);
 								}
-								__is_interacting__ = false;
+								__is_on_focus__ = false;
 								curt.focus = false;
-								trigger_event(self.events.submit, _text);
-								trigger_event(self.events.blur);
+								__trigger_event__(self.events.submit, _text);
+								__trigger_event__(self.events.on_blur);
 								break;
 							}
 
@@ -1119,7 +876,7 @@ function WWInputField() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									trigger_event(self.events.change, _text);
+									__trigger_event__(self.events.change, _text);
 								}
 								
 								break;
@@ -1293,7 +1050,7 @@ function WWInputField() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									trigger_event(self.events.change, _text);
+									__trigger_event__(self.events.change, _text);
 								}
 							}
 	
@@ -1306,7 +1063,7 @@ function WWInputField() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										trigger_event(self.events.change, _text);
+										__trigger_event__(self.events.change, _text);
 									}
 								}
 								break;
@@ -1398,7 +1155,7 @@ function WWInputField() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										trigger_event(self.events.change, _text);
+										__trigger_event__(self.events.change, _text);
 									}
 									
 									break;
@@ -1418,7 +1175,7 @@ function WWInputField() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										trigger_event(self.events.change, _text);
+										__trigger_event__(self.events.change, _text);
 									}
 									
 									break;
@@ -1438,7 +1195,7 @@ function WWInputField() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										trigger_event(self.events.change, _text);
+										__trigger_event__(self.events.change, _text);
 									}
 									
 									break;
@@ -1458,7 +1215,7 @@ function WWInputField() : GUICompRegion() constructor {
 									
 									if (__event_exists__(self.events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										trigger_event(self.events.change, _text);
+										__trigger_event__(self.events.change, _text);
 									}
 									
 									break;
@@ -1518,7 +1275,7 @@ function WWInputField() : GUICompRegion() constructor {
 								
 								if (__event_exists__(self.events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									trigger_event(self.events.change, _text);
+									__trigger_event__(self.events.change, _text);
 								}
 								
 								break;
@@ -1530,7 +1287,7 @@ function WWInputField() : GUICompRegion() constructor {
 				
 				}
 				
-				static __draw_gui__ = function(_input) {
+				static __draw_gui__ = function(_input) { static __run_once__ = trace(["__draw_gui__", __draw_gui__]);
 				
 					draw_gui(_input);
 				
@@ -1693,7 +1450,7 @@ function WWInputField() : GUICompRegion() constructor {
 						
 						#region draw cursor
 						
-							if (__is_interacting__)
+							if (__is_on_focus__)
 							&& (draw.display_cursor > 0)
 							&& (is_enabled) {
 								var _cursor_xoff = (__using_cached_drawing__) ? -x : 0
@@ -1736,7 +1493,7 @@ function WWInputField() : GUICompRegion() constructor {
 					//}
 					
 					if (curt.multiline) {
-						GUICompRegion.__draw_gui__(_input);
+						__SUPER__.__draw_gui__(_input);
 					}
 					
 					draw_debug();
@@ -1755,7 +1512,7 @@ function WWInputField() : GUICompRegion() constructor {
 					/// @param   {Asset.GMFont} font : The font to build the allowed charactor list.
 					/// @returns {Struct} Allowed Charactors Struct
 					#endregion
-					static __build_allowed_char__ = function(_font) {
+					static __build_allowed_char__ = function(_font) { static __run_once__ = trace(["__build_allowed_char__", __build_allowed_char__]);
 						var _info = font_get_info(_font);
 						var _struct_keys = variable_struct_get_names(_info.glyphs)
 						var _struct = {}
@@ -1801,36 +1558,36 @@ function WWInputField() : GUICompRegion() constructor {
 				
 				#region Format wrapping
 					
-					#region jsDoc
-					/// @func    __textbox_format_nowrap__()
-					/// @desc    Removes all line break, and tab charactor from a string.
-					/// @self    GUICompTextbox
-					/// @param   {String} str : The string to edit
-					/// @returns {String}
-					#endregion
-					static __textbox_format_nowrap__ = function(_str) {
-						var _return = string_replace_all(_str, "\n", "");
-						_return = string_replace_all(_return, "\r", "");
-						_return = string_replace_all(_return, "\t", "");
+#region jsDoc
+/// @func    __textbox_format_nowrap__()
+/// @desc    Removes all line break, and tab charactor from a string.
+/// @self    GUICompTextbox
+/// @param   {String} str : The string to edit
+/// @returns {String}
+#endregion
+static __textbox_format_nowrap__ = function(_str) { static __run_once__ = trace(["__textbox_format_nowrap__", __textbox_format_nowrap__]);
+	var _return = string_replace_all(_str, "\n", "");
+	_return = string_replace_all(_return, "\r", "");
+	_return = string_replace_all(_return, "\t", "");
 						
-						return _return;
+	return _return;
 
-					}
+}
 					
-					#region jsDoc
-					/// @func    __textbox_format_newline__()
-					/// @desc    Removes all tab charactors from a string.
-					/// @self    GUICompTextbox
-					/// @param   {String} str : The string to edit
-					/// @returns {String}
-					#endregion
-					static __textbox_format_newline__ = function(_str) {
-						var _return = string_replace_all(_str, "\r", "");
-						_return = string_replace_all(_return, "\t", "");
-						
-						return _return;
+#region jsDoc
+/// @func    __textbox_format_newline__()
+/// @desc    Removes all tab charactors from a string.
+/// @self    GUICompTextbox
+/// @param   {String} str : The string to edit
+/// @returns {String}
+#endregion
+static __textbox_format_newline__ = function(_str) { static __run_once__ = trace(["__textbox_format_newline__", __textbox_format_newline__]);
+	var _return = string_replace_all(_str, "\r", "");
+	_return = string_replace_all(_return, "\t", "");
+	
+	return _return;
 
-					}
+}
 					
 				#endregion
 				
@@ -1843,7 +1600,7 @@ function WWInputField() : GUICompRegion() constructor {
 					/// @param   {Array<String>} arr : The array of strings
 					/// @returns {String}
 					#endregion
-					static __textbox_lines_to_text__ = function(_arr) {
+					static __textbox_lines_to_text__ = function(_arr) { static __run_once__ = trace(["__textbox_lines_to_text__", __textbox_lines_to_text__]);
 						
 						var _str = _arr[0];
 						var _i = 1;
@@ -1865,7 +1622,7 @@ function WWInputField() : GUICompRegion() constructor {
 					/// @param   {String} str : The string to convert to an array
 					/// @returns {String}
 					#endregion
-					static __textbox_text_to_lines__ = function(_str) {
+					static __textbox_text_to_lines__ = function(_str) { static __run_once__ = trace(["__textbox_text_to_lines__", __textbox_text_to_lines__]);
 					
 						var _total_line_breaks = string_count("\n", _str)
 						var _arr = array_create(_total_line_breaks+1, 0);
@@ -1889,7 +1646,7 @@ function WWInputField() : GUICompRegion() constructor {
 					/// @self    GUICompTextbox
 					/// @returns {String}
 					#endregion
-					static __textbox_return__ = function() {
+					static __textbox_return__ = function() { static __run_once__ = trace(["__textbox_return__", __textbox_return__]);
 						var _text = "";
 						
 						_text = __textbox_lines_to_text__(curt.lines);
@@ -1916,7 +1673,7 @@ function WWInputField() : GUICompRegion() constructor {
 					
 					/// @param current_line
 					/// @param cursor
-					static __textbox_records_add__ = function(_line, _cursor) {
+					static __textbox_records_add__ = function(_line, _cursor) { static __run_once__ = trace(["__textbox_records_add__", __textbox_records_add__]);
 						var _cursor_records = curt.records_cursor + 1;
 
 						if (_cursor_records < array_length(curt.historic_records)) {
@@ -1946,7 +1703,7 @@ function WWInputField() : GUICompRegion() constructor {
 					
 					/// @param current_line
 					/// @param cursor
-					static __textbox_records_rec__ = function(_line, _cursor) {
+					static __textbox_records_rec__ = function(_line, _cursor) { static __run_once__ = trace(["__textbox_records_rec__", __textbox_records_rec__]);
 						
 						var _record = curt.historic_records[curt.records_cursor];
 						
@@ -1957,7 +1714,7 @@ function WWInputField() : GUICompRegion() constructor {
 					}
 					
 					/// @param change
-					static __textbox_records_set__ = function(_change) {
+					static __textbox_records_set__ = function(_change) { static __run_once__ = trace(["__textbox_records_set__", __textbox_records_set__]);
 						
 						var _historic_records = curt.historic_records;
 						var _cursor_records = curt.records_cursor + _change;
@@ -1982,7 +1739,7 @@ function WWInputField() : GUICompRegion() constructor {
 					
 				#endregion
 				
-				static __update_scroll__ = function() {
+				static __update_scroll__ = function() { static __run_once__ = trace(["__update_scroll__", __update_scroll__]);
 					
 					var _canvas_width, _canvas_height, _draw_width, _draw_height;
 					
@@ -2056,7 +1813,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				
-				static __textbox_max_length__ = function() {
+				static __textbox_max_length__ = function() { static __run_once__ = trace(["__textbox_max_length__", __textbox_max_length__]);
 					var _max_length = curt.max_length;
 					if (should_safety_check) {
 						if (_max_length < 0) {
@@ -2106,7 +1863,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				/// @param string
-				static __textbox_insert_string__ = function(_str) {
+				static __textbox_insert_string__ = function(_str) { static __run_once__ = trace(["__textbox_insert_string__", __textbox_insert_string__]);
 					
 					_str = __string_keep_allowed_char__(_str, __allowed_char__)
 					
@@ -2188,7 +1945,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				/// @param delete_key?
-				static __textbox_delete_string__ = function(_delete_key) {
+				static __textbox_delete_string__ = function(_delete_key) { static __run_once__ = trace(["__textbox_delete_string__", __textbox_delete_string__]);
 					var _current_line = curt.current_line;
 					var _cursor = curt.cursor;
 					var _select_line = curt.select_line;
@@ -2261,7 +2018,7 @@ function WWInputField() : GUICompRegion() constructor {
 					__textbox_records_add__(_current_line, _cursor);
 				}
 				
-				static __textbox_copy_string__ = function() {
+				static __textbox_copy_string__ = function() { static __run_once__ = trace(["__textbox_copy_string__", __textbox_copy_string__]);
 	
 					var _select = curt.select;
 					if (_select < 0) return;
@@ -2295,7 +2052,7 @@ function WWInputField() : GUICompRegion() constructor {
 					return _text;
 				}
 				
-				static __textbox_paste_string__ = function() {
+				static __textbox_paste_string__ = function() { static __run_once__ = trace(["__textbox_paste_string__", __textbox_paste_string__]);
 					var _pasted_string = "";
 					
 					if (os_browser == browser_not_a_browser) {
@@ -2312,7 +2069,7 @@ function WWInputField() : GUICompRegion() constructor {
 					return _pasted_string;
 				}
 				
-				static __textbox_break_line__ = function() {
+				static __textbox_break_line__ = function() { static __run_once__ = trace(["__textbox_break_line__", __textbox_break_line__]);
 					
 					var _current_line = curt.current_line;
 					var _text = curt.lines[_current_line];
@@ -2346,7 +2103,7 @@ function WWInputField() : GUICompRegion() constructor {
 				/// @param count
 				/// @param length
 				/// @param \n_length
-				static __textbox_break_lines__ = function(_start_line, _count, _length = 0, _nl_length = 0) {
+				static __textbox_break_lines__ = function(_start_line, _count, _length = 0, _nl_length = 0) { static __run_once__ = trace(["__textbox_break_lines__", __textbox_break_lines__]);
 					
 					static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
 					
@@ -2462,7 +2219,7 @@ function WWInputField() : GUICompRegion() constructor {
 				
 				/// @param string
 				/// @param start_line
-				static __textbox_close_lines__ = function(_string, _start_line) {
+				static __textbox_close_lines__ = function(_string, _start_line) { static __run_once__ = trace(["__textbox_close_lines__", __textbox_close_lines__]);
 					var _breakpoints = curt.width_breakpoints;
 					var _text = _string;
 					var _copied_text = _string;
@@ -2487,7 +2244,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				/// @param change
-				static __textbox_check_hinput__ = function(_change) {
+				static __textbox_check_hinput__ = function(_change) { static __run_once__ = trace(["__textbox_check_hinput__", __textbox_check_hinput__]);
 					
 					var _arr_lines = __array_clone__(curt.lines);
 					var _current_line = curt.current_line;
@@ -2520,7 +2277,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				/// @param change
-				static __textbox_check_vinput__ = function(_change) {
+				static __textbox_check_vinput__ = function(_change) { static __run_once__ = trace(["__textbox_check_vinput__", __textbox_check_vinput__]);
 					
 					var _current_line = curt.current_line;
 					var _cursor_update = curt.cursor;
@@ -2554,7 +2311,7 @@ function WWInputField() : GUICompRegion() constructor {
 				}
 				
 				/// @param select?
-				static __textbox_check_minput__ = function(_select) {
+				static __textbox_check_minput__ = function(_select) { static __run_once__ = trace(["__textbox_check_minput__", __textbox_check_minput__]);
 					var _select_line , _select_end;
 					
 					//cache the select line
@@ -2588,7 +2345,7 @@ function WWInputField() : GUICompRegion() constructor {
 				/// @param change
 				/// @param select?
 				/// @param vertical?
-				static __textbox_update_cursor__ = function(_change, _shift, _vertical) {
+				static __textbox_update_cursor__ = function(_change, _shift, _vertical) { static __run_once__ = trace(["__textbox_update_cursor__", __textbox_update_cursor__]);
 					
 					if (_shift) {
 						var _current_line = curt.current_line;
@@ -2630,7 +2387,7 @@ function WWInputField() : GUICompRegion() constructor {
 					
 				}
 				
-				static __array_clone__ = function(_arr) {
+				static __array_clone__ = function(_arr) { static __run_once__ = trace(["__array_clone__", __array_clone__]);
 					var _new_arr = array_create(0,0);
 					array_copy(_new_arr, 0, _arr, 0, array_length(_arr));
 					return _new_arr;
@@ -2647,5 +2404,3 @@ function WWInputField() : GUICompRegion() constructor {
 	__allowed_char__ = __build_allowed_char__(fGUIDefault);
 	set_text("");
 }
-
-

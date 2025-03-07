@@ -232,7 +232,7 @@ function GUICompRadioOption() : WWCore() constructor {
 			
 			button = new WWCheckbox()
 			
-			label = new WWTextScrolling()
+			label = new WWLabelScrolling()
 				.set_text_alignment(fa_left, fa_center)
 				.set_offset(button.region.get_width(), button.region.get_height()/2)
 			

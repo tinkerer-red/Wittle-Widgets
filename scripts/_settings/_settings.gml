@@ -23,9 +23,7 @@ if (__SETTINGS_AUTO_SCALE) {
 			if (is_browser) {
 				window_set_size(_width, _height);
 			}
-			show_debug_message(["camera_get_view_width(view_camera[0])", camera_get_view_width(view_camera[0])])
 			camera_set_view_size(view_camera[0], _width, _height);
-			show_debug_message(["camera_get_view_width(view_camera[0])", camera_get_view_width(view_camera[0])])
 			surface_resize(application_surface, _width, _height);
 		}
 		

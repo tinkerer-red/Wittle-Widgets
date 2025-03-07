@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWLabel",
   "parent":{
-    "name":"AI Driven",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/_system/AI Driven.yy",
+    "name":"Finished Components",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

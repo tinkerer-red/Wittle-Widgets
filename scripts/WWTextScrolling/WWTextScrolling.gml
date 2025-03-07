@@ -1,13 +1,13 @@
 #region jsDoc
-/// @func    WWTextScrolling()
+/// @func    WWLabelScrolling()
 /// @desc    Creates a scrolling text component
-/// @self    WWTextScrolling
+/// @self    WWLabelScrolling
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.WWTextScrolling}
+/// @return {Struct.WWLabelScrolling}
 #endregion
-function WWTextScrolling() : WWScrollingCanvas() constructor {
-	debug_name = "WWTextScrolling"
+function WWLabelScrolling() : WWScrollingCanvas() constructor {
+	debug_name = "WWLabelScrolling"
 	
 	#region Public
 		
@@ -75,8 +75,8 @@ function WWTextScrolling() : WWScrollingCanvas() constructor {
 		
 		#region Components
 			
-			// Automatically set up a WWText canvas
-			set_canvas(new WWText());
+			// Automatically set up a WWLabel canvas
+			set_canvas(new WWLabel());
 			
 		#endregion
 		
@@ -85,7 +85,7 @@ function WWTextScrolling() : WWScrollingCanvas() constructor {
 	
 }
 
-function WWTextScribbleScrolling() : WWTextScrolling() constructor {
+function WWLabelScribbleScrolling() : WWLabelScrolling() constructor {
 	
 	#region Public
 		
@@ -112,11 +112,13 @@ function WWTextScribbleScrolling() : WWTextScrolling() constructor {
 		
 		#region Components
 			
-			// Automatically set up a WWTextScribble canvas
-			set_canvas(new WWTextScribble());
+			// Automatically set up a WWLabelScribble canvas
+			set_canvas(new WWLabelScribble());
 			
 		#endregion
 		
 	#endregion
 	
 }
+
+

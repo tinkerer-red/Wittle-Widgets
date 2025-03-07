@@ -29,9 +29,6 @@ function WWButton() : WWSprite() constructor {
 			on_is_blurred(function(_input){
 				image_index = GUI_IMAGE_ENABLED;
 			})
-			on_post_step(function(_input) {
-				__handle_interaction__(_input);
-			})
 			
 			
 		#endregion

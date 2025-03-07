@@ -246,37 +246,13 @@ function WWTextBase() : WWCore() constructor {
 				/// @returns {Struct.GUICompTextbox}
 				#endregion
 				static set_cursor_gui_loc = function(_gui_x, _gui_y) {
-				    // Set font for accurate measurement.
-				    draw_set_font(text.font);
-				    var _lineHeight = line_height;
-    
-				    // Calculate relative Y coordinate within the component.
-				    // (Adjusting for the component's y position and vertical scroll offset.)
-				    var relY = _gui_y - y;
-				    var newCursorLine = clamp(floor(relY / _lineHeight), 0, array_length(__lines__) - 1);
-    
-				    // Get the text of the target line.
-				    var lineText = __lines__[newCursorLine];
-				    var lineLen = string_length(lineText);
-    
-				    // Calculate relative X coordinate (accounting for horizontal scroll).
-				    var relX = _gui_x - x;
-    
-				    // Determine the character index whose width is just at or exceeds the relative X position.
-				    var newCursorX = 0;
-				    for (var i = 0; i <= lineLen; i++) {
-				        if (string_width(string_copy(lineText, 1, i)) >= relX) {
-				            newCursorX = i;
-				            break;
-				        }
-				        newCursorX = i;  // If never exceeding, cursor goes to the end.
-				    }
-    
-				    // Update internal cursor positions.
-				    set_cursor_y_pos(newCursorLine);
-				    set_cursor_x_pos(newCursorX);
-				    __textbox_records_rec__(newCursorLine, newCursorX);
-    
+				    var _loc = __get_pos_from_gui__ (_gui_x, _gui_y)
+					
+					// Update internal cursor positions.
+				    set_cursor_y_pos(_loc.y);
+				    set_cursor_x_pos(_loc.x_start);
+				    __textbox_records_rec__(_loc.y, _loc.x_start);
+					
 				    return self;
 				}
 
@@ -330,37 +306,129 @@ function WWTextBase() : WWCore() constructor {
 				return self;
 			}
 			
-			//Cursor Handling
-			on_pre_step(function(_input) {
-			    // If the component is disabled, skip.
-			    if (!is_enabled) return;
+			on_post_step(function(_input) {
+				var _input_captured = _input.consumed;
+				var _mouse_on_comp = mouse_on_comp();
 				
-			    // Get current mouse coordinates in GUI space.
-			    var mouseX = device_mouse_x_to_gui(0);
-			    var mouseY = device_mouse_y_to_gui(0);
-    
-			    // Update click selection:
-			    // When the left mouse button is held, update the selection and cursor position.
-			    if (mouse_check_button(mb_left)) {
-			        // This routine (already defined) updates the cursor based on the mouse and sets selection anchors.
+				//handle focus/bluring
+				if (_mouse_on_comp) {
+					consume_input();
+					
+					if (!__is_focused__) {
+						__is_focused__ = true;
+						trigger_event(self.events.focus);
+					}
+					trigger_event(self.events.is_focused);
+				}
+				else {
+					if (__is_focused__) {
+						__is_focused__ = false;
+						trigger_event(self.events.blur);
+					}
+					trigger_event(self.events.is_blurred);
+				}
+				
+				// Early exit if disabled
+				if (!is_enabled) {
+					if (__is_interacting__) {
+			            __is_interacting__ = false
+			        }
+					if (__is_focused__) {
+			            __reset_focus__();
+			        }
+					return;
+				}
+				
+				// Early exit if input was captured
+				if (_input_captured) {
+					if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+				        __reset_focus__();
+				    }
+					return;
+				}
+				
+				//handle input
+				if (_mouse_on_comp) {
+					var _double_trigger = false;
+					if (mouse_check_button_pressed(mb_left)) {
+						if (current_time - __last_click_time__ < 1_000/3) {
+							_double_trigger = true;
+						}
+						
+				        __is_interacting__ = true;
+						__last_click_time__ = current_time;
+				        __click_held_timer__ = current_time;
+				        trigger_event(self.events.pressed);
+						
+						if (_double_trigger) trigger_event(self.events.double_click);
+				    }
+					
+					else if (__is_interacting__ && mouse_check_button(mb_left)) {
+				        trigger_event(self.events.held);
+						
+				        // Handle long press timing
+				        __click_held_timer__ += 1;
+				        if (current_time-__click_held_timer__ > 1_000/3) {
+				            trigger_event(self.events.long_press);
+				        }
+				    }
+					
+					else if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+				        __reset_focus__();
+				        trigger_event(self.events.released);
+				    }
+					
+				}
+				else {
+					if (__is_interacting__ && mouse_check_button_released(mb_left)) {
+				        __reset_focus__();
+				    }
+				}
+				
+			})
+			
+			on_pressed(function(_data) {
+				// get focus
+				__mouse_down_x__ = device_mouse_x_to_gui(0);
+				__mouse_down_y__ = device_mouse_y_to_gui(0);
+				
+				__check_minput__(false);
+				log("pressed")
+			})
+			on_held(function(_data) {
+				var mx = device_mouse_x_to_gui(0);
+				var my = device_mouse_y_to_gui(0);
+				if (__mouse_down_x__ = mx)
+				&& (__mouse_down_y__ = my) {
+					return;
+				}
+				
+				// stay focused if mouse is on component
+				log("held")
+				if (__word_selection_mode__) {
+			        __update_word_selection_drag__();
+			    } else {
 			        __check_minput__(true);
-			        __refresh_surf__ = true;
 			    }
-			    else {
-			        // When the left mouse button is released, ensure that selection state is finalized.
-			        // (You might choose to leave highlight_selected true to indicate an active selection.)
-			        __check_minput__(false);
-			    }
-    
-			    // Check for Ctrl+C hotkey to copy text.
-			    // (keyboard_check returns true as long as the key is held; keyboard_check_pressed triggers on the frame it is pressed.)
-			    if (keyboard_check(vk_control) && keyboard_check_pressed(ord("C"))) {
-			        var copiedText = __copy_string__();
-			        // Use the built-in clipboard_set_text to copy to the system clipboard.
-			        clipboard_set_text(copiedText);
-			        show_debug_message("Copied: " + copiedText);
-			    }
+			})
+			on_long_press(function(_data) {
+				// Phone support for selecting text
+			})
+			on_released(function(_data) {
+				// stay focused if mouse is on component
+				log("released")
+				__word_selection_mode__ = false;
+			})
+			on_double_click(function(_data) {
+			    __highlight_word_at_cursor__();
+			    __word_anchor_start__ = highlight_x_pos;
+			    // Assuming the current cursor position after double-click is the end of the word:
+			    __word_anchor_end__ = get_cursor_x_pos();
+			    __word_anchor_line__ = cursor_y_pos;
+			    __word_selection_mode__ = true;
+				log("double")
 			});
+
 
 			
 			// Pre-draw event handler.
@@ -584,6 +652,12 @@ function WWTextBase() : WWCore() constructor {
 			__allowed_char__ = __build_allowed_char__(text.font); // Struct holding characters allowed in input (for character enforcement).
 			__allowed_char_set__ = false; // Indicates whether allowed characters have been explicitly set.
 			
+			//used to better handle drag selections being ignored if mouse doesnt move
+			__mouse_down_x__ = -infinity;
+			__mouse_down_y__ = -infinity;
+			
+			__word_selection_mode__ = false;
+			
 		#endregion
 		
 		#region Functions
@@ -724,7 +798,7 @@ function WWTextBase() : WWCore() constructor {
 			#endregion
 			static __draw_cursor__ = function(_x, _y) {
 			    // Only draw the cursor if the component is focused.
-			    if (!__is_focused__) return;
+			    if (!__is_interacting__) return;
 				
 			    // Compute the cursor's pixel x coordinate.
 			    var current_line = __lines__[cursor_y_pos];
@@ -790,7 +864,7 @@ function WWTextBase() : WWCore() constructor {
 			    /// @param   {Asset.GMFont} _font : The font to build the allowed character list.
 			    /// @returns {Struct} Allowed Characters Struct
 			    #endregion
-			    static __build_allowed_char__ = function(_font) {
+			    static __build_allowed_char__ = function(_font, _include_nl=true) {
 			        var _info = font_get_info(_font);
 			        var _struct_keys = variable_struct_get_names(_info.glyphs);
 			        var _struct = {};
@@ -800,7 +874,9 @@ function WWTextBase() : WWCore() constructor {
 			            _struct[$ _struct_keys[_i]] = true;
 			            _i += 1;
 			        }
-
+					
+					if (_include_nl) _struct[$ "\n"] = true;
+					
 			        return _struct;
 			    }
 			
@@ -823,7 +899,7 @@ function WWTextBase() : WWCore() constructor {
 					buffer_seek(__args.buff, buffer_seek_start, 0);
 			        
 			        string_foreach(_text, method(__args, function(_char) {
-			            if (variable_struct_exists(__allowed_char__, _char) || (_char == "\n")) {
+			            if (__allowed_char__[$ _char]) {
 			                buffer_write(buff, buffer_text, _char);
 			            }
 			        }));
@@ -921,7 +997,7 @@ function WWTextBase() : WWCore() constructor {
 				static __break_lines__ = function(_start_line_index, _number_of_lines, _char_limit = 0, _cursor_line_offset = 0) {
 				    // Define characters that indicate a natural word-break.
 				    static __word_breakers = "\n" + chr(9) + chr(34) + " ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
-				
+					
 				    // Set the font for measurement.
 				    draw_set_font(text.font);
 
@@ -1176,12 +1252,12 @@ function WWTextBase() : WWCore() constructor {
 				        highlight_y_pos = cursor_y_pos;
 				        highlight_selected = true;
 				    }
-    
+					
 				    // Get mouse coordinates in GUI space.
 				    var mx = device_mouse_x_to_gui(0);
 				    var my = device_mouse_y_to_gui(0);
 				    set_cursor_gui_loc(mx, my);
-    
+					
 				    // If selecting, check if the new cursor equals the anchor.
 				    if (_select) {
 				        if (cursor_y_pos == highlight_y_pos && cursor_x_pos == highlight_x_pos) {
@@ -1195,7 +1271,7 @@ function WWTextBase() : WWCore() constructor {
 				        highlight_selected = false;
 				    }
 				}
-
+				
 				#region jsDoc
 				/// @func    __move_cursor_offset__()
 				/// @desc    Moves the cursor based on input and optionally extends selection. When shift is
@@ -1253,10 +1329,130 @@ function WWTextBase() : WWCore() constructor {
 		            array_copy(_new_arr, 0, _arr, 0, array_length(_arr));
 		            return _new_arr;
 		        }
-			
+				
 		    #endregion
 			
 			#region Input Handling
+				
+				#region jsDoc
+				/// @func    __compute_word_boundaries__
+				/// @desc    Given a line of text and a cursor index (1-indexed), computes the word boundaries
+				///          based on a shared list of word breakers. Returns a struct containing:
+				///              { x_start, x_end }
+				///          where x_start is the start index and x_end is the end index of the word.
+				/// @param   {String} lineText   : The text content of the line.
+				/// @param   {Real} cursorIndex  : The current cursor position in the line (1-indexed).
+				/// @returns {Struct} A struct with properties x_start and x_end.
+				/// @self    WWTextBase
+				#endregion
+				static __compute_word_boundaries__ = function(lineIndex, cursorIndex) {
+				    // Shared word breakers constant.
+				    static __word_breakers = "\n" + chr(9) + chr(34) + " ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
+					
+					// Retrieve the current line's text.
+				    var lineText = __lines__[lineIndex];
+				    var len = string_length(lineText);
+				    if (len == 0) return { x_start: 0, x_end: 0 };
+					
+				    // Get the character at the current cursor position.
+				    // Assume cursor_x_pos is 1-indexed.
+				    var currentChar = string_char_at(lineText, cursorIndex);
+    
+				    // Define allowed set based on the current character.
+				    var allowedSet;
+				    if (string_pos(currentChar, __word_breakers) == 0) {
+				        // Normal word: allowed characters are those NOT in __word_breakers.
+				        // We'll handle that by scanning until we hit a breaker.
+				        allowedSet = undefined;
+				    }
+				    else {
+				        // Current char is a breaker.
+				        // If it's a space or tab, we only allow spaces and tabs.
+				        if (currentChar == " " || currentChar == chr(9)) {
+				            allowedSet = " " + chr(9);
+				        }
+						else {
+				            // Otherwise, allow any character that is in __word_breakers.
+				            allowedSet = __word_breakers;
+				        }
+				    }
+					
+				    var startPos = cursorIndex;
+				    var endPos = cursorIndex;
+					
+				    // If allowedSet is undefined, then we are in a normal word:
+				    if (allowedSet == undefined) {
+				        // Scan left until a word breaker is encountered.
+				        while (startPos > 0 && string_pos(string_char_at(lineText, startPos), __word_breakers) == 0) {
+				            startPos -= 1;
+				        }
+				        // Scan right until a word breaker is encountered.
+				        while (endPos < len && string_pos(string_char_at(lineText, endPos + 1), __word_breakers) == 0) {
+				            endPos += 1;
+				        }
+				    }
+				    else {
+				        // When the current char is a breaker, use the allowedSet.
+				        // Scan left: while previous character exists and is in allowedSet.
+				        while (startPos > 0 && string_pos(string_char_at(lineText, startPos), allowedSet) > 0) {
+				            startPos -= 1;
+				        }
+				        // Scan right: while next character exists and is in allowedSet.
+				        while (endPos < len && string_pos(string_char_at(lineText, endPos + 1), allowedSet) > 0) {
+				            endPos += 1;
+				        }
+				    }
+					
+				    return { x_start: startPos, x_end: endPos };
+				};
+
+				#region jsDoc
+				/// @func    __get_pos_from_gui__
+				/// @desc    Converts GUI coordinates (absolute x, y) into a text position within the text box.
+				///          It calculates the line index and character index in that line. If _wordMode is true,
+				///          it returns the full word boundaries using __compute_word_boundaries__.
+				/// @param   {Real} _gui_x    : The x coordinate in GUI space.
+				/// @param   {Real} _gui_y    : The y coordinate in GUI space.
+				/// @param   {Bool} _wordMode : (Optional) If true, returns word boundaries; otherwise, returns just the cursor position.
+				/// @returns {Struct} A struct with properties:
+				///           - x_start: For _wordMode true, the start index of the word; otherwise, the cursor position.
+				///           - x_end  : For _wordMode true, the end index of the word; otherwise, equal to x_start.
+				///           - y      : The line index.
+				/// @self    WWTextBase
+				#endregion
+				static __get_pos_from_gui__ = function(_gui_x, _gui_y, _wordMode=false) {
+				    // Set font for measurement.
+				    draw_set_font(text.font);
+				    var _lineHeight = line_height;
+    
+				    // Compute the relative Y coordinate and determine the line.
+				    var relY = _gui_y - y;
+				    var lineIndex = clamp(floor(relY / _lineHeight), 0, array_length(__lines__) - 1);
+    
+				    var lineText = __lines__[lineIndex];
+				    var lineLen = string_length(lineText);
+    
+				    // Compute the relative X coordinate.
+				    var relX = _gui_x - x;
+				    var cursorPos = 0;
+				    for (var i = 0; i <= lineLen; i++) {
+				        if (string_width(string_copy(lineText, 1, i)) >= relX) {
+				            cursorPos = i;
+				            break;
+				        }
+				        cursorPos = i;
+				    }
+    
+				    var result = { x_start: cursorPos, x_end: cursorPos, y: lineIndex };
+    
+				    if (_wordMode) {
+				        var boundaries = __compute_word_boundaries__(lineIndex, cursorPos);
+				        result.x_start = boundaries.x_start;
+				        result.x_end = boundaries.x_end;
+				    }
+    
+				    return result;
+				};
 				
 				#region jsDoc
 			    /// @func    __insert_string_at_cursor__()
@@ -1372,7 +1568,8 @@ function WWTextBase() : WWCore() constructor {
 								_end_y   = highlight_y_pos;
 								_start_x = cursor_x_pos;
 								_end_x   = highlight_x_pos;
-							} else {
+							}
+							else {
 								_start_y = highlight_y_pos;
 								_end_y   = cursor_y_pos;
 								_start_x = highlight_x_pos;
@@ -1415,11 +1612,13 @@ function WWTextBase() : WWCore() constructor {
 							__lines__[_current_line_index] = _current_str + __lines__[_current_line_index + 1];
 							array_delete(__lines__, _current_line_index + 1, 1);
 							array_delete(__lines_broken_by_width__, _current_line_index + 1, 1);
-						} else {
+						}
+						else {
 							// Delete one character after the cursor.
 							__lines__[_current_line_index] = string_delete(_current_str, _current_cursor_pos + 1, 1);
 						}
-					} else {
+					}
+					else {
 						// Backspace deletion: delete the character before the cursor.
 						if (_current_cursor_pos == 0) {
 							// If at the beginning of the line, merge with the previous line.
@@ -1444,6 +1643,80 @@ function WWTextBase() : WWCore() constructor {
 					if (dynamic_width) __break_lines__(_current_line_index, 1);
 					__textbox_records_add__(_current_line_index, _current_cursor_pos);
 				}
+				
+				#region jsDoc
+				/// @func    __highlight_word_at_cursor__
+				/// @desc    Highlights the word at the current cursor position.  
+				///          - If the character at the cursor is not a word breaker (as defined by __word_breakers),  
+				///            it expands the selection left and right until a word breaker is encountered.  
+				///          - If the character is a word breaker, then:
+				///              - If it is a space or tab, it selects all adjacent spaces and tabs.
+				///              - Otherwise, it selects all contiguous word breaker characters.
+				/// @self    WWTextBase
+				/// @returns {Void}
+				#endregion
+				static __highlight_word_at_cursor__ = function() {
+				    var _loc = __compute_word_boundaries__(cursor_y_pos, cursor_x_pos);
+					
+				    // Set selection: highlight from startPos to endPos in the current line.
+				    highlight_x_pos = _loc.x_start;
+				    highlight_y_pos = cursor_y_pos;
+    
+				    // Move the cursor to the end of the selected range.
+				    set_cursor_x_pos(_loc.x_end);
+    
+				    // Activate the selection.
+				    highlight_selected = true;
+				};
+				
+				#region jsDoc
+				/// @func    __update_word_selection_drag__
+				/// @desc    Updates the word selection during a mouse drag after a double-click.
+				///          The cursor is updated based on the mouse position using __get_pos_from_gui__
+				///          while the selection anchors (stored in __word_anchor_start__, __word_anchor_end__, and __word_anchor_line__)
+				///          remain fixed from the double-click. If the cursor is to the left of the anchor on the same line,
+				///          the highlight is set to __word_anchor_end__; if to the right, it is set to __word_anchor_start__.
+				///          When on a different line, the highlight is anchored to the original word line.
+				/// @self    WWTextBase
+				/// @returns {Void}
+				#endregion
+				static __update_word_selection_drag__ = function() {
+				    // Get current mouse coordinates.
+				    var mx = device_mouse_x_to_gui(0);
+				    var my = device_mouse_y_to_gui(0);
+					
+				    // Use the unified helper to get the text position from GUI coordinates.
+				    var pos = __get_pos_from_gui__(mx, my, true); // _wordMode false; we only need the raw position.
+					
+				    // Update the cursor to the calculated position.
+				    set_cursor_x_pos(pos.x_start);
+				    set_cursor_y_pos(pos.y);
+					
+				    // Update the selection boundaries based on the stored anchor:
+				    // If the current line is above the anchor, highlight using the anchor's end.
+				    if (pos.y < __word_anchor_line__) {
+				        highlight_x_pos = __word_anchor_end__;
+				        highlight_y_pos = __word_anchor_line__;
+				    }
+				    // If below the anchor, highlight using the anchor's start.
+				    else if (pos.y > __word_anchor_line__) {
+				        highlight_x_pos = __word_anchor_start__;
+				        highlight_y_pos = __word_anchor_line__;
+				    }
+				    else {
+				        // On the same line, if the cursor is to the left of the anchor, use the anchor's end;
+				        // otherwise, use the anchor's start.
+				        if (pos.x_start > __word_anchor_start__) {
+				            highlight_x_pos = __word_anchor_start__;
+				        } else {
+				            highlight_x_pos = __word_anchor_end__;
+				        }
+				        highlight_y_pos = __word_anchor_line__;
+				    }
+					
+				    // Mark that a selection is active.
+				    highlight_selected = true;
+				};
 				
 			#endregion
 			
@@ -1557,7 +1830,7 @@ function WWTextBase() : WWCore() constructor {
 /// @desc    A single-line text input component supporting editing, caret, and selection.
 /// @returns {Struct.WWTextInputSingle}
 #endregion
-function WWTextInputSingle() : WWTextBase() constructor {
+function WWTextInputSingle() : WWTextInputMulti() constructor {
     debug_name = "WWTextInputSingle";
     
     #region Public
@@ -1650,7 +1923,6 @@ function WWTextInputSingle() : WWTextBase() constructor {
 			
 			max_char_length = infinity; // Maximum allowed number of characters (infinity for no limit).
 			
-			
 			shift_only_new_line = false; // If true, only Shift+Enter produces a new line (otherwise, Enter submits).
 			
 		#endregion
@@ -1670,7 +1942,6 @@ function WWTextInputSingle() : WWTextBase() constructor {
 		#endregion
 		
 		#region Functions
-		
 			
 			#region Input Handling
 
@@ -1769,8 +2040,6 @@ function WWTextInputSingle() : WWTextBase() constructor {
 			    }
 				
 			#endregion
-			
-			
 				
 		#endregion
 		

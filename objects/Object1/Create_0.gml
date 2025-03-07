@@ -17,18 +17,9 @@ var basicTextBox = new WWTextBase()
     .set_line_height(22);
 // Simulate a selection on the second line (index 1)
 basicTextBox.highlight_selected = true;
-basicTextBox.highlight_y_pos = 1;  // Second line
+basicTextBox.highlight_y_pos = 1;  // Second line (0-indexed)
 basicTextBox.highlight_x_pos = 8;  // Selection starts at character index 8
 basicTextBox.set_cursor_x_pos(20); // And the cursor is set at index 20 on that same line
-
-// Bind a Ctrl+C hotkey to copy selection from basicTextBox.
-//basicTextBox.on_pre_step(function(_input){
-//    if (keyboard_check(vk_control) && keyboard_check_pressed(ord("C"))) {
-//        var copied = basicTextBox.__copy_string__();
-//        clipboard_set_text(copied);
-//        show_debug_message("BasicTextBox copied: " + copied);
-//    }
-//});
 root.add(basicTextBox);
 
 // -------------------------------------------------------------
@@ -41,18 +32,18 @@ var dynamicWidthTextBox = new WWTextBase()
     .set_text_color(c_white)
     .set_highlight_color(c_blue)
     .set_line_height(22)
-    .set_dynamic_width(true); // Enable dynamic width so lines don't wrap unnecessarily
+    .set_dynamic_width(true);
 root.add(dynamicWidthTextBox);
 
 // -------------------------------------------------------------
 // Test 3: Custom Font TextBox
 // -------------------------------------------------------------
-// (Assume customFont is a valid font asset defined in your project.)
+// (Assume fGUIDefaultBig is a valid, larger font asset.)
 var customFontTextBox = new WWTextBase()
     .set_offset(50, 390)
     .set_size(600, 150)
     .set_text("Custom Font Test:\nThe quick brown fox jumps over the lazy dog.\nEnjoy the custom styling!")
-    .set_text_font(fGUIDefaultBig)  // customFont must be defined in your project
+    .set_text_font(fGUIDefaultBig)
     .set_text_color(c_white)
     .set_highlight_color(c_orange)
     .set_line_height(24);
@@ -70,3 +61,19 @@ var longTextBox = new WWTextBase()
     .set_highlight_color(c_red)
     .set_line_height(20);
 root.add(longTextBox);
+
+// -------------------------------------------------------------
+// Test 5: Emoji Font TextBox
+// -------------------------------------------------------------
+// (Assume emojiFont is a valid font asset supporting a wide range of emojis.)
+var emojiTextBox = new WWTextBase()
+    .set_offset(700, 400)
+    .set_size(500, 150)
+    .set_text("Emoji Test:\n😀 😃 😄 😁 😆 😅 😂 🤣 😊 😎 👍🏽 🌟 🚀 🎉 🥳")
+    .set_text_font(fNotoEmojiMedium)
+    .set_text_color(c_white)
+    .set_highlight_color(c_fuchsia)
+    .set_line_height(24);
+root.add(emojiTextBox);
+
+show_debug_overlay(true)

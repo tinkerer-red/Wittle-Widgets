@@ -1090,6 +1090,7 @@ function WWCore() constructor {
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0;
+			__last_click_time__  = 0;
 			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
 			__is_focused__ = false; // is currently the component capturing the input
 			
@@ -1166,7 +1167,12 @@ function WWCore() constructor {
 						if (_mouse_on_comp) {
 							
 							if (mouse_check_button_pressed(mb_left)) {
+								if (current_time - __last_click_time__ < 1_000/3) {
+									trigger_event(self.events.double_click);
+								}
+								
 					            __is_interacting__ = true;
+								__last_click_time__ = current_time;
 					            __click_held_timer__ = current_time;
 					            trigger_event(self.events.pressed);
 					        }

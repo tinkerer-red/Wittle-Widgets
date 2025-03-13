@@ -21,12 +21,14 @@ function WWButton() : WWSprite() constructor {
 				image_index = GUI_IMAGE_PRESSED;
 			})
 			on_held(function(_input){
-				image_index = GUI_IMAGE_PRESSED;
+				if (__is_hovered__) {
+					image_index = GUI_IMAGE_PRESSED;
+				}
 			})
-			on_is_focused(function(_input){
+			on_hover(function(_input){
 				image_index = GUI_IMAGE_HOVER;
 			})
-			on_is_blurred(function(_input){
+			on_hover_exit(function(_input){
 				image_index = GUI_IMAGE_ENABLED;
 			})
 			
@@ -34,6 +36,8 @@ function WWButton() : WWSprite() constructor {
 		#endregion
 		
 		#region Variables
+			
+			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
 			
 			set_sprite(sButton); // init the sprite variables
 			

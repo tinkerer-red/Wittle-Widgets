@@ -1,5 +1,17 @@
-function log(_str) {
-	show_debug_message(_str);
+function log(_message, _depth=-1) {
+	static __depth = 0;
+				
+	if (_depth >= 0) {
+		__depth = _depth;
+	}
+	else {
+		_depth = __depth;
+	}
+				
+	var _indent = (_depth > 1) ? string_repeat("│   ", _depth-1) : "";
+	if (_depth) _indent += "├── ";
+	show_debug_message(_indent + string(_message));
+	return;
 }
 
 #macro log_func static __run_once__ = show_debug_message([_GMFUNCTION_, asset_get_index(_GMFUNCTION_)])
@@ -22,37 +34,3 @@ function __trace(_location) {
 	});
 }
 
-/*
-function A() constructor {
-	static print_name = function() {
-		show_debug_message("A")
-	}
-}
-
-function B() : A() constructor {
-	static print_name = function() {
-		__SUPER__.print_name()
-		show_debug_message("B")
-	}
-}
-
-function C() : B() constructor {
-	static print_name = function() {
-		__SUPER__.print_name()
-		show_debug_message("C")
-	}
-}
-
-function D() : C() constructor {
-	static print_name = function() {
-		__SUPER__.print_name()
-		show_debug_message("D")
-	}
-}
-
-function E() : D() constructor {
-	static print_name = function() {
-		__SUPER__.print_name()
-		show_debug_message("E")
-	}
-}

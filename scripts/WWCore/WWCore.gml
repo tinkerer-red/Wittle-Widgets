@@ -174,6 +174,7 @@ function WWCore() constructor {
 				
 				is_enabled = _is_enabled;
 				
+				// Propagate the state change to children components.
 				if (!__is_empty__) {
 					var _comp;
 					var _i=0; repeat(__children_count__) {
@@ -212,6 +213,54 @@ function WWCore() constructor {
 				
 				return self;
 			}
+			#region jsDoc
+			/// @func    set_debug()
+			/// @desc    Enable or Disable the Component's debug drawing and logging.
+			/// @self    WWCore
+			/// @param   {Bool} debug_enabled : If the component should log and draw debugging information
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_debug = function(_debug_enabled) {
+				debug_enabled = _debug_enabled;
+				return self;
+			}
+			
+			static set_focus = function(_focus) {
+			    if (_focus && !__is_focused__) {
+					__is_focused__ = true;
+					trigger_event(self.events.focus_enter);
+					trigger_event(self.events.focus);
+				}
+			    else if (!_focus && __is_focused__) {
+					__is_focused__ = false;
+					trigger_event(self.events.focus_exit);
+				}
+			    return self;
+			}
+			static set_hover = function(_hover) {
+			    if (_hover && !__is_hovered__) {
+					__is_hovered__ = true;
+					trigger_event(self.events.hover_enter);
+					trigger_event(self.events.hover);
+				}
+			    else if (!_hover && __is_hovered__) {
+					__is_hovered__ = false;
+					trigger_event(self.events.hover_exit);
+				}
+			    return self;
+			}
+			static set_interact = function(_interact) {
+			    if (_interact && !__is_interacting__) {
+					__is_interacting__ = true;
+					trigger_event(self.events.interact_enter);
+					trigger_event(self.events.interact);
+				}
+			    else if (!_interact && __is_interacting__) {
+					__is_interacting__ = false;
+					trigger_event(self.events.interact_exit);
+				}
+			    return self;
+			}
 			
 		#endregion
 		
@@ -225,25 +274,54 @@ function WWCore() constructor {
 			}
 			
 			
-			#region Focus/Blur
-			events.focus     = variable_get_hash("focus"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			events.is_focused = variable_get_hash("is_focused"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			events.blur      = variable_get_hash("blur");  //triggered when the component loses focus, this commonly occurs when the mouse is clicked down off it, or when the mouse is released off it.
-			events.is_blurred = variable_get_hash("is_blurred"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region Focus
+			events.focus_enter = variable_get_hash("focus_enter"); //triggered when component first accepted keyboard inputs
+			events.focus       = variable_get_hash("focus"); //triggered every frame component can accept keyboard inputs
+			events.focus_exit  = variable_get_hash("focus_exit"); //triggered when the component can no longer accept keyboard inputs
+			static on_focus_enter = function(_func) {
+				add_event_listener(events.focus_enter, _func);
+				return self;
+			}
 			static on_focus = function(_func) {
 				add_event_listener(events.focus, _func);
 				return self;
 			}
-			static on_is_focused = function(_func) {
-				add_event_listener(events.is_focused, _func);
+			static on_focus_exit = function(_func) {
+				add_event_listener(events.focus_exit, _func);
 				return self;
 			}
-			static on_blur = function(_func) {
-				add_event_listener(events.blur, _func);
+			#endregion
+			#region Interact
+			events.interact_enter = variable_get_hash("interact_enter"); //triggered when component first accepted keyboard inputs
+			events.interact       = variable_get_hash("interact"); //triggered every frame component can accept keyboard inputs
+			events.interact_exit  = variable_get_hash("interact_exit"); //triggered when the component can no longer accept keyboard inputs
+			static on_interact_enter = function(_func) {
+				add_event_listener(events.interact_enter, _func);
 				return self;
 			}
-			static on_is_blurred = function(_func) {
-				add_event_listener(events.is_blurred, _func);
+			static on_interact = function(_func) {
+				add_event_listener(events.interact, _func);
+				return self;
+			}
+			static on_interact_exit = function(_func) {
+				add_event_listener(events.interact_exit, _func);
+				return self;
+			}
+			#endregion
+			#region Hover
+			events.hover_enter = variable_get_hash("hover_enter"); //triggered when component first accepted keyboard inputs
+			events.hover       = variable_get_hash("hover"); //triggered every frame component can accept keyboard inputs
+			events.hover_exit  = variable_get_hash("hover_exit"); //triggered when the component can no longer accept keyboard inputs
+			static on_hover_enter = function(_func) {
+				add_event_listener(events.hover_enter, _func);
+				return self;
+			}
+			static on_hover = function(_func) {
+				add_event_listener(events.hover, _func);
+				return self;
+			}
+			static on_hover_exit = function(_func) {
+				add_event_listener(events.hover_exit, _func);
 				return self;
 			}
 			#endregion
@@ -275,6 +353,7 @@ function WWCore() constructor {
 				return self;
 			}
 			#endregion
+			
 			#region Step/Draw
 			events.pre_step  = variable_get_hash("pre_step"); //triggered every frame before the begin step event is activated
 			events.post_step = variable_get_hash("post_step"); //triggered every frame after the end step event is activated
@@ -313,18 +392,15 @@ function WWCore() constructor {
 			
 			events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			events.mouse_off_group = variable_get_hash("mouse_off_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			static on_mouse_over_group = function(_func) {
+				add_event_listener(events.mouse_over_group, _func);
+				return self;
+			}
 			static on_mouse_off_group = function(_func) {
 				add_event_listener(events.mouse_off_group, _func);
 				return self;
 			}
-			
 			#endregion
-			
-			events.interact    = variable_get_hash("interact"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			static on_interact = function(_func) {
-				add_event_listener(events.interact, _func);
-				return self;
-			}
 			
 			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
@@ -356,10 +432,101 @@ function WWCore() constructor {
 			
 		#endregion
 		
+		#region Focus & Navigation
+            
+            /// @func    navigate_focus()
+            /// @desc    Attempts to shift focus in the given _dir ('next', 'prev', 'up', 'down', etc.)
+            ///          This simple algorithm checks the parent’s children list and, if needed, escalates upward.
+            /// @param   {String} _dir : The navigation _dir.
+            /// @returns {Struct.WWCore} The component that received focus, or self if none found.
+            static navigate_focus = function(_dir) {
+                // If no parent, we cannot navigate away.
+                if (__parent__ == noone) {
+                    return self;
+                }
+                
+                var siblings = __parent__.get_children();
+                var currentIndex = __find_index_in_parent__();
+                var target = undefined;
+                
+                // For simplicity, treat "next", "right", and "down" the same; similarly "prev", "left", "up"
+                if (_dir == "next" || _dir == "right" || _dir == "down") {
+                    var i = currentIndex + 1;
+                    while (i < array_length(siblings)) {
+                        if (siblings[i].is_focusable && siblings[i].is_enabled) {
+                            target = siblings[i];
+                            break;
+                        }
+                        i++;
+                    }
+                }
+                else if (_dir == "prev" || _dir == "left" || _dir == "up") {
+                    var i = currentIndex - 1;
+                    while (i >= 0) {
+                        if (siblings[i].is_focusable && siblings[i].is_enabled) {
+                            target = siblings[i];
+                            break;
+                        }
+                        i--;
+                    }
+                }
+                
+                // If no suitable sibling found, optionally escalate up the parent chain.
+                if (target == undefined && __parent__ != noone) {
+                    target = __parent__.navigate_focus(_dir);
+                }
+                
+                // If found, remove focus from self and assign to the target.
+                if (target != undefined && target != self) {
+                    set_focus(false);
+                    target.set_focus(true);
+                }
+                return target != undefined ? target : self;
+            }
+			
+            /// @func    handle_keyboard_navigation()
+            /// @desc    Checks for tab or arrow key presses and navigates focus accordingly.
+            ///          When tab is pressed, if shift is down, it navigates in reverse.
+            /// @param   {Struct} _input : The input struct (should contain keyboard state).
+            static handle_keyboard_navigation = function(_input) {
+                // Example pseudo-code for key checking; replace with your own input functions.
+                if (keyboard_check_pressed(vk_tab)) {
+                    if (keyboard_check(vk_shift)) {
+                        navigate_focus("prev");
+                    }
+                    else {
+                        navigate_focus("next");
+                    }
+                    _input.consumed = true;
+                }
+                if (keyboard_check_pressed(vk_left)) {
+                    navigate_focus("left");
+                    _input.consumed = true;
+                }
+                if (keyboard_check_pressed(vk_right)) {
+                    navigate_focus("right");
+                    _input.consumed = true;
+                }
+                if (keyboard_check_pressed(vk_up)) {
+                    navigate_focus("up");
+                    _input.consumed = true;
+                }
+                if (keyboard_check_pressed(vk_down)) {
+                    navigate_focus("down");
+                    _input.consumed = true;
+                }
+            }
+			
+        #endregion
+		
 		#region Variables
+			
+			is_focusable = false; // Mark this component as focusable (set to false if a component should never receive focus)
 			
 			is_enabled = true; //if the component is in a enabled/disabled state, typically if you want to grey out a button
 			is_active  = true; //is the component's code is being executed
+			
+			debug_enabled = false;
 			
 			halign = fa_left;
 			valign = fa_top;
@@ -406,7 +573,7 @@ function WWCore() constructor {
 			#endregion
 			
 		#endregion
-	
+		
 		#region Functions
 			
 			#region Event Functions
@@ -421,17 +588,43 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static trigger_event = function(_event_id, _data=undefined) {
-				var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id)
-				if (_event_arr != undefined) {
-					var _size = array_length(_event_arr);
-					
-					var _i=0; repeat(_size) {
-						var _struct = _event_arr[_i];
-						_struct.func(_data);
-					_i+=1;}//end repeat loop
-				}
+			    static __depth = 0;
+			    static __queue = [];
 				
-			}
+			    if (debug_enabled) {
+			        log("Trigger: " + self.event_name(_event_id), __depth);
+			    }
+				
+			    // If we're in the middle of an event chain, queue this trigger rather than running it immediately.
+			    if (__depth > 0) {
+			        array_push(__queue, { event: _event_id, data: _data });
+			        return;
+			    }
+				
+			    __depth++;
+				
+			    var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id);
+			    if (_event_arr != undefined) {
+			        var _size = array_length(_event_arr);
+			        var _i = 0;
+			        repeat(_size) {
+			            var _struct = _event_arr[_i];
+			            _struct.func(_data);
+			            _i += 1;
+			        }
+			    }
+				
+			    __depth--;
+				
+			    // If we're back at the root, process any queued events.
+			    if (__depth == 0 && array_length(__queue) > 0) {
+			        while (array_length(__queue) > 0) {
+			            var queued = array_shift(__queue); // Remove the first queued event.
+			            self.trigger_event(queued.event, queued.data);
+			        }
+			    }
+			};
+			
 			#region jsDoc
 			/// @func    add_event_listener()
 			/// @desc    Add an event listener to the component,
@@ -661,13 +854,6 @@ function WWCore() constructor {
 					y+height
 				)
 				
-				if (__mouse_on_comp__) {
-					trigger_event(self.events.mouse_over);
-				}
-				else {
-					trigger_event(self.events.mouse_off);
-				}
-				
 				return __mouse_on_comp__;
 			}
 			#region jsDoc
@@ -683,9 +869,6 @@ function WWCore() constructor {
 					if (!__parent__.__mouse_on_group__) {
 						return false;
 					}
-					if (__parent__.__mouse_on_comp__) {
-						return false;
-					}
 				}
 				
 				__mouse_on_group__ = point_in_rectangle(
@@ -696,13 +879,6 @@ function WWCore() constructor {
 						x+__group__.width,
 						y+__group__.height
 				);
-				
-				if (__mouse_on_group__) {
-					trigger_event(self.events.mouse_over_group);
-				}
-				else {
-					trigger_event(self.events.mouse_off_group);
-				}
 				
 				return __mouse_on_group__;
 			}
@@ -971,6 +1147,7 @@ function WWCore() constructor {
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group();
 				
+				//if is_focusable
 				if (background_color_set) {
 					draw_sprite_stretched_ext(
 						s9GUIPixel,
@@ -984,6 +1161,7 @@ function WWCore() constructor {
 					);
 				}
 				
+				//if is_focusable
 				trigger_event(self.events.pre_draw, _input);
 				
 				//run the children
@@ -993,7 +1171,7 @@ function WWCore() constructor {
 					_comp.draw(_input, _debug);
 				_i+=1;}//end repeat loop
 				
-				if (_debug) {
+				if (_debug || debug_enabled) {
 					draw_set_alpha(0.2)
 					#region Comp Region
 					draw_set_color(c_red)
@@ -1077,7 +1255,6 @@ function WWCore() constructor {
 			__comp_id__ = __GLOBAL_ID__++; // used to make sure we dont re add the same component to a controller
 			__previous_scissor__ = undefined;
 			
-			
 			#region Event Variables
 			__event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
 			__event_listener_uid__ = 0; // a unique identifier for event listeners
@@ -1092,8 +1269,8 @@ function WWCore() constructor {
 			__click_held_timer__ = 0;
 			__last_click_time__  = 0;
 			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
-			__is_focused__ = false; // is currently the component capturing the input
-			
+			__is_focused__ = false; // is currently the component capturing the input, and accepting keyboard inputs
+			__is_hovered__ = false; // is currently consuming the input through depth order (the mouse projected down onto this component, instead of others)
 			#endregion
 			#region Sub Component Variables
 			__is_empty__ = true;
@@ -1113,111 +1290,90 @@ function WWCore() constructor {
 		
 		#region Functions
 			#region Input Priv Functions
-			#region jsDoc
-			/// @func    __reset_focus__()
-			/// @desc    Resets the component from being currently interacted with
-			/// @self    WWCore
-			/// @returns {undefined}
-			/// @ignore
-			#endregion
-			static __reset_focus__ = function() {
-				if (__is_interacting__) {
-					__is_interacting__ = false;
-					trigger_event(self.events.blur);
-				}
-			}
-			
-			#region jsDoc
-			/// @func    __handle_interaction__()
-			/// @desc    Handles input interactions for buttons and sliders.
-			/// @self    WWCore
-			/// @param   {Struct.Input} _input : The input struct containing shared data.
-			/// @param   {Bool} _keep_focus : If true, retains focus even if the mouse moves off (for sliders).
-			/// @param   {Bool} _use_value : If true, passes `self.value` to the held/released events (for sliders).
-			#endregion
-			static __handle_interaction__ = function(_input) {
-				// Early exit if disabled
-			    if (is_enabled) {
-			        
-				    var _input_captured = _input.consumed;
-					var _mouse_on_comp = mouse_on_comp();
-					
-					
-					//handle focus/bluring
-					if (_mouse_on_comp) {
-						consume_input();
-						
-						if (!__is_focused__) {
-							__is_focused__ = true;
-							trigger_event(self.events.focus);
-						}
-						trigger_event(self.events.is_focused);
-					}
-					else {
-						if (__is_focused__) {
-							__is_focused__ = false;
-							trigger_event(self.events.blur);
-						}
-						trigger_event(self.events.is_blurred);
-					}
-					
-					
-					//handle input
-					if (!_input_captured) {
-						if (_mouse_on_comp) {
-							
-							if (mouse_check_button_pressed(mb_left)) {
-								if (current_time - __last_click_time__ < 1_000/3) {
-									trigger_event(self.events.double_click);
-								}
-								
-					            __is_interacting__ = true;
-								__last_click_time__ = current_time;
-					            __click_held_timer__ = current_time;
-					            trigger_event(self.events.pressed);
-					        }
-							
-							else if (__is_interacting__ && mouse_check_button(mb_left)) {
-					            trigger_event(self.events.held);
-						
-					            // Handle long press timing
-					            __click_held_timer__ += 1;
-					            if (current_time-__click_held_timer__ > 1_000/3) {
-					                trigger_event(self.events.long_press);
-					            }
-					        }
-							
-							else if (__is_interacting__ && mouse_check_button_released(mb_left)) {
-					            __reset_focus__();
-					            trigger_event(self.events.released);
-					        }
-						}
-						else {
-							if (__is_interacting__ && mouse_check_button_released(mb_left)) {
-					            __reset_focus__();
-					        }
-						}
-					}
-					else {
-						if (__is_interacting__ && mouse_check_button_released(mb_left)) {
-				            __reset_focus__();
-				        }
-					}
-				}
-				else {
-					if (__is_interacting__) {
-			            __reset_focus__();
-			        }
+			on_post_step(function(){
+				if (!is_enabled) {
+					return;
 				}
 				
-				if (__is_interacting__) {
-					trigger_event(self.events.interact);
+				var _mouse_on_group = mouse_on_group();
+				if (_mouse_on_group) {
+					trigger_event(self.events.mouse_over_group);
 				}
-			}
-			
-			#endregion
-			#region Event Priv Functions
-			
+				else {
+					trigger_event(self.events.mouse_off_group);
+				}
+				
+				var _mouse_on = mouse_on_comp();
+				if (_mouse_on) {
+					trigger_event(self.events.mouse_over);
+				}
+				else {
+					trigger_event(self.events.mouse_off);
+				}
+				
+				if (__is_hovered__) trigger_event(self.events.hover);
+				if (__is_focused__) trigger_event(self.events.focus);
+				if (__is_interacting__) trigger_event(self.events.interact);
+			})
+			on_mouse_over(function(){
+				if (!is_enabled) {
+					return;
+				}
+				
+				var _input_captured = __user_input__.consumed;
+				set_hover(!_input_captured);
+			})
+			on_mouse_off(function(){
+				set_hover(false);
+			})
+			on_hover(function(){
+				if (!is_enabled || !is_focusable) {
+					return;
+				}
+				
+				consume_input();
+				
+				if (mouse_check_button_pressed(mb_left)) {
+					trigger_event(self.events.pressed);
+				}
+				
+			})
+			on_pressed(function(){
+				var _double_trigger = false;
+				if (current_time - __last_click_time__ < 1_000/3) {
+					_double_trigger = true;
+				}
+				
+				set_interact(true);
+				__last_click_time__ = current_time;
+				__click_held_timer__ = current_time;
+				
+				if (_double_trigger) trigger_event(self.events.double_click);
+			})
+			on_interact_enter(function(){
+				if (!is_enabled || !is_focusable) {
+					return;
+				}
+				
+				set_focus(true);
+			})
+			on_interact(function(_input) {
+				if (mouse_check_button(mb_left)) {
+				    trigger_event(self.events.held);
+						
+				    // Handle long press timing
+				    __click_held_timer__ += 1;
+				    if (current_time-__click_held_timer__ > 1_000/3) {
+				        trigger_event(self.events.long_press);
+				    }
+				}
+				
+				else if (mouse_check_button_released(mb_left)) {
+				    set_interact(false);
+				    trigger_event(self.events.released);
+				}
+					
+			})
 			#endregion
 			#region Sub Component Priv Functions
 			#region jsDoc
@@ -1551,3 +1707,7 @@ function WWCore() constructor {
 	#endregion
 	
 }
+
+
+
+

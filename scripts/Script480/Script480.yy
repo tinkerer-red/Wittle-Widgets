@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Script480",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Script480",
+  "parent":{
+    "name":"Reds_GUI",
+    "path":"Reds_GUI.yyp",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

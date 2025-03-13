@@ -225,6 +225,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			
 			draw_set_font(fGUIDefault)
 			
+			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
+			
 			owner = other;
 			
 			copy_function  = undefined; //these get set after private variables function are defined
@@ -850,7 +852,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					repeat (1) {
 						
 						#region escape
-				
+							
 							if (keyboard_check_pressed(keys.escape))
 							|| (!curt.multiline && keyboard_check_pressed(keys.enter))
 							|| (!curt.shift_only_new_line && curt.no_wrap && keyboard_check_pressed(keys.enter))
@@ -865,7 +867,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								__trigger_event__(self.events.on_blur);
 								break;
 							}
-
+							
 						#endregion
 						
 						#region break line
@@ -1143,7 +1145,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										else {
 											js_clipboard_set_text(_text);
 										}
-							
+										
 										__textbox_delete_string__(false);
 										__update_scroll__();
 									}

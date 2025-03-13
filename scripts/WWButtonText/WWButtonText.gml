@@ -103,11 +103,18 @@ function WWButtonText() : WWButtonSprite() constructor {
 		#region Events
 			
 			on_held(function(_input) {
-				text_component.__set_offset__(text.x_offset, text.click_yoff);
+				if (__is_hovered__) {
+					text_component.__set_offset__(text.x_offset, text.click_yoff);
+				}
+				//else {
+				//	text_component.__set_offset__(text.x_offset, text.y_offset);
+				//}
 			})
-			on_blur(function(_input) {
+			var _func = function(_input) {
 				text_component.__set_offset__(text.x_offset, text.y_offset);
-			})
+			}
+			on_hover_exit(_func)
+			on_released(_func)
 			
 		#endregion
 		

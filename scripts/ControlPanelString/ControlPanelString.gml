@@ -246,7 +246,7 @@ function ControlPanelString(_label="<Missing Label>", _str, _func) : GUICompCont
 				//set the focus to the textbox
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
-						__is_interacting__ = true;
+						set_interact(true);
 						trigger_event(self.events.focus);
 						
 						var _line_last = curt.length - 1;

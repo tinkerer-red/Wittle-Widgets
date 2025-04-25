@@ -6,7 +6,7 @@
   "name":"scribble_super_glyph_copy_all",
   "parent":{
     "name":"Superfonts",
-    "path":"folders/_Libraries/Scribble/Superfonts.yy",
+    "path":"folders/Scribble/Superfonts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

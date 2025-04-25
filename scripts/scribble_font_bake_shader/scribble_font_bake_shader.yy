@@ -6,7 +6,7 @@
   "name":"scribble_font_bake_shader",
   "parent":{
     "name":"Fonts",
-    "path":"folders/_Libraries/Scribble/Fonts.yy",
+    "path":"folders/Scribble/Fonts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

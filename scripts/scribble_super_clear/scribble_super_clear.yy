@@ -6,7 +6,7 @@
   "name":"scribble_super_clear",
   "parent":{
     "name":"Superfonts",
-    "path":"folders/_Libraries/Scribble/Superfonts.yy",
+    "path":"folders/Scribble/Superfonts.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

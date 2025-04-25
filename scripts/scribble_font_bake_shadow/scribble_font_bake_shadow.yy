@@ -6,7 +6,7 @@
   "name":"scribble_font_bake_shadow",
   "parent":{
     "name":"Legacy",
-    "path":"folders/_Libraries/Scribble/Legacy.yy",
+    "path":"folders/Scribble/Legacy.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

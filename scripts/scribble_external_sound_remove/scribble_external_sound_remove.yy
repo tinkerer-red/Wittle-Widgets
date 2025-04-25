@@ -6,7 +6,7 @@
   "name":"scribble_external_sound_remove",
   "parent":{
     "name":"External Assets",
-    "path":"folders/_Libraries/Scribble/External Assets.yy",
+    "path":"folders/Scribble/External Assets.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

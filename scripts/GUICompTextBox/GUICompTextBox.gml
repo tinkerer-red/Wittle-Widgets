@@ -259,7 +259,6 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				view : false,									// view;
 				multiline : true,							// multiline; if the text field is a multiline text field
 				length : 1,										// length
-				placeholder : "",							// placeholder; when there is no text in the field what should be written
 				current_line : 0,							// current line; the current line number the cursor is on
 				cursor : 0,										// cursor; what char pos is the cursor at
 				select : -1,									// select; if a region is being highlighted
@@ -610,7 +609,15 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					
 								//if we clicked on the box
 								if (_mouse_on_comp) {
-									keyboard_string = "";
+									//keyboard_string = "";
+									InputTextRequestSetParams(INPUT_VERB.PAUSE, INPUT_VERB.ACTION);
+									InputTextRequest("<missing caption>", __textbox_return__(), 32, function() {
+										//if on console, just directly use that text from the pop up model keyboard
+										if (INPUT_ON_CONSOLE) {
+											text.content = InputTextRequestGetString();
+										}
+									})
+									
 									__textbox_check_minput__(keyboard_check(keys.shift));
 									curt.button_repeat = 5;
 								}
@@ -710,7 +717,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										}
 										
 										//html5 support
-										keyboard_string = "";
+										//keyboard_string = "";
 										
 										keys.last_key = keys.c;
 					
@@ -739,7 +746,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										set_cursor_x_pos(__textbox_check_vinput__(-_lines_shown));
 								
 										//html5 support
-										keyboard_string = "";
+										//keyboard_string = "";
 									
 										keys.last_key = keys.page_up;
 								
@@ -763,7 +770,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 										set_cursor_x_pos(__textbox_check_vinput__(_lines_shown));
 									
 										//html5 support
-										keyboard_string = "";
+										//keyboard_string = "";
 									
 										keys.last_key = keys.page_down;
 								
@@ -791,7 +798,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											set_cursor_y_pos(curt.current_line - _lines_shown)
 									
 											//html5 support
-											keyboard_string = "";
+											//keyboard_string = "";
 										
 											keys.last_key = keys.page_up;
 									
@@ -819,7 +826,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 											set_cursor_y_pos(curt.current_line + _lines_shown)
 									
 											//html5 support
-											keyboard_string = "";
+											//keyboard_string = "";
 										
 											keys.last_key = keys.page_down;
 									
@@ -1080,8 +1087,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								// Keyboard repeat stuff
 								if (keys.last_key != undefined) {
 									if (keyboard_check(keys.last_key)) {
+										//ToDo:: update this to make use of `get_timer()` or `current_time`
 										keys.last_key_time += 1;
-									
+										
 										if (keys.last_key_time > game_get_speed(gamespeed_fps)/3)
 										&& (keys.last_key_time % floor(game_get_speed(gamespeed_fps)/30) == 0) { // simulate another keypress to do key repeat
 											keyboard_key_release(keys.last_key);
@@ -1091,7 +1099,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									else {
 										keys.last_key_time = 0;	
 										keys.last_key = undefined;
-										keyboard_string = "";
+										//keyboard_string = "";
 									}
 								}
 		
@@ -1108,7 +1116,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 							
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.a;
 									
@@ -1128,7 +1136,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 			
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.c;
 									
@@ -1151,7 +1159,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 									
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.x;
 									
@@ -1171,7 +1179,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 			
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.v;
 									
@@ -1191,7 +1199,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 			
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.z;
 									
@@ -1211,7 +1219,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									}
 			
 									//html5 support
-									keyboard_string = "";
+									//keyboard_string = "";
 									
 									keys.last_key = keys.y;
 									
@@ -1269,10 +1277,11 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						
 						#region get string
 					
-							var _keyboard_string = keyboard_string;
+							//var _keyboard_string = keyboard_string;
+							var _keyboard_string = InputTextDelta();
 							if (_keyboard_string != "") {
-								keyboard_string = "";
-					
+								//keyboard_string = "";
+								
 								__textbox_insert_string__(_keyboard_string);
 								
 								if (__event_exists__(self.events.change)) {
@@ -1290,9 +1299,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				}
 				
 				static __draw_gui__ = function(_input) { static __run_once__ = trace(["__draw_gui__", __draw_gui__]);
-				
+					
 					draw_gui(_input);
-				
+					
 					draw_sprite_stretched_ext(
 							s9GUIPixel,
 							0,
@@ -1359,7 +1368,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							if (_line_count == 1 && _arr_lines[0] == "") {
 								//draw the place holder text
 								draw_set_alpha(0.6);
-								draw_text(_draw_x-_x_off, _draw_y-_center_y, curt.placeholder);
+								draw_text(_draw_x-_x_off, _draw_y-_center_y, text.caption);
 								draw_set_alpha(1);
 							}
 							else {
@@ -1499,6 +1508,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					}
 					
 					draw_debug();
+					
+					draw_text(x, y, $"__is_on_focus__ = {__is_on_focus__}\ncurt.focus = {curt.focus}")
 				}
 				
 			#endregion

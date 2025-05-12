@@ -42,6 +42,20 @@ function WWTextBase() : WWCore() constructor {
 					return self;
 				}
 				#region jsDoc
+				/// @func	set_caption()
+				/// @desc	Sets the text displayed when the text feild is empty. This text is not selectable or editable by the user. Will also effect how consoles display a header for the on screen keyboard
+				/// @self	WWTextBase
+				/// @param   {String} _text : The caption text to display.
+				/// @returns {Struct.WWTextBase}
+				#endregion
+				static set_caption = function(_text = "") {
+					if (text.caption == _text) return self;
+					
+					if (text.content == "") __refresh_surf__ = true;
+					
+					return self;
+				}
+				#region jsDoc
 				/// @func	set_text_font()
 				/// @desc	Sets the font used for rendering text.
 				/// @self	WWTextBase
@@ -284,9 +298,9 @@ function WWTextBase() : WWCore() constructor {
 				add_event_listener(events.select, _func);
 				return self;
 			}
-			events.copy    = variable_get_hash("change"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
-			static on_change = function(_func) {
-				add_event_listener(events.change, _func);
+			events.copy    = variable_get_hash("copy"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			static on_copy = function(_func) {
+				add_event_listener(events.copy, _func);
 				return self;
 			}
 			events.paste    = variable_get_hash("paste"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
@@ -352,6 +366,7 @@ function WWTextBase() : WWCore() constructor {
 			});
 			
 			on_focus(function(_input) {
+				/*
 			    #region --- Navigation Controls: Arrow Keys ---
 			    // Left arrow
 			    if (keyboard_check_pressed(vk_left)) {
@@ -440,30 +455,9 @@ function WWTextBase() : WWCore() constructor {
 			        }
 			    }
 			    #endregion
-			    #region --- Clipboard Commands ---
-			    if (keyboard_check(vk_control) && keyboard_check_pressed(ord("C"))) {
-			        // Copy the currently selected text.
-			        copy_selection_to_clipboard();
-			    }
-			    #endregion
-			    #region --- Additional Navigation Shortcut: Ctrl + A ---
-			    if (keyboard_check(vk_control) && keyboard_check_pressed(ord("A"))) {
-			        // Select all text in the component.
-			        select_all_text();
-			    }
-			    #endregion
-			    #region --- Additional Shortcut: Ctrl + F (Optional) ---
-			    if (keyboard_check(vk_control) && keyboard_check_pressed(ord("F"))) {
-			        // Trigger a search dialog or search functionality.
-			        //trigger_search_dialog();
-			    }
-			    #endregion
-			    #region --- Focus and Scrolling Adjustments: Auto-Scroll on Selection ---
-			    // After processing navigation/selection, ensure the cursor remains visible.
-			    //update_cursor_and_scroll();
-				#endregion
+				//*/
+			    hotkey_manager.step()
 			});
-
 			
 			// Pre-draw event handler.
 			on_pre_draw(function(_input) {
@@ -488,6 +482,238 @@ function WWTextBase() : WWCore() constructor {
 				}
 			});
 			
+			
+			
+			hotkey_manager = new WWHotkeyManager();
+			
+			// Register various key sequences
+			#region Navigation — Arrows, Home/End, Page Up/Down
+			
+			#region No modifier
+			
+			var _arrow_key_handler = function() {
+				var _shift = keyboard_check(vk_shift);
+				var _ctrl = keyboard_check(vk_control);
+				// Left arrow
+				if (keyboard_check_pressed(vk_left)) {
+			        __move_cursor_offset__(-1, _shift, false, _ctrl);
+			    }
+			    // Right arrow
+			    if (keyboard_check_pressed(vk_right)) {
+			        __move_cursor_offset__(1, _shift, false, _ctrl);
+			    }
+			    // Up arrow
+			    if (keyboard_check_pressed(vk_up)) {
+			        __move_cursor_offset__(-1, _shift, true, _ctrl);
+			    }
+			    // Down arrow
+			    if (keyboard_check_pressed(vk_down)) {
+			        __move_cursor_offset__(1, _shift, true, _ctrl);
+			    }
+			}
+			hotkey_manager.register([vk_left], _arrow_key_handler);
+			hotkey_manager.register([vk_right], _arrow_key_handler);
+			hotkey_manager.register([vk_up], _arrow_key_handler);
+			hotkey_manager.register([vk_down], _arrow_key_handler);
+			
+			hotkey_manager.register([vk_home], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				set_cursor_x_pos(0);
+				highlight_selected = false;
+				cursor_last_width = get_string_width_to_cursor_pos(cursor_y_pos, cursor_x_pos);
+			});
+			hotkey_manager.register([vk_end], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				var _lineText = __lines__[cursor_y_pos];
+				var _endPos = __string_length(_lineText);
+				set_cursor_x_pos(_endPos);
+				highlight_selected = false;
+				cursor_last_width = get_string_width_to_cursor_pos(cursor_y_pos, cursor_x_pos);
+			});
+			
+			hotkey_manager.register([vk_pageup], function() {
+				var _newLine = max(0, cursor_y_pos - 5);
+				highlight_selected = false;
+				set_cursor_y_pos(_newLine);
+			});
+			hotkey_manager.register([vk_pagedown], function() {
+				var _maxLine = array_length(__lines__) - 1;
+				var _newLine = min(_maxLine, cursor_y_pos + 5);
+				highlight_selected = false;
+				set_cursor_y_pos(_newLine);
+			});
+			#endregion
+			
+			#region Ctrl Modifier
+			hotkey_manager.register([vk_control, vk_left], function() {
+				__move_cursor_offset__(-1, false, false, true);
+			});
+			hotkey_manager.register([vk_control, vk_right], function() {
+				__move_cursor_offset__(1, false, false, true);
+			});
+			hotkey_manager.register([vk_control, vk_up], function() {
+				__move_cursor_offset__(-1, false, true, true);
+			});
+			hotkey_manager.register([vk_control, vk_down], function() {
+				__move_cursor_offset__(1, false, true, true);
+			});
+
+			hotkey_manager.register([vk_control, vk_home], function() {
+				set_cursor_y_pos(0);
+				set_cursor_x_pos(0);
+				highlight_selected = false;
+			});
+			hotkey_manager.register([vk_control, vk_end], function() {
+				set_cursor_y_pos(array_length(__lines__) - 1);
+				var _lineText = __lines__[cursor_y_pos];
+				var _endPos = __string_length(_lineText);
+				set_cursor_x_pos(_endPos);
+				highlight_selected = false;
+			});
+			#endregion
+			
+			#region Shift Modifier
+			hotkey_manager.register([vk_shift, vk_left], function() {
+				__move_cursor_offset__(-1, true, false, false);
+			});
+			hotkey_manager.register([vk_shift, vk_right], function() {
+				__move_cursor_offset__(1, true, false, false);
+			});
+			hotkey_manager.register([vk_shift, vk_up], function() {
+				__move_cursor_offset__(-1, true, true, false);
+			});
+			hotkey_manager.register([vk_shift, vk_down], function() {
+				__move_cursor_offset__(1, true, true, false);
+			});
+
+			hotkey_manager.register([vk_shift, vk_home], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				set_cursor_x_pos(0);
+				cursor_last_width = get_string_width_to_cursor_pos(cursor_y_pos, cursor_x_pos);
+			});
+			hotkey_manager.register([vk_shift, vk_end], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				var _lineText = __lines__[cursor_y_pos];
+				var _endPos = __string_length(_lineText);
+				set_cursor_x_pos(_endPos);
+				cursor_last_width = get_string_width_to_cursor_pos(cursor_y_pos, cursor_x_pos);
+			});
+			hotkey_manager.register([vk_shift, vk_pageup], function() {
+				var _newLine = max(0, cursor_y_pos - 5);
+				set_cursor_y_pos(_newLine);
+			});
+			hotkey_manager.register([vk_shift, vk_pagedown], function() {
+				var _maxLine = array_length(__lines__) - 1;
+				var _newLine = min(_maxLine, cursor_y_pos + 5);
+				set_cursor_y_pos(_newLine);
+			});
+			#endregion
+			
+			#region Ctrl + Shift Modifier
+			hotkey_manager.register([vk_control, vk_shift, vk_left], function() {
+				__move_cursor_offset__(-1, true, false, true);
+			});
+			hotkey_manager.register([vk_control, vk_shift, vk_right], function() {
+				__move_cursor_offset__(1, true, false, true);
+			});
+			hotkey_manager.register([vk_control, vk_shift, vk_up], function() {
+				__move_cursor_offset__(-1, true, true, true);
+			});
+			hotkey_manager.register([vk_control, vk_shift, vk_down], function() {
+				__move_cursor_offset__(1, true, true, true);
+			});
+			hotkey_manager.register([vk_control, vk_shift, vk_home], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				set_cursor_y_pos(0);
+				set_cursor_x_pos(0);
+			});
+			hotkey_manager.register([vk_control, vk_shift, vk_end], function() {
+				if (!highlight_selected) {
+					highlight_x_pos = cursor_x_pos;
+					highlight_y_pos = cursor_y_pos;
+					highlight_selected = true;
+				}
+				set_cursor_y_pos(array_length(__lines__) - 1);
+				var _lineText = __lines__[cursor_y_pos];
+				var _endPos = __string_length(_lineText);
+				set_cursor_x_pos(_endPos);
+			});
+			#endregion
+			
+			#endregion
+			
+			#region Deletion — Backspace, Delete, Ctrl+Delete
+			#region No modifier
+			hotkey_manager.register([vk_backspace], function() { /* Delete character before cursor */ });
+			hotkey_manager.register([vk_delete],    function() { /* Delete character after cursor */ });
+			#endregion
+			
+			#region Ctrl Modifier
+			hotkey_manager.register([vk_control, vk_backspace], function() { /* Delete previous word */ });
+			hotkey_manager.register([vk_control, vk_delete],    function() { /* Delete next word */ });
+			#endregion
+			
+			#region Ctrl + Shift Modifier
+			hotkey_manager.register([vk_control, vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+			#endregion
+			#endregion
+			
+			#region Clipboard & Edit Commands — Ctrl Combos
+			hotkey_manager.register([vk_control, ord("A")], function() {
+				select_all_text();
+			});
+			hotkey_manager.register([vk_control, ord("C")], function() {
+				copy_selection_to_clipboard();
+			});
+			hotkey_manager.register([vk_control, ord("V")], function() { /* Paste */ });
+			hotkey_manager.register([vk_control, ord("X")], function() { /* Cut */ });
+			
+			hotkey_manager.register([vk_control, ord("Z")], function() { /* Undo */ });
+			hotkey_manager.register([vk_control, ord("Y")], function() { /* Redo */ });
+			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { /* Redo (alternate) */ });
+			#endregion
+			
+			#region Control & Submission
+			hotkey_manager.register([vk_enter], function() { /* Submit or insert new line */ });
+			hotkey_manager.register([vk_shift, vk_enter], function() { /* Insert new line (force multiline) */ });
+			hotkey_manager.register([vk_control, vk_enter], function() { /* Optional: Submit (e.g., Ctrl+Enter) */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_enter], function() { /* Optional: Multiline submit override */ });
+			
+			hotkey_manager.register([vk_escape], function() { /* Cancel or unfocus */ });
+			#endregion
+			
+			#region Tab / Focus & Indent Control
+			hotkey_manager.register([vk_tab], function() { /* Indent or move to next focus */ });
+			hotkey_manager.register([vk_shift, vk_tab], function() { /* Unindent or move to previous focus */ });
+			hotkey_manager.register([vk_control, vk_tab], function() { /* Optional: Switch next panel/focus group */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_tab], function() { /* Optional: Switch previous panel/focus group */ });
+			#endregion
+			
+			hotkey_manager.build();
+			
+			
+			
         #endregion
         
         #region Variables
@@ -496,6 +722,7 @@ function WWTextBase() : WWCore() constructor {
 			
 			text = {
 				content : "", // The main text string displayed or edited in the component.
+				caption : "", // The text string displayed by default when field is empty, will also effect how consoles display a header for the on screen keyboard.
 				font : fGUIDefault, // The font asset used for rendering text.
 				alpha : 1, 
 				color : c_white, // The color used to draw the text.
@@ -816,7 +1043,7 @@ function WWTextBase() : WWCore() constructor {
 			    surface_set_target(__my_surface__);
 				
 			    // Clear the surface (with background color and 0 alpha if needed).
-			    draw_clear_alpha(background_color, 0);
+			    draw_clear_alpha(c_black, 0);
 				
 			    // Draw selection highlight and text to the surface.
 			    __draw_highlight_selection__(0, 0);
@@ -2161,19 +2388,11 @@ function WWTextInputMulti() : WWTextBase() constructor {
     
     #region Public
         #region Variables
-            // Maintain an array of lines for multi-line editing.
-            lines = [];
+            
         #endregion
         
         #region Functions
-            static set_text = function(_text) {
-                // Split text into lines.
-                lines = string_split(_text, "\n");
-                textContent = _text;
-                self.render_text();
-                return self;
-            }
-            
+			
             static render_text = function() {
                 var currentY = y;
                 for (var i = 0; i < array_length(lines); i++) {
@@ -2262,15 +2481,19 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func	set_placeholder_text()
-			/// @desc	Sets the placeholder text that is displayed when no user input exists.
+			/// @func	set_caption()
+			/// @desc	Sets the caption; aka: "placeholder" text, that is displayed when no user input exists.
 			///		 This text is not selectable; for selectable text, use set_text().
+			///		 This will also effect how console's display the keyboard.
 			/// @self	WWTextBase
-			/// @param   {String} _placeholder : The placeholder text.
+			/// @param   {String} _text : The caption/placeholder text.
 			/// @returns {Struct.WWTextBase}
 			#endregion
-			static set_placeholder_text = function(_placeholder = "Enter Text") {
-				placeholder_text = _placeholder;
+			static set_caption = function(_text = "") {
+				if (text.caption == _text) return self;
+					
+				if (text.content == "") __refresh_surf__ = true;
+					
 				return self;
 			}
 			#region jsDoc

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"InputPlayerHasDeviceCount",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"InputPlayerHasDeviceCount",
+  "parent":{
+    "name":"Player",
+    "path":"folders/_Libraries/Input/Player.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

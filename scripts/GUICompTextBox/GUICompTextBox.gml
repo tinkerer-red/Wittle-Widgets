@@ -1558,7 +1558,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								buffer_write(buff, buffer_text, _char);
 							}
 						}));
-					
+						buffer_write(buff, buffer_u8, 0); //write null op
+						
 						buffer_seek(_buff, buffer_seek_start, 0)
 						var _new_text = buffer_read(_buff, buffer_string)
 					

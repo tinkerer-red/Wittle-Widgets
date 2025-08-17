@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TextboxTempDesign",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TextboxTempDesign",
+  "parent":{
+    "name":"Reds_GUI",
+    "path":"Reds_GUI.yyp",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

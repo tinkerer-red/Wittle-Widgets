@@ -482,8 +482,6 @@ function WWTextBase() : WWCore() constructor {
 				}
 			});
 			
-			
-			
 			hotkey_manager = new WWHotkeyManager();
 			
 			// Register various key sequences
@@ -686,12 +684,12 @@ function WWTextBase() : WWCore() constructor {
 			hotkey_manager.register([vk_control, ord("C")], function() {
 				copy_selection_to_clipboard();
 			});
-			hotkey_manager.register([vk_control, ord("V")], function() { /* Paste */ });
-			hotkey_manager.register([vk_control, ord("X")], function() { /* Cut */ });
+			//hotkey_manager.register([vk_control, ord("V")], function() { /* Paste */ });
+			//hotkey_manager.register([vk_control, ord("X")], function() { /* Cut */ });
 			
-			hotkey_manager.register([vk_control, ord("Z")], function() { /* Undo */ });
-			hotkey_manager.register([vk_control, ord("Y")], function() { /* Redo */ });
-			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { /* Redo (alternate) */ });
+			//hotkey_manager.register([vk_control, ord("Z")], function() { /* Undo */ });
+			//hotkey_manager.register([vk_control, ord("Y")], function() { /* Redo */ });
+			//hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { /* Redo (alternate) */ });
 			#endregion
 			
 			#region Control & Submission
@@ -711,8 +709,6 @@ function WWTextBase() : WWCore() constructor {
 			#endregion
 			
 			hotkey_manager.build();
-			
-			
 			
         #endregion
         
@@ -928,16 +924,10 @@ function WWTextBase() : WWCore() constructor {
 						var _end_x = max(cursor_x_pos, highlight_x_pos);
 						_text = __string_copy(_lines[cursor_y_pos], _start_x + 1, _end_x - _start_x);
 						
-						if (os_browser == browser_not_a_browser) {
-							clipboard_set_text(_text);
-						}
-						else {
-							js_clipboard_set_text(_text);
-						}
+						__clipboard_set_text__(_text);
 						
 						return _text;
 					}
-					
 					
 					// Determine start and end of selection.
 					var _start_y, _end_y, _start_x, _end_x;
@@ -970,12 +960,7 @@ function WWTextBase() : WWCore() constructor {
 					//cleanup array
 					array_resize(__temp_arr, 0);
 					
-					if (os_browser == browser_not_a_browser) {
-						clipboard_set_text(_text);
-					}
-					else {
-						js_clipboard_set_text(_text);
-					}
+					__clipboard_set_text__(_text);
 					
 					return _text;
 				}
@@ -2105,9 +2090,9 @@ function WWTextBase() : WWCore() constructor {
 							_current_line_index = _start_y;
 							_current_cursor_pos = _start_x;
 						}
-		
+						
 						highlight_selected = false;
-		
+						
 						// Update cursor and view, then exit.
 						set_cursor_y_pos(_current_line_index);
 						set_cursor_x_pos(_current_cursor_pos);
@@ -2115,10 +2100,10 @@ function WWTextBase() : WWCore() constructor {
 						__textbox_records_add__(_current_line_index, _current_cursor_pos);
 						return;
 					}
-	
+					
 					// No selection active – handle deletion of a single character.
 					var _current_str = __lines__[_current_line_index];
-	
+					
 					if (_is_del_key) {
 						// Forward deletion: delete the character after the cursor.
 						if (_current_cursor_pos == __string_length(_current_str)) {
@@ -2151,7 +2136,7 @@ function WWTextBase() : WWCore() constructor {
 							_current_cursor_pos -= 1;
 						}
 					}
-	
+					
 					// Update cursor positions and refresh the display.
 					set_cursor_y_pos(_current_line_index);
 					set_cursor_x_pos(_current_cursor_pos);
@@ -2240,6 +2225,46 @@ function WWTextBase() : WWCore() constructor {
 				    // Mark that a selection is active.
 				    highlight_selected = true;
 				};
+				
+				#region jsDoc
+			    /// @func    __clipboard_get_text__()
+			    /// @desc    Retrieves text from the clipboard for pasting into the input field.
+			    /// @self    WWTextInputSingle
+			    /// @returns {String}
+			    #endregion
+			    static __clipboard_get_text__ = function() {
+			        var _pasted_string = "";
+					
+			        if (os_browser == browser_not_a_browser) {
+			            if (clipboard_has_text()) {
+			                _pasted_string = clipboard_get_text();
+			            }
+			        } else {
+			            if (js_clipboard_has_text_()) {
+			                _pasted_string = js_clipboard_get_text();
+			            }
+			        }
+					
+			        return _pasted_string;
+			    }
+				
+				#region jsDoc
+			    /// @func    __clipboard_set_text__()
+			    /// @desc    Sets the clipboard text.
+			    /// @self    WWTextInputSingle
+			    /// @returns {String}
+			    #endregion
+			    static __clipboard_set_text__ = function(_str) {
+			        if (os_browser == browser_not_a_browser) {
+			            if (clipboard_has_text()) {
+			                clipboard_set_text(_str);
+			            }
+			        } else {
+			            if (js_clipboard_has_text_()) {
+			                js_clipboard_set_text(_str);
+			            }
+			        }
+			    }
 				
 			#endregion
 			
@@ -2406,7 +2431,89 @@ function WWTextInputMulti() : WWTextBase() constructor {
         
         #region Events
             // Handle key events for multi-line input similarly, with logic for newlines.
+			// Register various key sequences
+			#region Deletion — Backspace, Delete, Ctrl+Delete
+			#region No modifier
+			hotkey_manager.register([vk_backspace], function() {
+				/* Delete character before cursor */
+				__textbox_delete_string__(false);
+			});
+			hotkey_manager.register([vk_delete],    function() {
+				/* Delete character after cursor */
+				__textbox_delete_string__(true);
+			});
+			#endregion
+			
+			#region Ctrl Modifier
+			hotkey_manager.register([vk_control, vk_backspace], function() { /* Delete previous word */ });
+			hotkey_manager.register([vk_control, vk_delete],    function() { /* Delete next word */ });
+			#endregion
+			
+			#region Shift Modifier
+			hotkey_manager.register([vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
+			hotkey_manager.register([vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+			#endregion
+			
+			#region Ctrl + Shift Modifier
+			hotkey_manager.register([vk_control, vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+			#endregion
+			#endregion
+			
+			#region Clipboard & Edit Commands — Ctrl Combos
+			hotkey_manager.register([vk_control, ord("A")], function() {
+				select_all_text();
+			});
+			hotkey_manager.register([vk_control, ord("C")], function() {
+				copy_selection_to_clipboard();
+			});
+			hotkey_manager.register([vk_control, ord("V")], function() {
+				/* Paste */
+				__insert_string_at_cursor__(__clipboard_get_text__());
+			});
+			hotkey_manager.register([vk_control, ord("X")], function() {
+				/* Cut */
+				if (highlight_selected) {
+					copy_selection_to_clipboard();
+					__textbox_delete_string__(false);
+				}
+				
+			});
+			
+			hotkey_manager.register([vk_control, ord("Z")], function() {
+				/* Undo */
+				
+			});
+			hotkey_manager.register([vk_control, ord("Y")], function() {
+				/* Redo */
+				
+			});
+			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() {
+				/* Redo (alternate) */
+				
+			});
+			#endregion
+			
+			#region Control & Submission
+			hotkey_manager.register([vk_enter], function() { /* Submit or insert new line */ });
+			hotkey_manager.register([vk_shift, vk_enter], function() { /* Insert new line (force multiline) */ });
+			hotkey_manager.register([vk_control, vk_enter], function() { /* Optional: Submit (e.g., Ctrl+Enter) */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_enter], function() { /* Optional: Multiline submit override */ });
+			
+			hotkey_manager.register([vk_escape], function() { /* Cancel or unfocus */ });
+			#endregion
+			
+			#region Tab / Focus & Indent Control
+			hotkey_manager.register([vk_tab], function() { /* Indent or move to next focus */ });
+			hotkey_manager.register([vk_shift, vk_tab], function() { /* Unindent or move to previous focus */ });
+			hotkey_manager.register([vk_control, vk_tab], function() { /* Optional: Switch next panel/focus group */ });
+			hotkey_manager.register([vk_control, vk_shift, vk_tab], function() { /* Optional: Switch previous panel/focus group */ });
+			#endregion
+			
+			hotkey_manager.build();
+			
         #endregion
+		
     #endregion
 }
 
@@ -2608,28 +2715,6 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			    }
 				
 			    #region jsDoc
-			    /// @func    __textbox_paste_string__()
-			    /// @desc    Retrieves text from the clipboard for pasting into the input field.
-			    /// @self    WWTextInputSingle
-			    /// @returns {String}
-			    #endregion
-			    static __textbox_paste_string__ = function() {
-			        var _pasted_string = "";
-
-			        if (os_browser == browser_not_a_browser) {
-			            if (clipboard_has_text()) {
-			                _pasted_string = clipboard_get_text();
-			            }
-			        } else {
-			            if (js_clipboard_has_text_()) {
-			                _pasted_string = js_clipboard_get_text();
-			            }
-			        }
-
-			        return _pasted_string;
-			    }
-
-			    #region jsDoc
 			    /// @func    __textbox_break_line__()
 			    /// @desc    Inserts a new line at the cursor position.
 			    /// @self    WWTextInputSingle
@@ -2669,3 +2754,29 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 }
 
 
+function WWTextBoxRegionManVanilla() constructor {
+    regions       = [];       // List of WWTextBoxRegion
+
+    static detect_region = function() {
+		// returns undefined or a single region
+	};
+	
+	static set_regions = function() {
+		clear_regions()
+		// sets all regions
+	};
+	
+	static clear_regions = function() {
+		// clears all existing regions
+	};
+	
+	static draw_regions = function() {
+		// draws all regions
+	};
+	
+};
+
+function WWTextBoxRegion() constructor {
+	pos_start = -1;
+	pos_end = -1;
+}

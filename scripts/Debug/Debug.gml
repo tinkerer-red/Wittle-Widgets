@@ -131,3 +131,6 @@ function __log_pre(_file, _func, _line) {
     __log.__line = _line;
 	return 1;
 }
+
+#macro DEBUG_SPEED_INIT ___time = get_timer()
+#macro DEBUG_SPEED_GET show_debug_message($"{(get_timer()-___time)/1000}ms")

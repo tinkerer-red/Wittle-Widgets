@@ -16,15 +16,15 @@ function GUICompDropdown() : GUICompController() constructor {
 			#region General
 				
 				#region jsDoc
-			/// @func    set_size()
-			/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
-			/// @self    GUICompCore
-			/// @param   {real} left : The left side of the bounding box
-			/// @param   {real} top : The top side of the bounding box
-			/// @param   {real} right : The right side of the bounding box
-			/// @param   {real} bottom : The bottom side of the bounding box
-			/// @returns {Struct.GUICompCore}
-			#endregion
+				/// @func    set_size()
+				/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
+				/// @self    GUICompCore
+				/// @param   {real} left : The left side of the bounding box
+				/// @param   {real} top : The top side of the bounding box
+				/// @param   {real} right : The right side of the bounding box
+				/// @param   {real} bottom : The bottom side of the bounding box
+				/// @returns {Struct.GUICompCore}
+				#endregion
 				static set_size = function(_left, _top, _right, _bottom) {
 					static __set_size = GUICompController.set_size;
 					__set_size(_left, _top, _right, _bottom);

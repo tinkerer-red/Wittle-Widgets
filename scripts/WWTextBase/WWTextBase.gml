@@ -171,24 +171,31 @@ function WWTextBase() : WWCore() constructor {
 			}
 			
 			#region jsDoc
-			/// @func	set_allowed_char()
-			/// @desc	Sets the allowed characters to be used in this textbox. If undefined, the allowed characters are generated from the current font.
-			/// @self	WWTextBase
-			/// @param   {String} _allowed_char : A string of allowed characters (optional).
+			/// @func   set_allowed_char()
+			/// @desc   Sets the allowed characters to be used in this textbox. 
+			///         If undefined, the allowed characters are generated from the current font.
+			///         Will also infer and set keyboard type if not already user-defined.
+			/// @self   WWTextBase
+			/// @param  {String} _allowed_char : A string of allowed characters (optional).
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_allowed_char = function(_allowed_char = undefined) {
-				if (is_undefined(_allowed_char)) {
-					__allowed_char__ = __build_allowed_char__(text.font);
-				}
-				else {
-					__allowed_char__ = {};
-					__allowed_char_set__ = true;
-					string_foreach(_allowed_char, function(_char, _pos) {
-						__allowed_char__[$ _char] = true;
-					});
-				}
-				return self;
+			    if (is_undefined(_allowed_char)) {
+			        __allowed_char__ = __build_allowed_char__(text.font);
+			    }
+			    else {
+			        __allowed_char__ = {};
+			        __allowed_char_set__ = true;
+			        string_foreach(_allowed_char, function(_char, _pos) {
+			            __allowed_char__[$ _char] = true;
+			        });
+
+			        // Infer keyboard type if none has been set by user
+			        if (!__keyboard_type_set__) {
+			            __keyboard_type__ = __infer_keyboard_type__(_allowed_char);
+			        }
+			    }
+			    return self;
 			}
 			
 			#region Cursor
@@ -999,6 +1006,9 @@ function WWTextBase() : WWCore() constructor {
 			__allowed_char__ = __build_allowed_char__(text.font); // Struct holding characters allowed in input (for character enforcement).
 			__allowed_char_set__ = false; // Indicates whether allowed characters have been explicitly set.
 			
+			__keyboard_type__ = kbv_type_default; //Used for on screen keyboards.
+			__keyboard_type_set__ = false; // Indicates whether keyboard type has been explicitly set.
+			
 			//used to better handle drag selections being ignored if mouse doesnt move
 			__mouse_down_x__ = -infinity;
 			__mouse_down_y__ = -infinity;
@@ -1016,7 +1026,7 @@ function WWTextBase() : WWCore() constructor {
 			/// @desc    Draws the static parts (highlight selection and text) to a cached surface.
 			///          This function is called whenever the text or formatting changes, so that the
 			///          expensive drawing of text is only performed once.
-			/// @returns {Void}
+			/// @returns {undefined}
 			#endregion
 			static draw_to_surface = function() {
 			    // Create or reuse a surface sized to the text box.
@@ -1045,7 +1055,7 @@ function WWTextBase() : WWCore() constructor {
 			///          to compute the rectangular areas for each affected line.
 			/// @param   {Real} _x : The x-offset (typically 0 when drawing to surface).
 			/// @param   {Real} _y : The y-offset.
-			/// @returns {Void}
+			/// @returns {undefined}
 			#endregion
 			static __draw_highlight_selection__ = function(_x, _y) {
 			    // Only draw a highlight if a selection is active.
@@ -1106,7 +1116,7 @@ function WWTextBase() : WWCore() constructor {
 			///          the function uses the current GPU scissor region to determine which lines are visible.
 			/// @param   {Real} _x : The x-offset for drawing.
 			/// @param   {Real} _y : The y-offset for drawing.
-			/// @returns {Void}
+			/// @returns {undefined}
 			#endregion
 			static __draw_text__ = function(_x, _y) {
 			    // Set the font and color.
@@ -1141,7 +1151,7 @@ function WWTextBase() : WWCore() constructor {
 			///          directly (not cached) because it updates frequently.
 			/// @param   {Real} _x : The x-offset of the component.
 			/// @param   {Real} _y : The y-offset of the component.
-			/// @returns {Void}
+			/// @returns {undefined}
 			#endregion
 			static __draw_cursor__ = function(_x, _y) {
 			    // Only draw the cursor if the component is focused.
@@ -1260,7 +1270,106 @@ function WWTextBase() : WWCore() constructor {
 			        
 			        return _new_text;
 			    }
-			
+				
+				#region jsDoc
+				/// @func    __infer_keyboard_type__
+				/// @desc    Choose a best-fit virtual keyboard type from an allowed-character palette.
+				///         Heuristics are ordered from most-specific to most-generic and are conservative:
+				///         - Pure digits -> numbers
+				///         - Digits with phone punctuation -> phone
+				///         - E-mail shape (needs '@' and '.') and no spaces -> email
+				///         - URL shape (needs ':' or '/' and often '.') and no spaces -> url
+				///         - ASCII-only palette (no non-ascii) -> ascii
+				///         - Name-like (letters, spaces, dash, apostrophe; no digits) -> phone_name
+				///         - Otherwise -> default
+				/// @param   {String|Undefined} _allowed
+				/// @returns {Real} kbv_type_* constant
+				#endregion
+				static __infer_keyboard_type__ = function(_allowed) {
+				    // Defensive defaults
+				    if (is_undefined(_allowed) || !is_string(_allowed) || _allowed == "") {
+				        return kbv_type_default;
+				    }
+
+				    // Local helpers (all ASCII-safe)
+				    static __has__ = function(_pool, _ch) {
+				        return string_pos(_ch, _pool) > 0;
+				    };
+				    static __all_in__ = function(_pool, _set) {
+				        var idx = 1, len = string_length(_pool);
+				        while (idx <= len) {
+				            var ch = string_char_at(_pool, idx);
+				            if (string_pos(ch, _set) == 0) return false;
+				            idx += 1;
+				        }
+				        return true;
+				    };
+				    static __is_subset_of__ = __all_in__;
+				    static __is_ascii_only__ = function(_pool) {
+				        var idx = 1, len = string_length(_pool);
+				        while (idx <= len) {
+				            var ch = string_char_at(_pool, idx);
+				            if (ord(ch) < 0 || ord(ch) > 127) return false;
+				            idx += 1;
+				        }
+				        return true;
+				    };
+
+				    var pool = _allowed;
+
+				    // Canonical class sets
+				    var digits         = "0123456789";
+				    var phone_punct    = "+-() #*";
+				    var decimal_punct  = "+-.";
+				    var ascii_letters  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+				    var letters_spaces = ascii_letters + " -'";
+				    var url_marks      = ":/.?&#%=_~-";
+				    var email_marks    = "@._-+";
+
+				    // 1) Strict numbers: palette contains only digits
+				    if (__is_subset_of__(pool, digits)) {
+				        return kbv_type_numbers;
+				    }
+
+				    // 2) Phone: digits plus common phone punctuation, and no letters
+				    if (__is_subset_of__(pool, digits + phone_punct)) {
+				        return kbv_type_phone;
+				    }
+
+				    // 3) E-mail: must allow '@' and '.', forbid spaces, and be subset of a sane email set
+				    if (__has__(pool, "@") && __has__(pool, ".")
+				    && !__has__(pool, " ")
+				    && __is_subset_of__(pool, ascii_letters + digits + email_marks)) {
+				        return kbv_type_email;
+				    }
+
+				    // 4) URL: must allow ':' or '/', forbid spaces, and be subset of a sane url set
+				    if ((__has__(pool, ":") || __has__(pool, "/"))
+				    && !__has__(pool, " ")
+				    && __is_subset_of__(pool, ascii_letters + digits + url_marks)) {
+				        return kbv_type_url;
+				    }
+
+				    // 5) Decimal-ish numeric input: digits plus "+-." (still best served by numbers pad)
+				    if (__is_subset_of__(pool, digits + decimal_punct)) {
+				        // GM does not have a dedicated "decimal" keyboard, numbers is the closest
+				        return kbv_type_numbers;
+				    }
+
+				    // 6) ASCII-only palette (no non-ascii glyphs)
+				    if (__is_ascii_only__(pool)) {
+				        // If it looks like a name field (letters, spaces, dash, apostrophe, no digits), prefer phone_name
+				        if (__is_subset_of__(pool, letters_spaces)) {
+				            // Android will fall back to ASCII automatically if phone_name is not supported
+				            return kbv_type_phone_name;
+				        }
+				        return kbv_type_ascii;
+				    }
+
+				    // 7) Default catch-all
+				    return kbv_type_default;
+				};
+
 			#endregion
 			
 			#region Line Breaking
@@ -1295,9 +1404,10 @@ function WWTextBase() : WWCore() constructor {
 				    while (_start_line_index < _end_line_index) {
 				        var _current_str = __lines__[_start_line_index];
 				        var _current_strWidth = __string_width(_current_str);
-
+						
 				        // If the current line exceeds the available drawing width, break it.
-				        if (_current_strWidth > _draw_width) {
+				        if (_current_strWidth >= _draw_width) {
+							log("A")
 				            var _char_index = 0;
 				            var _current_str_length = __string_length(_current_str);
             
@@ -1330,45 +1440,47 @@ function WWTextBase() : WWCore() constructor {
 				            _end_line_index += 1;
 				        }
 				        else {
-				            // Attempt to merge the current line with the next one if possible.
+							// Attempt to merge the current line with the next one if possible.
 				            var nextLineIdx = _start_line_index + 1;
 				            if (nextLineIdx < array_length(__lines_broken_by_width__) && !__lines_broken_by_width__[nextLineIdx]) {
 				                var nextText = __lines__[nextLineIdx];
 				                var nextTextWidth = __string_width(nextText);
-                
+								
 				                // If merging does not exceed the allowed width, combine the lines.
 				                if (_current_strWidth + nextTextWidth <= _draw_width) {
+									log("B1")
 				                    __lines__[_start_line_index] = _current_str + nextText;
 				                    array_delete(__lines__, nextLineIdx, 1);
 				                    array_delete(__lines_broken_by_width__, nextLineIdx, 1);
 				                    _end_line_index -= 1;
 				                }
 				                else {
-				                    // Otherwise, process the next line to see where it can be split.
-				                    var _char_index = 1;
-				                    var nextTextLength = __string_length(nextText);
-				                    repeat (nextTextLength) {
-				                        if (_current_strWidth + __string_width(__string_copy(nextText, 1, _char_index)) > _draw_width) {
-				                            // Backtrack to a valid break point in the next line.
-				                            _breaker_pos = _char_index;
-				                            repeat (_char_index) {
-				                                _current_char = __string_char_at(nextText, _breaker_pos);
-				                                if (__string_pos(_current_char, __word_breakers)) {
-				                                    _char_index = _breaker_pos;
-				                                    break;
-				                                }
-				                                _breaker_pos--;
-				                            }
+									log("B2")
+									// Otherwise, process the next line to see where it can be split.
+									var _char_index = 1;
+									var nextTextLength = __string_length(nextText);
+									repeat (nextTextLength) {
+										if (_current_strWidth + __string_width(__string_copy(nextText, 1, _char_index)) > _draw_width) {
+											// Backtrack to a valid break point in the next line.
+											_breaker_pos = _char_index;
+											repeat (_char_index) {
+												_current_char = __string_char_at(nextText, _breaker_pos);
+												if (__string_pos(_current_char, __word_breakers)) {
+													_char_index = _breaker_pos;
+													break;
+												}
+												_breaker_pos--;
+											}
                             
-				                            // Break the next line at the determined point.
-				                            __lines__[_start_line_index] = _current_str + __string_copy(nextText, 1, _char_index - 1);
-				                            __lines__[nextLineIdx] = string_delete(nextText, 1, _char_index - 1);
-				                            break;
-				                        }
-				                        _char_index += 1;
-				                    }
-				                    // A new line was effectively created so adjust the end index.
-				                    _end_line_index += 1;
+											// Break the next line at the determined point.
+											__lines__[_start_line_index] = _current_str + __string_copy(nextText, 1, _char_index - 1);
+											__lines__[nextLineIdx] = string_delete(nextText, 1, _char_index - 1);
+											break;
+										}
+										_char_index += 1;
+									}
+									// A new line was effectively created so adjust the end index.
+									_end_line_index += 1;
 				                }
 				            }
 				        }
@@ -1457,7 +1569,7 @@ function WWTextBase() : WWCore() constructor {
 				///          equals the anchor, selection is cleared; otherwise, selection remains active.
 				/// @self    WWTextInputSingle
 				/// @param   {Bool} _select : Whether selection mode is enabled.
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __check_minput__ = function(_select) {
 					// If selection mode is enabled and no anchor is set, establish the anchor.
@@ -1494,7 +1606,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @param   {Real} _change : The amount to move the cursor.
 				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
 				/// @param   {Bool} _vertical : Whether the movement is vertical (if false, horizontal).
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __move_cursor_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
 					static __struct = { x: undefined, y: undefined, width: undefined };
@@ -1959,74 +2071,78 @@ function WWTextBase() : WWCore() constructor {
 			    /// @desc    Inserts a new string at the cursor position, respecting allowed characters.
 			    /// @self    WWTextInputSingle
 			    /// @param   {String} _str : The string to insert.
-			    /// @returns {Void}
+			    /// @returns {undefined}
 			    #endregion
-			    static __insert_string_at_cursor__ = function(_str) {
-			        // Sanitize input: only allowed characters are retained.
-					_str = __keep_allowed_char__(_str, __allowed_char__);
-					var _str_length = __string_length(_str);
-					
-					// If text is highlighted, remove the selection before inserting.
-			        if (highlight_selected) __textbox_delete_string__(false);
-					
-					// If the lines should wrap after reaching the width
-					var _should_wrap = (__size_set__ && !dynamic_width);
-					
-					
-					
-					// split the text at newlines.
-			        var _split_lines = __text_to_lines__(_str);
-			        
-					// Separate the current line into two parts: before and after the cursor.
-				    var currentLine = __lines__[cursor_y_pos];
-				    var leftText = __string_copy(currentLine, 1, cursor_x_pos);
-				    var rightText = __string_copy(currentLine, cursor_x_pos + 1, __string_length(currentLine) - cursor_x_pos);
-					
-					
-					// Early exit if there is only a single line to add
-					if (array_length(_split_lines) == 1) {
-					    // Simple insertion when no newline is present.
-					    __lines__[cursor_y_pos] = leftText + _split_lines[0] + rightText;
-					    cursor_x_pos += __string_length(_split_lines[0]);
-					    // Optionally, update line breaks if needed.
-					    if (_should_wrap) {
-					        __break_lines__(cursor_y_pos, 1, _str_length, 0);
-					    }
-					    return;
-					}
-					
-					
-				    // The first inserted line merges with the text before the cursor.
-				    __lines__[cursor_y_pos] = leftText + _split_lines[0];
+				static __insert_string_at_cursor__ = function(_str) {
+				    // sanitize input
+				    _str = __keep_allowed_char__(_str, __allowed_char__);
+				    var insert_length = __string_length(_str);
 
-				    // Insert any middle lines.
-				    for (var i = 1; i < array_length(_split_lines) - 1; i++) {
-				        array_insert(__lines__, cursor_y_pos + i, _split_lines[i]);
+				    // if selection, delete it first
+				    if (highlight_selected) __textbox_delete_string__(false);
+
+				    // wrapping decision
+				    var should_wrap = (__size_set__ && !dynamic_width);
+
+				    // remember where the insert starts (line and column BEFORE we modify text)
+				    var start_line_index = cursor_y_pos;
+				    var start_column_pos = cursor_x_pos;
+
+				    // split incoming string by newlines
+				    var split_lines = __text_to_lines__(_str);
+
+				    // split current line around cursor
+				    var current_line_text = __lines__[cursor_y_pos];
+				    var left_text  = __string_copy(current_line_text, 1, cursor_x_pos);
+				    var right_text = __string_copy(current_line_text, cursor_x_pos + 1, __string_length(current_line_text) - cursor_x_pos);
+
+				    if (array_length(split_lines) == 1) {
+				        // single-line insertion
+				        __lines__[cursor_y_pos] = left_text + split_lines[0] + right_text;
+				        cursor_x_pos += __string_length(split_lines[0]);
+				        // if wrapping: run the breaker with an ABSOLUTE walk to the caret
+				        if (should_wrap) {
+				            var absolute_walk = cursor_x_pos; // distance from start_line_index within the processed slice
+				            __break_lines__(start_line_index, 1, absolute_walk, 0);
+				        }
+				        return;
+				    }
+
+				    // multi-line insertion
+
+				    // first line merges with left side
+				    __lines__[cursor_y_pos] = left_text + split_lines[0];
+
+				    // middle lines insert verbatim
+				    for (var i = 1; i < array_length(split_lines) - 1; i++) {
+				        array_insert(__lines__, cursor_y_pos + i, split_lines[i]);
 				        array_insert(__lines_broken_by_width__, cursor_y_pos + i, true);
 				    }
 
-				    // The last line of the inserted text is merged with the text after the cursor.
-				    array_insert(
-						__lines__,
-						cursor_y_pos + array_length(_split_lines) - 1,
-						_split_lines[array_length(_split_lines) - 1] + rightText
-					);
-				    array_insert(
-						__lines_broken_by_width__,
-						cursor_y_pos + array_length(_split_lines) - 1,
-						true
-					);
-					
+				    // last line merges with right side
+				    var last_index = cursor_y_pos + array_length(split_lines) - 1;
+				    array_insert(__lines__, last_index, split_lines[array_length(split_lines) - 1] + right_text);
+				    array_insert(__lines_broken_by_width__, last_index, true);
 
-				    // Update cursor positions.
-				    cursor_y_pos += array_length(_split_lines) - 1;
-				    cursor_x_pos = __string_length(_split_lines[array_length(_split_lines) - 1]);
+				    // move caret to end of the inserted payload (before wrapping)
+				    cursor_y_pos = last_index;
+				    cursor_x_pos = __string_length(split_lines[array_length(split_lines) - 1]);
 
-				    // Adjust line breaks if dynamic width is enabled.
-				    if (_should_wrap) {
-				        __break_lines__(cursor_y_pos, 1, _str_length, string_count("\n", _str));
+				    if (should_wrap) {
+				        // compute an ABSOLUTE character walk from start_line_index to the caret
+				        var number_of_lines = (cursor_y_pos - start_line_index + 1);
+				        var absolute_walk   = 0;
+				        var line_iter       = start_line_index;
+				        while (line_iter < cursor_y_pos) {
+				            absolute_walk += __string_length(__lines__[line_iter]);
+				            line_iter += 1;
+				        }
+				        absolute_walk += cursor_x_pos;
+
+				        __break_lines__(start_line_index, number_of_lines, absolute_walk, 0);
 				    }
-			    }
+				}
+
 				
 				#region jsDoc
 				/// @func	__textbox_delete_string__()
@@ -2038,7 +2154,7 @@ function WWTextBase() : WWCore() constructor {
 				///		  at the beginning of the selection.
 				/// @self	WWTextInputSingle
 				/// @param   {Bool} _is_del_key : True if the delete key is pressed (forward delete), false if backspace.
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __textbox_delete_string__ = function(_is_del_key) {
 					// Store current cursor position.
@@ -2153,7 +2269,7 @@ function WWTextBase() : WWCore() constructor {
 				///              - If it is a space or tab, it selects all adjacent spaces and tabs.
 				///              - Otherwise, it selects all contiguous word breaker characters.
 				/// @self    WWTextBase
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __highlight_word_at_cursor__ = function() {
 				    var _loc = __compute_word_boundaries__(cursor_y_pos, cursor_x_pos);
@@ -2178,7 +2294,7 @@ function WWTextBase() : WWCore() constructor {
 				///          the highlight is set to __word_anchor_end__; if to the right, it is set to __word_anchor_start__.
 				///          When on a different line, the highlight is anchored to the original word line.
 				/// @self    WWTextBase
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __update_word_selection_drag__ = function() {
 				    // Get current mouse coordinates.
@@ -2294,7 +2410,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _line   : The active line index.
 				/// @param   {Real} _cursor : The cursor position in the active line.
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __textbox_records_add__ = function(_line, _cursor) {
 				    var nextRecordIndex = __historic_records_loc__ + 1;
@@ -2329,7 +2445,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _line   : The active line index.
 				/// @param   {Real} _cursor : The cursor position in the active line.
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __textbox_records_rec__ = function(_line, _cursor) {
 				    var currentRecord = __historic_records__[__historic_records_loc__];
@@ -2343,7 +2459,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @desc    Moves the history cursor by _change steps and restores that snapshot (for undo/redo).
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _change : The number of steps to move in the history (negative for undo, positive for redo).
-				/// @returns {Void}
+				/// @returns {undefined}
 				#endregion
 				static __textbox_records_set__ = function(_change) {
 				    var targetIndex = __historic_records_loc__ + _change;
@@ -2412,8 +2528,95 @@ function WWTextInputMulti() : WWTextBase() constructor {
     debug_name = "WWTextInputMulti";
     
     #region Public
+		#region Optional Dependancies
+			
+		#endregion
+		
+		#region Builder Functions
+			
+			#region jsDoc
+            /// @func    set_accept_return()
+            /// @desc    Allow Enter to insert a newline.
+            /// @param   {Bool} _allow
+            /// @returns {Struct.WWTextInputMulti}
+            #endregion
+			static set_accept_return = function(_allow=true) {
+                accept_return = _allow;
+                return self;
+            }
+			
+			#region jsDoc
+            /// @func    set_auto_indent()
+            /// @desc    Inherit leading whitespace when pressing Enter.
+            /// @param   {Bool} _enable
+            /// @returns {Struct.WWTextInputMulti}
+            #endregion
+			static set_auto_indent = function(_enable=true) {
+                auto_indent = _enable;
+                return self;
+            }
+			
+			#region jsDoc
+            /// @func    set_indent_string()
+            /// @desc    Set the indentation token inserted by Tab. Code editor may set "\t".
+            /// @param   {String} _str
+            /// @returns {Struct.WWTextInputMulti}
+            #endregion
+			static set_indent_string = function(_str="    ") {
+                indent_string = _str;
+                return self;
+            }
+			
+			#region jsDoc
+            /// @func    set_submit_ctrl_enter()
+            /// @desc    If true, Ctrl+Enter will trigger the submit event.
+            /// @param   {Bool} _enable
+            /// @returns {Struct.WWTextInputMulti}
+            #endregion
+			static set_submit_ctrl_enter = function(_enable=true) {
+                submit_ctrl_enter = _enable;
+                return self;
+            }
+			
+			#region jsDoc
+            /// @func    set_max_length()
+            /// @desc    Cap character count (excluding newline characters).
+            /// @param   {Real} _max
+            /// @returns {Struct.WWTextInputMulti}
+            #endregion
+			static set_max_length = function(_max=infinity) {
+                max_char_length = _max;
+                return self;
+            }
+			
+			#region jsDoc
+			/// @func   set_keyboard_type()
+			/// @desc   Sets the keyboard type to be used in this textbox. 
+			///         If not set, the type may be inferred when allowed characters are defined.
+			/// @self   WWTextBase
+			/// @param  {String} _keyboard_type : The keyboard type (e.g. "default", "numeric", "email").
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_keyboard_type = function(_keyboard_type) {
+			    __keyboard_type__ = _keyboard_type;
+			    __keyboard_type_set__ = true;
+			    return self;
+			}
+			
+        #endregion
+		
         #region Variables
-            
+			// Editable behavior toggles
+			accept_return = true;              // if true, Enter inserts newline
+			auto_indent  = true;               // if true, new lines inherit indentation from current line
+			submit_ctrl_enter = true;          // if true, Ctrl+Enter fires submit event
+			
+			// Indentation control (kept simple so CodeEditor can override)
+			indent_string = "    ";            // default to 4 spaces; code editor may set to "\t" or custom
+			
+			// Maximum length (characters excluding newline characters). Infinity means no cap.
+			max_char_length = infinity;
+			
         #endregion
         
         #region Functions
@@ -2427,9 +2630,55 @@ function WWTextInputMulti() : WWTextBase() constructor {
                 self.render_selection();
                 // Optionally render caret on the active line.
             }
-        #endregion
+			
+		#endregion
         
         #region Events
+			
+			// Focus enter: start a request on mobile/console; desktop uses Direct path
+			on_focus_enter(function(_input) {
+			    if (WW_ON_MOBILE || WW_ON_CONSOLE) {
+					var request_caption   = text.caption;                 // placeholder/caption from base
+			        var request_initial   = get_text();                   // current content
+			        var request_maxlength = max_char_length;
+					var started_ok = false;
+					
+					// keyboard type is optional; pass only if you keep such a macro/var
+			        var _kb_type = (variable_instance_exists(self, "keyboard_type")) ? keyboard_type : kbv_type_default;
+			        
+			        //activate on screen keyboard
+			    }
+			});
+
+			// Focused frame: handle desktop input and poll mobile/console request status
+			on_focus(function(_input) {
+
+			    // DESKTOP: plug-in present -> Direct functions (preferred on desktop)
+			    if (WW_ON_DESKTOP) {
+			        // DESKTOP: vanilla fallback (no plug-in)
+			        var typed_text = keyboard_string;
+			        if (is_string(typed_text) && typed_text != "") {
+			                keyboard_string = "";
+			                __insert_text__(typed_text);
+			            }
+			        
+			        return; // desktop path handled
+			    }
+
+			    // MOBILE/CONSOLE: if a request is active, poll status for runtimes that do not callback
+			    if (WW_ON_MOBILE || WW_ON_CONSOLE) {
+			        
+			        return;
+			    }
+
+			    // Other platforms: no vanilla support added yet
+			});
+
+			// Focus exit: stop outstanding requests cleanly
+			on_focus_exit(function(_input) {
+			    // close on screen keyboard updates (usually for mobile)
+			});
+			
             // Handle key events for multi-line input similarly, with logic for newlines.
 			// Register various key sequences
 			#region Deletion — Backspace, Delete, Ctrl+Delete
@@ -2445,18 +2694,21 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#endregion
 			
 			#region Ctrl Modifier
-			hotkey_manager.register([vk_control, vk_backspace], function() { /* Delete previous word */ });
-			hotkey_manager.register([vk_control, vk_delete],    function() { /* Delete next word */ });
+			hotkey_manager.register([vk_control, vk_backspace], function() {
+				__delete_word_left__();
+			});
+			hotkey_manager.register([vk_control, vk_delete],    function() { __delete_word_right__(); });
 			#endregion
 			
 			#region Shift Modifier
-			hotkey_manager.register([vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
-			hotkey_manager.register([vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+			// There is no shift modifier, though we arent using it we will leave the comment here.
+			//hotkey_manager.register([vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
+			//hotkey_manager.register([vk_shift, vk_delete],    function() { /* Delete until end of line */ });
 			#endregion
 			
 			#region Ctrl + Shift Modifier
-			hotkey_manager.register([vk_control, vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
-			hotkey_manager.register([vk_control, vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+	        hotkey_manager.register([vk_control, vk_shift, vk_backspace], function() { __delete_to_line_start__(); });
+	        hotkey_manager.register([vk_control, vk_shift, vk_delete],    function() { __delete_to_line_end__();   });
 			#endregion
 			#endregion
 			
@@ -2465,47 +2717,58 @@ function WWTextInputMulti() : WWTextBase() constructor {
 				select_all_text();
 			});
 			hotkey_manager.register([vk_control, ord("C")], function() {
-				copy_selection_to_clipboard();
-			});
-			hotkey_manager.register([vk_control, ord("V")], function() {
-				/* Paste */
-				__insert_string_at_cursor__(__clipboard_get_text__());
-			});
-			hotkey_manager.register([vk_control, ord("X")], function() {
-				/* Cut */
-				if (highlight_selected) {
-					copy_selection_to_clipboard();
-					__textbox_delete_string__(false);
-				}
-				
+				var copy_text = copy_selection_to_clipboard();
+				static __ev = {}; __ev.text = copy_text; trigger_event(events.copy, __ev);
 			});
 			
-			hotkey_manager.register([vk_control, ord("Z")], function() {
-				/* Undo */
-				
+			
+			// Clipboard
+			hotkey_manager.register([vk_control, ord("V")], function() {
+				var paste_text = __get_clipboard_text__();
+				if (paste_text != "") __insert_text__(paste_text);
+				static __ev = {}; __ev.text = paste_text; trigger_event(events.paste, __ev);
 			});
-			hotkey_manager.register([vk_control, ord("Y")], function() {
-				/* Redo */
-				
+			hotkey_manager.register([vk_control, ord("X")], function() { 
+				var copy_text = copy_selection_to_clipboard();
+				static __ev = {}; __ev.text = copy_text; trigger_event(events.copy, __ev);
+				__cut_selection__();
 			});
-			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() {
-				/* Redo (alternate) */
-				
-			});
+			
+			// Undo / Redo
+			hotkey_manager.register([vk_control, ord("Z")], function() { __textbox_records_set__(-1); });
+			hotkey_manager.register([vk_control, ord("Y")], function() { __textbox_records_set__(1);  });
+			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { __textbox_records_set__(1); });
 			#endregion
 			
 			#region Control & Submission
-			hotkey_manager.register([vk_enter], function() { /* Submit or insert new line */ });
-			hotkey_manager.register([vk_shift, vk_enter], function() { /* Insert new line (force multiline) */ });
-			hotkey_manager.register([vk_control, vk_enter], function() { /* Optional: Submit (e.g., Ctrl+Enter) */ });
-			hotkey_manager.register([vk_control, vk_shift, vk_enter], function() { /* Optional: Multiline submit override */ });
+			// Return / Submit
+			hotkey_manager.register([vk_enter], function() {
+			    if (accept_return && !keyboard_check(vk_control)) {
+			        __insert_newline__();
+			        return;
+			    }
+			    // If Enter is treated as submit in this widget, fire submit
+			    if (!accept_return || (accept_return && keyboard_check(vk_control) && submit_ctrl_enter)) {
+			        static __ev = {}; __ev.text = get_text();
+			        trigger_event(events.submit, __ev);
+			    }
+			});
+
+			hotkey_manager.register([vk_control, vk_enter], function() {
+			    if (submit_ctrl_enter) {
+			        static __ev = {}; __ev.text = get_text();
+			        trigger_event(events.submit, __ev);
+			    } else if (accept_return) {
+			        __insert_newline__();
+			    }
+			});
 			
 			hotkey_manager.register([vk_escape], function() { /* Cancel or unfocus */ });
 			#endregion
 			
 			#region Tab / Focus & Indent Control
-			hotkey_manager.register([vk_tab], function() { /* Indent or move to next focus */ });
-			hotkey_manager.register([vk_shift, vk_tab], function() { /* Unindent or move to previous focus */ });
+			hotkey_manager.register([vk_tab], function() { __indent_selection_or_cursor__(); });
+			hotkey_manager.register([vk_shift, vk_tab], function() { __unindent_selection_or_cursor__(); });
 			hotkey_manager.register([vk_control, vk_tab], function() { /* Optional: Switch next panel/focus group */ });
 			hotkey_manager.register([vk_control, vk_shift, vk_tab], function() { /* Optional: Switch previous panel/focus group */ });
 			#endregion
@@ -2514,6 +2777,321 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			
         #endregion
 		
+    #endregion
+	
+	#region Private
+        #region Functions
+
+            #region jsDoc
+            /// @func    __emit_change__()
+            /// @desc    Mark render dirty, push history snapshot, and fire change event.
+            /// @param   {Bool} _push_history
+            /// @returns {undefined}
+            #endregion
+            static __emit_change__ = function(_push_history=true) {
+                __refresh_surf__ = true;
+                if (_push_history) {
+                    __textbox_records_add__(cursor_y_pos, cursor_x_pos);
+                } else {
+                    __textbox_records_rec__(cursor_y_pos, cursor_x_pos);
+                }
+                static __ev = {};
+                __ev.text = get_text();
+                trigger_event(events.change, __ev);
+            }
+
+            #region jsDoc
+            /// @func    __get_clipboard_text__
+            /// @desc    Get text from clipboard (desktop or html5 shim).
+            /// @returns {String}
+            #endregion
+            static __get_clipboard_text__ = function() {
+                var result = "";
+                if (os_browser == browser_not_a_browser) {
+                    if (clipboard_has_text()) result = clipboard_get_text();
+                } else {
+                    if (js_clipboard_has_text_()) result = js_clipboard_get_text();
+                }
+                return result;
+            }
+
+            #region jsDoc
+            /// @func    __delete_selection_or_char__()
+            /// @desc    Wrapper around base deletion that also emits change.
+            /// @param   {Bool} _forward
+            /// @returns {undefined}
+            #endregion
+			static __delete_selection_or_char__ = function(_forward) {
+			    __textbox_delete_string__(_forward);
+			    __reflow_after_edit__();       // <- keep word chunks pulling back up when they fit
+			    __emit_change__(false);        // base delete already pushed history
+			}
+
+            #region jsDoc
+            /// @func    __delete_word_left__()
+            /// @desc    Delete the previous word (selection-aware).
+            /// @returns {undefined}
+            #endregion
+            static __delete_word_left__ = function() {
+                if (highlight_selected) {
+                    __delete_selection_or_char__(false);
+                    return;
+                }
+                var loc = __compute_word_boundaries__(cursor_y_pos, max(0, cursor_x_pos), true);
+                // select from word start to cursor, then delete via backspace path
+                highlight_y_pos = cursor_y_pos;
+                highlight_x_pos = loc.x_start;
+                highlight_selected = true;
+                set_cursor_x_pos(loc.x_end); // ensure cursor sits at end of selection
+                __delete_selection_or_char__(false);
+            }
+
+            #region jsDoc
+            /// @func    __delete_word_right__()
+            /// @desc    Delete the next word (selection-aware).
+            /// @returns {undefined}
+            #endregion
+            static __delete_word_right__ = function() {
+                if (highlight_selected) {
+                    __delete_selection_or_char__(true);
+                    return;
+                }
+                var loc = __compute_word_boundaries__(cursor_y_pos, max(0, cursor_x_pos+1), true);
+                // select from cursor to word end
+                highlight_y_pos = cursor_y_pos;
+                highlight_x_pos = cursor_x_pos;
+                set_cursor_x_pos(loc.x_end);
+                highlight_selected = true;
+                __delete_selection_or_char__(true);
+            }
+
+            #region jsDoc
+            /// @func    __delete_to_line_start__()
+            /// @desc    Delete from cursor to beginning of line.
+            /// @returns {undefined}
+            #endregion
+            static __delete_to_line_start__ = function() {
+                if (cursor_x_pos <= 0) return;
+                highlight_y_pos = cursor_y_pos;
+                highlight_x_pos = 0;
+                highlight_selected = true;
+                __delete_selection_or_char__(false);
+            }
+
+            #region jsDoc
+            /// @func    __delete_to_line_end__()
+            /// @desc    Delete from cursor to end of line.
+            /// @returns {undefined}
+            #endregion
+            static __delete_to_line_end__ = function() {
+                var line_text = __lines__[cursor_y_pos];
+                var end_pos = __string_length(line_text);
+                if (cursor_x_pos >= end_pos) return;
+                highlight_y_pos = cursor_y_pos;
+                highlight_x_pos = end_pos;
+                highlight_selected = true;
+                // place cursor at original location as "start" of selection
+                set_cursor_x_pos(cursor_x_pos);
+                __delete_selection_or_char__(true);
+            }
+
+            #region jsDoc
+            /// @func    __insert_text__()
+            /// @desc    Insert text with max-length enforcement and change event.
+            /// @param   {String} _text
+            /// @returns {undefined}
+            #endregion
+            static __insert_text__ = function(_text) {
+                if (!is_string(_text) || _text == "") return;
+
+                // Enforce max length (count without newlines)
+                if (max_char_length != infinity) {
+                    var flat_before = string_replace_all(get_text(), "\n", "");
+                    var remain = max_char_length - __string_length(flat_before);
+                    if (remain <= 0) return;
+                    // Trim incoming (excluding newline count)
+                    var incoming_flat = string_replace_all(_text, "\n", "");
+                    if (__string_length(incoming_flat) > remain) {
+                        // Cut down to remaining, but keep newlines as-is
+                        var kept = 0;
+                        var out_buff = "";
+                        string_foreach(_text, function(ch) {
+                            if (ch == "\n") { out_buff += "\n"; return; }
+                            if (kept < remain) { out_buff += ch; kept += 1; }
+                        });
+                        _text = out_buff;
+                    }
+                }
+
+                __insert_string_at_cursor__(_text);
+                __emit_change__(true); // push a history point for each insert packet
+            }
+
+            #region jsDoc
+            /// @func    __insert_newline__()
+            /// @desc    Insert newline, optionally inheriting indentation, and emit change.
+            /// @returns {undefined}
+            #endregion
+            static __insert_newline__ = function() {
+                // compute indentation from beginning of current line
+                var indent = "";
+                if (auto_indent) {
+                    var line_text = __lines__[cursor_y_pos];
+                    var len = __string_length(line_text);
+                    var p = 1;
+                    while (p <= len) {
+                        var ch = __string_char_at(line_text, p);
+                        if (ch == " " || ch == chr(9)) { indent += ch; p += 1; } else { break; }
+                    }
+                }
+
+                // Break line using base helper (pushes history already)
+                __textbox_break_line__();
+
+                if (indent != "") {
+                    // after break, we are at column 0 on new line
+                    __insert_string_at_cursor__(indent);
+                    __emit_change__(true);
+                } else {
+                    __emit_change__(false); // break already recorded
+                }
+            }
+
+            #region jsDoc
+            /// @func    __indent_selection_or_cursor__()
+            /// @desc    Tab behavior: if selection spans multiple lines, indent each line; otherwise insert indent_string.
+            /// @returns {undefined}
+            #endregion
+            static __indent_selection_or_cursor__ = function() {
+                if (!highlight_selected) {
+                    __insert_text__(indent_string);
+                    return;
+                }
+
+                // Normalize selection bounds by lines
+                var start_y, end_y, start_x, end_x;
+                if (cursor_y_pos < highlight_y_pos) {
+                    start_y = cursor_y_pos; end_y = highlight_y_pos;
+                    start_x = cursor_x_pos;  end_x = highlight_x_pos;
+                } else {
+                    start_y = highlight_y_pos; end_y = cursor_y_pos;
+                    start_x = highlight_x_pos;  end_x = cursor_x_pos;
+                }
+
+                // If single line selection, insert indent_string before selection start
+                if (start_y == end_y) {
+                    set_cursor_y_pos(start_y);
+                    set_cursor_x_pos(min(start_x, end_x));
+                    __insert_text__(indent_string);
+                    // keep selection visually extended by shifting anchor
+                    if (cursor_y_pos == highlight_y_pos) {
+                        highlight_x_pos += __string_length(indent_string);
+                    } else {
+                        // bring anchor to the other endpoint consistently
+                        // harmless if off by one; selection will often be cleared by further typing
+                    }
+                    return;
+                }
+
+                // Multi-line: indent each line in range
+                var i = start_y;
+                while (i <= end_y) {
+                    var src = __lines__[i];
+                    __lines__[i] = indent_string + src;
+                    i += 1;
+                }
+                // Adjust selection columns to account for added indent at starts
+                if (start_x > 0) start_x += __string_length(indent_string);
+                end_x += __string_length(indent_string);
+
+                // Restore cursor and anchor to new locations
+                set_cursor_y_pos(end_y);
+                set_cursor_x_pos(end_x);
+                highlight_y_pos = start_y;
+                highlight_x_pos = start_x;
+                highlight_selected = true;
+
+                __emit_change__(true);
+            }
+
+            #region jsDoc
+            /// @func    __unindent_selection_or_cursor__()
+            /// @desc    Shift+Tab behavior: remove one indent_string or single leading tab/spaces from lines in selection.
+            /// @returns {undefined}
+            #endregion
+            static __unindent_selection_or_cursor__ = function() {
+                var start_y, end_y, start_x, end_x;
+
+                if (!highlight_selected) {
+                    start_y = cursor_y_pos; end_y = cursor_y_pos;
+                    start_x = cursor_x_pos;  end_x = cursor_x_pos;
+                } else {
+                    if (cursor_y_pos < highlight_y_pos) {
+                        start_y = cursor_y_pos; end_y = highlight_y_pos;
+                        start_x = cursor_x_pos;  end_x = highlight_x_pos;
+                    } else {
+                        start_y = highlight_y_pos; end_y = cursor_y_pos;
+                        start_x = highlight_x_pos;  end_x = cursor_x_pos;
+                    }
+                }
+
+                var removed_total = 0;
+                var indent_len = __string_length(indent_string);
+                var i = start_y;
+                while (i <= end_y) {
+                    var line_str = __lines__[i];
+
+                    // Remove exact indent_string if present; else remove single tab; else remove up to indent_len spaces
+                    if (indent_len > 0 && __string_copy(line_str, 1, indent_len) == indent_string) {
+                        __lines__[i] = string_delete(line_str, 1, indent_len);
+                        removed_total = indent_len;
+                    } else if (__string_length(line_str) > 0 && __string_char_at(line_str, 1) == chr(9)) {
+                        __lines__[i] = string_delete(line_str, 1, 1);
+                        removed_total = 1;
+                    } else if (__string_length(line_str) > 0 && __string_char_at(line_str, 1) == " ") {
+                        // remove up to indent_len spaces
+                        var count = 0;
+                        while (count < indent_len && __string_length(__lines__[i]) > 0 && __string_char_at(__lines__[i], 1) == " ") {
+                            __lines__[i] = string_delete(__lines__[i], 1, 1);
+                            count += 1;
+                        }
+                        removed_total = count;
+                    } else {
+                        removed_total = 0;
+                    }
+
+                    // adjust selection columns on affected lines
+                    if (i == start_y) {
+                        if (start_x > 0) start_x = max(0, start_x - removed_total);
+                    }
+                    if (i == end_y) {
+                        if (end_x > 0) end_x = max(0, end_x - removed_total);
+                    }
+                    i += 1;
+                }
+
+                // Restore cursor and anchor
+                set_cursor_y_pos(end_y);
+                set_cursor_x_pos(end_x);
+                highlight_y_pos = start_y;
+                highlight_x_pos = start_x;
+                highlight_selected = (start_y != end_y) || (start_x != end_x);
+
+                __emit_change__(true);
+            }
+
+            #region jsDoc
+            /// @func    __cut_selection__()
+            /// @desc    Copy selection and delete.
+            /// @returns {undefined}
+            #endregion
+            static __cut_selection__ = function() {
+                if (!highlight_selected) return;
+                var copied = copy_selection_to_clipboard();
+                __delete_selection_or_char__(false);
+            }
+
+        #endregion
     #endregion
 }
 
@@ -2677,7 +3255,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			    /// @func    __textbox_max_length__()
 			    /// @desc    Enforces the maximum character limit for the text input component.
 			    /// @self    WWTextInputSingle
-			    /// @returns {Void}
+			    /// @returns {undefined}
 			    #endregion
 			    static __textbox_max_length__ = function() {
 			        if (max_char_length == infinity) return;
@@ -2718,7 +3296,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			    /// @func    __textbox_break_line__()
 			    /// @desc    Inserts a new line at the cursor position.
 			    /// @self    WWTextInputSingle
-			    /// @returns {Void}
+			    /// @returns {undefined}
 			    #endregion
 			    static __textbox_break_line__ = function() {
 			        var _current_line = cursor_y_pos;
@@ -2751,32 +3329,4 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 		
     #endregion
 	
-}
-
-
-function WWTextBoxRegionManVanilla() constructor {
-    regions       = [];       // List of WWTextBoxRegion
-
-    static detect_region = function() {
-		// returns undefined or a single region
-	};
-	
-	static set_regions = function() {
-		clear_regions()
-		// sets all regions
-	};
-	
-	static clear_regions = function() {
-		// clears all existing regions
-	};
-	
-	static draw_regions = function() {
-		// draws all regions
-	};
-	
-};
-
-function WWTextBoxRegion() constructor {
-	pos_start = -1;
-	pos_end = -1;
 }

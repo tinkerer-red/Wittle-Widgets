@@ -1407,8 +1407,7 @@ function WWTextBase() : WWCore() constructor {
 						
 				        // If the current line exceeds the available drawing width, break it.
 				        if (_current_strWidth >= _draw_width) {
-							log("A")
-				            var _char_index = 0;
+							var _char_index = 0;
 				            var _current_str_length = __string_length(_current_str);
             
 				            // Move forward until the text width exceeds the allowed draw width.
@@ -3330,3 +3329,5 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
     #endregion
 	
 }
+
+

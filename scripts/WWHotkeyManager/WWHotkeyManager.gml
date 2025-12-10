@@ -140,22 +140,3 @@ function WWHotkeyManager() constructor {
 	};
 	
 }
-
-
-
-var hotkey_manager = new WWHotkeyManager();
-
-// Register various key sequences
-hotkey_manager.register([ord("S"), vk_control], function() { show_debug_message("Ctrl+S called"); });
-hotkey_manager.register([ord("S"), vk_alt, vk_control], function() { show_debug_message("Ctrl+Alt+S called"); });
-hotkey_manager.register([vk_control, ord("Z")], function() { show_debug_message("Undo"); });
-hotkey_manager.register([vk_pageup], function() { show_debug_message("PageUp called"); });
-hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { show_debug_message("Redo"); });
-hotkey_manager.register([vk_alt, ord("F")], function() { show_debug_message("Alt+F called"); });
-hotkey_manager.register([vk_control, ord("S")], function() { show_debug_message("Ctrl+S duplicate"); }); // This should overwrite the earlier callback
-
-hotkey_manager.build();
-
-// Before optimization
-show_debug_message("--- Before Optimize ---");
-pprint(hotkey_manager.__root, 0);

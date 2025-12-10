@@ -22,7 +22,7 @@ function WWTextBase() : WWCore() constructor {
 				#endregion
 				static set_text = function(_text = "") {
 					if (text.content == _text) return self;
-				
+					
 					var _prev_cursor_x = get_cursor_x_pos();
 					var _prev_cursor_y = get_cursor_y_pos();
 				
@@ -724,6 +724,7 @@ function WWTextBase() : WWCore() constructor {
 			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
 			
 			text = {
+				buffer  : buffer_create(16384, buffer_grow, 1), // The buffer which contains the text
 				content : "", // The main text string displayed or edited in the component.
 				caption : "", // The text string displayed by default when field is empty, will also effect how consoles display a header for the on screen keyboard.
 				font : fGUIDefault, // The font asset used for rendering text.
@@ -2680,99 +2681,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			
             // Handle key events for multi-line input similarly, with logic for newlines.
 			// Register various key sequences
-			#region Deletion — Backspace, Delete, Ctrl+Delete
-			#region No modifier
-			hotkey_manager.register([vk_backspace], function() {
-				/* Delete character before cursor */
-				__textbox_delete_string__(false);
-			});
-			hotkey_manager.register([vk_delete],    function() {
-				/* Delete character after cursor */
-				__textbox_delete_string__(true);
-			});
-			#endregion
-			
-			#region Ctrl Modifier
-			hotkey_manager.register([vk_control, vk_backspace], function() {
-				__delete_word_left__();
-			});
-			hotkey_manager.register([vk_control, vk_delete],    function() { __delete_word_right__(); });
-			#endregion
-			
-			#region Shift Modifier
-			// There is no shift modifier, though we arent using it we will leave the comment here.
-			//hotkey_manager.register([vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
-			//hotkey_manager.register([vk_shift, vk_delete],    function() { /* Delete until end of line */ });
-			#endregion
-			
-			#region Ctrl + Shift Modifier
-	        hotkey_manager.register([vk_control, vk_shift, vk_backspace], function() { __delete_to_line_start__(); });
-	        hotkey_manager.register([vk_control, vk_shift, vk_delete],    function() { __delete_to_line_end__();   });
-			#endregion
-			#endregion
-			
-			#region Clipboard & Edit Commands — Ctrl Combos
-			hotkey_manager.register([vk_control, ord("A")], function() {
-				select_all_text();
-			});
-			hotkey_manager.register([vk_control, ord("C")], function() {
-				var copy_text = copy_selection_to_clipboard();
-				static __ev = {}; __ev.text = copy_text; trigger_event(events.copy, __ev);
-			});
-			
-			
-			// Clipboard
-			hotkey_manager.register([vk_control, ord("V")], function() {
-				var paste_text = __get_clipboard_text__();
-				if (paste_text != "") __insert_text__(paste_text);
-				static __ev = {}; __ev.text = paste_text; trigger_event(events.paste, __ev);
-			});
-			hotkey_manager.register([vk_control, ord("X")], function() { 
-				var copy_text = copy_selection_to_clipboard();
-				static __ev = {}; __ev.text = copy_text; trigger_event(events.copy, __ev);
-				__cut_selection__();
-			});
-			
-			// Undo / Redo
-			hotkey_manager.register([vk_control, ord("Z")], function() { __textbox_records_set__(-1); });
-			hotkey_manager.register([vk_control, ord("Y")], function() { __textbox_records_set__(1);  });
-			hotkey_manager.register([vk_control, vk_shift, ord("Z")], function() { __textbox_records_set__(1); });
-			#endregion
-			
-			#region Control & Submission
-			// Return / Submit
-			hotkey_manager.register([vk_enter], function() {
-			    if (accept_return && !keyboard_check(vk_control)) {
-			        __insert_newline__();
-			        return;
-			    }
-			    // If Enter is treated as submit in this widget, fire submit
-			    if (!accept_return || (accept_return && keyboard_check(vk_control) && submit_ctrl_enter)) {
-			        static __ev = {}; __ev.text = get_text();
-			        trigger_event(events.submit, __ev);
-			    }
-			});
 
-			hotkey_manager.register([vk_control, vk_enter], function() {
-			    if (submit_ctrl_enter) {
-			        static __ev = {}; __ev.text = get_text();
-			        trigger_event(events.submit, __ev);
-			    } else if (accept_return) {
-			        __insert_newline__();
-			    }
-			});
-			
-			hotkey_manager.register([vk_escape], function() { /* Cancel or unfocus */ });
-			#endregion
-			
-			#region Tab / Focus & Indent Control
-			hotkey_manager.register([vk_tab], function() { __indent_selection_or_cursor__(); });
-			hotkey_manager.register([vk_shift, vk_tab], function() { __unindent_selection_or_cursor__(); });
-			hotkey_manager.register([vk_control, vk_tab], function() { /* Optional: Switch next panel/focus group */ });
-			hotkey_manager.register([vk_control, vk_shift, vk_tab], function() { /* Optional: Switch previous panel/focus group */ });
-			#endregion
-			
-			hotkey_manager.build();
 			
         #endregion
 		

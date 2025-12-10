@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextBoxV3",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextBoxV3",
+  "parent":{
+    "name":"TextBoxV3",
+    "path":"folders/TextBoxV3.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

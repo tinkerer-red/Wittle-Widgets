@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextBuffer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextBuffer",
+  "parent":{
+    "name":"TextBoxV3",
+    "path":"folders/TextBoxV3.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

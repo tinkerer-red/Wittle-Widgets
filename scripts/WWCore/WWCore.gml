@@ -1263,7 +1263,7 @@ function WWCore() constructor {
 			__default_user_input__ = {
 				consumed : false,
 			}
-			__user_input__ = json_parse(json_stringify(__default_user_input__));
+			__user_input__ = variable_clone(__default_user_input__);
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0;

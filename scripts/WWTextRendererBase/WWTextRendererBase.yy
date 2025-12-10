@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"TextboxTempDesign",
+  "%Name":"WWTextRendererBase",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"TextboxTempDesign",
+  "name":"WWTextRendererBase",
   "parent":{
-    "name":"Reds_GUI",
-    "path":"Reds_GUI.yyp",
+    "name":"TextBoxV3",
+    "path":"folders/TextBoxV3.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

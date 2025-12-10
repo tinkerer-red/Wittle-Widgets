@@ -9,10 +9,8 @@ function json(_input) {
 /// @param ...args
 function __pprint() {
     var _str = $"PRINTER :: {
-		string_replace(string_replace(__pprint.__file, "gml_Object_", ""), "gml_GlobalScript_", "")
-	}/{
-		string_replace(string_replace(__pprint.__func, "gml_Object_", ""), "gml_Script_", "")
-	}:{__pprint.__line}:\n"
+		string_replace(string_replace(__pprint.__file, "gml_Object_", ""), "gml_GlobalScript_", "")}/{
+		string_replace(string_replace(__pprint.__func, "gml_Object_", ""), "gml_Script_", "")}:{__pprint.__line}:\n"
     
     var _i=0; repeat(argument_count) {
 		_str += json_stringify(__reStruct(argument[_i]), true)+"\n";
@@ -114,10 +112,8 @@ function __reStruct(_struct) {
 /// @param ...args
 function __log() {
     var _str = $"LOGGER :: {
-		string_replace(string_replace(__log.__file, "gml_Object_", ""), "gml_GlobalScript_", "")
-	}/{
-		string_replace(string_replace(__log.__func, "gml_Object_", ""), "gml_Script_", "")
-	}:{__log.__line}:"
+		string_replace(string_replace(__log.__file, "gml_Object_", ""), "gml_GlobalScript_", "")}/{
+		string_replace(string_replace(__log.__func, "gml_Object_", ""), "gml_Script_", "")}:{__log.__line}:"
 	
 	for (var i = 0; i < argument_count; i++) {
         _str += $"\n\t{argument[i]}"
@@ -133,4 +129,4 @@ function __log_pre(_file, _func, _line) {
 }
 
 #macro DEBUG_SPEED_INIT ___time = get_timer()
-#macro DEBUG_SPEED_GET show_debug_message($"{(get_timer()-___time)/1000}ms")
+#macro DEBUG_SPEED_GET show_debug_message((get_timer()-___time)/1000"ms")

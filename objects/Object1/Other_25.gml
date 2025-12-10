@@ -1,4 +1,4 @@
-build_ui_discord = function(){
+Dbuild_ui_discord = function(){
 	// 🌟 Root GUI (Discord Window)
 	root = new WWCore()
 	    .set_offset(0, 0)
@@ -737,13 +737,13 @@ build_ui_text_boxes = function(){
 	// Test 4: Long Text with Scrolling/Line Breaking
 	// -------------------------------------------------------------
 	var longText = "Scrolling Test:\n" + string_repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ", 10);
-	var longTextBox = new WWTextInputMulti()
+	var longTextBox = new WWTextBoxV3()
 	    .set_offset(700, 50)
 	    .set_size(500, 300)
 	    .set_text(longText)
 	    .set_text_color(c_white)
 	    .set_highlight_color(c_red)
-	    .set_line_height(20);
+	    //.set_line_height(20);
 	root.add(longTextBox);
 
 	// -------------------------------------------------------------

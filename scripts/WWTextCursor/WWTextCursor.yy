@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextCursor",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextCursor",
+  "parent":{
+    "name":"TextBoxV3",
+    "path":"folders/TextBoxV3.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

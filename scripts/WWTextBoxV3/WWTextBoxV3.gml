@@ -600,9 +600,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				cursor.set_highlight_active(false);
 				
-				cursor.__mark_dirty__();
-				renderer.__mark_dirty__();
-				renderer.__ensure_layout__();
+				__force_rebuild__();
 				
 				var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
 				cursor.set_index(_new_index);
@@ -623,9 +621,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.set_highlight_active(false);
 				cursor.set_index(_start);
 				
-				cursor.__mark_dirty__();
-				renderer.__mark_dirty__();
-				renderer.__ensure_layout__();
+				__force_rebuild__();
 				
 				__history_add_record__();
 			});
@@ -633,18 +629,20 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, ord("Z")], function() {
 				if (read_only) return;
 				// Undo
-				__history_jump__(-1)
-				
+				__history_jump__(-1);
+				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, ord("Y")], function() {
 				if (read_only) return;
 				// Redo
-				__history_jump__(1)
+				__history_jump__(1);
+				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, vk_shift, ord("Z")], function() {
 				if (read_only) return;
 				// Redo (alternate)
-				__history_jump__(1)
+				__history_jump__(1);
+				__force_rebuild__();
 			});
 			#endregion
 			
@@ -1754,14 +1752,20 @@ function WWTextBoxV3() : WWCore() constructor {
 
 				    buffer.set_text(_record.content);
 				    cursor.set_index(_record.cursor);
-					__history_add_record__();
-
+					
 				    __historic_records_loc__ = _target;
 
 				    cursor.set_highlight_active(false);
 				};
 				
 			#endregion
+			
+			static __force_rebuild__ = function(){
+				cursor.__mark_dirty__();
+				renderer.__mark_dirty__();
+				renderer.__ensure_layout__();
+				cursor.__update_gui_position__()
+			}
 			
 			static __get_renderer__ = function(){
 				return renderer;

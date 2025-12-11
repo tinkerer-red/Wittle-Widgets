@@ -40,6 +40,17 @@ function WWTextCursor() : WWCore() constructor {
 			};
 			
 			#region jsDoc
+			/// @func   set_cursor_visibility()
+			/// @desc   Sets caret index and updates line, col, and GUI position.
+			/// @param  {Bool} read_only
+			/// @returns {Struct.WWTextCursor}
+			#endregion
+			static set_cursor_visibility = function(_bool) {
+				cursor_visible = _bool;
+				return self;
+			};
+			
+			#region jsDoc
 			/// @func   set_index()
 			/// @desc   Sets caret index and updates line, col, and GUI position.
 			/// @param  {Real} _index_new
@@ -47,7 +58,7 @@ function WWTextCursor() : WWCore() constructor {
 			#endregion
 			static set_index = function(_index_new) {
 				if (index != _index_new) {
-					__is_gui_dirty__ = true;
+					__is_dirty__ = true;
 				}
 				index = _index_new;
 				return self;
@@ -78,7 +89,7 @@ function WWTextCursor() : WWCore() constructor {
 			#endregion
 			static set_highlight_start_index = function(_ind) {
 				if (highlight_start_index != _ind) {
-					__is_gui_dirty__ = true;
+					__is_dirty__ = true;
 				}
 				highlight_start_index = _ind;
 				return self;
@@ -92,7 +103,7 @@ function WWTextCursor() : WWCore() constructor {
 			#endregion
 			static set_highlight_end_index = function(_ind) {
 				if (highlight_end_index != _ind) {
-					__is_gui_dirty__ = true;
+					__is_dirty__ = true;
 				}
 				highlight_end_index = _ind;
 				return self;
@@ -148,11 +159,12 @@ function WWTextCursor() : WWCore() constructor {
 				}
 				
 				//Draw cursor
-				draw_set_color(cursor_color);
-				
-				var _line_index = _renderer.get_line_from_index(index)
-				var _glyph_height = _renderer.get_line_height(_line_index);
-				draw_rectangle(x+cursor_x, y+cursor_y, x+cursor_x+1, y+cursor_y+_glyph_height, false);
+				if (cursor_visible) {
+					draw_set_color(cursor_color);
+					var _line_index = _renderer.get_line_from_index(index)
+					var _glyph_height = _renderer.get_line_height(_line_index);
+					draw_rectangle(x+cursor_x, y+cursor_y, x+cursor_x+1, y+cursor_y+_glyph_height, false);
+				}
 				
 				draw_set_color(_pre_color);
 			})
@@ -209,6 +221,7 @@ function WWTextCursor() : WWCore() constructor {
 			index = 0;
 			cursor_x = 0;
 			cursor_y = 0;
+			cursor_visible = true;
 			
 			// Highlight state
 			highlight_active = false;
@@ -223,7 +236,7 @@ function WWTextCursor() : WWCore() constructor {
 			cursor_color = c_white;
 			highlight_color = c_aqua;
 			
-			__is_gui_dirty__ = true;
+			__is_dirty__ = true;
 			__textbox_parent__ = undefined;
 			
 		#endregion
@@ -231,12 +244,20 @@ function WWTextCursor() : WWCore() constructor {
 		#region Functions
 			
 			#region jsDoc
+            /// @func   __mark_dirty__()
+            /// @desc   Marks the cursor as needing recomputation.
+            #endregion
+            static __mark_dirty__ = function() {
+                __is_dirty__ = true;
+            };
+            
+			#region jsDoc
 			/// @func   __update_gui_position__()
 			/// @desc   Resolves GUI x,y from the renderer based on caret index.
 			#endregion
 			static __update_gui_position__ = function() {
-				if (!__is_gui_dirty__) return;
-				__is_gui_dirty__ = false;
+				if (!__is_dirty__) return;
+				__is_dirty__ = false;
 				
 				var _renderer = __textbox_parent__.__get_renderer__();
 				cursor_x = _renderer.get_x_from_index(index);

@@ -740,6 +740,7 @@ build_ui_text_boxes = function(){
 	var longTextBox = new WWTextBoxV3()
 	    .set_offset(700, 50)
 	    .set_size(500, 300)
+		.set_text_font(fGUIDefaultBig)
 	    .set_text(longText)
 	    .set_text_color(c_white)
 	    .set_highlight_color(c_red)

@@ -69,7 +69,7 @@ function __get_controller_archor_y__(_valign=fa_middle) {
 }
 
 
-//todo: add these functions when html5's statig_get(statig_get(self)) is no longer broken
+//todo: add these functions when html5's static_get(statig_get(self)) is no longer broken
 function js_clipboard_get_text(){};
 function js_clipboard_set_text(){};
 function js_clipboard_has_text_(){};

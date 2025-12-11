@@ -6,7 +6,7 @@
 ///		  semantics. Does not know about layout, cursors, or rendering.
 /// @returns {Struct.WWTextBuffer}
 #endregion
-function WWTextBuffer() constructor {
+function WWTextBuffer() : WWCore() constructor {
 	debug_name = "WWTextBuffer";
 	
 	#region Public
@@ -170,14 +170,14 @@ function WWTextBuffer() constructor {
 			
 			#region jsDoc
 			/// @func	insert()
-			/// @desc	Insert text at the given 0-based index. Existing text at and
-			///		  after that index is shifted to the right.
-			/// @param   {Real} _index  : Insertion index (0-based).
-			/// @param   {String} _text : Text to insert.
+			/// @desc	Insert text at the given 0-based *byte* index. Existing bytes at and
+			///         after that index are shifted to the right.
+			/// @param	{Real}  _index : Insertion index (0-based, in bytes).
+			/// @param	{String} _text : Text to insert.
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static insert = function(_index, _text) {
-				//early out
+				// Early out
 				if (_text == "") { return self; }
 				_text = __filter_allowed__(_text);
 				if (_text == "") { return self; }
@@ -192,36 +192,94 @@ function WWTextBuffer() constructor {
 				
 				var _insert_byte_length = string_byte_length(_text);
 				
-				// Clamp index to [0, get_size()]
+				// Get current used byte length
 				var _current_text = get_text();
-				var _pre_str = string_copy(_text, 0, _index);
-				var _byte_index = string_byte_length(_pre_str);
-				
 				var _current_byte_length = string_byte_length(_current_text);
 				
-				// Number of bytes from the right side to preserve:
-				// everything from [_byte_index, _byte_index)
-				var _right_bytes = _current_byte_length - _byte_index;
-				
-				// Copy right side out of the main buffer into the temp buffer
-				if (_right_bytes > 0) {
-					buffer_copy(__buffer__, _byte_index, _right_bytes, __temp_buffer__, 0);
+				// Bytes on the right we need to preserve
+				var _right_bytes = _current_byte_length - _index;
+				if (_right_bytes < 0) {
+					_right_bytes = 0;
 				}
-				
-				// Write the new text into the main buffer at _byte_index
-				buffer_seek(__buffer__, buffer_seek_start, _byte_index);
-				buffer_write(__buffer__, buffer_text, _text);
-				
-				// Copy the preserved right side back into the main buffer after the insert
+	
+				// Copy right side into temp
 				if (_right_bytes > 0) {
-					var _dest_offset = _byte_index + _insert_byte_length;
+					buffer_copy(__buffer__, _index, _right_bytes, __temp_buffer__, 0);
+				}
+	
+				// Write new text at insertion point
+				buffer_seek(__buffer__, buffer_seek_start, _index);
+				buffer_write(__buffer__, buffer_text, _text);
+	
+				// Copy preserved right side back after inserted text
+				if (_right_bytes > 0) {
+					var _dest_offset = _index + _insert_byte_length;
 					buffer_copy(__temp_buffer__, 0, _right_bytes, __buffer__, _dest_offset);
 				}
 	
+				// New terminator at end of text
+				var _final_byte_length = _current_byte_length + _insert_byte_length;
+				buffer_seek(__buffer__, buffer_seek_start, _final_byte_length);
+				buffer_write(__buffer__, buffer_u8, 0);
+	
 				__is_dirty__ = true;
-				
 				return self;
 			};
+			
+			#region jsDoc
+			/// @func    erase()
+			/// @desc    Erase bytes in the given 0-based index range (start, end).
+			/// @param   {Real} _start : Start index (0-based, inclusive, in bytes).
+			/// @param   {Real} _end   : End index (0-based, exclusive, in bytes).
+			/// @returns {Struct.WWTextBuffer}
+			#endregion
+			static erase = function(_start, _end) {
+				// No range to erase
+				if (_start == _end) { return self; }
+				
+				// Ensure backing buffers exist
+				if (!buffer_exists(__buffer__)) {
+					__buffer__ = buffer_create(65536, buffer_grow, 1);
+					return;
+				}
+				if (!buffer_exists(__temp_buffer__)) {
+					__temp_buffer__ = buffer_create(65536, buffer_grow, 1);
+				}
+				
+				var _current_text = get_text();
+				var _current_byte_length = string_byte_length(_current_text);
+	
+				// Nothing to erase if empty
+				if (_current_byte_length <= 0) { return self; }
+				
+				// Normalize so start <= end
+				if (_start > _end) {
+					var _temp_swap = _start;
+					_start = _end;
+					_end = _temp_swap;
+				}
+				
+				// Bytes on the right to preserve (everything after _end)
+				var _right_bytes = _current_byte_length - _end;
+				if (_right_bytes <= 0) {
+					_right_bytes = 0;
+				}
+				// Copy right side into temp
+				if (_right_bytes > 0) {
+					buffer_copy(__buffer__, _end, _right_bytes, __temp_buffer__, 0);
+					buffer_copy(__temp_buffer__, 0, _right_bytes, __buffer__, _start);
+				}
+				
+				// New terminator at end of shortened text
+				var _final_byte_length = _start + _right_bytes;
+				buffer_seek(__buffer__, buffer_seek_start, _final_byte_length);
+				buffer_write(__buffer__, buffer_u8, 0);
+				
+				__is_dirty__ = true;
+				return self;
+			};
+
+
 			
 		#endregion
 		

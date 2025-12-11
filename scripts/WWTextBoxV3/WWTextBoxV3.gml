@@ -18,7 +18,9 @@ function WWTextBoxV3() : WWCore() constructor {
 		buffer  .__set_textbox__(self);
 		renderer.__set_textbox__(self);
 		
-		add([cursor, renderer]);
+		cursor.add([renderer]);
+		
+		add([buffer, cursor]);
 		
 	#endregion
 	
@@ -38,6 +40,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				static set_text = function(_text = "") {
 					if (buffer.get_text() == _text) return self;
 					buffer.set_text(_text);
+					__history_add_record__();
 					return self;
 				}
 				#region jsDoc
@@ -92,6 +95,32 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			
 			#region jsDoc
+			/// @func    set_read_only()
+			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
+			///          like one would from a console or webpage, but modifying the text is prohibited.
+			/// @self    WWTextBase
+			/// @param   {Bool} read_only : If the text is read only.
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_read_only = function(_bool) {
+				read_only = _bool;
+				cursor.set_cursor_visibility(_bool);
+				return self;
+			}
+			
+			#region jsDoc
+			/// @func	set_cursor_color()
+			/// @desc	Sets the color for the selection highlight.
+			/// @self	WWTextBase
+			/// @param   {Constant.Color} _color : The highlight color.
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_cursor_color = function(_color = #FFFFFF) {
+				cursor.set_cursor_color(_color);
+				return self;
+			}
+			
+			#region jsDoc
 			/// @func	set_highlight_color()
 			/// @desc	Sets the color for the selection highlight.
 			/// @self	WWTextBase
@@ -142,10 +171,13 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @func    set_cursor_index()
 				/// @desc    Get cursor's x position in the GUI
 				/// @self    GUICompTextbox
+				/// @param  {String} _allowed_char : A string of allowed characters (optional).
 				/// @returns {Real}
 				#endregion
-				static set_cursor_index = function() {
-					return cursor.set_index();
+				static set_cursor_index = function(_index) {
+					var _r = cursor.set_index(_index);
+					__history_update_latest_cursor__();
+					return _r;
 				}
 				#region jsDoc
 				/// @func    set_cursor_highlight_start_index()
@@ -231,7 +263,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#endregion
 				static set_cursor_xy = function(_x, _y) {
 					var _index = renderer.get_index_from_xy(_x, _y);
-					return cursor.set_index(_index);
+					var _r = cursor.set_index(_index);
+					__history_update_latest_cursor__();
+					return _r
 				}
 				
 			#endregion
@@ -303,116 +337,32 @@ function WWTextBoxV3() : WWCore() constructor {
 				__word_selection_mode__ = false;
 			})
 			on_double_click(function(_data) {
-			    __highlight_word_at_cursor__();
+			    var _loc = __compute_word_boundaries__(cursor.get_index());
+				
+				// Activate the selection.
+				cursor.set_highlight_active(true);
+				
+				// Set selection: highlight from startPos to endPos in the current line.
+				cursor.set_highlight_start_index(_loc.index_start);
+				cursor.set_highlight_end_index(_loc.index_end);
+				cursor.set_index(_loc.index_end);
+				__history_update_latest_cursor__();
 			    
-				__word_anchor_start__ = cursor.get_highlight_start_index();
-			    __word_anchor_end__   = cursor.get_highlight_end_index();
-			    
+				__word_anchor_start__ = _loc.index_start;
+			    __word_anchor_end__   = _loc.index_end;
 				__word_selection_mode__ = true;
 				
 				cursor_last_width = renderer.get_x_from_index(cursor.get_index());
 			});
 			
 			on_focus(function(_input) {
-				/*
-			    #region --- Navigation Controls: Arrow Keys ---
-			    // Left arrow
-			    if (keyboard_check_pressed(vk_left)) {
-			        __move_cursor_offset__(-1, keyboard_check(vk_shift), false, keyboard_check(vk_control));
-			    }
-			    // Right arrow
-			    if (keyboard_check_pressed(vk_right)) {
-			        __move_cursor_offset__(1, keyboard_check(vk_shift), false, keyboard_check(vk_control));
-			    }
-			    // Up arrow
-			    if (keyboard_check_pressed(vk_up)) {
-			        __move_cursor_offset__(-1, keyboard_check(vk_shift), true, keyboard_check(vk_control));
-			    }
-			    // Down arrow
-			    if (keyboard_check_pressed(vk_down)) {
-			        __move_cursor_offset__(1, keyboard_check(vk_shift), true, keyboard_check(vk_control));
-			    }
-			    #endregion
-				#region --- Home/End Navigation ---
-			    if (keyboard_check_pressed(vk_home)) {
-			        if (!cursor.get_highlight_active()) {
-						highlight_x_pos = cursor_x_pos;
-						highlight_y_pos = cursor_y_pos;
-						cursor.set_highlight_active(true);
-					}
-					
-					set_cursor_x_pos(0);
-					
-					if (keyboard_check(vk_control)) {
-			            set_cursor_y_pos(0);
-			        }
-					
-			        if (!keyboard_check(vk_shift)) {
-			            cursor.set_highlight_active(false);
-			        }
-					
-					cursor_last_width = renderer.get_x_from_index(cursor.get_index())
-			    }
-			    if (keyboard_check_pressed(vk_end)) {
-			        if (!cursor.get_highlight_active()) {
-						highlight_x_pos = cursor_x_pos;
-						highlight_y_pos = cursor_y_pos;
-						cursor.set_highlight_active(true);
-					}
-					
-					
-					
-					if (keyboard_check(vk_control)) {
-			            set_cursor_y_pos(array_length(__lines__)-1);
-			        }
-					
-					// Get the end position of the current line.
-			        var _lineText = __lines__[cursor_y_pos];
-			        var _endPos = __string_length(_lineText);
-					
-					set_cursor_x_pos(_endPos);
-					
-			        if (!keyboard_check(vk_shift)) {
-			            cursor.set_highlight_active(false);
-			        }
-					
-					cursor_last_width = renderer.get_x_from_index(cursor.get_index())
-			    }
-			    #endregion
-			    #region --- Page Up/Page Down Navigation ---
-			    // Assuming a page is roughly 5 lines.
-			    if (keyboard_check_pressed(vk_pageup)) {
-			        var _newLine = cursor_y_pos - 5;
-			        if (_newLine < 0) { _newLine = 0; }
-			        if (keyboard_check(vk_shift)) {
-			            set_cursor_y_pos(_newLine);
-			        }
-					else {
-			            cursor.set_highlight_active(false);
-			            set_cursor_y_pos(_newLine);
-			        }
-			    }
-			    if (keyboard_check_pressed(vk_pagedown)) {
-			        var _maxLine = array_length(__lines__) - 1;
-			        var _newLine = cursor_y_pos + 5;
-			        if (_newLine > _maxLine) { _newLine = _maxLine; }
-			        if (keyboard_check(vk_shift)) {
-			            set_cursor_y_pos(_newLine);
-			        }
-					else {
-			            cursor.set_highlight_active(false);
-			            set_cursor_y_pos(_newLine);
-			        }
-			    }
-			    #endregion
-				//*/
-			    hotkeys.step()
+				hotkeys.step()
 			});
 			
-			// Pre-draw event handler.
-			on_pre_draw(function(_input) {
-			    
-			});
+			//// Pre-draw event handler.
+			//on_pre_draw(function(_input) {
+			//    
+			//});
 			
 		#endregion
         
@@ -441,6 +391,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _line = renderer.get_line_from_index(_index);
 				var _new_index = renderer.get_line_index_start(_line);
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
+				
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_end], function() {
@@ -449,6 +401,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _line = renderer.get_line_from_index(_index);
 				var _new_index = renderer.get_line_index_end(_line);
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_pageup], function() {
@@ -479,12 +432,14 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.set_highlight_active(false);
 				var _new_index = 0;
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_control, vk_end], function() {
 				cursor.set_highlight_active(false);
 				var _new_index = renderer.get_glyph_count()-1;
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			
@@ -512,12 +467,14 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.set_highlight_active(true);
 				var _new_index = 0;
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_shift, vk_end], function() {
 				cursor.set_highlight_active(true);
 				var _new_index = renderer.get_glyph_count()-1;
 				cursor.set_index(_new_index);
+				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_shift, vk_pageup], function() {
@@ -570,18 +527,40 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region Deletion — Backspace, Delete, Ctrl+Delete
 			#region No modifier
-			hotkeys.register([vk_backspace], function() { /* Delete character before cursor */ });
-			hotkeys.register([vk_delete],    function() { /* Delete character after cursor */ });
+			hotkeys.register([vk_backspace], function() {
+				if (read_only) return;
+				// Delete character before cursor
+				
+			});
+			hotkeys.register([vk_delete],    function() {
+				if (read_only) return;
+				// Delete character after cursor
+				
+			});
 			#endregion
 			
 			#region Ctrl Modifier
-			hotkeys.register([vk_control, vk_backspace], function() { /* Delete previous word */ });
-			hotkeys.register([vk_control, vk_delete],    function() { /* Delete next word */ });
+			hotkeys.register([vk_control, vk_backspace], function() {
+				if (read_only) return;
+				// Delete previous word
+				
+			});
+			hotkeys.register([vk_control, vk_delete],    function() {
+				if (read_only) return;
+				// Delete next word
+				
+			});
 			#endregion
 			
 			#region Ctrl + Shift Modifier
-			hotkeys.register([vk_control, vk_shift, vk_backspace], function() { /* Delete until begining of line */ });
-			hotkeys.register([vk_control, vk_shift, vk_delete],    function() { /* Delete until end of line */ });
+			hotkeys.register([vk_control, vk_shift, vk_backspace], function() {
+				if (read_only) return;
+				// Delete until begining of line
+			});
+			hotkeys.register([vk_control, vk_shift, vk_delete],    function() {
+				if (read_only) return;
+				// Delete until end of line
+			});
 			#endregion
 			#endregion
 			
@@ -590,30 +569,126 @@ function WWTextBoxV3() : WWCore() constructor {
 				select_all_text();
 			});
 			hotkeys.register([vk_control, ord("C")], function() {
-				copy_selection_to_clipboard();
+				var _start = cursor.get_highlight_start_index();
+				var _end   = cursor.get_highlight_end_index();
+				var _buffer_start = renderer.get_glyph_buffer_index(_start);
+				var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+				var _string = buffer.get_substring(_buffer_start, _buffer_end);
+				__clipboard_set_text__(_string);
 			});
-			//hotkeys.register([vk_control, ord("V")], function() { /* Paste */ });
-			//hotkeys.register([vk_control, ord("X")], function() { /* Cut */ });
+			hotkeys.register([vk_control, ord("V")], function() {
+				if (read_only) return;
+				// Paste
+				var _str = __clipboard_get_text__();
+				var _str_byte_len = string_byte_length(_str);
+				
+				var _index = cursor.get_index();
+				var _buffer_index = renderer.get_glyph_buffer_index(_index);
+				
+				if (cursor.get_highlight_active()) {
+					//replace the highlighted text
+					var _start = cursor.get_highlight_start_index();
+					var _end   = cursor.get_highlight_end_index();
+					var _buffer_start = renderer.get_glyph_buffer_index(_start);
+					var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+					buffer.erase(_buffer_start, _buffer_end);
+					_buffer_index = _buffer_start;
+				}
+				
+				// insert the text
+				buffer.insert(_buffer_index, _str);
+				
+				cursor.set_highlight_active(false);
+				
+				cursor.__mark_dirty__();
+				renderer.__mark_dirty__();
+				renderer.__ensure_layout__();
+				
+				var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
+				cursor.set_index(_new_index);
+				
+				__history_add_record__();
+			});
+			hotkeys.register([vk_control, ord("X")], function() {
+				if (read_only) return;
+				// Cut
+				var _start = cursor.get_highlight_start_index();
+				var _end   = cursor.get_highlight_end_index();
+				var _buffer_start = renderer.get_glyph_buffer_index(_start);
+				var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+				var _string = buffer.get_substring(_buffer_start, _buffer_end);
+				__clipboard_set_text__(_string);
+				buffer.erase(_buffer_start, _buffer_end);
+				
+				cursor.set_highlight_active(false);
+				cursor.set_index(_start);
+				
+				cursor.__mark_dirty__();
+				renderer.__mark_dirty__();
+				renderer.__ensure_layout__();
+				
+				__history_add_record__();
+			});
 			
-			//hotkeys.register([vk_control, ord("Z")], function() { /* Undo */ });
-			//hotkeys.register([vk_control, ord("Y")], function() { /* Redo */ });
-			//hotkeys.register([vk_control, vk_shift, ord("Z")], function() { /* Redo (alternate) */ });
+			hotkeys.register([vk_control, ord("Z")], function() {
+				if (read_only) return;
+				// Undo
+				__history_jump__(-1)
+				
+			});
+			hotkeys.register([vk_control, ord("Y")], function() {
+				if (read_only) return;
+				// Redo
+				__history_jump__(1)
+			});
+			hotkeys.register([vk_control, vk_shift, ord("Z")], function() {
+				if (read_only) return;
+				// Redo (alternate)
+				__history_jump__(1)
+			});
 			#endregion
 			
 			#region Control & Submission
-			hotkeys.register([vk_enter], function() { /* Submit or insert new line */ });
-			hotkeys.register([vk_shift, vk_enter], function() { /* Insert new line (force multiline) */ });
-			hotkeys.register([vk_control, vk_enter], function() { /* Optional: Submit (e.g., Ctrl+Enter) */ });
-			hotkeys.register([vk_control, vk_shift, vk_enter], function() { /* Optional: Multiline submit override */ });
+			hotkeys.register([vk_enter], function() {
+				if (read_only) return;
+				//Submit or insert new line
+			});
+			hotkeys.register([vk_shift, vk_enter], function() {
+				if (read_only) return;
+				// Insert new line (force multiline)
+			});
+			hotkeys.register([vk_control, vk_enter], function() {
+				if (read_only) return;
+				// Optional: Submit (e.g., Ctrl+Enter)
+			});
+			hotkeys.register([vk_control, vk_shift, vk_enter], function() {
+				if (read_only) return;
+				// Optional: Multiline submit override
+			});
 			
-			hotkeys.register([vk_escape], function() { /* Cancel or unfocus */ });
+			hotkeys.register([vk_escape], function() {
+				if (read_only) return;
+				// Cancel or unfocus
+			});
 			#endregion
 			
 			#region Tab / Focus & Indent Control
-			hotkeys.register([vk_tab], function() { /* Indent or move to next focus */ });
-			hotkeys.register([vk_shift, vk_tab], function() { /* Unindent or move to previous focus */ });
-			hotkeys.register([vk_control, vk_tab], function() { /* Optional: Switch next panel/focus group */ });
-			hotkeys.register([vk_control, vk_shift, vk_tab], function() { /* Optional: Switch previous panel/focus group */ });
+			hotkeys.register([vk_tab], function() {
+				if (read_only) return;
+				// Indent or move to next focus
+			});
+			hotkeys.register([vk_shift, vk_tab], function() {
+				if (read_only) return;
+				// Unindent or move to previous focus
+			});
+			hotkeys.register([vk_control, vk_tab], function() {
+				if (read_only) return;
+				// Optional: Switch next panel/focus group
+			});
+			hotkeys.register([vk_control, vk_shift, vk_tab], function() {
+				if (read_only) return;
+				// Optional: Switch previous panel/focus group
+			});
 			#endregion
 			
 			hotkeys.build();
@@ -623,6 +698,7 @@ function WWTextBoxV3() : WWCore() constructor {
         #region Variables
 			
 			is_focusable  = true;
+			read_only = false;
 			
 		#endregion
         
@@ -646,6 +722,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			static clear_text = function() {
 				buffer.clear_text();
+				cursor.set_index(0);
+				__history_update_latest_cursor__();
+				cursor.set_highlight_active(false);
 			}
 			#region jsDoc
 			/// @func    select_all_text()
@@ -654,8 +733,12 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static select_all_text = function() {
-				var _size = buffer.get_size();
-				cursor.set_highlight_index(0, _size);
+				var _glyph_count = renderer.get_glyph_count();
+				cursor.set_highlight_active(true);
+				cursor.set_highlight_start_index(0);
+				cursor.set_highlight_end_index(_glyph_count-1);
+				cursor.set_index(_glyph_count-1);
+				__history_update_latest_cursor__();
 			}
 			
 			#region Sizing
@@ -768,7 +851,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					return cursor.get_highlight_end_col();
 				}
 				
-				//GUI
+				//Relative GUI
 				#region jsDoc
 				/// @func    get_cursor_x()
 				/// @desc    Get cursor's x position in the GUI
@@ -851,25 +934,6 @@ function WWTextBoxV3() : WWCore() constructor {
 				};
 			
 			#endregion
-
-			#region Clipboard
-				
-				#region jsDoc
-				/// @func	copy_selection_to_clipboard()
-				/// @desc	Copies the selected text to the clipboard. If the selection is on a single line,
-				///         it extracts the substring between the cursor and the selection anchor. For multi‑line
-				///         selections, it extracts the portion from the selection start on the first line,
-				///         all full lines in between, and the portion up to the selection end on the last line.
-				/// @self	WWTextBase
-				/// @returns {String} The copied text.
-				#endregion
-				static copy_selection_to_clipboard = function() {
-					var _start = cursor.get_highlight_start_index();
-					var _end   = cursor.get_highlight_end_index();
-					return buffer.get_substring(_start, _end);
-				}
-				
-		    #endregion
 			
         #endregion
 		
@@ -892,7 +956,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			__cursor_last_width__ = undefined; //The last known x position in pixels, to ensure pressing up or down multiple times doesnt deviate the cursor off from its intended "center"
 			
-			__historic_records_loc__ = 0;
+			__historic_records_loc__ = -1;
 			__historic_records__ = [];
 			__history_records_limit__ = 65536; // power(2, 16); // we'll simply allow for a lot to start with, memory shouldnt be an issue but for low end devices this is here as an option
 			
@@ -1080,11 +1144,13 @@ function WWTextBoxV3() : WWCore() constructor {
 						if (_line == 0) && (_vector < 0) {
 							var _new_index = renderer.get_line_index_start(_line);
 							cursor.set_index(_new_index)
+							__history_update_latest_cursor__();
 							return;
 						}
 						if (_line == _line_count-1) && (_vector > 0) {
 							var _new_index = renderer.get_line_index_end(_line);
 							cursor.set_index(_new_index)
+							__history_update_latest_cursor__();
 							return;
 						}
 						
@@ -1092,10 +1158,11 @@ function WWTextBoxV3() : WWCore() constructor {
 						var _yoff = renderer.get_line_y_offset(_new_line);
 						var _new_index = renderer.get_index_from_xy(x+cursor_last_width, y+_yoff);
 						cursor.set_index(_new_index);
+						__history_update_latest_cursor__();
 					}
 					else {
 						if (_word_mode) {
-							var _index = cursor.get_index()
+							var _index = cursor.get_index()+_vector;
 							var _line = renderer.get_line_from_index(_index);
 							var _start = renderer.get_line_index_start(_line);
 							var _end   = renderer.get_line_index_end(_line);
@@ -1103,21 +1170,28 @@ function WWTextBoxV3() : WWCore() constructor {
 							
 							var _word_breakers = __word_breakers;
 							
+							var _new_index = _index;
+							
 							var _i = _index+_vector;
-							var _length = (_vector) ? _end-_i : _i-_start;
+							var _length = (_vector) ? _end-_i : _i-_start+1;
 							repeat(_length) {
-								var _new_index = _i;
 								var _char = renderer.get_glyph_char(_i);
 								if (string_pos(_char, _word_breakers)) {
+									if (_vector) {
+										_new_index = _i;
+									}
 									break;
 								}
+								_new_index = _i;
 							_i+=_vector}
 							
 							cursor.set_index(_new_index);
+							__history_update_latest_cursor__();
 						}
 						else {
 							var _index = cursor.get_index() + _vector;
 							cursor.set_index(_index);
+							__history_update_latest_cursor__();
 						}
 						cursor_last_width = renderer.get_x_from_index(cursor.get_index());
 					}
@@ -1192,6 +1266,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					var _final_y_offset = renderer.get_line_y_offset(_target_line);
 					var _new_index = renderer.get_index_from_xy(x + cursor_last_width, y + _final_y_offset);
 					cursor.set_index(_new_index);
+					__history_update_latest_cursor__();
 
 					// Update highlight
 					var _final_index = cursor.get_index();
@@ -1397,7 +1472,6 @@ function WWTextBoxV3() : WWCore() constructor {
 					var _index = cursor.get_index();
 					buffer.insert(_index, _str);
 				}
-
 				
 				#region jsDoc
 				/// @func	__textbox_delete_string__()
@@ -1468,7 +1542,7 @@ function WWTextBoxV3() : WWCore() constructor {
 						set_cursor_y_pos(_current_line_index);
 						set_cursor_x_pos(_current_cursor_pos);
 						if (dynamic_width) __break_lines__(_current_line_index, 1);
-						__textbox_records_add__(_current_line_index, _current_cursor_pos);
+						__history_add_record__();
 						return;
 					}
 					
@@ -1512,31 +1586,8 @@ function WWTextBoxV3() : WWCore() constructor {
 					set_cursor_y_pos(_current_line_index);
 					set_cursor_x_pos(_current_cursor_pos);
 					if (dynamic_width) __break_lines__(_current_line_index, 1);
-					__textbox_records_add__(_current_line_index, _current_cursor_pos);
+					__history_add_record__();
 				}
-				
-				#region jsDoc
-				/// @func    __highlight_word_at_cursor__
-				/// @desc    Highlights the word at the current cursor position.  
-				///          - If the character at the cursor is not a word breaker (as defined by __word_breakers),  
-				///            it expands the selection left and right until a word breaker is encountered.  
-				///          - If the character is a word breaker, then:
-				///              - If it is a space or tab, it selects all adjacent spaces and tabs.
-				///              - Otherwise, it selects all contiguous word breaker characters.
-				/// @self    WWTextBase
-				/// @returns {undefined}
-				#endregion
-				static __highlight_word_at_cursor__ = function() {
-				    var _loc = __compute_word_boundaries__(cursor.get_index());
-					
-					// Activate the selection.
-				    cursor.set_highlight_active(true);
-					
-				    // Set selection: highlight from startPos to endPos in the current line.
-					cursor.set_highlight_start_index(_loc.index_start);
-					cursor.set_highlight_end_index(_loc.index_end);
-					cursor.set_index(_loc.index_end);
-				};
 				
 				#region jsDoc
 				/// @func    __update_word_selection_drag__
@@ -1580,8 +1631,8 @@ function WWTextBoxV3() : WWCore() constructor {
 					cursor.set_highlight_active(true);
 					cursor.set_highlight_start_index(_selection_start_index);
 					cursor.set_highlight_end_index(_selection_end_index);
+					__history_update_latest_cursor__();
 				};
-
 				
 				#region jsDoc
 			    /// @func    __clipboard_get_text__()
@@ -1630,91 +1681,86 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			
 			#region Undo / Redo
-
-			    #region jsDoc
-				/// @func    __record__()
-				/// @desc    Snapshot record constructor for undo/redo history.
-				///          Stores a clone of the text lines, the active line, cursor position, and the width‐breakpoints.
-				/// @self    WWTextInputSingle
-				/// @param   {Array<String>} _lines_arr : The text content as an array of lines.
-				/// @param   {Real} _line              : The active line index.
-				/// @param   {Real} _cursor            : The cursor position within the active line.
-				/// @param   {Array<Bool>} _break_arr  : The array of soft-break flags.
-				/// @returns {Struct} A record object.
-				#endregion
-				static __record__ = function(_content, _cursor_index) constructor {
-				    content = _content;
-				    cursor = _cursor_index;
-				};
-
+				
 				#region jsDoc
-				/// @func    __textbox_records_add__()
-				/// @desc    Adds a new snapshot to the history stack for undo/redo.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _line   : The active line index.
-				/// @param   {Real} _cursor : The cursor position in the active line.
+				/// @func    __history_record_create__()
+				/// @desc    Constructor for an undo/redo snapshot.
+				/// @param   {String} _content       : Full text content.
+				/// @param   {Real}   _cursor_index  : Global cursor index.
+				/// @returns {Struct} A history snapshot.
+				#endregion
+				static __history_record_create__ = function(_content, _cursor_index) constructor {
+				    content = _content;
+				    cursor  = _cursor_index;
+				};
+				
+				#region jsDoc
+				/// @func    __history_add_record__()
+				/// @desc    Captures a new snapshot and pushes it to the undo history.
 				/// @returns {undefined}
 				#endregion
-				static __textbox_records_add__ = function() {
-				    var nextRecordIndex = __historic_records_loc__ + 1;
-    
-				    // Truncate history if we're not at the end.
-				    if (nextRecordIndex < array_length(__historic_records__)) {
-				        array_resize(__historic_records__, nextRecordIndex);
+				static __history_add_record__ = function() {
+
+				    var _next_index = __historic_records_loc__ + 1;
+
+				    // If not at end of history, truncate forward history
+				    if (_next_index < array_length(__historic_records__)) {
+				        array_resize(__historic_records__, _next_index);
 				    }
-    
-				    // Create a new record by cloning current state.
-				    var _record = new __record__(
+
+				    // Create new snapshot
+				    var _record = new __history_record_create__(
 				        buffer.get_text(),
-				        cursor.get_index(),
+				        cursor.get_index()
 				    );
-    
+
 				    array_push(__historic_records__, _record);
-    
-				    // Limit history to a maximum number of records.
+
+				    // Enforce max history limit
 				    if (array_length(__historic_records__) > __history_records_limit__) {
 				        array_delete(__historic_records__, 0, 1);
-				        nextRecordIndex -= 1;
+				        _next_index -= 1;
 				    }
-    
-				    __historic_records_loc__ = nextRecordIndex;
-				};
 
+				    __historic_records_loc__ = _next_index;
+				};
+				
 				#region jsDoc
-				/// @func    __textbox_records_update_cursor__()
-				/// @desc    Updates the latest history record with the current cursor position.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _line   : The active line index.
-				/// @param   {Real} _cursor : The cursor position in the active line.
+				/// @func    __history_update_latest_cursor__()
+				/// @desc    Updates the most recent snapshot’s cursor field.
 				/// @returns {undefined}
 				#endregion
-				static __textbox_records_update_cursor__ = function() {
+				static __history_update_latest_cursor__ = function() {
 				    __historic_records__[__historic_records_loc__].cursor = cursor.get_index();
 				};
-
+				
 				#region jsDoc
-				/// @func    __textbox_records_set__()
-				/// @desc    Moves the history cursor by _change steps and restores that snapshot (for undo/redo).
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _change : The number of steps to move in the history (negative for undo, positive for redo).
+				/// @func    __history_jump__()
+				/// @desc    Moves through undo/redo history by a signed offset
+				///          and restores the corresponding snapshot.
+				/// @param   {Real} _change : Negative=undo, Positive=redo.
 				/// @returns {undefined}
 				#endregion
-				static __textbox_records_set__ = function(_change) {
-				    var targetIndex = __historic_records_loc__ + _change;
-    
-				    // Ensure the target index is within bounds.
-				    if (targetIndex < 0 || targetIndex >= array_length(__historic_records__)) {
+				static __history_jump__ = function(_change) {
+
+				    var _target = __historic_records_loc__ + _change;
+
+				    // Bounds check
+				    if (_target < 0 || _target >= array_length(__historic_records__)) {
 				        return;
 				    }
-    
-				    var record = __historic_records__[targetIndex];
-				    buffer.set_text(record.content);
-				    cursor.set_index(record.cursor_index);
-					
-				    __historic_records_loc__ = targetIndex;
+
+				    var _record = __historic_records__[_target];
+
+				    buffer.set_text(_record.content);
+				    cursor.set_index(_record.cursor);
+					__history_add_record__();
+
+				    __historic_records_loc__ = _target;
+
 				    cursor.set_highlight_active(false);
 				};
-
+				
 			#endregion
 			
 			static __get_renderer__ = function(){

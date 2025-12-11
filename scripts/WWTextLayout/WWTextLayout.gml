@@ -1,7 +1,6 @@
 /// @func    WWTextLayout()
 /// @desc    Layout handler that owns a ds_map-based text layout.
-function WWTextLayout() constructor
-{
+function WWTextLayout() constructor {
     // Root layout map
     layout_data = {};
     
@@ -500,8 +499,7 @@ function WWTextLayout() constructor
 	/// @param   {Real} _buffer_index
 	/// @returns {Real}
 	#endregion
-	static get_glyph_for_buffer_index = function(_buffer_index)
-	{
+	static get_glyph_for_buffer_index = function(_buffer_index) {
 	    var _glyphs = layout_data.glyphs;
 	    var _count = layout_data.glyphs_count;
 		

@@ -29,7 +29,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         return self;
                     }
                     caption = _new_text;
-                    __mark_layout_dirty__();
+                    __mark_dirty__();
                     return self;
                 };
         
@@ -49,7 +49,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         return self;
                     }
                     font = _font_asset;
-                    __mark_layout_dirty__();
+                    __mark_dirty__();
                     return self;
                 };
                 
@@ -94,7 +94,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 #endregion
                 static set_wrap_width = function(_wrap_width_pixels) {
                     wrap_width = _wrap_width_pixels;
-                    __mark_layout_dirty__();
+                    __mark_dirty__();
                     return self;
                 };
                 
@@ -106,7 +106,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 #endregion
                 static set_line_sep = function(_line_sep_pixels) {
                     line_sep = _line_sep_pixels;
-                    __mark_layout_dirty__();
+                    __mark_dirty__();
                     return self;
                 };
             
@@ -123,10 +123,14 @@ function WWTextRendererBase() : WWCore() constructor {
             }
             
             on_text_change(function(_input) {
-                __mark_layout_dirty__();
+                __mark_dirty__();
             });
             
-            on_pre_draw(function(_input) {
+            on_post_step(function(_input) {
+                __ensure_layout__();
+            });
+            
+			on_post_draw(function(_input) {
                 __ensure_layout__();
                 __draw_text__(x, y);
             });
@@ -137,7 +141,7 @@ function WWTextRendererBase() : WWCore() constructor {
             
             // Styling
             caption     = "";
-            font        = -1;
+            font        = fGUIDefault;
             color       = c_white;
             alpha       = 1;
             
@@ -619,7 +623,196 @@ function WWTextRendererBase() : WWCore() constructor {
 			};
 
 			#endregion
-        #endregion
+			
+			#region Buffer region
+			
+			#region jsDoc
+			/// @func   get_buffer_index_from_index()
+			/// @desc   Convert a logical text index into a buffer byte offset.
+			///         This uses the line’s glyph range to avoid scanning all glyphs.
+			/// @param  {Real} _index
+			/// @returns {Real}
+			#endregion
+			static get_buffer_index_from_index = function(_index) {
+				__ensure_layout__();
+				
+				var _line_count = __layout__.get_line_count();
+				if (_line_count <= 0) { return 0; }
+				
+				// Find the line for this index
+				var _line_index = get_line_from_index(_index);
+				
+				var _line_start_index = __layout__.get_line_index_start(_line_index);
+				var _line_end_index   = __layout__.get_line_index_end(_line_index);
+				
+				// Glyph range for this line [glyph_start, glyph_end)
+				var _glyph_start = __layout__.get_line_index_start(_line_index);
+				var _glyph_end   = __layout__.get_line_index_end(_line_index);
+				var _glyph_count_line = _glyph_end - _glyph_start;
+				
+				// If this line has no glyphs, fall back to previous line end or 0
+				if (_glyph_count_line <= 0) {
+					if (_line_index > 0) {
+						var _prev_line = _line_index - 1;
+						var _prev_glyph_start = __layout__.get_line_index_start(_prev_line);
+						var _prev_glyph_end   = __layout__.get_line_index_end(_prev_line);
+						if (_prev_glyph_end > _prev_glyph_start) {
+							var _prev_last_glyph = _prev_glyph_end - 1;
+							var _prev_buf_start  = __layout__.get_glyph_buffer_index(_prev_last_glyph);
+							var _prev_buf_size   = __layout__.get_glyph_buffer_size(_prev_last_glyph);
+							return _prev_buf_start + _prev_buf_size;
+						}
+					}
+					return 0;
+				}
+				
+				// Compute buffer end of this line (end of the last glyph in line)
+				var _last_glyph_in_line = _glyph_end - 1;
+				var _last_buf_start     = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
+				var _last_buf_size      = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
+				var _line_buf_end       = _last_buf_start + _last_buf_size;
+				
+				// Clamp index to line bounds
+				if (_index <= _line_start_index) {
+					// At or before the first character in this line
+					return __layout__.get_glyph_buffer_index(_glyph_start);
+				}
+				if (_index >= _line_end_index) {
+					// At or after the end of this line
+					return _line_buf_end;
+				}
+				
+				// Search only glyphs in this line
+				var _result = _line_buf_end;
+				var _g = _glyph_start;
+				repeat (_glyph_count_line) {
+					var _logical_index = __layout__.get_glyph_index(_g);
+					if (_logical_index >= _index) {
+						_result = __layout__.get_glyph_buffer_index(_g);
+						break;
+					}
+					_g++;
+				}
+	
+				return _result;
+			};
+			
+			#region jsDoc
+			/// @func   get_index_from_buffer_index()
+			/// @desc   Convert a buffer byte offset into the nearest logical text index.
+			///         First narrows to a line using that line’s glyph buffer range, then
+			///         searches only the glyphs in that line.
+			/// @param  {Real} _buffer_index
+			/// @returns {Real}
+			#endregion
+			static get_index_from_buffer_index = function(_buffer_index) {
+			    __ensure_layout__();
+			    if (is_undefined(__layout__)) {
+			        return 0;
+			    }
+    
+			    var _line_count = __layout__.get_line_count();
+			    if (_line_count <= 0) {
+			        return 0;
+			    }
+    
+			    var _target_line_index = 0;
+			    var _found_line = false;
+    
+			    // First pass: find which line this buffer offset belongs to
+			    var _line = 0;
+			    repeat (_line_count) {
+			        var _glyph_start = __layout__.get_line_index_start(_line);
+			        var _glyph_end   = __layout__.get_line_index_end(_line);
+			        var _glyph_count_line = _glyph_end - _glyph_start;
+        
+			        if (_glyph_count_line > 0) {
+			            var _first_buf_start    = __layout__.get_glyph_buffer_index(_glyph_start);
+			            var _last_glyph_in_line = _glyph_end - 1;
+			            var _last_buf_start     = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
+			            var _last_buf_size      = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
+			            var _line_buf_end       = _last_buf_start + _last_buf_size;
+            
+			            if (_buffer_index < _first_buf_start) {
+			                // Before this line's first glyph: caret is at the start of this line
+			                _target_line_index = _line;
+			                _found_line = true;
+			                break;
+			            }
+            
+			            if (_buffer_index >= _first_buf_start && _buffer_index < _line_buf_end) {
+			                // Within this line's glyph buffer range
+			                _target_line_index = _line;
+			                _found_line = true;
+			                break;
+			            }
+            
+			            // Otherwise, buffer index is beyond this line; keep scanning
+			            _target_line_index = _line;
+			        }
+        
+			        _line++;
+			    }
+    
+			    // If we never matched inside or before a line, clamp to just after last glyph overall
+			    if (!_found_line) {
+			        var _last_line_index = _line_count - 1;
+			        var _last_glyph_start = __layout__.get_line_index_start(_last_line_index);
+			        var _last_glyph_end   = __layout__.get_line_index_end(_last_line_index);
+			        if (_last_glyph_end > _last_glyph_start) {
+			            var _last_glyph = _last_glyph_end - 1;
+			            var _last_logical_index = __layout__.get_glyph_index(_last_glyph);
+			            return _last_logical_index + 1;
+			        }
+			        return 0;
+			    }
+    
+			    // Second pass: search within the chosen line's glyph range
+			    var _line_start_index = __layout__.get_line_index_start(_target_line_index);
+    
+			    var _glyph_start_line = __layout__.get_line_index_start(_target_line_index);
+			    var _glyph_end_line   = __layout__.get_line_index_end(_target_line_index);
+			    var _glyph_count_line2 = _glyph_end_line - _glyph_start_line;
+    
+			    if (_glyph_count_line2 <= 0) {
+			        // Line has no glyphs: caret is at line start
+			        return _line_start_index;
+			    }
+    
+			    var _first_buf_start_line = __layout__.get_glyph_buffer_index(_glyph_start_line);
+			    if (_buffer_index <= _first_buf_start_line) {
+			        return _line_start_index;
+			    }
+    
+			    var _closest_index = _line_start_index;
+			    var _g2 = _glyph_start_line;
+			    repeat (_glyph_count_line2) {
+			        var _buf_start = __layout__.get_glyph_buffer_index(_g2);
+			        var _buf_size  = __layout__.get_glyph_buffer_size(_g2);
+			        var _buf_end   = _buf_start + _buf_size;
+			        var _logical_index = __layout__.get_glyph_index(_g2);
+        
+			        if (_buffer_index >= _buf_start && _buffer_index < _buf_end) {
+			            // Inside this glyph's byte region
+			            return _logical_index;
+			        }
+        
+			        if (_buffer_index < _buf_start) {
+			            // Before this glyph: caret is at this glyph's index
+			            return _logical_index;
+			        }
+        
+			        _closest_index = _logical_index + 1;
+			        _g2++;
+			    }
+    
+			    // Beyond all glyphs in this line: caret at end of line
+			    return _closest_index;
+			};
+
+			#endregion
+			
+		#endregion
     
     #endregion
     
@@ -639,10 +832,10 @@ function WWTextRendererBase() : WWCore() constructor {
         #region Functions
             
             #region jsDoc
-            /// @func   __mark_layout_dirty__()
+            /// @func   __mark_dirty__()
             /// @desc   Marks the layout as needing recomputation.
             #endregion
-            static __mark_layout_dirty__ = function() {
+            static __mark_dirty__ = function() {
                 __is_dirty__ = true;
             };
             
@@ -684,7 +877,8 @@ function WWTextRendererBase() : WWCore() constructor {
                 if (!is_undefined(__layout__)) {
                     __content_width__ = __layout__.get_content_width();
                     __content_height__ = __layout__.get_content_height();
-                } else {
+                }
+				else {
                     __content_width__ = 0;
                     __content_height__ = 0;
                 }
@@ -751,9 +945,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _layout = new WWTextLayout();
                 
                 var _old_font = draw_get_font();
-                if (font_exists(_font_id) && _font_id != _old_font) {
-                    draw_set_font(_font_id);
-                }
+                draw_set_font(_font_id);
                 
                 var _wrapped_lines = [];
                 

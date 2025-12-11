@@ -71,12 +71,6 @@ function WWTextCursor() : WWCore() constructor {
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_highlight_active = function(_bool) {
-				if (!_bool) {
-					highlight_start_index = index;
-				}
-				else {
-					highlight_end_index = index;
-				}
 				highlight_active = _bool;
 				return self;
 			};

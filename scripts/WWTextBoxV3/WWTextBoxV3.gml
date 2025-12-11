@@ -102,7 +102,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @param   {Bool} read_only : If the text is read only.
 			/// @returns {Struct.WWTextBase}
 			#endregion
-			static set_read_only = function(_bool) {
+			static set_read_only = function(_bool = false) {
 				read_only = _bool;
 				cursor.set_cursor_visibility(_bool);
 				return self;
@@ -528,28 +528,141 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region Deletion — Backspace, Delete, Ctrl+Delete
 			#region No modifier
 			hotkeys.register([vk_backspace], function() {
-				if (read_only) return;
-				// Delete character before cursor
+			    if (read_only) return;
 				
-			});
-			hotkeys.register([vk_delete],    function() {
-				if (read_only) return;
-				// Delete character after cursor
+			    // If selection exists: delete selection
+			    if (cursor.get_highlight_active()) {
+			        var _start = cursor.get_highlight_start_index();
+			        var _end   = cursor.get_highlight_end_index();
+			        var _buffer_start = renderer.get_buffer_index_from_index(_start);
+			        var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+			        buffer.erase(_buffer_start, _buffer_end);
+			        cursor.set_highlight_active(false);
+			        cursor.set_index(_start);
+			        __force_rebuild__();
+			        __history_add_record__();
+			        return;
+			    }
 				
+			    // No selection: delete character before cursor
+			    var _index = cursor.get_index();
+			    if (_index <= 0) return;
+				
+			    var _prev_index = _index - 1;
+			    var _buf_start  = renderer.get_buffer_index_from_index(_prev_index);
+			    var _buf_end    = renderer.get_buffer_index_from_index(_index);
+				
+			    buffer.erase(_buf_start, _buf_end);
+			    cursor.set_index(_prev_index);
+				
+			    __force_rebuild__();
+			    __history_add_record__();
 			});
+
+			hotkeys.register([vk_delete], function() {
+				if (read_only) return;
+				
+				// If selection exists: delete selection
+				if (cursor.get_highlight_active()) {
+					var _start = cursor.get_highlight_start_index();
+					var _end   = cursor.get_highlight_end_index();
+					var _buffer_start = renderer.get_buffer_index_from_index(_start);
+					var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+
+					buffer.erase(_buffer_start, _buffer_end);
+					cursor.set_highlight_active(false);
+					cursor.set_index(_start);
+
+					__force_rebuild__();
+					__history_add_record__();
+					return;
+				}
+				
+				// No selection: delete character at cursor
+				var _index = cursor.get_index();
+				var _next  = _index + 1;
+				
+				// If at end of text, nothing to delete
+				if (_index >= renderer.get_glyph_count()) return;
+				
+				var _buf_start = renderer.get_buffer_index_from_index(_index);
+				var _buf_end   = renderer.get_buffer_index_from_index(_next);
+				
+				buffer.erase(_buf_start, _buf_end);
+				
+				__force_rebuild__();
+				__history_add_record__();
+			});
+
 			#endregion
 			
 			#region Ctrl Modifier
 			hotkeys.register([vk_control, vk_backspace], function() {
 				if (read_only) return;
-				// Delete previous word
 				
-			});
-			hotkeys.register([vk_control, vk_delete],    function() {
-				if (read_only) return;
-				// Delete next word
+				var _index = cursor.get_index();
 				
+				// If selection exists → treat like normal delete
+				if (cursor.get_highlight_active()) {
+					var _start = cursor.get_highlight_start_index();
+					var _end   = cursor.get_highlight_end_index();
+					var _buffer_start = renderer.get_buffer_index_from_index(_start);
+					var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+					buffer.erase(_buffer_start, _buffer_end);
+					cursor.set_index(_start);
+					cursor.set_highlight_active(false);
+					__force_rebuild__();
+					__history_add_record__();
+					return;
+				}
+				
+				// Compute previous word boundary
+				var _bounds = __compute_word_bounds__(_index, false);
+				var _start = _bounds.x_start;
+				if (_start >= _index) return;
+				
+				var _buffer_start = renderer.get_buffer_index_from_index(_start);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_index);
+				
+				buffer.erase(_buffer_start, _buffer_end);
+				cursor.set_index(_start);
+				
+				__force_rebuild__();
+				__history_add_record__();
 			});
+			hotkeys.register([vk_control, vk_delete], function() {
+			    if (read_only) return;
+				
+			    var _index = cursor.get_index();
+				
+			    // Selection → normal delete
+			    if (cursor.get_highlight_active()) {
+			        var _start = cursor.get_highlight_start_index();
+			        var _end   = cursor.get_highlight_end_index();
+			        var _buffer_start = renderer.get_buffer_index_from_index(_start);
+			        var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+			        buffer.erase(_buffer_start, _buffer_end);
+			        cursor.set_index(_start);
+			        cursor.set_highlight_active(false);
+			        __force_rebuild__();
+			        __history_add_record__();
+			        return;
+			    }
+				
+			    // Compute next word boundary
+			    var _bounds = __compute_word_bounds__(_index, false);
+			    var _end = _bounds.x_end;
+			    if (_end <= _index) return;
+				
+			    var _buffer_start = renderer.get_buffer_index_from_index(_index);
+			    var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				
+			    buffer.erase(_buffer_start, _buffer_end);
+				
+			    __force_rebuild__();
+			    __history_add_record__();
+			});
+
 			#endregion
 			
 			#region Ctrl + Shift Modifier
@@ -1198,10 +1311,12 @@ function WWTextBoxV3() : WWCore() constructor {
 					if (!_shift) {
 						//cursor.set_highlight_start_index(cursor.get_index());
 						cursor.set_highlight_active(false);
+						cursor.set_highlight_start_index(_index);
 					}
 					else {
 						//cursor.set_highlight_end_index(cursor.get_index());
 						cursor.set_highlight_active(true);
+						cursor.set_highlight_end_index(cursor.get_index());
 					}
 					
 					//__textbox_records_rec__(cursor_y_pos, cursor_x_pos);

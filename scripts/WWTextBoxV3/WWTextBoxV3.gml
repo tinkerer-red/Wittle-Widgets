@@ -600,9 +600,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, vk_backspace], function() {
 				if (read_only) return;
 				
-				var _index = cursor.get_index();
-				
-				// If selection exists → treat like normal delete
+				// If selection exists; normal delete
 				if (cursor.get_highlight_active()) {
 					var _start = cursor.get_highlight_start_index();
 					var _end   = cursor.get_highlight_end_index();
@@ -617,12 +615,14 @@ function WWTextBoxV3() : WWCore() constructor {
 				}
 				
 				// Compute previous word boundary
-				var _bounds = __compute_word_bounds__(_index, false);
-				var _start = _bounds.x_start;
-				if (_start >= _index) return;
+				var _index = cursor.get_index();
+				var _pointed_index = max(0, _index-1);
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_start);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_index);
+				var _bounds = __compute_word_boundaries__(_pointed_index, false);
+				var _start = _bounds.index_start;
+				
+				var _buffer_start = renderer.get_buffer_index_from_index(_start+1);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_index+1);
 				
 				buffer.erase(_buffer_start, _buffer_end);
 				cursor.set_index(_start);
@@ -633,9 +633,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, vk_delete], function() {
 			    if (read_only) return;
 				
-			    var _index = cursor.get_index();
-				
-			    // Selection → normal delete
+			    // Selection; normal delete
 			    if (cursor.get_highlight_active()) {
 			        var _start = cursor.get_highlight_start_index();
 			        var _end   = cursor.get_highlight_end_index();
@@ -650,14 +648,17 @@ function WWTextBoxV3() : WWCore() constructor {
 			    }
 				
 			    // Compute next word boundary
-			    var _bounds = __compute_word_bounds__(_index, false);
-			    var _end = _bounds.x_end;
-			    if (_end <= _index) return;
+			    var _index = cursor.get_index();
+				var _pointed_index = min(_index+1, renderer.get_glyph_count());
+				
+				var _bounds = __compute_word_boundaries__(_pointed_index, false);
+			    var _end = _bounds.index_end;
 				
 			    var _buffer_start = renderer.get_buffer_index_from_index(_index);
 			    var _buffer_end   = renderer.get_buffer_index_from_index(_end);
 				
 			    buffer.erase(_buffer_start, _buffer_end);
+				cursor.set_index(_index);
 				
 			    __force_rebuild__();
 			    __history_add_record__();
@@ -1406,7 +1407,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				///          based on a shared list of word breakers. Returns a struct containing:
 				///              { x_start, x_end }
 				///          where x_start is the start index and x_end is the end index of the word.
-				/// @param   {String} lineText   : The text content of the line.
+				/// @param   {Real} index : The glyph index.
 				/// @param   {Bool} include_whitespaces : (Optional) If true, adjust boundaries to exclude adjacent whitespace. Default is false.
 				/// @returns {Struct} A struct with properties index_start and index_end.
 				/// @self    WWTextBase

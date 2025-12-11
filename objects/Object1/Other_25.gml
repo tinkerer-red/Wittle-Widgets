@@ -736,7 +736,7 @@ build_ui_text_boxes = function(){
 	// -------------------------------------------------------------
 	// Test 4: Long Text with Scrolling/Line Breaking
 	// -------------------------------------------------------------
-	var longText = "Scrolling Test:\n" + string_repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit. ", 10);
+	var longText = "Scrolling Test:\n" + string_repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n", 10);
 	var longTextBox = new WWTextBoxV3()
 	    .set_offset(700, 50)
 	    .set_size(500, 300)

@@ -510,7 +510,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			};
 	
 			#endregion
-	
+			
 			#region Glyph getters
 	
 			#region jsDoc

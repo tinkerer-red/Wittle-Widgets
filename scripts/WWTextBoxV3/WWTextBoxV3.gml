@@ -711,6 +711,12 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			
 			#region Ctrl + Shift Modifier
+			////////////////////////////////////////////////////////////////
+			// NOTE::
+			// Technically these are only used in rich text editors and not
+			// in code editors but it hurts nothing to include them in both.
+			////////////////////////////////////////////////////////////////
+			
 			hotkeys.register([vk_control, vk_shift, vk_backspace], function() {
 				if (read_only) return;
 				

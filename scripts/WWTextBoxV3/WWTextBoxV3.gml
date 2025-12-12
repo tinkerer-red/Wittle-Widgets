@@ -412,11 +412,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_pageup], function() {
-				cursor.set_highlight_active(false);
 				__move_cursor_paged_offset__(-1, false);
 			});
 			hotkeys.register([vk_pagedown], function() {
-				cursor.set_highlight_active(false);
 				__move_cursor_paged_offset__(1, false);
 			});
 			#endregion
@@ -508,10 +506,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_shift, vk_pageup], function() {
-				//TODO::
+				__move_cursor_paged_offset__(-1, true);
 			});
 			hotkeys.register([vk_shift, vk_pagedown], function() {
-				//TODO::
+				__move_cursor_paged_offset__(1, true);
 			});
 			#endregion
 			
@@ -1487,11 +1485,11 @@ function WWTextBoxV3() : WWCore() constructor {
 					// Update highlight
 					var _final_index = cursor.get_index();
 					if (!_shift) {
-						//cursor.set_highlight_start_index(_final_index);
+						cursor.set_highlight_start_index(_final_index);
 						cursor.set_highlight_active(false);
 					}
 					else {
-						//cursor.set_highlight_end_index(_final_index);
+						cursor.set_highlight_end_index(_final_index);
 						cursor.set_highlight_active(true);
 					}
 					

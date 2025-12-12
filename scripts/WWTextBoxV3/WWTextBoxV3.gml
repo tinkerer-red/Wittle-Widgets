@@ -831,6 +831,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			hotkeys.register([vk_control, ord("X")], function() {
 				if (read_only) return;
+				
 				// Cut
 				var _start = cursor.get_highlight_start_index();
 				var _end   = cursor.get_highlight_end_index();
@@ -1328,15 +1329,16 @@ function WWTextBoxV3() : WWCore() constructor {
 					
 					//we either released of just pressed
 					if (!_select) {
-						//cursor.set_highlight_start_index(cursor.get_index());
+						cursor.set_highlight_start_index(cursor.get_index());
 						cursor.set_highlight_active(false)
 					}
 					else {
-						//cursor.set_highlight_end_index(cursor.get_index());
+						cursor.set_highlight_end_index(cursor.get_index());
 						cursor.set_highlight_active(true)
 					}
 					
 					cursor_last_width = renderer.get_x_from_index(cursor.get_index());
+					__history_update_latest_cursor__();
 				}
 				
 				#region jsDoc
@@ -1354,9 +1356,11 @@ function WWTextBoxV3() : WWCore() constructor {
 					
 					if (_vector == 0) return;
 					
+					var _index = cursor.get_index();
+					var _new_index = _index; //will be overwritten
+					
 					// move cursor
 					if (_vertical) {
-						var _index = cursor.get_index();
 						var _line = renderer.get_line_from_index(_index);
 						var _line_count = renderer.get_line_count();
 						
@@ -1409,27 +1413,24 @@ function WWTextBoxV3() : WWCore() constructor {
 							__history_update_latest_cursor__();
 						}
 						else {
-							var _index = cursor.get_index() + _vector;
-							cursor.set_index(_index);
+							var _new_index = cursor.get_index() + _vector;
+							cursor.set_index(_new_index);
 							__history_update_latest_cursor__();
 						}
-						cursor_last_width = renderer.get_x_from_index(cursor.get_index());
+						cursor_last_width = renderer.get_x_from_index(_new_index);
 					}
 					
 					// update highlight
-					if (!_shift) {
-						//cursor.set_highlight_start_index(cursor.get_index());
-						cursor.set_highlight_active(false);
-						cursor.set_highlight_start_index(_index);
+					if (_shift) {
+						cursor.set_highlight_end_index(_new_index);
+						cursor.set_highlight_active(true);
 					}
 					else {
-						//cursor.set_highlight_end_index(cursor.get_index());
-						cursor.set_highlight_active(true);
-						cursor.set_highlight_end_index(cursor.get_index());
+						cursor.set_highlight_start_index(_new_index);
+						cursor.set_highlight_active(false);
 					}
 					
-					//__textbox_records_rec__(cursor_y_pos, cursor_x_pos);
-					
+					__history_update_latest_cursor__();
 				}
 				
 				#region jsDoc
@@ -1501,8 +1502,7 @@ function WWTextBoxV3() : WWCore() constructor {
 						cursor.set_highlight_active(true);
 					}
 					
-					//__textbox_records_rec__(cursor_y_pos, cursor_x_pos);
-					
+					__history_update_latest_cursor__();
 				}
 				
 			#endregion

@@ -464,27 +464,47 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 
 			hotkeys.register([vk_shift, vk_home], function() {
-				cursor.set_highlight_active(true);
-				var _new_index = 0;
+				var _index = cursor.get_index();
+				
+				if not (cursor.get_highlight_active()) {
+					cursor.set_highlight_active(true);
+					cursor.set_highlight_start_index(_index);
+				}
+				
+				var _line = renderer.get_line_from_index(_index)
+				var _new_index = renderer.get_line_index_start(_line);
+				
 				cursor.set_index(_new_index);
+				cursor.set_highlight_end_index(_new_index);
 				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_shift, vk_end], function() {
-				cursor.set_highlight_active(true);
-				var _new_index = renderer.get_glyph_count()-1;
+				var _index = cursor.get_index();
+				
+				if not (cursor.get_highlight_active()) {
+					cursor.set_highlight_active(true);
+					cursor.set_highlight_start_index(_index);
+				}
+				
+				var _line = renderer.get_line_from_index(_index)
+				var _new_index = renderer.get_line_index_end(_line);
+				
+				//if literal `\n` ignore it
+				if not (renderer.get_line_forced_wrapped(_line)) {
+					_new_index -= 1;
+				}
+				
 				cursor.set_index(_new_index);
+				cursor.set_highlight_end_index(_new_index);
 				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)
 			});
 			hotkeys.register([vk_shift, vk_pageup], function() {
-				var _newLine = max(0, cursor_y_pos - 5);
-				set_cursor_y_pos(_newLine);
+				//TODO::
 			});
 			hotkeys.register([vk_shift, vk_pagedown], function() {
-				var _maxLine = array_length(__lines__) - 1;
-				var _newLine = min(_maxLine, cursor_y_pos + 5);
-				set_cursor_y_pos(_newLine);
+				//TODO::
 			});
 			#endregion
 			
@@ -501,25 +521,42 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, vk_shift, vk_down], function() {
 				__move_cursor_offset__(1, true, true, true);
 			});
+			
 			hotkeys.register([vk_control, vk_shift, vk_home], function() {
-				if (!cursor.get_highlight_active()) {
-					highlight_x_pos = cursor_x_pos;
-					highlight_y_pos = cursor_y_pos;
+				var _index = cursor.get_index();
+				
+				if not (cursor.get_highlight_active()) {
 					cursor.set_highlight_active(true);
+					cursor.set_highlight_start_index(_index);
 				}
-				set_cursor_y_pos(0);
-				set_cursor_x_pos(0);
+				
+				var _new_index = 0;
+				cursor.set_index(_new_index);
+				cursor.set_highlight_end_index(_new_index);
+				
+				__history_update_latest_cursor__();
+				
+				cursor_last_width = renderer.get_x_from_index(_new_index);
 			});
 			hotkeys.register([vk_control, vk_shift, vk_end], function() {
-				if (!cursor.get_highlight_active()) {
-					highlight_x_pos = cursor_x_pos;
-					highlight_y_pos = cursor_y_pos;
+				var _index = cursor.get_index();
+				
+				if not (cursor.get_highlight_active()) {
 					cursor.set_highlight_active(true);
+					cursor.set_highlight_start_index(_index);
 				}
-				set_cursor_y_pos(array_length(__lines__) - 1);
-				var _lineText = __lines__[cursor_y_pos];
-				var _endPos = __string_length(_lineText);
-				set_cursor_x_pos(_endPos);
+				
+				var _new_index = renderer.get_glyph_count()-1;
+				cursor.set_index(_new_index);
+				cursor.set_highlight_end_index(_new_index);
+				__history_update_latest_cursor__();
+				cursor_last_width = renderer.get_x_from_index(_new_index)
+			});
+			hotkeys.register([vk_control, vk_shift, vk_pageup], function() {
+				//Consumed, and is intended to do nothing
+			});
+			hotkeys.register([vk_control, vk_shift, vk_pagedown], function() {
+				//Consumed, and is intended to do nothing
 			});
 			#endregion
 			
@@ -669,11 +706,69 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region Ctrl + Shift Modifier
 			hotkeys.register([vk_control, vk_shift, vk_backspace], function() {
 				if (read_only) return;
+				
+				// If selection exists; normal delete
+				if (cursor.get_highlight_active()) {
+					var _start = cursor.get_highlight_start_index();
+					var _end   = cursor.get_highlight_end_index();
+					var _buffer_start = renderer.get_buffer_index_from_index(_start);
+					var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+					buffer.erase(_buffer_start, _buffer_end);
+					cursor.set_index(_start);
+					cursor.set_highlight_active(false);
+					__force_rebuild__();
+					__history_add_record__();
+					return;
+				}
+				
+				
 				// Delete until begining of line
+				var _end = cursor.get_index();
+				var _line = renderer.get_line_from_index(_end)
+				var _start = renderer.get_line_index_start(_line);
+				
+				var _buffer_start = renderer.get_buffer_index_from_index(_start);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				buffer.erase(_buffer_start, _buffer_end);
+				cursor.set_index(_start);
+				cursor.set_highlight_active(false);
+				__force_rebuild__();
+				__history_add_record__();
 			});
 			hotkeys.register([vk_control, vk_shift, vk_delete],    function() {
 				if (read_only) return;
-				// Delete until end of line
+				
+				// If selection exists; normal delete
+				if (cursor.get_highlight_active()) {
+					var _start = cursor.get_highlight_start_index();
+					var _end   = cursor.get_highlight_end_index();
+					var _buffer_start = renderer.get_buffer_index_from_index(_start);
+					var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+					buffer.erase(_buffer_start, _buffer_end);
+					cursor.set_index(_start);
+					cursor.set_highlight_active(false);
+					__force_rebuild__();
+					__history_add_record__();
+					return;
+				}
+				
+				// Delete until end of line, preserve `\n` line breaks, and stop on force wrapped
+				var _start = cursor.get_index();
+				var _line = renderer.get_line_from_index(_start)
+				var _end = renderer.get_line_index_end(_line);
+				
+				//if literal `\n` preserve it
+				if not (renderer.get_line_forced_wrapped(_line)) {
+					_end -= 1;
+				}
+				
+				var _buffer_start = renderer.get_buffer_index_from_index(_start);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				buffer.erase(_buffer_start, _buffer_end);
+				cursor.set_index(_start);
+				cursor.set_highlight_active(false);
+				__force_rebuild__();
+				__history_add_record__();
 			});
 			#endregion
 			#endregion

@@ -397,9 +397,16 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			hotkeys.register([vk_end], function() {
 				cursor.set_highlight_active(false);
+				
 				var _index = cursor.get_index();
 				var _line = renderer.get_line_from_index(_index);
 				var _new_index = renderer.get_line_index_end(_line);
+				
+				//if literal `\n` ignore it
+				if not (renderer.get_line_forced_wrapped(_line)) {
+					_new_index -= 1;
+				}
+				
 				cursor.set_index(_new_index);
 				__history_update_latest_cursor__();
 				cursor_last_width = renderer.get_x_from_index(_new_index)

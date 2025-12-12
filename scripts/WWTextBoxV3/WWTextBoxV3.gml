@@ -94,6 +94,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 			#endregion
 			
+			#region Controller Options
+			
 			#region jsDoc
 			/// @func    set_read_only()
 			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
@@ -105,30 +107,6 @@ function WWTextBoxV3() : WWCore() constructor {
 			static set_read_only = function(_bool = false) {
 				read_only = _bool;
 				cursor.set_cursor_visibility(_bool);
-				return self;
-			}
-			
-			#region jsDoc
-			/// @func	set_cursor_color()
-			/// @desc	Sets the color for the selection highlight.
-			/// @self	WWTextBase
-			/// @param   {Constant.Color} _color : The highlight color.
-			/// @returns {Struct.WWTextBase}
-			#endregion
-			static set_cursor_color = function(_color = #FFFFFF) {
-				cursor.set_cursor_color(_color);
-				return self;
-			}
-			
-			#region jsDoc
-			/// @func	set_highlight_color()
-			/// @desc	Sets the color for the selection highlight.
-			/// @self	WWTextBase
-			/// @param   {Constant.Color} _color : The highlight color.
-			/// @returns {Struct.WWTextBase}
-			#endregion
-			static set_highlight_color = function(_color = #0A68D8) {
-				cursor.set_highlight_color(_color);
 				return self;
 			}
 			
@@ -164,9 +142,33 @@ function WWTextBoxV3() : WWCore() constructor {
 			    return self;
 			}
 			
+			#endregion
+			
 			#region Cursor
 				
-				//Buffer
+				#region jsDoc
+				/// @func	set_cursor_color()
+				/// @desc	Sets the color for the selection highlight.
+				/// @self	WWTextBase
+				/// @param   {Constant.Color} _color : The highlight color.
+				/// @returns {Struct.WWTextBase}
+				#endregion
+				static set_cursor_color = function(_color = #FFFFFF) {
+					cursor.set_cursor_color(_color);
+					return self;
+				}
+				#region jsDoc
+				/// @func	set_highlight_color()
+				/// @desc	Sets the color for the selection highlight.
+				/// @self	WWTextBase
+				/// @param   {Constant.Color} _color : The highlight color.
+				/// @returns {Struct.WWTextBase}
+				#endregion
+				static set_highlight_color = function(_color = #0A68D8) {
+					cursor.set_highlight_color(_color);
+					return self;
+				}
+				
 				#region jsDoc
 				/// @func    set_cursor_index()
 				/// @desc    Get cursor's x position in the GUI

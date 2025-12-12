@@ -621,8 +621,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _bounds = __compute_word_boundaries__(_pointed_index, false);
 				var _start = _bounds.index_start;
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_start+1);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_index+1);
+				var _buffer_start = renderer.get_buffer_index_from_index(_start);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_index);
 				
 				buffer.erase(_buffer_start, _buffer_end);
 				cursor.set_index(_start);

@@ -888,14 +888,16 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _old_font = draw_get_font();
                 draw_set_font(_font_id);
                 
-                var _wrapped_lines = [];
-                
+				var _input_lines = array_map(string_split(_str, "\n"), function(_value, _index) {
+					return _value+"\n";
+				})
+					
                 if (_width_limit < 0 || _width_limit == infinity) {
-                    _wrapped_lines = string_split(_str, "\n");
+                    var _wrapped_lines = _input_lines;
+					
                 }
 				else {
                     var _space_width = string_width(" ");
-                    var _input_lines = string_split(_str, "\n");
                     var _input_line_count = array_length(_input_lines);
                     
                     var _output_arr = [];
@@ -1010,7 +1012,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         _line_index++;
                     }
                     
-                    _wrapped_lines = _output_arr;
+                    var _wrapped_lines = _output_arr;
                 }
                 
                 var _line_count_final = array_length(_wrapped_lines);

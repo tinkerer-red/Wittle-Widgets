@@ -635,66 +635,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			#endregion
 			static get_buffer_index_from_index = function(_index) {
 				__ensure_layout__();
-				
-				var _line_count = __layout__.get_line_count();
-				if (_line_count <= 0) { return 0; }
-				
-				// Find the line for this index
-				var _line_index = get_line_from_index(_index);
-				
-				var _line_start_index = __layout__.get_line_index_start(_line_index);
-				var _line_end_index   = __layout__.get_line_index_end(_line_index);
-				
-				// Glyph range for this line [glyph_start, glyph_end)
-				var _glyph_start = __layout__.get_line_index_start(_line_index);
-				var _glyph_end   = __layout__.get_line_index_end(_line_index);
-				var _glyph_count_line = _glyph_end - _glyph_start;
-				
-				// If this line has no glyphs, fall back to previous line end or 0
-				if (_glyph_count_line <= 0) {
-					if (_line_index > 0) {
-						var _prev_line = _line_index - 1;
-						var _prev_glyph_start = __layout__.get_line_index_start(_prev_line);
-						var _prev_glyph_end   = __layout__.get_line_index_end(_prev_line);
-						if (_prev_glyph_end > _prev_glyph_start) {
-							var _prev_last_glyph = _prev_glyph_end - 1;
-							var _prev_buf_start  = __layout__.get_glyph_buffer_index(_prev_last_glyph);
-							var _prev_buf_size   = __layout__.get_glyph_buffer_size(_prev_last_glyph);
-							return _prev_buf_start + _prev_buf_size;
-						}
-					}
-					return 0;
-				}
-				
-				// Compute buffer end of this line (end of the last glyph in line)
-				var _last_glyph_in_line = _glyph_end - 1;
-				var _last_buf_start     = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
-				var _last_buf_size      = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
-				var _line_buf_end       = _last_buf_start + _last_buf_size;
-				
-				// Clamp index to line bounds
-				if (_index <= _line_start_index) {
-					// At or before the first character in this line
-					return __layout__.get_glyph_buffer_index(_glyph_start);
-				}
-				if (_index >= _line_end_index) {
-					// At or after the end of this line
-					return _line_buf_end;
-				}
-				
-				// Search only glyphs in this line
-				var _result = _line_buf_end;
-				var _g = _glyph_start;
-				repeat (_glyph_count_line) {
-					var _logical_index = __layout__.get_glyph_index(_g);
-					if (_logical_index >= _index) {
-						_result = __layout__.get_glyph_buffer_index(_g);
-						break;
-					}
-					_g++;
-				}
-	
-				return _result;
+				return __layout__.get_glyph_buffer_index(_index);
 			};
 			
 			#region jsDoc

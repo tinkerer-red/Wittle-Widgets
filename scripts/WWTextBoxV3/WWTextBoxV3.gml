@@ -101,11 +101,11 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
 			///          like one would from a console or webpage, but modifying the text is prohibited.
 			/// @self    WWTextBase
-			/// @param   {Bool} read_only : If the text is read only.
+			/// @param   {Bool} is_read_only : If the text is read only.
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_read_only = function(_bool = false) {
-				read_only = _bool;
+				is_read_only = _bool;
 				cursor.set_cursor_visibility(_bool);
 				return self;
 			}
@@ -140,6 +140,57 @@ function WWTextBoxV3() : WWCore() constructor {
 			    }
 				
 			    return self;
+			}
+			
+			#region jsDoc
+			/// @func   set_keyboard_type()
+			/// @desc   Sets the keyboard type used in this textbox. 
+			///         If undefined, the keyboard type is generated from the allowed char.
+			/// @self   WWTextBase
+			/// @param  {Constant.VirtualKeyboardType} _keyboard_type : Which keyset will be available on the virtual keyboard (optional).
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_keyboard_type = function(_keyboard_type = undefined) {
+				if (is_undefined(_keyboard_type)) {
+			        if (__allowed_char_set__) {
+						__keyboard_type__ = __infer_keyboard_type__(buffer.get_allowed_char());
+					}
+					else {
+						__keyboard_type__ = kbv_type_default;
+					}
+			    }
+			    else {
+					__keyboard_type_set__ = true;
+			        __keyboard_type__ = kbv_type_default;
+			    }
+				
+			    return self;
+			}
+			
+			#region jsDoc
+			/// @func   set_enter_submits_text()
+			/// @desc   Sets if pressing enter will submit and exit editing text,
+			///         false will result in attempting to insert the newline glyph `\n`
+			/// @self   WWTextBase
+			/// @param  {Bool} _enabled : Wheather pressing enter will submit the text.
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_enter_submits_text = function(_enabled = false) {
+				enter_submits_text = _enabled;
+				return self;
+			}
+			
+			#region jsDoc
+			/// @func   set_tab_exits_text()
+			/// @desc   Sets if pressing tab will exit editing text,
+			///         false will result in attempting to insert the tab glyph `\t`
+			/// @self   WWTextBase
+			/// @param  {Bool} _enabled : Wheather pressing tab will exit the editing of text.
+			/// @returns {Struct.WWTextBase}
+			#endregion
+			static set_tab_exits_text = function(_enabled) {
+				tab_exits_text = _enabled;
+				return self;
 			}
 			
 			#endregion
@@ -572,7 +623,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region Deletion — Backspace, Delete, Ctrl+Delete
 			#region No modifier
 			hotkeys.register([vk_backspace], function() {
-			    if (read_only) return;
+			    if (is_read_only) return;
 				
 			    // If selection exists: delete selection
 			    if (cursor.get_highlight_active()) {
@@ -604,7 +655,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 
 			hotkeys.register([vk_delete], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				
 				// If selection exists: delete selection
 				if (cursor.get_highlight_active()) {
@@ -642,7 +693,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region Ctrl Modifier
 			hotkeys.register([vk_control, vk_backspace], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				
 				// If selection exists; normal delete
 				if (cursor.get_highlight_active()) {
@@ -675,7 +726,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__history_add_record__();
 			});
 			hotkeys.register([vk_control, vk_delete], function() {
-			    if (read_only) return;
+			    if (is_read_only) return;
 				
 			    // Selection; normal delete
 			    if (cursor.get_highlight_active()) {
@@ -718,7 +769,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			////////////////////////////////////////////////////////////////
 			
 			hotkeys.register([vk_control, vk_shift, vk_backspace], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				
 				// If selection exists; normal delete
 				if (cursor.get_highlight_active()) {
@@ -749,7 +800,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__history_add_record__();
 			});
 			hotkeys.register([vk_control, vk_shift, vk_delete],    function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				
 				// If selection exists; normal delete
 				if (cursor.get_highlight_active()) {
@@ -799,38 +850,19 @@ function WWTextBoxV3() : WWCore() constructor {
 				__clipboard_set_text__(_string);
 			});
 			hotkeys.register([vk_control, ord("V")], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Paste
 				var _str = __clipboard_get_text__();
-				var _str_byte_len = string_byte_length(_str);
-				
-				var _index = cursor.get_index();
-				var _buffer_index = renderer.get_glyph_buffer_index(_index);
-				
-				if (cursor.get_highlight_active()) {
-					//replace the highlighted text
-					var _start = cursor.get_highlight_start_index();
-					var _end   = cursor.get_highlight_end_index();
-					var _buffer_start = renderer.get_glyph_buffer_index(_start);
-					var _buffer_end   = renderer.get_glyph_buffer_index(_end);
-					buffer.erase(_buffer_start, _buffer_end);
-					_buffer_index = _buffer_start;
-				}
-				
-				// insert the text
-				buffer.insert(_buffer_index, _str);
-				
-				cursor.set_highlight_active(false);
-				
-				__force_rebuild__();
-				
-				var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
-				cursor.set_index(_new_index);
-				
-				__history_add_record__();
+				__insert_string_at_cursor__(_str);
 			});
 			hotkeys.register([vk_control, ord("X")], function() {
-				if (read_only) return;
+				if (is_read_only) return;
+				
+				//if no selection made cut the entire line including the `\n`
+				if not (cursor.get_highlight_active()) {
+					//TODO:
+					return;
+				}
 				
 				// Cut
 				var _start = cursor.get_highlight_start_index();
@@ -842,7 +874,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				buffer.erase(_buffer_start, _buffer_end);
 				
 				cursor.set_highlight_active(false);
-				cursor.set_index(_start);
+				
+				var _new_index = min(_start, _end)
+				cursor.set_index(_new_index);
 				
 				__force_rebuild__();
 				
@@ -850,19 +884,19 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			
 			hotkeys.register([vk_control, ord("Z")], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Undo
 				__history_jump__(-1);
 				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, ord("Y")], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Redo
 				__history_jump__(1);
 				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, vk_shift, ord("Z")], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Redo (alternate)
 				__history_jump__(1);
 				__force_rebuild__();
@@ -871,43 +905,58 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region Control & Submission
 			hotkeys.register([vk_enter], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				//Submit or insert new line
+				if (enter_submits_text) {
+					//TODO::
+				}
+				else {
+					__insert_string_at_cursor__("\n");
+				}
 			});
 			hotkeys.register([vk_shift, vk_enter], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Insert new line (force multiline)
+				__insert_string_at_cursor__("\n");
 			});
 			hotkeys.register([vk_control, vk_enter], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Optional: Submit (e.g., Ctrl+Enter)
+				// I have no idea if this does anything
 			});
 			hotkeys.register([vk_control, vk_shift, vk_enter], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Optional: Multiline submit override
+				// I have no idea if this does anything
 			});
 			
 			hotkeys.register([vk_escape], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Cancel or unfocus
 			});
 			#endregion
 			
 			#region Tab / Focus & Indent Control
 			hotkeys.register([vk_tab], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Indent or move to next focus
+				if (tab_exits_text) {
+					//TODO::
+				}
+				else {
+					__insert_string_at_cursor__("\t");
+				}
 			});
 			hotkeys.register([vk_shift, vk_tab], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Unindent or move to previous focus
 			});
 			hotkeys.register([vk_control, vk_tab], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Optional: Switch next panel/focus group
 			});
 			hotkeys.register([vk_control, vk_shift, vk_tab], function() {
-				if (read_only) return;
+				if (is_read_only) return;
 				// Optional: Switch previous panel/focus group
 			});
 			#endregion
@@ -918,8 +967,10 @@ function WWTextBoxV3() : WWCore() constructor {
 		
         #region Variables
 			
-			is_focusable  = true;
-			read_only = false;
+			is_focusable = true;
+			is_read_only = false;
+			enter_submits_text = false;
+			tab_exits_text = false;
 			
 		#endregion
         
@@ -1175,7 +1226,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			__word_selection_mode__ = false;
 			
-			__cursor_last_width__ = undefined; //The last known x position in pixels, to ensure pressing up or down multiple times doesnt deviate the cursor off from its intended "center"
+			cursor_last_width = undefined; //The last known x position in pixels, to ensure pressing up or down multiple times doesnt deviate the cursor off from its intended "center"
 			
 			__historic_records_loc__ = -1;
 			__historic_records__ = [];
@@ -1338,6 +1389,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					}
 					
 					cursor_last_width = renderer.get_x_from_index(cursor.get_index());
+					
 					__history_update_latest_cursor__();
 				}
 				
@@ -1430,6 +1482,8 @@ function WWTextBoxV3() : WWCore() constructor {
 						cursor.set_highlight_active(false);
 					}
 					
+					cursor_last_width = renderer.get_x_from_index(_new_index);
+					
 					__history_update_latest_cursor__();
 				}
 				
@@ -1492,15 +1546,16 @@ function WWTextBoxV3() : WWCore() constructor {
 					__history_update_latest_cursor__();
 
 					// Update highlight
-					var _final_index = cursor.get_index();
 					if (!_shift) {
-						cursor.set_highlight_start_index(_final_index);
+						cursor.set_highlight_start_index(_new_index);
 						cursor.set_highlight_active(false);
 					}
 					else {
-						cursor.set_highlight_end_index(_final_index);
+						cursor.set_highlight_end_index(_new_index);
 						cursor.set_highlight_active(true);
 					}
+					
+					cursor_last_width = renderer.get_x_from_index(_new_index);
 					
 					__history_update_latest_cursor__();
 				}
@@ -1687,127 +1742,36 @@ function WWTextBoxV3() : WWCore() constructor {
 			    #endregion
 				static __insert_string_at_cursor__ = function(_str) {
 				    // sanitize input
-				    _str = __keep_allowed_char__(_str, __allowed_char__);
+				    var _new_str = buffer.__filter_allowed__(_str);
 				    
-					if (cursor.get_highlight_active()) __textbox_delete_string__(false);
+					if (_new_str == "") return;
+					
+					var _str_byte_len = string_byte_length(_new_str);
 					
 					var _index = cursor.get_index();
-					buffer.insert(_index, _str);
-				}
-				
-				#region jsDoc
-				/// @func	__textbox_delete_string__()
-				/// @desc	Deletes a character at the cursor position or removes a selection if active.
-				///		  For forward deletion (delete key), it removes the character after the cursor,
-				///		  merging with the next line if at the end. For backspace deletion, it removes the
-				///		  character before the cursor, merging with the previous line if at the start.
-				///		  When a selection is active, it deletes the entire selection and positions the cursor
-				///		  at the beginning of the selection.
-				/// @self	WWTextInputSingle
-				/// @param   {Bool} _is_del_key : True if the delete key is pressed (forward delete), false if backspace.
-				/// @returns {undefined}
-				#endregion
-				static __textbox_delete_string__ = function(_is_del_key) {
-					// Store current cursor position.
-					var _current_line_index = cursor_y_pos;
-					var _current_cursor_pos = cursor_x_pos;
+					var _buffer_index = renderer.get_glyph_buffer_index(_index);
 					
-					// If a selection is active, handle deletion and return early.
 					if (cursor.get_highlight_active()) {
-						// Retrieve selection details.
-						var _select_line = highlight_y_pos;
-						var _select_pos = highlight_x_pos;
-						
-						// Case 1: Selection is on a single line.
-						if (_select_line == _current_line_index) {
-							var _deletion_count = abs(_current_cursor_pos - _select_pos);
-							// Set cursor to the beginning of the selection.
-							_current_cursor_pos = min(_current_cursor_pos, _select_pos);
-							__lines__[_current_line_index] = string_delete(__lines__[_current_line_index], _current_cursor_pos + 1, _deletion_count);
-						} 
-						// Case 2: Multi-line selection.
-						else {
-							// Determine start and end of selection.
-							var _start_y, _end_y, _start_x, _end_x;
-							// Normalize selection bounds.
-							if (cursor_y_pos < highlight_y_pos) {
-								_start_y = cursor_y_pos;
-								_end_y   = highlight_y_pos;
-								_start_x = cursor_x_pos;
-								_end_x   = highlight_x_pos;
-							}
-							else {
-								_start_y = highlight_y_pos;
-								_end_y   = cursor_y_pos;
-								_start_x = highlight_x_pos;
-								_end_x   = cursor_x_pos;
-							}
-			
-							// Merge text: Keep text from start line up to selection start and append
-							// text from end line after the selection.
-							var _tail_text = string_delete(__lines__[_end_y], 1, _end_x);
-							__lines__[_start_y] = __string_copy(__lines__[_start_y], 1, _start_x) + _tail_text;
-			
-							// Delete any lines between the start and end of selection.
-							var _num_lines_to_del = _end_y - _start_y;
-							array_delete(__lines__, _start_y + 1, _num_lines_to_del);
-							array_delete(__lines_broken_by_width__, _start_y + 1, _num_lines_to_del);
-			
-							// Update the cursor to the beginning of the selection.
-							_current_line_index = _start_y;
-							_current_cursor_pos = _start_x;
-						}
-						
+						//replace the highlighted text
+						var _start = cursor.get_highlight_start_index();
+						var _end   = cursor.get_highlight_end_index();
+						var _buffer_start = renderer.get_glyph_buffer_index(_start);
+						var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+						buffer.erase(_buffer_start, _buffer_end);
 						cursor.set_highlight_active(false);
-						
-						// Update cursor and view, then exit.
-						set_cursor_y_pos(_current_line_index);
-						set_cursor_x_pos(_current_cursor_pos);
-						if (dynamic_width) __break_lines__(_current_line_index, 1);
-						__history_add_record__();
-						return;
+						_buffer_index = min(_buffer_start, _buffer_end);
 					}
 					
-					// No selection active – handle deletion of a single character.
-					var _current_str = __lines__[_current_line_index];
+					// insert the text
+					buffer.insert(_buffer_index, _new_str);
 					
-					if (_is_del_key) {
-						// Forward deletion: delete the character after the cursor.
-						if (_current_cursor_pos == __string_length(_current_str)) {
-							// If at the end of the line, attempt to merge with the next line.
-							if (_current_line_index == array_length(__lines__) - 1) return; // No next line.
-							__lines__[_current_line_index] = _current_str + __lines__[_current_line_index + 1];
-							array_delete(__lines__, _current_line_index + 1, 1);
-							array_delete(__lines_broken_by_width__, _current_line_index + 1, 1);
-						}
-						else {
-							// Delete one character after the cursor.
-							__lines__[_current_line_index] = string_delete(_current_str, _current_cursor_pos + 1, 1);
-						}
-					}
-					else {
-						// Backspace deletion: delete the character before the cursor.
-						if (_current_cursor_pos == 0) {
-							// If at the beginning of the line, merge with the previous line.
-							if (_current_line_index == 0) return; // Already at the first line.
-							var _prev_line_text = __lines__[_current_line_index - 1];
-							_current_cursor_pos = __string_length(_prev_line_text);
-							__lines__[_current_line_index - 1] = _prev_line_text + _current_str;
-							array_delete(__lines__, _current_line_index, 1);
-							array_delete(__lines_broken_by_width__, _current_line_index, 1);
-							_current_line_index -= 1;
-						}
-						else {
-							// Delete one character before the cursor.
-							__lines__[_current_line_index] = string_delete(_current_str, _current_cursor_pos, 1);
-							_current_cursor_pos -= 1;
-						}
-					}
+					__force_rebuild__();
 					
-					// Update cursor positions and refresh the display.
-					set_cursor_y_pos(_current_line_index);
-					set_cursor_x_pos(_current_cursor_pos);
-					if (dynamic_width) __break_lines__(_current_line_index, 1);
+					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
+					cursor.set_index(_new_index);
+					
+					cursor_last_width = renderer.get_x_from_index(_new_index)
+					
 					__history_add_record__();
 				}
 				
@@ -1853,6 +1817,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					cursor.set_highlight_active(true);
 					cursor.set_highlight_start_index(_selection_start_index);
 					cursor.set_highlight_end_index(_selection_end_index);
+					cursor_last_width = renderer.get_x_from_index(_cursor_index);
 					__history_update_latest_cursor__();
 				};
 				

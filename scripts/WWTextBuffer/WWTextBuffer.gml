@@ -91,7 +91,8 @@ function WWTextBuffer() : WWCore() constructor {
 						var _text = buffer_read(__buffer__, buffer_text);
 						__content__  = _text;
 						__length__   = string_length(_text);
-					} else {
+					}
+					else {
 						__content__  = "";
 						__length__   = 0;
 					}
@@ -313,6 +314,10 @@ function WWTextBuffer() : WWCore() constructor {
 		#endregion
 		
 		#region Functions
+			
+			static __mark_dirty__ = function() {
+				__is_dirty__ = true;
+			}
 			
 			static __set_text__ = function(_text) {
 				if (!buffer_exists(__buffer__)) {

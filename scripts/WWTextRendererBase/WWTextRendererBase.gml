@@ -86,14 +86,13 @@ function WWTextRendererBase() : WWCore() constructor {
             #region Layout Config
                 
                 #region jsDoc
-                /// @func   set_wrap_width()
-                /// @desc   Sets the maximum width before wrapping text. If set to
-                ///         a value greater than zero, custom wrapping is used.
-                /// @param  {Real} _wrap_width_pixels
+                /// @func   set_wrap_enabled()
+                /// @desc   Sets if word wrapping is enabled, true will wrap words to next line.
+                /// @param  {Bool} should_wrap
                 /// @returns {Struct.WWTextRendererBase}
                 #endregion
-                static set_wrap_width = function(_wrap_width_pixels) {
-                    wrap_width = _wrap_width_pixels;
+                static set_wrap_enabled = function(_should_wrap) {
+                    should_wrap = _should_wrap;
                     __mark_dirty__();
                     return self;
                 };
@@ -146,7 +145,7 @@ function WWTextRendererBase() : WWCore() constructor {
             alpha       = 1;
             
             // Layout
-            wrap_width  = infinity;
+            should_wrap  = false;
             line_sep    = -1;
             
             __textbox_parent__ = undefined;
@@ -196,9 +195,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_x_from_index = function(_index) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 
                 var _line = get_line_from_index(_index);
                 var _start = __layout__.get_line_index_start(_line);
@@ -248,9 +244,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_y_from_index = function(_index) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 var _line = get_line_from_index(_index);
                 return __layout__.get_line_y_offset(_line);
             };
@@ -264,9 +257,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_index_from_xy = function(_x, _y) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 
 				var _layout = __layout__;
 				
@@ -328,9 +318,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_line_from_index = function(_index) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 
                 var _line_count = __layout__.get_line_count();
                 if (_line_count <= 0) {
@@ -365,9 +352,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_col_from_index = function(_index) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 
                 var _line = get_line_from_index(_index);
                 var _start = __layout__.get_line_index_start(_line);
@@ -385,9 +369,6 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static get_index_from_line_col = function(_line, _col) {
                 __ensure_layout__();
-                if (is_undefined(__layout__)) {
-                    return 0;
-                }
                 
                 var _line_count = __layout__.get_line_count();
                 if (_line_count <= 0) {
@@ -648,10 +629,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			#endregion
 			static get_index_from_buffer_index = function(_buffer_index) {
 			    __ensure_layout__();
-			    if (is_undefined(__layout__)) {
-			        return 0;
-			    }
-    
+			    
 			    var _line_count = __layout__.get_line_count();
 			    if (_line_count <= 0) {
 			        return 0;
@@ -787,7 +765,7 @@ function WWTextRendererBase() : WWCore() constructor {
             ///         otherwise falls back to caption.
             #endregion
             static __ensure_layout__ = function() {
-                if (!__is_dirty__ && !is_undefined(__layout__)) {
+                if (!__is_dirty__) {
                     return;
                 }
                 
@@ -796,33 +774,16 @@ function WWTextRendererBase() : WWCore() constructor {
                     _str = __textbox_parent__.get_text();
                 }
                 
-                if (_str == "" && caption != "") {
+                if (_str == "") {
                     _str = caption;
                 }
                 
                 __display_text__ = _str;
                 
-                if (!is_undefined(__layout__)) {
-                    __layout__ = undefined;
-                }
-                
-                if (_str == "") {
-                    __content_width__ = 0;
-                    __content_height__ = 0;
-                    __is_dirty__ = false;
-                    return;
-                }
-                
                 __layout__ = __build_layout__(_str);
                 
-                if (!is_undefined(__layout__)) {
-                    __content_width__ = __layout__.get_content_width();
-                    __content_height__ = __layout__.get_content_height();
-                }
-				else {
-                    __content_width__ = 0;
-                    __content_height__ = 0;
-                }
+                __content_width__ = __layout__.get_content_width();
+                __content_height__ = __layout__.get_content_height();
                 
                 __is_dirty__ = false;
             };
@@ -835,10 +796,6 @@ function WWTextRendererBase() : WWCore() constructor {
             /// @param  {Real} _origin_y
             #endregion
             static __draw_text__ = function(_origin_x, _origin_y) {
-                if (is_undefined(__layout__)) {
-                    return;
-                }
-                
                 if (font_exists(font)) {
                     draw_set_font(font);
                 }
@@ -872,7 +829,22 @@ function WWTextRendererBase() : WWCore() constructor {
                 __textbox_parent__ = _comp;
                 return self;
             };
-            
+			
+            static __string_split_and_retain__ = function(_str, _delim) {
+				static __closure = {};
+				static __fn = method(__closure, function(_value, _index) {
+					if (last_index == _index) return _value;
+					
+					return _value + delim;
+				});
+				
+				var _arr = string_split(_str, _delim);
+				__closure.delim = _delim;
+				__closure.last_index = array_length(_arr) - 1;
+				array_map_ext(_arr, __fn)
+				return _arr;
+			}
+			
             #region jsDoc
             /// @func   __build_layout__(_str)
             /// @desc   Build a WWTextLayout instance (lines + glyphs) for the given string.
@@ -880,7 +852,7 @@ function WWTextRendererBase() : WWCore() constructor {
             /// @returns {Struct.WWTextLayout}
             #endregion
             static __build_layout__ = function(_str) {
-                var _width_limit = wrap_width;
+                var _width_limit = (should_wrap) ? __textbox_parent__.width : infinity;
                 var _font_id = font;
                 
                 var _layout = new WWTextLayout();
@@ -888,9 +860,9 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _old_font = draw_get_font();
                 draw_set_font(_font_id);
                 
-				var _input_lines = array_map(string_split(_str, "\n"), function(_value, _index) {
-					return _value+"\n";
-				})
+				//convert string to array of lines, retaining their `\n`
+				var _input_lines = __string_split_and_retain__(_str, "\n");
+				
 					
                 if (_width_limit < 0 || _width_limit == infinity) {
                     var _wrapped_lines = _input_lines;
@@ -912,7 +884,7 @@ function WWTextRendererBase() : WWCore() constructor {
                             continue;
                         }
                         
-                        var _words = string_split(_raw_line, " ");
+                        var _words = __string_split_and_retain__(_raw_line, " ");
                         var _word_count = array_length(_words);
                         
                         var _start_index = 0;
@@ -933,7 +905,7 @@ function WWTextRendererBase() : WWCore() constructor {
                                 }
 								else {
                                     if (_segment_word_count > 0) {
-                                        var _segment_str_flush = string_join_ext(" ", _words, _start_index, _segment_word_count);
+                                        var _segment_str_flush = string_concat_ext(_words, _start_index, _segment_word_count);
                                         array_push(_output_arr, _segment_str_flush);
                                         _start_index += _segment_word_count;
                                     }
@@ -943,7 +915,7 @@ function WWTextRendererBase() : WWCore() constructor {
                                 }
                                 
                                 if (_current_width_val >= _width_limit) {
-                                    var _segment_str_flush2 = string_join_ext(" ", _words, _start_index, _segment_word_count);
+                                    var _segment_str_flush2 = string_concat_ext(_words, _start_index, _segment_word_count);
                                     array_push(_output_arr, _segment_str_flush2);
                                     _current_width_val = 0;
                                     _start_index += _segment_word_count;
@@ -952,7 +924,7 @@ function WWTextRendererBase() : WWCore() constructor {
                             }
 							else {
                                 if (_segment_word_count > 0) {
-                                    var _segment_str_flush3 = string_join_ext(" ", _words, _start_index, _segment_word_count);
+                                    var _segment_str_flush3 = string_concat_ext(_words, _start_index, _segment_word_count);
                                     array_push(_output_arr, _segment_str_flush3);
                                     _start_index += _segment_word_count;
                                     _segment_word_count = 0;
@@ -1005,7 +977,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         }
                         
                         if (_segment_word_count > 0) {
-                            var _segment_str_flush4 = string_join_ext(" ", _words, _start_index, _segment_word_count);
+                            var _segment_str_flush4 = string_concat_ext(_words, _start_index, _segment_word_count);
                             array_push(_output_arr, _segment_str_flush4);
                         }
                         
@@ -1078,12 +1050,6 @@ function WWTextRendererBase() : WWCore() constructor {
                 }
                 
                 return _layout;
-            };
-            
-            static __del__ = function() {
-                if (!is_undefined(__layout__)) {
-                    __layout__ = undefined;
-                }
             };
             
         #endregion

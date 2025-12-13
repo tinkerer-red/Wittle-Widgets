@@ -1686,7 +1686,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			            }
 			        }
 					else {
-			            if (js_clipboard_has_text_()) {
+			            if (js_clipboard_has_text()) {
 			                _pasted_string = js_clipboard_get_text();
 			            }
 			        }
@@ -1706,7 +1706,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			            clipboard_set_text(_str);
 			        }
 					else {
-			            if (js_clipboard_has_text_()) {
+			            if (js_clipboard_has_text()) {
 			                js_clipboard_set_text(_str);
 			            }
 			        }
@@ -1851,7 +1851,6 @@ function WWTextBoxV3() : WWCore() constructor {
 			    }
 				
 			};
-
 			
 			#region jsDoc
 			/// @func    __delete_selection_if_any__

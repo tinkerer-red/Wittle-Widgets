@@ -2356,7 +2356,7 @@ function WWTextBase() : WWCore() constructor {
 			                _pasted_string = clipboard_get_text();
 			            }
 			        } else {
-			            if (js_clipboard_has_text_()) {
+			            if (js_clipboard_has_text()) {
 			                _pasted_string = js_clipboard_get_text();
 			            }
 			        }
@@ -2376,7 +2376,7 @@ function WWTextBase() : WWCore() constructor {
 			                clipboard_set_text(_str);
 			            }
 			        } else {
-			            if (js_clipboard_has_text_()) {
+			            if (js_clipboard_has_text()) {
 			                js_clipboard_set_text(_str);
 			            }
 			        }
@@ -2718,7 +2718,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
                 if (os_browser == browser_not_a_browser) {
                     if (clipboard_has_text()) result = clipboard_get_text();
                 } else {
-                    if (js_clipboard_has_text_()) result = js_clipboard_get_text();
+                    if (js_clipboard_has_text()) result = js_clipboard_get_text();
                 }
                 return result;
             }

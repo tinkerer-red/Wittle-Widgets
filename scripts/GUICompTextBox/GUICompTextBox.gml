@@ -2075,7 +2075,7 @@ static __textbox_format_newline__ = function(_str) { static __run_once__ = trace
 						}
 					}
 					else {
-						if (js_clipboard_has_text_()) {
+						if (js_clipboard_has_text()) {
 							_pasted_string = js_clipboard_get_text();
 						}
 					}

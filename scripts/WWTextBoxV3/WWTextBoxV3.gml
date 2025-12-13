@@ -409,7 +409,13 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			
 			on_focus(function(_input) {
-				hotkeys.step()
+				var _return = hotkeys.step();
+				if (_return == undefined)
+				&& (keyboard_string != "") {
+					__insert_string_at_cursor__(keyboard_string);
+				}
+				
+				keyboard_string = "";
 			});
 			
 			//// Pre-draw event handler.

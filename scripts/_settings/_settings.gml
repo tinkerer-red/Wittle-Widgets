@@ -5,7 +5,7 @@ if (__SETTINGS_AUTO_SCALE) {
 		static get_current_width  = (is_browser) ? function() {return browser_width}  : window_get_width;
 		static get_current_height = (is_browser) ? function() {return browser_height} : window_get_height;
 		
-		static browser_extra = (is_browser) ? -4 : 0;
+		static browser_extra = (!is_browser) ? 0 : ((os_type == os_operagx) ? 0 : -4);
 		
 		var _width = get_current_width() + browser_extra;
 		var _height = get_current_height() + browser_extra;

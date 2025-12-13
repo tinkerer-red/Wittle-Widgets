@@ -1676,7 +1676,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			    static __clipboard_get_text__ = function() {
 					var _pasted_string = "";
 					
-			        if (os_browser == browser_not_a_browser) {
+			        if (os_browser == browser_not_a_browser)
+					&& (os_type != os_operagx) {
 			            if (clipboard_has_text()) {
 			                _pasted_string = clipboard_get_text();
 			            }
@@ -1697,7 +1698,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			    /// @returns {String}
 			    #endregion
 			    static __clipboard_set_text__ = function(_str) {
-			        if (os_browser == browser_not_a_browser) {
+			        if (os_browser == browser_not_a_browser)
+					&& (os_type != os_operagx) {
 			            clipboard_set_text(_str);
 			        }
 					else {

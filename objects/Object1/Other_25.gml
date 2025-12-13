@@ -682,82 +682,267 @@ build_ui_inline_test = function(){
 }
 
 build_ui_text_boxes = function(){
-	// Create the root GUI window.
+	// Root GUI
 	root = new WWCore()
 	    .set_offset(0, 0)
 	    .set_size(1280, 720)
 	    .set_background_color(c_black)
 	    .set_enabled(true);
-	
+
 	// -------------------------------------------------------------
-	// Test 1: Basic Text Rendering & Selection
+	// Theme (higher contrast, less "flat grey")
 	// -------------------------------------------------------------
-	var basicTextBox = new WWTextBase()
-	    .set_offset(50, 50)
-	    .set_size(600, 150)
-	    .set_text("Basic Test:\nThis is a basic test of text rendering and selection.\nIt should display three lines.")
+	var _page_bg = make_color_rgb(16, 16, 18);
+
+	var _card_bg = make_color_rgb(46, 46, 52);
+	var _card_hdr = make_color_rgb(34, 34, 38);
+
+	var _textbox_bg = make_color_rgb(24, 24, 26);
+
+	var _subtitle_color = make_color_rgb(180, 180, 190);
+	var _caption_color = make_color_rgb(220, 220, 230);
+
+	var _footer_bg = make_color_rgb(34, 34, 38);
+	var _footer_color = make_color_rgb(200, 200, 210);
+
+	// -------------------------------------------------------------
+	// Page backdrop
+	// -------------------------------------------------------------
+	var _page_backdrop = new WWCore()
+	    .set_offset(12, 12)
+	    .set_size(1256, 696)
+	    .set_background_color(_page_bg);
+	root.add(_page_backdrop);
+
+	// -------------------------------------------------------------
+	// Title + Subheader
+	// -------------------------------------------------------------
+	var _title_label = new WWLabel()
+	    .set_offset(24, 14)
+	    .set_size(1232, 30)
+	    .set_text("WWTextBoxV3 Demo - 4 configurations")
+	    .set_text_color(c_white)
+	    .set_text_font(fGUIDefaultBig);
+	root.add(_title_label);
+
+	var _subtitle_label = new WWLabel()
+	    .set_offset(24, 46)
+	    .set_size(1232, 20)
+	    .set_text("Selection, wrapping, fonts, and color themes. Each box is interactive.")
+	    .set_text_color(_subtitle_color);
+	root.add(_subtitle_label);
+
+	// -------------------------------------------------------------
+	// Layout constants
+	// -------------------------------------------------------------
+	var _margin_left = 24;
+	var _margin_top = 88;
+	var _gap_x = 18;
+	var _gap_y = 18;
+
+	var _panel_width = 600;
+	var _panel_height = 300;
+
+	var _panel1_x = _margin_left;
+	var _panel1_y = _margin_top;
+
+	var _panel2_x = _margin_left + _panel_width + _gap_x;
+	var _panel2_y = _margin_top;
+
+	var _panel3_x = _margin_left;
+	var _panel3_y = _margin_top + _panel_height + _gap_y;
+
+	var _panel4_x = _margin_left + _panel_width + _gap_x;
+	var _panel4_y = _margin_top + _panel_height + _gap_y;
+
+	// Card geometry
+	var _card_pad = 12;
+	var _header_height = 26;
+	var _textbox_inset = 12;
+
+	var _card_width = _panel_width + (_card_pad * 2);
+	var _card_height = _panel_height + (_card_pad * 2);
+
+	var _textbox_xoff = _textbox_inset;
+	var _textbox_yoff = _header_height + _textbox_inset;
+
+	var _textbox_width = _card_width - (_textbox_inset * 2);
+	var _textbox_height = _card_height - _header_height - (_textbox_inset * 2);
+
+	// -------------------------------------------------------------
+	// Panel 1
+	// -------------------------------------------------------------
+	var _card1 = new WWCore()
+	    .set_offset(_panel1_x - _card_pad, _panel1_y - _card_pad)
+	    .set_size(_card_width, _card_height)
+	    .set_background_color(_card_bg);
+	root.add(_card1);
+
+	var _card1_hdr = new WWCore()
+	    .set_offset(_panel1_x - _card_pad, _panel1_y - _card_pad)
+	    .set_size(_card_width, _header_height)
+	    .set_background_color(_card_hdr);
+	root.add(_card1_hdr);
+
+	var _caption_1 = new WWLabel()
+	    .set_offset(_panel1_x - _card_pad + 10, _panel1_y - _card_pad + 5)
+	    .set_size(_card_width - 20, _header_height)
+	    .set_text("1) No wrap - short text, fast caret movement")
+	    .set_text_color(_caption_color);
+	root.add(_caption_1);
+
+	var _text_1 =
+		"Quick input, no wrapping.\n" +
+		"Try arrow keys, selection, and backspace.\n\n" +
+		"Tip: This is perfect for chat or command bars.";
+
+	var _textbox_1 = new WWTextBoxV3()
+	    .set_offset(_panel1_x - _card_pad + _textbox_xoff, _panel1_y - _card_pad + _textbox_yoff)
+	    .set_size(_textbox_width, _textbox_height)
+	    .set_background_color(_textbox_bg)
+	    .set_text(_text_1)
+	    .set_text_color(c_white)
+	    .set_highlight_color(c_aqua)
+	    .set_cursor_color(c_white)
+	    .set_wrap_enabled(false);
+	root.add(_textbox_1);
+
+	// -------------------------------------------------------------
+	// Panel 2
+	// -------------------------------------------------------------
+	var _card2 = new WWCore()
+	    .set_offset(_panel2_x - _card_pad, _panel2_y - _card_pad)
+	    .set_size(_card_width, _card_height)
+	    .set_background_color(_card_bg);
+	root.add(_card2);
+
+	var _card2_hdr = new WWCore()
+	    .set_offset(_panel2_x - _card_pad, _panel2_y - _card_pad)
+	    .set_size(_card_width, _header_height)
+	    .set_background_color(_card_hdr);
+	root.add(_card2_hdr);
+
+	var _caption_2 = new WWLabel()
+	    .set_offset(_panel2_x - _card_pad + 10, _panel2_y - _card_pad + 5)
+	    .set_size(_card_width - 20, _header_height)
+	    .set_text("2) Wrap enabled - paragraph formatting")
+	    .set_text_color(_caption_color);
+	root.add(_caption_2);
+
+	var _text_2 =
+		"Word wrap is enabled here. Type a long sentence and watch the layout rebuild.\n\n" +
+		"This mode is ideal for notes, rich text, and long descriptions.";
+
+	var _textbox_2 = new WWTextBoxV3()
+	    .set_offset(_panel2_x - _card_pad + _textbox_xoff, _panel2_y - _card_pad + _textbox_yoff)
+	    .set_size(_textbox_width, _textbox_height)
+	    .set_background_color(_textbox_bg)
+	    .set_text(_text_2)
 	    .set_text_color(c_white)
 	    .set_highlight_color(c_lime)
-	    .set_line_height(22);
-	// Simulate a selection on the second line (index 1)
-	basicTextBox.highlight_selected = true;
-	basicTextBox.highlight_y_pos = 1;  // Second line (0-indexed)
-	basicTextBox.highlight_x_pos = 8;  // Selection starts at character index 8
-	basicTextBox.set_cursor_x_pos(20); // And the cursor is set at index 20 on that same line
-	root.add(basicTextBox);
+	    .set_cursor_color(c_white)
+	    .set_wrap_enabled(true);
+	root.add(_textbox_2);
 
 	// -------------------------------------------------------------
-	// Test 2: Dynamic Width TextBox
+	// Panel 3
 	// -------------------------------------------------------------
-	var dynamicWidthTextBox = new WWTextBase()
-	    .set_offset(50, 220)
-	    .set_size(600, 150)
-	    .set_text("Dynamic Width Test: This text should adjust its line breaks automatically if it exceeds the width of the box. Dynamic width is enabled.")
+	var _card3 = new WWCore()
+	    .set_offset(_panel3_x - _card_pad, _panel3_y - _card_pad)
+	    .set_size(_card_width, _card_height)
+	    .set_background_color(_card_bg);
+	root.add(_card3);
+
+	var _card3_hdr = new WWCore()
+	    .set_offset(_panel3_x - _card_pad, _panel3_y - _card_pad)
+	    .set_size(_card_width, _header_height)
+	    .set_background_color(_card_hdr);
+	root.add(_card3_hdr);
+
+	var _caption_3 = new WWLabel()
+	    .set_offset(_panel3_x - _card_pad + 10, _panel3_y - _card_pad + 5)
+	    .set_size(_card_width - 20, _header_height)
+	    .set_text("3) Code editor - wrap off, tabs, indentation")
+	    .set_text_color(_caption_color);
+	root.add(_caption_3);
+
+	var _text_3 =
+		"function demo_example() {\n" +
+		"\tvar _counter_value = 0;\n" +
+		"\tvar _message_text = \"Hello from WWTextBoxV3\";\n\n" +
+		"\tif (_counter_value == 0) {\n" +
+		"\t\t_message_text += \" - ready\";\n" +
+		"\t}\n\n" +
+		"\t// Try selecting across lines and deleting.\n" +
+		"\treturn _message_text;\n" +
+		"}\n";
+
+	var _textbox_3 = new WWTextBoxV3()
+	    .set_offset(_panel3_x - _card_pad + _textbox_xoff, _panel3_y - _card_pad + _textbox_yoff)
+	    .set_size(_textbox_width, _textbox_height)
+	    .set_background_color(_textbox_bg)
+	    .set_text(_text_3)
 	    .set_text_color(c_white)
-	    .set_highlight_color(c_blue)
-	    .set_line_height(22)
-	    .set_dynamic_width(true);
-	root.add(dynamicWidthTextBox);
+	    .set_highlight_color(c_yellow)
+	    .set_cursor_color(c_white)
+	    .set_wrap_enabled(false);
+	root.add(_textbox_3);
 
 	// -------------------------------------------------------------
-	// Test 3: Custom Font TextBox
+	// Panel 4
 	// -------------------------------------------------------------
-	// (Assume fGUIDefaultBig is a valid, larger font asset.)
-	var customFontTextBox = new WWTextBase()
-	    .set_offset(50, 390)
-	    .set_size(600, 150)
-	    .set_text("Custom Font Test:\nThe quick brown fox jumps over the lazy dog.\nEnjoy the custom styling!")
-	    .set_text_font(fGUIDefaultBig)
-	    .set_text_color(c_white)
-	    .set_highlight_color(c_orange)
-	    .set_line_height(24);
-	root.add(customFontTextBox);
+	var _card4 = new WWCore()
+	    .set_offset(_panel4_x - _card_pad, _panel4_y - _card_pad)
+	    .set_size(_card_width, _card_height)
+	    .set_background_color(_card_bg);
+	root.add(_card4);
 
-	// -------------------------------------------------------------
-	// Test 4: Long Text with Scrolling/Line Breaking
-	// -------------------------------------------------------------
-	var longText = "Scrolling Test:\n" + string_repeat("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n", 10);
-	var longTextBox = new WWTextBoxV3()
-	    .set_offset(700, 50)
-	    .set_size(500, 300)
-		.set_text_font(fGUIDefaultBig)
-	    .set_text(longText)
-	    .set_text_color(c_white)
-	    .set_highlight_color(c_red)
-	    //.set_line_height(20);
-	root.add(longTextBox);
+	var _card4_hdr = new WWCore()
+	    .set_offset(_panel4_x - _card_pad, _panel4_y - _card_pad)
+	    .set_size(_card_width, _header_height)
+	    .set_background_color(_card_hdr);
+	root.add(_card4_hdr);
 
-	// -------------------------------------------------------------
-	// Test 5: Emoji Font TextBox
-	// -------------------------------------------------------------
-	// (Assume emojiFont is a valid font asset supporting a wide range of emojis.)
-	var emojiTextBox = new WWTextBase()
-	    .set_offset(700, 400)
-	    .set_size(500, 150)
-	    .set_text("Emoji Test:\n\t\t\tstatic  abc     =      1")
-	    //.set_text_font(fNotoEmojiMedium)
+	var _caption_4 = new WWLabel()
+	    .set_offset(_panel4_x - _card_pad + 10, _panel4_y - _card_pad + 5)
+	    .set_size(_card_width - 20, _header_height)
+	    .set_text("4) Styled - different font/theme, wrap on")
+	    .set_text_color(_caption_color);
+	root.add(_caption_4);
+
+	var _text_4 =
+		"Styled demo:\n" +
+		"- Different highlight color\n" +
+		"- Different background color\n" +
+		"- Wrap enabled for comfortable reading\n\n" +
+		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+		"Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\n" +
+		"Try pasting a big chunk of text here.";
+
+	var _textbox_4 = new WWTextBoxV3()
+	    .set_offset(_panel4_x - _card_pad + _textbox_xoff, _panel4_y - _card_pad + _textbox_yoff)
+	    .set_size(_textbox_width, _textbox_height)
+	    .set_background_color(make_color_rgb(22, 22, 30))
+	    .set_text(_text_4)
 	    .set_text_color(c_white)
 	    .set_highlight_color(c_fuchsia)
-	    .set_line_height(24);
-	root.add(emojiTextBox);
-}
+	    .set_cursor_color(c_white)
+	    .set_wrap_enabled(true);
+	root.add(_textbox_4);
+
+	// -------------------------------------------------------------
+	// Footer
+	// -------------------------------------------------------------
+	var _footer_back = new WWCore()
+	    .set_offset(24, 684)
+	    .set_size(1232, 24)
+	    .set_background_color(_footer_bg);
+	root.add(_footer_back);
+
+	var _footer_label = new WWLabel()
+	    .set_offset(34, 688)
+	    .set_size(1212, 18)
+	    .set_text("Hint: Shift+Arrow selects. Test Backspace/Delete near wraps. Tabs are preserved in the code sample.")
+	    .set_text_color(_footer_color);
+	root.add(_footer_label);
+};

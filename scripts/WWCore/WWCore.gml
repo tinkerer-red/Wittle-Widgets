@@ -273,7 +273,6 @@ function WWCore() constructor {
 				return self;
 			}
 			
-			
 			#region Focus
 			events.focus_enter = variable_get_hash("focus_enter"); //triggered when component first accepted keyboard inputs
 			events.focus       = variable_get_hash("focus"); //triggered every frame component can accept keyboard inputs

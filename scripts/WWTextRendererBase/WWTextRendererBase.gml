@@ -277,6 +277,7 @@ function WWTextRendererBase() : WWCore() constructor {
 					if (_target_y >= _y_off && _target_y < _y_off + _h) {
                         break;
                     }
+					
                     _i++;
                 }
                 
@@ -285,9 +286,21 @@ function WWTextRendererBase() : WWCore() constructor {
 				var _line_width_val = __layout__.get_line_width(_line);
                 
 				if (_target_x <= 0) { return _start; }
-                if (_target_x >= _line_width_val) { return _end; }
-                
-				
+                if (_target_x >= _line_width_val) {
+					
+				    var _is_forced_wrapped = _layout.get_line_forced_wrapped(_line);
+				    var _is_last_line = (_line == _line_count - 1);
+					
+				    // Forced wrap has no literal '\n' glyph to skip.
+				    // Last line often has no trailing '\n' either.
+				    if (_is_forced_wrapped || _is_last_line) {
+				        return _end;
+				    }
+					
+				    // Normal line break: ignore the literal '\n' at the end of the line.
+				    return max(_start, _end - 1);
+				}
+
                 var _index_result = _end;
                 var _sum = 0;
                 

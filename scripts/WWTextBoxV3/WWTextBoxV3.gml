@@ -378,9 +378,6 @@ function WWTextBoxV3() : WWCore() constructor {
 				__check_minput__(false);
 			})
 			on_interact(function(_data) {
-				var mx = device_mouse_x_to_gui(0);
-				var my = device_mouse_y_to_gui(0);
-				
 				// stay focused if mouse is on component
 				if (__word_selection_mode__) {
 			        __update_word_selection_drag__();
@@ -620,6 +617,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				buffer.erase(_buf_start, _buf_end);
 				__force_rebuild__();
 			    __cursor_set_index_synced__(_prev_index);
+				__history_add_record__();
 			});
 
 			hotkeys.register([vk_delete], function() {
@@ -666,6 +664,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
 				__cursor_set_index_synced__(_start);
+				__history_add_record__();
 			});
 			hotkeys.register([vk_control, vk_delete], function() {
 			    if (is_read_only) return;
@@ -686,6 +685,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			    buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
 				__cursor_set_index_synced__(_index);
+				__history_add_record__();
 			});
 
 			#endregion
@@ -1138,7 +1138,10 @@ function WWTextBoxV3() : WWCore() constructor {
 			__historic_records__ = [];
 			__history_records_limit__ = 65536; // power(2, 16); // we'll simply allow for a lot to start with, memory shouldnt be an issue but for low end devices this is here as an option
 			
-			static __clipboard_layout_cache__ = {}; //globally used in all textboxes to carry leyout information from one textbox to another, commonly used for rich text rendering, or syntax highlighting
+			//globally used in all textboxes to carry leyout information from one textbox to another, commonly used for rich text rendering, or syntax highlighting
+			static __clipboardcache__ = {
+				text: "",
+			};
 			
 		#endregion
 		
@@ -1819,6 +1822,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			static __cursor_set_index_synced__ = function(_new_index, _shift_select = false, _update_history = true, _update_width = true) {
 				
 				var _old_index = cursor.get_index();
+				
+				if (_old_index == _new_index) return;
+				
 			    cursor.set_index(_new_index);
 
 			    if (_shift_select) {

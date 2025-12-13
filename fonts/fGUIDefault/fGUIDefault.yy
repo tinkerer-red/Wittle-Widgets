@@ -135,7 +135,10 @@
   "sdfSpread":8,
   "size":12.0,
   "styleName":"Regular",
-  "textureGroupId":null,
+  "textureGroupId":{
+    "name":"Default",
+    "path":"texturegroups/Default",
+  },
   "TTFName":"${project_dir}\\fonts\\fGUIDefault\\RedsFont.ttf",
   "usesSDF":false,
 }

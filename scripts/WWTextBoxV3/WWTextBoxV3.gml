@@ -616,8 +616,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				buffer.erase(_buf_start, _buf_end);
 				__force_rebuild__();
-			    __cursor_set_index_synced__(_prev_index);
 				__history_add_record__();
+				__cursor_set_index_synced__(_prev_index, false, false);
 			});
 
 			hotkeys.register([vk_delete], function() {
@@ -637,7 +637,6 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _buf_end   = renderer.get_buffer_index_from_index(_next);
 				
 				buffer.erase(_buf_start, _buf_end);
-				
 				__force_rebuild__();
 				__history_add_record__();
 			});
@@ -663,8 +662,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
-				__cursor_set_index_synced__(_start);
 				__history_add_record__();
+				__cursor_set_index_synced__(_start, false, false);
 			});
 			hotkeys.register([vk_control, vk_delete], function() {
 			    if (is_read_only) return;
@@ -684,8 +683,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 			    buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
-				__cursor_set_index_synced__(_index);
 				__history_add_record__();
+				__cursor_set_index_synced__(_index);
 			});
 
 			#endregion
@@ -701,7 +700,13 @@ function WWTextBoxV3() : WWCore() constructor {
 				if (is_read_only) return;
 				
 				// If selection exists; normal delete
+				///////////////////////////////////////////////////////////////////////
+				// NOTE! This actually shouldnt delete anything normally and should
+				// early out, at least this is the results from a few text boxes tested
+				// like discord. however it makes more sense to just delete delection
 				if (__delete_selection_if_any__(true, true)) return;
+				///////////////////////////////////////////////////////////////////////
+				
 				
 				// Delete until begining of line
 				var _end = cursor.get_index();
@@ -720,7 +725,12 @@ function WWTextBoxV3() : WWCore() constructor {
 				if (is_read_only) return;
 				
 				// If selection exists; normal delete
+				///////////////////////////////////////////////////////////////////////
+				// NOTE! This actually shouldnt delete anything normally and should
+				// early out, at least this is the results from a few text boxes tested
+				// like discord. however it makes more sense to just delete delection
 				if (__delete_selection_if_any__(true, true)) return;
+				///////////////////////////////////////////////////////////////////////
 				
 				// Delete until end of line, preserve `\n` line breaks, and stop on force wrapped
 				var _start = cursor.get_index();
@@ -797,19 +807,16 @@ function WWTextBoxV3() : WWCore() constructor {
 				if (is_read_only) return;
 				// Undo
 				__history_jump__(-1);
-				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, ord("Y")], function() {
 				if (is_read_only) return;
 				// Redo
 				__history_jump__(1);
-				__force_rebuild__();
 			});
 			hotkeys.register([vk_control, vk_shift, ord("Z")], function() {
 				if (is_read_only) return;
 				// Redo (alternate)
 				__history_jump__(1);
-				__force_rebuild__();
 			});
 			#endregion
 			
@@ -832,7 +839,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, vk_enter], function() {
 				if (is_read_only) return;
 				// Optional: Submit (e.g., Ctrl+Enter)
-				// I have no idea if this does anything
+				// dialog boxes which support enter should allow for ctrl+enter toi force submit, this sh
 			});
 			hotkeys.register([vk_control, vk_shift, vk_enter], function() {
 				if (is_read_only) return;
@@ -905,8 +912,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			static clear_text = function() {
 				buffer.clear_text();
 				cursor.set_index(0);
-				__history_update_latest_cursor__();
 				cursor.set_highlight_active(false);
+				__history_update_latest_cursor__();
 			}
 			#region jsDoc
 			/// @func    select_all_text()
@@ -1139,7 +1146,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			__history_records_limit__ = 65536; // power(2, 16); // we'll simply allow for a lot to start with, memory shouldnt be an issue but for low end devices this is here as an option
 			
 			//globally used in all textboxes to carry leyout information from one textbox to another, commonly used for rich text rendering, or syntax highlighting
-			static __clipboardcache__ = {
+			static __global_clipboard_container__ = {
 				text: "",
 			};
 			
@@ -1617,9 +1624,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					
 					// insert the text
 					buffer.insert(_buffer_index, _new_str);
-					
 					__force_rebuild__();
-					
 					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
 					__cursor_set_index_synced__(_new_index);
 				}
@@ -1677,21 +1682,22 @@ function WWTextBoxV3() : WWCore() constructor {
 			    /// @returns {String}
 			    #endregion
 			    static __clipboard_get_text__ = function() {
-					var _pasted_string = "";
-					
-			        if (os_browser == browser_not_a_browser)
-					&& (os_type != os_operagx) {
-			            if (clipboard_has_text()) {
-			                _pasted_string = clipboard_get_text();
-			            }
+					if (clipboard_has_text()) {
+						var _pasted_string = clipboard_get_text();
+						//text was coppied from outside the program clear layout data
+						if (_pasted_string != __global_clipboard_container__.text) {
+							//clear layout data
+						}
+						__global_clipboard_container__.text = _pasted_string;
 			        }
+					else if (__global_clipboard_container__.text != "") {
+						var _pasted_string = __global_clipboard_container__.text;
+					}
 					else {
-			            if (js_clipboard_has_text()) {
-			                _pasted_string = js_clipboard_get_text();
-			            }
-			        }
-					
-			        return _pasted_string;
+						//nothing has been coppied.... maybe print a warning?
+					}
+			        
+					return _pasted_string;
 			    }
 				
 				#region jsDoc
@@ -1701,15 +1707,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			    /// @returns {String}
 			    #endregion
 			    static __clipboard_set_text__ = function(_str) {
-			        if (os_browser == browser_not_a_browser)
-					&& (os_type != os_operagx) {
-			            clipboard_set_text(_str);
-			        }
-					else {
-			            if (js_clipboard_has_text()) {
-			                js_clipboard_set_text(_str);
-			            }
-			        }
+			        __global_clipboard_container__.text = _str;
+					//TODO: update or clear layout data aswell
+					clipboard_set_text(_str);
 			    }
 				
 			#endregion
@@ -1723,9 +1723,12 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param   {Real}   _cursor_index  : Global cursor index.
 				/// @returns {Struct} A history snapshot.
 				#endregion
-				static __history_record_create__ = function(_content, _cursor_index) constructor {
+				static __history_record_create__ = function(_content, _cursor_index, _highlight_active, _highlight_start_index, _highlight_end_index) constructor {
 				    content = _content;
-				    cursor  = _cursor_index;
+				    cursor_index  = _cursor_index;
+					highlight_active = _highlight_active;
+					highlight_start_index = _highlight_start_index;
+					highlight_end_index = _highlight_end_index;
 				};
 				
 				#region jsDoc
@@ -1745,8 +1748,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				    // Create new snapshot
 				    var _record = new __history_record_create__(
 				        buffer.get_text(),
-				        cursor.get_index()
-				    );
+				        cursor.get_index(),
+						cursor.get_highlight_active(),
+					    cursor.get_highlight_start_index(),
+					    cursor.get_highlight_end_index(),
+					);
 
 				    array_push(__historic_records__, _record);
 
@@ -1765,7 +1771,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {
-				    __historic_records__[__historic_records_loc__].cursor = cursor.get_index();
+					var _record = __historic_records__[__historic_records_loc__];
+				    _record.cursor_index = cursor.get_index();
+				    _record.highlight_active = cursor.get_highlight_active();
+				    _record.highlight_start_index = cursor.get_highlight_start_index();
+				    _record.highlight_end_index = cursor.get_highlight_end_index();
 				};
 				
 				#region jsDoc
@@ -1787,13 +1797,16 @@ function WWTextBoxV3() : WWCore() constructor {
 				    var _record = __historic_records__[_target];
 
 				    buffer.set_text(_record.content);
-				    cursor.set_index(_record.cursor);
-				    cursor.set_highlight_start_index(_record.cursor);
-				    cursor.set_highlight_end_index(_record.cursor);
+				    cursor.set_index(_record.cursor_index);
+				    cursor.set_highlight_active(_record.highlight_active);
+				    cursor.set_highlight_start_index(_record.highlight_start_index);
+				    cursor.set_highlight_end_index(_record.highlight_end_index);
 					
 				    __historic_records_loc__ = _target;
 
 				    cursor.set_highlight_active(false);
+					
+					__force_rebuild__();
 				};
 				
 			#endregion
@@ -1823,7 +1836,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				var _old_index = cursor.get_index();
 				
-				if (_old_index == _new_index) return;
+				//if (_old_index == _new_index) return;
 				
 			    cursor.set_index(_new_index);
 
@@ -1834,7 +1847,6 @@ function WWTextBoxV3() : WWCore() constructor {
 			            cursor.set_highlight_active(true);
 			        }
 			        cursor.set_highlight_end_index(_new_index);
-			        cursor.set_highlight_active(true);
 			    }
 			    else {
 			        cursor.set_highlight_active(false);
@@ -1870,23 +1882,25 @@ function WWTextBoxV3() : WWCore() constructor {
 
 			    buffer.erase(_buffer_start, _buffer_end);
 
-			    cursor.set_highlight_active(false);
-
 			    var _new_index = min(_start_index, _end_index);
-			    __cursor_set_index_synced__(_new_index);
-
+			    __cursor_set_index_synced__(_new_index, false, false);
+				
 			    if (_force_rebuild) {
 			        __force_rebuild__();
 			    }
 			    if (_push_history) {
 			        __history_add_record__();
 			    }
-
+				
 			    return true;
 			};
 
 		#endregion
 		
+		
+		
     #endregion
 	
 }
+
+

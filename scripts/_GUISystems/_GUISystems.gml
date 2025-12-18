@@ -69,7 +69,10 @@ function __get_controller_archor_y__(_valign=fa_middle) {
 }
 
 
-//todo: add these functions when html5's static_get(statig_get(self)) is no longer broken
+
+
+//todo: add these functions as an extension to make it easier on devs to integrate.
+/*
 function js_clipboard_get_text() {
 	return clipboard_get_text()
 };
@@ -82,3 +85,5 @@ function js_clipboard_has_text() {
 function js_set_cursor(c) {
 	return window_set_cursor(c)
 };
+
+

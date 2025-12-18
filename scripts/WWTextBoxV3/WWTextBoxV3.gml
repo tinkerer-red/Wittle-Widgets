@@ -1804,9 +1804,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					
 				    __historic_records_loc__ = _target;
 
-				    cursor.set_highlight_active(false);
-					
-					__force_rebuild__();
+				    __force_rebuild__();
 				};
 				
 			#endregion
@@ -1881,17 +1879,18 @@ function WWTextBoxV3() : WWCore() constructor {
 			    var _buffer_end = renderer.get_buffer_index_from_index(_end_index);
 
 			    buffer.erase(_buffer_start, _buffer_end);
-
-			    var _new_index = min(_start_index, _end_index);
-			    __cursor_set_index_synced__(_new_index, false, false);
 				
-			    if (_force_rebuild) {
-			        __force_rebuild__();
-			    }
 			    if (_push_history) {
 			        __history_add_record__();
 			    }
 				
+				var _new_index = min(_start_index, _end_index);
+			    __cursor_set_index_synced__(_new_index, false, false);
+				
+				if (_force_rebuild) {
+			        __force_rebuild__();
+			    }
+			    
 			    return true;
 			};
 

@@ -477,8 +477,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _line = renderer.get_line_from_index(_index);
 				var _new_index = renderer.get_line_index_end(_line);
 				
+				var _last_line_index = renderer.get_line_count() - 1;
+				
 				//if literal `\n` ignore it
-				if not (renderer.get_line_forced_wrapped(_line)) {
+				if not (renderer.get_line_forced_wrapped(_line))
+				&& (_line != _last_line_index) {
 					_new_index -= 1;
 				}
 				
@@ -511,7 +514,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__cursor_set_index_synced__(_new_index, false);
 			});
 			hotkeys.register([vk_control, vk_end], function() {
-				var _new_index = renderer.get_glyph_count()-1;
+				var _new_index = renderer.get_glyph_count();
 				__cursor_set_index_synced__(_new_index, false);
 			});
 			
@@ -548,8 +551,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _line = renderer.get_line_from_index(_index)
 				var _new_index = renderer.get_line_index_end(_line);
 				
+				var _last_line_index = renderer.get_line_count() - 1;
+				
 				//if literal `\n` ignore it
-				if not (renderer.get_line_forced_wrapped(_line)) {
+				if not (renderer.get_line_forced_wrapped(_line))
+				&& (_line != _last_line_index) {
 					_new_index -= 1;
 				}
 				
@@ -585,7 +591,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			hotkeys.register([vk_control, vk_shift, vk_end], function() {
 				var _index = cursor.get_index();
-				var _new_index = renderer.get_glyph_count()-1;
+				var _new_index = renderer.get_glyph_count();
 				__cursor_set_index_synced__(_new_index, true);
 			});
 			hotkeys.register([vk_control, vk_shift, vk_pageup], function() {

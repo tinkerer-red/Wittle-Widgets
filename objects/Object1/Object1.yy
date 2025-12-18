@@ -11,8 +11,8 @@
   "name":"Object1",
   "overriddenProperties":[],
   "parent":{
-    "name":"Reds_GUI",
-    "path":"Reds_GUI.yyp",
+    "name":"Wittle Widgets",
+    "path":"Wittle Widgets.yyp",
   },
   "parentObjectId":null,
   "persistent":false,

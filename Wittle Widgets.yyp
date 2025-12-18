@@ -1,6 +1,6 @@
 {
   "$GMProject":"v1",
-  "%Name":"Reds_GUI",
+  "%Name":"Wittle Widgets",
   "AudioGroups":[
     {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
@@ -56,7 +56,7 @@
   "MetaData":{
     "IDEVersion":"2024.14.2.212",
   },
-  "name":"Reds_GUI",
+  "name":"Wittle Widgets",
   "resources":[
     {"id":{"name":"fGUIDefault","path":"fonts/fGUIDefault/fGUIDefault.yy",},},
     {"id":{"name":"fGUIDefaultBig","path":"fonts/fGUIDefaultBig/fGUIDefaultBig.yy",},},

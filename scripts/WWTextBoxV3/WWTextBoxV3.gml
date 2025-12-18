@@ -1837,8 +1837,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				//if (_old_index == _new_index) return;
 				
 			    cursor.set_index(_new_index);
-
-			    if (_shift_select) {
+				
+				var _selection_is_non_zero = _new_index != cursor.get_highlight_start_index();
+				
+				
+			    if (_shift_select && _selection_is_non_zero) {
 			        if (!cursor.get_highlight_active()) {
 			            cursor.set_highlight_start_index(_old_index);
 			            cursor.set_highlight_end_index(_new_index);

@@ -396,6 +396,10 @@ function WWTextLayout() constructor {
 		}
 		if (_glyph_index >= _data.glyphs_count) {
 	        _glyph_index = _data.glyphs_count-1;
+			var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
+			var _buffer_index = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Index]
+			var _buffer_size = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Size]
+			return _buffer_index + _buffer_size;
 	    }
 	    
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;

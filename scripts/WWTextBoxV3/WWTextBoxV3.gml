@@ -761,7 +761,12 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region Clipboard & Edit Commands — Ctrl Combos
 			hotkeys.register([vk_control, ord("A")], function() {
-				select_all_text();
+				var _glyph_count = renderer.get_glyph_count();
+				cursor.set_highlight_active(true);
+				cursor.set_highlight_start_index(0);
+				cursor.set_highlight_end_index(_glyph_count);
+				cursor.set_index(_glyph_count);
+				__history_update_latest_cursor__();
 			});
 			hotkeys.register([vk_control, ord("C")], function() {
 				var _start = cursor.get_highlight_start_index();
@@ -919,20 +924,6 @@ function WWTextBoxV3() : WWCore() constructor {
 				buffer.clear_text();
 				cursor.set_index(0);
 				cursor.set_highlight_active(false);
-				__history_update_latest_cursor__();
-			}
-			#region jsDoc
-			/// @func    select_all_text()
-			/// @desc    Select all the text from the text box.
-			/// @self    GUICompTextbox
-			/// @returns {Undefined}
-			#endregion
-			static select_all_text = function() {
-				var _glyph_count = renderer.get_glyph_count();
-				cursor.set_highlight_active(true);
-				cursor.set_highlight_start_index(0);
-				cursor.set_highlight_end_index(_glyph_count-1);
-				cursor.set_index(_glyph_count-1);
 				__history_update_latest_cursor__();
 			}
 			

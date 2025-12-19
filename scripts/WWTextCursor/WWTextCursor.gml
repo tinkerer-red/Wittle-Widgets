@@ -130,8 +130,8 @@ function WWTextCursor() : WWCore() constructor {
 					repeat((_end_line - _start_line) + 1) {
 
 						var _y  = _renderer.get_line_y_offset(_line);
-						var _h  = _renderer.get_line_height(_line);
-						var _w  = _renderer.get_line_width(_line);
+						var _h  = _renderer.get_line_height(_line)-1;
+						var _w  = _renderer.get_line_width(_line)-1;
 
 						var _range_start = 0;
 						var _range_end   = _w;

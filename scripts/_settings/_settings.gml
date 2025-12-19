@@ -1,15 +1,15 @@
 if (__SETTINGS_AUTO_SCALE) {
 	time_source_start(time_source_create(time_source_game, 1, time_source_units_frames, function(){
-		static is_browser = (os_browser != browser_not_a_browser)
+		static is_browser = (os_browser != browser_not_a_browser);
+		static is_wasm = (os_type == os_operagx);
 		
 		static get_current_width  = (is_browser) ? function() {return browser_width}  : window_get_width;
 		static get_current_height = (is_browser) ? function() {return browser_height} : window_get_height;
 		
-		static browser_extra = (!is_browser) ? 0 : ((os_type == os_operagx) ? 0 : -4);
+		static browser_extra = (is_browser) ? -4 : 0;
 		
 		var _width = get_current_width() + browser_extra;
 		var _height = get_current_height() + browser_extra;
-		
 		
 		
 		if (_width <= 0)
@@ -24,7 +24,9 @@ if (__SETTINGS_AUTO_SCALE) {
 				window_set_size(_width, _height);
 			}
 			camera_set_view_size(view_camera[0], _width, _height);
-			surface_resize(application_surface, _width, _height);
+			if (!is_wasm) {
+				surface_resize(application_surface, _width, _height);
+			}
 		}
 		
 	}

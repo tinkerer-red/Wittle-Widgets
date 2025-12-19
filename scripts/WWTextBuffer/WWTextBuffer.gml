@@ -60,24 +60,7 @@ function WWTextBuffer() : WWCore() constructor {
 		
 		#region Functions
 			
-			#region jsDoc
-			/// @func	destroy()
-			/// @desc	Delete the underlying buffer. Do not use this instance after.
-			/// @returns {Struct.WWTextBuffer}
-			#endregion
-			static destroy = function() {
-				if (buffer_exists(__buffer__)) {
-					buffer_delete(__buffer__);
-				}
-				if (buffer_exists(__temp_buffer__)) {
-					buffer_delete(__temp_buffer__);
-				}
-				__buffer__ = -1;
-				__content__ = "";
-				__length__ = 0;
-				__allowed_char_map__ = undefined;
-				return self;
-			};
+			#region Getters
 			
 			#region jsDoc
 			/// @func	get_text()
@@ -99,25 +82,6 @@ function WWTextBuffer() : WWCore() constructor {
 					__is_dirty__ = false;
 				}
 				return __content__;
-			};
-			
-			#region jsDoc
-			/// @func	clear_text()
-			/// @desc	Clear the buffer to an empty string.
-			/// @returns {Struct.WWTextBuffer}
-			#endregion
-			static clear_text = function() {
-				if (buffer_exists(__buffer__)) {
-					buffer_resize(__buffer__, 0);
-					buffer_resize(__buffer__, 65536);
-					buffer_seek(__buffer__, buffer_seek_start, 0);
-				}
-	
-				__content__   = "";
-				__length__	= 0;
-				__is_dirty__  = false;
-	
-				return self;
 			};
 			
 			#region jsDoc
@@ -167,6 +131,56 @@ function WWTextBuffer() : WWCore() constructor {
 				// GameMaker strings are 1-based.
 				var _gm_start = _start_clamp + 1;
 				return string_copy(get_text(), _gm_start, _count);
+			};
+			
+			#region jsDoc
+			/// @func	get_allowed_char()
+			/// @desc	Gets the allowed character struct.
+			/// @returns {Struct}
+			#endregion
+			static get_allowed_char = function() {
+				return __allowed_char_map__;
+			};
+			
+			#endregion
+			
+			#region jsDoc
+			/// @func	destroy()
+			/// @desc	Delete the underlying buffer. Do not use this instance after.
+			/// @returns {Struct.WWTextBuffer}
+			#endregion
+			static destroy = function() {
+				if (buffer_exists(__buffer__)) {
+					buffer_delete(__buffer__);
+				}
+				if (buffer_exists(__temp_buffer__)) {
+					buffer_delete(__temp_buffer__);
+				}
+				__buffer__ = -1;
+				__content__ = "";
+				__length__ = 0;
+				__allowed_char_map__ = undefined;
+				return self;
+			};
+			
+			
+			#region jsDoc
+			/// @func	clear_text()
+			/// @desc	Clear the buffer to an empty string.
+			/// @returns {Struct.WWTextBuffer}
+			#endregion
+			static clear_text = function() {
+				if (buffer_exists(__buffer__)) {
+					buffer_resize(__buffer__, 0);
+					buffer_resize(__buffer__, 65536);
+					buffer_seek(__buffer__, buffer_seek_start, 0);
+				}
+	
+				__content__   = "";
+				__length__	= 0;
+				__is_dirty__  = false;
+	
+				return self;
 			};
 			
 			#region jsDoc
@@ -279,8 +293,6 @@ function WWTextBuffer() : WWCore() constructor {
 				__is_dirty__ = true;
 				return self;
 			};
-
-
 			
 		#endregion
 		
@@ -341,13 +353,13 @@ function WWTextBuffer() : WWCore() constructor {
 				static __args = {
 					buff : buffer_create(1, buffer_grow, 1),
 				}
-				__args.__allowed_char__ = __allowed_char__;
+				__args.__allowed_char_map__ = __allowed_char_map__;
 				
 				buffer_resize(__args.buff, string_byte_length(_text));
 				buffer_seek(__args.buff, buffer_seek_start, 0);
 				
 				string_foreach(_text, method(__args, function(_char, _index) {
-					if (__allowed_char__[$ _char]) {
+					if (__allowed_char_map__[$ _char]) {
 						buffer_write(buff, buffer_text, _char);
 					}
 				}));

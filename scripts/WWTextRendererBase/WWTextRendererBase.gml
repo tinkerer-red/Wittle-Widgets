@@ -64,6 +64,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         return self;
                     }
                     color = _color_value;
+                    __mark_vb_dirty__();
                     return self;
                 };
                 
@@ -78,6 +79,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         return self;
                     }
                     alpha = _alpha_value;
+                    __mark_vb_dirty__();
                     return self;
                 };
         
@@ -108,6 +110,126 @@ function WWTextRendererBase() : WWCore() constructor {
                     __mark_dirty__();
                     return self;
                 };
+
+                #region jsDoc
+                /// @func   set_tab_size_spaces()
+                /// @desc   Sets how many spaces per tab stop (usually 2 or 4).
+                ///         This affects both fixed tabs and tab stop alignment.
+                /// @param  {Real} _space_count
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_tab_size_spaces = function(_space_count) {
+                    var _space_count_int = floor(_space_count);
+                    if (_space_count_int < 1) { _space_count_int = 1; }
+
+                    if (tab_size_spaces == _space_count_int) {
+                        return self;
+                    }
+
+                    tab_size_spaces = _space_count_int;
+
+                    // Tabs affect layout width and glyph placement, so rebuild layout.
+                    __mark_dirty__();
+                    return self;
+                };
+
+                #region jsDoc
+                /// @func   set_tab_use_stops()
+                /// @desc   If enabled, a tab advances to the next tab stop (tab stops mode).
+                ///         If disabled, a tab always advances by a fixed width (fixed mode).
+                /// @param  {Bool} _use_stops
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_tab_use_stops = function(_use_stops) {
+                    if (tab_use_stops == _use_stops) {
+                        return self;
+                    }
+
+                    tab_use_stops = _use_stops;
+
+                    // Tab policy affects layout width and glyph placement.
+                    __mark_dirty__();
+                    return self;
+                };
+
+                #region jsDoc
+                /// @func   set_whitespace_visible()
+                /// @desc   If enabled, draws visible markers for spaces and tabs.
+                /// @param  {Bool} _is_visible
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_whitespace_visible = function(_is_visible) {
+                    if (whitespace_visible == _is_visible) {
+                        return self;
+                    }
+
+                    whitespace_visible = _is_visible;
+
+                    // Visibility affects only the baked vertices (what we draw), not layout.
+                    __mark_vb_dirty__();
+                    return self;
+                };
+
+                #region jsDoc
+                /// @func   set_whitespace_color()
+                /// @desc   Sets marker color for visible whitespace.
+                /// @param  {Constant.Color} _color_value
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_whitespace_color = function(_color_value) {
+                    if (whitespace_color == _color_value) {
+                        return self;
+                    }
+
+                    whitespace_color = _color_value;
+                    __mark_vb_dirty__();
+                    return self;
+                };
+
+                #region jsDoc
+                /// @func   set_whitespace_alpha()
+                /// @desc   Sets marker alpha for visible whitespace.
+                /// @param  {Real} _alpha_value
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_whitespace_alpha = function(_alpha_value) {
+                    if (whitespace_alpha == _alpha_value) {
+                        return self;
+                    }
+
+                    whitespace_alpha = _alpha_value;
+                    __mark_vb_dirty__();
+                    return self;
+                };
+
+            #endregion
+
+            #region Syntax Highlight
+
+                #region jsDoc
+                /// @func   set_highlight_runs()
+                /// @desc   Provide ordered highlight runs for syntax coloring.
+                ///         Each run is an Array:
+                ///         [start_index, end_index, color, alpha_optional]
+                ///         Indices are logical text indices (same domain as get_index_from_xy()).
+                ///         Runs must be sorted and non-overlapping (assumed).
+                ///         Any glyph not inside a run uses default text color/alpha.
+                /// @param  {Array} _runs_array
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_highlight_runs = function(_runs_array) {
+                    // Allow clearing by passing [] or undefined.
+                    if (is_undefined(_runs_array)) {
+                        _runs_array = [];
+                    }
+
+                    __highlight_runs__ = _runs_array;
+                    __highlight_count__ = array_length(_runs_array);
+
+                    // Highlighting changes vertex colors only -> rebuild VB, not layout.
+                    __mark_vb_dirty__();
+                    return self;
+                };
             
             #endregion
         
@@ -130,8 +252,7 @@ function WWTextRendererBase() : WWCore() constructor {
             });
             
 			on_post_draw(function(_input) {
-                __ensure_layout__();
-                __draw_text__(x, y);
+                __draw_text_vb__(x, y);
             });
             
         #endregion
@@ -147,6 +268,17 @@ function WWTextRendererBase() : WWCore() constructor {
             // Layout
             should_wrap  = false;
             line_sep    = -1;
+
+            // Tabs
+            tab_size_spaces = 4;
+            tab_use_stops = true;
+
+            // Whitespace visibility
+            whitespace_visible = false;
+            whitespace_color = c_gray;
+            whitespace_alpha = 0.35;
+            whitespace_marker_space = ".";
+            whitespace_marker_tab = ">";
             
             __textbox_parent__ = undefined;
             
@@ -757,7 +889,26 @@ function WWTextRendererBase() : WWCore() constructor {
             __content_width__  = 0;
             __content_height__ = 0;
             
-            __layout__         = undefined; // WWTextLayout instance
+            __layout__ = __build_layout__(""); // WWTextLayout instance
+
+            // VB cache (separate from layout cache)
+            __vb_is_dirty__ = true;
+            __vb_format__ = undefined;
+            __vb_buffer__ = undefined;
+            __vb_texture__ = undefined;
+            
+            // Per-font glyph info cache
+            __glyph_cache_font__ = undefined;
+            __glyph_cache__ = {};
+
+            // Tab metrics cached per rebuild
+            __space_width__ = 0;
+            __tab_width__ = 0;
+
+            // Syntax highlight runs (ordered)
+            // Each run: [start_index, end_index, color, alpha_optional]
+            __highlight_runs__  = [];
+            __highlight_count__ = 0;
             
         #endregion
         
@@ -769,6 +920,110 @@ function WWTextRendererBase() : WWCore() constructor {
             #endregion
             static __mark_dirty__ = function() {
                 __is_dirty__ = true;
+                // Layout changes invalidate the cached vertex buffer too.
+                __mark_vb_dirty__();
+            };
+
+            #region jsDoc
+            /// @func   __mark_vb_dirty__()
+            /// @desc   Marks the vertex buffer as needing a rebuild.
+            ///         Use this when appearance changes (color/alpha/whitespace display),
+            ///         but layout positions have not changed.
+            #endregion
+            static __mark_vb_dirty__ = function() {
+                __vb_is_dirty__ = true;
+            };
+
+            #region jsDoc
+            /// @func   __vb_free__()
+            /// @desc   Frees the owned vertex buffer, if any.
+            #endregion
+            static __vb_free__ = function() {
+                if (!is_undefined(__vb_buffer__)) {
+                    vertex_delete_buffer(__vb_buffer__);
+                    __vb_buffer__ = undefined;
+                }
+            };
+
+            #region jsDoc
+            /// @func   __vb_ensure_format__()
+            /// @desc   Creates the vertex format used for glyph rendering, if needed.
+            ///         Format: position + texcoord + colour.
+            #endregion
+            static __vb_ensure_format__ = function() {
+                if (!is_undefined(__vb_format__)) {
+                    return;
+                }
+
+                vertex_format_begin();
+                vertex_format_add_position();
+                vertex_format_add_texcoord();
+                vertex_format_add_colour();
+                __vb_format__ = vertex_format_end();
+            };
+			
+            #region jsDoc
+            /// @func   __tab_advance__()
+            /// @desc   Returns how many pixels a tab should advance from _cursor_x.
+            ///         In tab stops mode, this advances to the next multiple of __tab_width__.
+            ///         In fixed mode, this always advances exactly __tab_width__ pixels.
+            /// @param  {Real} _cursor_x
+            /// @returns {Real}
+            #endregion
+            static __tab_advance__ = function(_cursor_x) {
+                var _tab_width_local = __tab_width__;
+                if (_tab_width_local <= 0) {
+                    return 0;
+                }
+
+                // Fixed width mode.
+                if (!tab_use_stops) {
+                    return _tab_width_local;
+                }
+
+                // Tab stops mode: advance to the next stop.
+                // This makes tab width vary between 1..tab_width depending on current x.
+                var _pos_mod = _cursor_x mod _tab_width_local;
+
+                // Exactly on a stop -> advance one full stop.
+                if (_pos_mod == 0) {
+                    return _tab_width_local;
+                }
+
+                return _tab_width_local - _pos_mod;
+            };
+
+            #region jsDoc
+            /// @func   __measure_line_width_tabs__()
+            /// @desc   Measures line width treating tabs using the configured tab policy.
+            ///         This is used for early-out decisions like "does the raw line already fit".
+            /// @param  {String} _line_text
+            /// @returns {Real}
+            #endregion
+            static __measure_line_width_tabs__ = function(_line_text) {
+                var _line_len = string_length(_line_text);
+                if (_line_len <= 0) {
+                    return 0;
+                }
+
+                var _cursor_x_local = 0;
+
+                var _char_index = 1;
+                repeat (_line_len) {
+                    var _char_val = string_char_at(_line_text, _char_index);
+
+                    if (_char_val == "\t") {
+                        _cursor_x_local += __tab_advance__(_cursor_x_local);
+                    } else if (_char_val == "\n" || _char_val == "\r") {
+                        // Explicit line breaks don't contribute to width.
+                    } else {
+                        _cursor_x_local += string_width(_char_val);
+                    }
+
+                    _char_index++;
+                }
+
+                return _cursor_x_local;
             };
             
             #region jsDoc
@@ -799,6 +1054,300 @@ function WWTextRendererBase() : WWCore() constructor {
                 __content_height__ = __layout__.get_content_height();
                 
                 __is_dirty__ = false;
+            };
+
+            #region jsDoc
+            /// @func   __ensure_vb__()
+            /// @desc   Rebuilds the vertex buffer if dirty and layout is ready.
+            ///         This is the "single batched draw call" cache.
+            ///         It is safe to call every frame.
+            #endregion
+            static __ensure_vb__ = function() {
+                if (!__vb_is_dirty__) {
+                    return;
+                }
+				
+                __ensure_layout__();
+				
+                __vb_ensure_format__();
+                __vb_free__();
+				
+                // Font texture + UV rectangle (handles atlas layouts).
+                __vb_texture__ = font_get_texture(font);
+                __vb_buffer__ = vertex_create_buffer();
+                __build_vb__();
+				
+                __vb_is_dirty__ = false;
+            };
+
+            #region jsDoc
+            /// @func   __vb_emit_glyph__()
+            /// @desc   Emits a single glyph quad into the active vertex buffer.
+            ///         This assumes vertex_begin(...) is already active.
+            ///         Returns true if a glyph was emitted, false if it could not be.
+            /// @param  {Struct} _font_info
+            /// @param  {String} _char
+            /// @param  {Real} _pos_x
+            /// @param  {Real} _pos_y
+            /// @param  {Constant.Color} _col
+            /// @param  {Real} _alp
+            /// @returns {Bool}
+            #endregion
+            static __vb_emit_glyph__ = function(_font_info, _char, _pos_x, _pos_y, _col, _alp) {
+                if (_char == "" || is_undefined(_font_info)) {
+                    return false;
+                }
+				
+                // Ensure the glyph is present on the font atlas (important for runtime fonts).
+                var _glyph_info = _font_info.glyphs[$ _char];
+				
+				
+				// Glyph rect in texels on the font texture page.
+                var _gx = _glyph_info.x;
+                var _gy = _glyph_info.y;
+                var _gw = _glyph_info.w;
+                var _gh = _glyph_info.h;
+				
+                // Some glyphs may not have a bitmap.
+                if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
+                    return false;
+                }
+				
+                // Convert glyph texels -> normalized page UVs using texel size.
+                var _texel_w = texture_get_texel_width(__vb_texture__);
+                var _texel_h = texture_get_texel_height(__vb_texture__);
+				
+                var _u0 = _gx * _texel_w;
+                var _v0 = _gy * _texel_h;
+                var _u1 = _u0 + (_gw * _texel_w);
+                var _v1 = _v0 + (_gh * _texel_h);
+				
+                // offset accounts for glyph bearings.
+                var _xoff = _glyph_info.offset;
+                var _yoff = _glyph_info.yoffset;
+				
+                var _x0 = _pos_x + _xoff;
+                var _y0 = _pos_y + _yoff;
+                var _x1 = _x0 + _gw;
+                var _y1 = _y0 + _gh;
+				
+                // Triangle 1
+                vertex_position(__vb_buffer__, _x0, _y0);
+                vertex_texcoord(__vb_buffer__, _u0, _v0);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                vertex_position(__vb_buffer__, _x1, _y0);
+                vertex_texcoord(__vb_buffer__, _u1, _v0);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                vertex_position(__vb_buffer__, _x1, _y1);
+                vertex_texcoord(__vb_buffer__, _u1, _v1);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                // Triangle 2
+                vertex_position(__vb_buffer__, _x0, _y0);
+                vertex_texcoord(__vb_buffer__, _u0, _v0);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                vertex_position(__vb_buffer__, _x1, _y1);
+                vertex_texcoord(__vb_buffer__, _u1, _v1);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                vertex_position(__vb_buffer__, _x0, _y1);
+                vertex_texcoord(__vb_buffer__, _u0, _v1);
+                vertex_colour(__vb_buffer__, _col, _alp);
+				
+                return true;
+            };
+
+            #region jsDoc
+            /// @func   __build_vb__()
+            /// @desc   Converts the current layout glyphs into a single triangle list VB.
+            ///         Notes:
+            ///         - '\n' and '\r' are not rendered.
+            ///         - '\t' is not rendered unless whitespace_visible is enabled, in which
+            ///           case we render a marker glyph.
+            ///         - spaces can optionally render a marker glyph when enabled.
+            ///         Everything still submits as one draw call.
+            #endregion
+            static __build_vb__ = function() {
+                var _font_info = font_get_info(font);
+                if (is_undefined(_font_info)) {
+                    return;
+                }
+                
+                // Ensure string_width() for marker centering matches the rendered font.
+                var _old_font = draw_get_font();
+                if (font_exists(font)) {
+                    draw_set_font(font);
+                }
+                
+                var _glyph_count = __layout__.get_glyph_count();
+
+                // Highlight run iterator state
+                var _run_array = __highlight_runs__;
+                var _run_count = __highlight_count__;
+                var _run_index = 0;
+
+                // Current run cached values (valid only if _run_index < _run_count)
+                var _run_start = 0;
+                var _run_end = 0;
+                var _run_color = c_white;
+                var _run_alpha = 1;
+
+                if (_run_count > 0) {
+                    var _run0 = _run_array[0];
+                    _run_start = _run0[0];
+                    _run_end = _run0[1];
+                    _run_color = _run0[2];
+
+                    // Optional alpha
+                    if (array_length(_run0) >= 4) {
+                        _run_alpha = _run0[3];
+                    } else {
+                        _run_alpha = alpha;
+                    }
+                }
+
+                vertex_begin(__vb_buffer__, __vb_format__);
+
+                var _glyph_index = 0;
+                repeat (_glyph_count) {
+                    var _char = __layout__.get_glyph_char(_glyph_index);
+
+                    // Always skip explicit line breaks.
+                    if (_char == "\n" || _char == "\r" || _char == "") {
+                        _glyph_index++;
+                        continue;
+                    }
+
+                    // Skip tabs unless visualized; layout already advanced x.
+                    if (_char == "\t" && !whitespace_visible) {
+                        _glyph_index++;
+                        continue;
+                    }
+
+                    var _pos_x = __layout__.get_glyph_x(_glyph_index);
+                    var _pos_y = __layout__.get_glyph_y(_glyph_index);
+
+                    // Whitespace visualization replaces whitespace with marker glyphs.
+                    if (whitespace_visible) {
+
+                        if (_char == " ") {
+                            var _cell_w = __layout__.get_glyph_width(_glyph_index);
+
+                            // Center "." inside the space cell for readability.
+                            var _mark_char = whitespace_marker_space;
+                            var _mark_w = string_width(_mark_char);
+
+                            var _mark_x = _pos_x;
+                            if (_cell_w > 0 && _mark_w > 0) {
+                                _mark_x = _pos_x + ((_cell_w - _mark_w) * 0.5);
+                            }
+
+                            __vb_emit_glyph__(_font_info, _mark_char, _mark_x, _pos_y, whitespace_color, whitespace_alpha);
+
+                            _glyph_index++;
+                            continue;
+                        }
+
+                        if (_char == "\t") {
+                            // Draw a ">" at the start of the tab cell.
+                            var _mark_char2 = whitespace_marker_tab;
+                            __vb_emit_glyph__(_font_info, _mark_char2, _pos_x, _pos_y, whitespace_color, whitespace_alpha);
+
+                            _glyph_index++;
+                            continue;
+                        }
+                    }
+
+                    // Decide final color for this glyph based on highlight runs.
+                    // NOTE: We use the glyph's logical text index, not the glyph array index.
+                    var _final_color = color;
+                    var _final_alpha = alpha;
+
+                    if (_run_index < _run_count) {
+
+                        var _logical_index = __layout__.get_glyph_index(_glyph_index);
+
+                        // Advance runs if this glyph is beyond the current run.
+                        // Runs are ordered, so once we pass a run, we never revisit it.
+                        if (_logical_index >= _run_end) {
+
+                            var _remaining = _run_count - _run_index - 1;
+                            var _step = 0;
+                            repeat (_remaining) {
+
+                                _run_index++;
+
+                                var _run_next = _run_array[_run_index];
+                                _run_start = _run_next[0];
+                                _run_end = _run_next[1];
+                                _run_color = _run_next[2];
+
+                                if (array_length(_run_next) >= 4) {
+                                    _run_alpha = _run_next[3];
+                                } else {
+                                    _run_alpha = alpha;
+                                }
+
+                                // If this run ends after our glyph starts, stop advancing.
+                                if (_logical_index < _run_end) {
+                                    break;
+                                }
+
+                                _step++;
+                            }
+                        }
+
+                        // If still within a valid run, apply it.
+                        if (_run_index < _run_count) {
+                            if (_logical_index >= _run_start && _logical_index < _run_end) {
+                                _final_color = _run_color;
+                                _final_alpha = _run_alpha;
+                            }
+                        }
+                    }
+
+                    // Normal glyph
+                    __vb_emit_glyph__(_font_info, _char, _pos_x, _pos_y, _final_color, _final_alpha);
+
+                    _glyph_index++;
+                }
+
+                vertex_end(__vb_buffer__);
+
+                // Freeze since this buffer is reused until something changes.
+                vertex_freeze(__vb_buffer__);
+                
+                if (font_exists(_old_font) && _old_font != draw_get_font()) {
+                    draw_set_font(_old_font);
+                }
+
+            };
+
+            #region jsDoc
+            /// @func   __draw_text_vb__()
+            /// @desc   Submits the cached VB with a single draw call.
+            ///         Uses a world-matrix translation so we don't rebuild vertices per draw.
+            /// @param  {Real} _origin_x
+            /// @param  {Real} _origin_y
+            #endregion
+            static __draw_text_vb__ = function(_origin_x, _origin_y) {
+                __ensure_vb__();
+
+                if (is_undefined(__vb_buffer__) || is_undefined(__vb_texture__)) {
+                    return;
+                }
+
+                // Apply translation without rebuilding the VB.
+                var _old_mat = matrix_get(matrix_world);
+                matrix_set(matrix_world, matrix_build(_origin_x, _origin_y, 0, 0, 0, 0, 1, 1, 1));
+
+                vertex_submit(__vb_buffer__, pr_trianglelist, __vb_texture__);
+
+                // Restore previous world matrix.
+                matrix_set(matrix_world, _old_mat);
             };
             
             #region jsDoc
@@ -872,6 +1421,10 @@ function WWTextRendererBase() : WWCore() constructor {
                 
                 var _old_font = draw_get_font();
                 draw_set_font(_font_id);
+
+                // Cache tab metrics for this rebuild.
+                __space_width__ = string_width(" ");
+                __tab_width__ = __space_width__ * tab_size_spaces;
                 
 				//convert string to array of lines, retaining their `\n`
 				var _input_lines = __string_split_and_retain__(_str, "\n");
@@ -882,7 +1435,7 @@ function WWTextRendererBase() : WWCore() constructor {
 					
                 }
 				else {
-                    var _space_width = string_width(" ");
+                    var _space_width = __space_width__;
                     var _input_line_count = array_length(_input_lines);
                     
                     var _output_arr = [];
@@ -890,8 +1443,10 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _line_index = 0;
                     repeat (_input_line_count) {
                         var _raw_line = _input_lines[_line_index];
-                        
-                        if (_raw_line == "" || string_width(_raw_line) <= _width_limit) {
+
+                        var _raw_width = __measure_line_width_tabs__(_raw_line);
+
+                        if (_raw_line == "" || _raw_width <= _width_limit) {
                             array_push(_output_arr, _raw_line);
                             _line_index++;
                             continue;
@@ -907,7 +1462,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         var _word_index = 0;
                         repeat (_word_count) {
                             var _word = _words[_word_index];
-                            var _word_width_val = string_width(_word);
+                            var _word_width_val = __measure_line_width_tabs__(_word);
                             
                             if (_word_width_val < _width_limit) {
                                 var _new_width_val = _current_width_val + _word_width_val;
@@ -951,7 +1506,7 @@ function WWTextRendererBase() : WWCore() constructor {
                                 var _char_index = 1;
                                 repeat (_word_len) {
                                     var _char = string_char_at(_word, _char_index);
-                                    var _char_width_val = string_width(_char);
+                                    var _char_width_val = (_char == "\t") ? __tab_advance__(_segment_width_chars) : string_width(_char);
                                     
                                     if (_segment_width_chars > 0 && (_segment_width_chars + _char_width_val) > _width_limit) {
                                         var _segment_length_chars = _char_index - _segment_start_char_index;
@@ -1017,7 +1572,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _char_index2 = 1;
                     repeat (_line_len) {
                         var _char2 = string_char_at(_line_text, _char_index2);
-                        var _char_width2 = string_width(_char2);
+                        var _char_width2 = (_char2 == "\t") ? __tab_advance__(_cursor_x) : string_width(_char2);
                         
                         var _index = _global_index + (_char_index2 - 1);
                         var _buffer_index = _index;
@@ -1064,6 +1619,20 @@ function WWTextRendererBase() : WWCore() constructor {
                 
                 return _layout;
             };
+
+            #region jsDoc
+            /// @func   __cleanup__()
+            /// @desc   Called by WWCore teardown flow. Frees VB resources owned by this renderer.
+            #endregion
+            static __cleanup__ = function() {
+                __vb_free__();
+
+                if (!is_undefined(__vb_format__)) {
+                    vertex_format_delete(__vb_format__);
+                    __vb_format__ = undefined;
+                }
+            };
+
             
         #endregion
         

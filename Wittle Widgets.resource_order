@@ -31,6 +31,7 @@
   "ResourceOrderSettings":[
     {"name":"fGUIDefault","order":6,"path":"fonts/fGUIDefault/fGUIDefault.yy",},
     {"name":"fGUIDefaultBig","order":7,"path":"fonts/fGUIDefaultBig/fGUIDefaultBig.yy",},
+    {"name":"fnt_consolas_10","order":8,"path":"fonts/fnt_consolas_10/fnt_consolas_10.yy",},
     {"name":"Note1","order":5,"path":"notes/Note1/Note1.yy",},
     {"name":"obj_gui_dropbox","order":4,"path":"objects/obj_gui_dropbox/obj_gui_dropbox.yy",},
     {"name":"obj_gui_textbox","order":2,"path":"objects/obj_gui_textbox/obj_gui_textbox.yy",},

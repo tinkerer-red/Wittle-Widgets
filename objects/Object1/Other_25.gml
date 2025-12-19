@@ -794,7 +794,7 @@ build_ui_text_boxes = function(){
 	var _text_1 =
 		"Quick input, no wrapping.\n" +
 		"Try arrow keys, selection, and backspace.\n\n" +
-		"Tip: This is perfect for chat or command bars.";
+		"Tip: This is perfect for chat or command barsW";
 
 	var _textbox_1 = new WWTextBoxV3()
 	    .set_offset(_panel1_x - _card_pad + _textbox_xoff, _panel1_y - _card_pad + _textbox_yoff)
@@ -881,6 +881,7 @@ build_ui_text_boxes = function(){
 	    .set_offset(_panel3_x - _card_pad + _textbox_xoff, _panel3_y - _card_pad + _textbox_yoff)
 	    .set_size(_textbox_width, _textbox_height)
 	    .set_background_color(_textbox_bg)
+	    .set_text_font(fnt_consolas_10)
 	    .set_text(_text_3)
 	    .set_text_color(c_white)
 	    .set_highlight_color(c_yellow)

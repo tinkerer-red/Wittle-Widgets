@@ -60,6 +60,7 @@
   "resources":[
     {"id":{"name":"fGUIDefault","path":"fonts/fGUIDefault/fGUIDefault.yy",},},
     {"id":{"name":"fGUIDefaultBig","path":"fonts/fGUIDefaultBig/fGUIDefaultBig.yy",},},
+    {"id":{"name":"fnt_consolas_10","path":"fonts/fnt_consolas_10/fnt_consolas_10.yy",},},
     {"id":{"name":"Note1","path":"notes/Note1/Note1.yy",},},
     {"id":{"name":"obj_example_core","path":"objects/obj_example_core/obj_example_core.yy",},},
     {"id":{"name":"obj_gui_dropbox","path":"objects/obj_gui_dropbox/obj_gui_dropbox.yy",},},

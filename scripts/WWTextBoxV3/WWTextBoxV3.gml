@@ -1647,7 +1647,6 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {undefined}
 				#endregion
 				static __update_word_selection_drag__ = function() {
-	
 					// Get current mouse coordinates in GUI space.
 					var _mouse_x_gui = device_mouse_x_to_gui(0);
 					var _mouse_y_gui = device_mouse_y_to_gui(0);

@@ -775,7 +775,19 @@ function WWTextRendererBase() : WWCore() constructor {
 			static get_index_from_buffer_index = function(_buffer_index) {
 			    __ensure_layout__();
 			    
-			    var _line_count = __layout__.get_line_count();
+				if (_buffer_index <= 0) { return 0; }
+				
+				var _line_count = __layout__.get_line_count();
+				var _last_line_index = _line_count - 1;
+			    var _last_glyph_index = __layout__.get_line_index_end(_last_line_index);
+				var _last_glyph_buffer_start = __layout__.get_glyph_buffer_index(_last_glyph_index);
+				//essentially free to check this so might as well
+				if (_buffer_index = _last_glyph_buffer_start) { return _last_glyph_index; };
+				var _last_glyph_buffer_end = _last_glyph_buffer_start + __layout__.get_glyph_buffer_size(_last_glyph_index);
+				//if at the end, return index+1
+				if (_buffer_index >= _last_glyph_buffer_end) { return _last_glyph_index+1; };
+				
+				
 			    if (_line_count <= 0) {
 			        return 0;
 			    }
@@ -820,7 +832,6 @@ function WWTextRendererBase() : WWCore() constructor {
     
 			    // If we never matched inside or before a line, clamp to just after last glyph overall
 			    if (!_found_line) {
-			        var _last_line_index = _line_count - 1;
 			        var _last_glyph_start = __layout__.get_line_index_start(_last_line_index);
 			        var _last_glyph_end   = __layout__.get_line_index_end(_last_line_index);
 			        if (_last_glyph_end > _last_glyph_start) {
@@ -900,7 +911,7 @@ function WWTextRendererBase() : WWCore() constructor {
             // Per-font glyph info cache
             __glyph_cache_font__ = undefined;
             __glyph_cache__ = {};
-
+			
             // Tab metrics cached per rebuild
             __space_width__ = 0;
             __tab_width__ = 0;
@@ -1343,11 +1354,16 @@ function WWTextRendererBase() : WWCore() constructor {
                 // Apply translation without rebuilding the VB.
                 var _old_mat = matrix_get(matrix_world);
                 matrix_set(matrix_world, matrix_build(_origin_x, _origin_y, 0, 0, 0, 0, 1, 1, 1));
-
+				// Apply texture filtering for better text rendering
+				var _old_filt = gpu_get_tex_filter();
+				gpu_set_tex_filter(true);
+				
                 vertex_submit(__vb_buffer__, pr_trianglelist, __vb_texture__);
-
-                // Restore previous world matrix.
+				
+				// Restore previous world matrix.
                 matrix_set(matrix_world, _old_mat);
+				// Restore the previous texture filtering
+				gpu_set_tex_filter(_old_filt);
             };
             
             #region jsDoc

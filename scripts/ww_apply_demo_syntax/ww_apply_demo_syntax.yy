@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ww_apply_demo_syntax",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ww_apply_demo_syntax",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Demo/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"RegexIter",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"RegexIter",
+  "parent":{
+    "name":"SubClasses",
+    "path":"folders/_Libraries/RegEx/_internal/SubClasses.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

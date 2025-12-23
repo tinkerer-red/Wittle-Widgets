@@ -866,7 +866,7 @@ build_ui_text_boxes = function(){
 	    .set_text_color(_caption_color);
 	root.add(_caption_3);
 
-	var _text_3 =
+	var _text_3 = 
 		"function demo_example() {\n" +
 		"\tvar _counter_value = 0;\n" +
 		"\tvar _message_text = \"Hello from WWTextBoxV3\";\n\n" +
@@ -876,19 +876,22 @@ build_ui_text_boxes = function(){
 		"\t// Try selecting across lines and deleting.\n" +
 		"\treturn _message_text;\n" +
 		"}\n";
-
+	
 	var _textbox_3 = new WWTextBoxV3()
 	    .set_offset(_panel3_x - _card_pad + _textbox_xoff, _panel3_y - _card_pad + _textbox_yoff)
 	    .set_size(_textbox_width, _textbox_height)
-	    .set_background_color(_textbox_bg)
+	    .set_background_color(#222222)
 	    .set_text_font(fnt_consolas_10)
 	    .set_text(_text_3)
 	    .set_text_color(c_white)
-	    .set_highlight_color(c_yellow)
+	    .set_highlight_color(#78848A)
 	    .set_cursor_color(c_white)
 	    .set_wrap_enabled(false);
+	
+	ww_apply_demo_syntax_to_textbox(_textbox_3);
+	
 	root.add(_textbox_3);
-
+	
 	// -------------------------------------------------------------
 	// Panel 4
 	// -------------------------------------------------------------
@@ -947,3 +950,5 @@ build_ui_text_boxes = function(){
 	    .set_text_color(_footer_color);
 	root.add(_footer_label);
 };
+
+

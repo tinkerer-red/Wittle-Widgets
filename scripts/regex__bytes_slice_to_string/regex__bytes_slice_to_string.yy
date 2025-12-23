@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"regex__bytes_slice_to_string",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"regex__bytes_slice_to_string",
+  "parent":{
+    "name":"Helper",
+    "path":"folders/_Libraries/RegEx/_internal/Helper.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

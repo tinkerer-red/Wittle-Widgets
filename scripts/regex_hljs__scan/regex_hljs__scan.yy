@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"regex_hljs__scan",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"regex_hljs__scan",
+  "parent":{
+    "name":"Highlight.gml",
+    "path":"folders/_Libraries/RegEx/Highlight.gml.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

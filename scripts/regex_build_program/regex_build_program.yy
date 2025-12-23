@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"regex_build_program",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"regex_build_program",
+  "parent":{
+    "name":"_internal",
+    "path":"folders/_Libraries/RegEx/_internal.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"regex",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"regex",
+  "parent":{
+    "name":"RegEx",
+    "path":"folders/_Libraries/RegEx.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

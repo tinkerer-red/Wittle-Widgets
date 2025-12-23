@@ -1,26 +1,26 @@
 /// @func    WWTextLayout()
 /// @desc    Layout handler that owns a ds_map-based text layout.
 function WWTextLayout() constructor {
-    // Root layout map
-    layout_data = {};
-    
-    // Owned lists: when layout_data is destroyed, these lists are also destroyed.
-    layout_data.lines  = [];
-    layout_data.glyphs = [];
-    
+	// Root layout map
+	layout_data = {};
+	
+	// Owned lists: when layout_data is destroyed, these lists are also destroyed.
+	layout_data.lines  = [];
+	layout_data.glyphs = [];
+	
 	layout_data.lines_count  = 0;
-    layout_data.glyphs_count = 0;
-    
-    // Aggregate content bounds (in local space)
-    layout_data.content_width = 0;
-    layout_data.content_height = 0;
-    
-    /// @func add_line(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped)
-    /// @desc Record a single laid-out line in the layout.
-    static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped) {
-        var _data = layout_data;
+	layout_data.glyphs_count = 0;
+	
+	// Aggregate content bounds (in local space)
+	layout_data.content_width = 0;
+	layout_data.content_height = 0;
+	
+	/// @func add_line(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped)
+	/// @desc Record a single laid-out line in the layout.
+	static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped) {
+		var _data = layout_data;
 		var _lines = _data.lines;
-        
+		
 		array_push(_lines,
 			_text,
 			_start_ind,
@@ -31,24 +31,24 @@ function WWTextLayout() constructor {
 			_force_wrapped
 		)
 		
-        // Update content bounds
-        var _content_width = _data.content_width;
-        var _content_height = _data.content_height;
-        var _line_bottom = _yoff + _height;
-        
-        if (_width > _content_width) _content_width = _width;
-        if (_line_bottom > _content_height) _content_height = _line_bottom;
-        
-        _data.content_width  = _content_width;
-        _data.content_height = _content_height;
-        
+		// Update content bounds
+		var _content_width = _data.content_width;
+		var _content_height = _data.content_height;
+		var _line_bottom = _yoff + _height;
+		
+		if (_width > _content_width) _content_width = _width;
+		if (_line_bottom > _content_height) _content_height = _line_bottom;
+		
+		_data.content_width  = _content_width;
+		_data.content_height = _content_height;
+		
 		var _line_index = _data.lines_count;
 		_data.lines_count++;
 		
-        // Return index of this line if you want to keep a handle
-        return _line_index;
-    };
-    enum __WW_Layout_Line {
+		// Return index of this line if you want to keep a handle
+		return _line_index;
+	};
+	enum __WW_Layout_Line {
 		Text,
 		Start_Index,
 		End_Index,
@@ -60,7 +60,7 @@ function WWTextLayout() constructor {
 	}
 	
 	#region jsDoc
-	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height)
+	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _color, _alpha, _font, _style, _size_mul, _underline)
 	/// @desc    Adds a glyph record to the layout. This glyph may represent a full Unicode cluster.
 	/// @param   {String} _char          : Representative character or cluster.
 	/// @param   {Real}   _index         : Logical text index (cluster index).
@@ -70,14 +70,37 @@ function WWTextLayout() constructor {
 	/// @param   {Real}   _y             : Y position in layout space.
 	/// @param   {Real}   _width         : Glyph width.
 	/// @param   {Real}   _height        : Glyph height.
+	/// @param   {Constant.Color} _color : Glyph color (baked per-glyph).
+	/// @param   {Real}   _alpha         : Glyph alpha (baked per-glyph).
+	/// @param   {Asset.GMFont} _font    : Font asset to render this glyph with (or -1 to mean "use renderer font").
+	/// @param   {Real}   _style         : Style enum (Regular/Bold/Italic/Bold_Italic).
+	/// @param   {Real}   _size_mul      : Size multiplier (1 is normal).
+	/// @param   {Real}   _underline     : Underline enum (None/Regular/Warning/Error).
 	/// @returns {Real}                  : Glyph slot index.
 	#endregion
-	static add_glyph = function(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height)
-	{
-	    var _data = layout_data;
-	    var _glyphs = _data.glyphs;
-		
-		array_push(_glyphs,
+	static add_glyph = function(
+		_char,
+		_index,
+		_buffer_index,
+		_buffer_size,
+		_x,
+		_y,
+		_width,
+		_height,
+		_color,
+		_alpha,
+		_font,
+		_style,
+		_size_mul,
+		_underline
+	) {
+		var _data = layout_data;
+		var _glyphs = _data.glyphs;
+
+		if (_size_mul <= 0) { _size_mul = 1; }
+
+		array_push(
+			_glyphs,
 			_char,
 			_index,
 			_buffer_index,
@@ -85,23 +108,28 @@ function WWTextLayout() constructor {
 			_x,
 			_y,
 			_width,
-			_height
+			_height,
+			_color,
+			_alpha,
+			_font,
+			_style,
+			_size_mul,
+			_underline
 		);
-		
-	    // update content bounds
-	    var _r = _x + _width;
-	    var _b = _y + _height;
-		
-	    if (_r > _data.content_width)  _data.content_width = _r;
-	    if (_b > _data.content_height) _data.content_height = _b;
-		
-		
+
+		// update content bounds
+		var _r = _x + _width;
+		var _b = _y + _height;
+
+		if (_r > _data.content_width)  _data.content_width = _r;
+		if (_b > _data.content_height) _data.content_height = _b;
+
 		var _glyph_index = _data.glyphs_count;
 		_data.glyphs_count++;
-		
-        // Return index of this line if you want to keep a handle
-        return _glyph_index;
+
+		return _glyph_index;
 	};
+
 	enum __WW_Layout_Glyph {
 		Char,
 		Index,
@@ -111,9 +139,17 @@ function WWTextLayout() constructor {
 		Y,
 		Width,
 		Height,
+		// Formatting (baked per glyph)
+		Color,
+		Alpha,
+		Font,
+		Style,
+		Size_Mul,
+		Underline,
+
 		__Size__
 	}
-	
+
 	#region Basic layout getters
 	
 	#region jsDoc
@@ -122,7 +158,7 @@ function WWTextLayout() constructor {
 	/// @returns {Struct}
 	#endregion
 	static get_layout_data = function() {
-	    return layout_data;
+		return layout_data;
 	};
 	
 	#region jsDoc
@@ -131,7 +167,7 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_content_width = function() {
-	    return layout_data.content_width;
+		return layout_data.content_width;
 	};
 	
 	#region jsDoc
@@ -140,7 +176,7 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_content_height = function() {
-	    return layout_data.content_height;
+		return layout_data.content_height;
 	};
 	
 	#endregion
@@ -153,7 +189,7 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_count = function() {
-	    return layout_data.lines_count;
+		return layout_data.lines_count;
 	};
 	
 	#region jsDoc
@@ -166,9 +202,9 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= layout_data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _lines = _data.lines;
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		var _line = {
@@ -180,8 +216,8 @@ function WWTextLayout() constructor {
 			y_offset     : _lines[_index + __WW_Layout_Line.Y_Offset],
 			force_wraped : _lines[_index + __WW_Layout_Line.Force_Wraped]
 		}
-	    
-	    return _line;
+		
+		return _line;
 	};
 	
 	#region jsDoc
@@ -191,12 +227,12 @@ function WWTextLayout() constructor {
 	/// @returns {String}
 	#endregion
 	static get_line_text = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Text]
 	};
@@ -208,12 +244,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_index_start = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Start_Index]
 	};
@@ -225,12 +261,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_index_end = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.End_Index]
 	};
@@ -242,12 +278,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_width = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Width]
 	};
@@ -259,12 +295,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_height = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Height]
 	};
@@ -276,12 +312,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_y_offset = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Y_Offset]
 	};
@@ -293,12 +329,12 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_line_forced_wrapped = function(_line_index) {
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Force_Wraped]
 	};
@@ -313,7 +349,7 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_glyph_count = function() {
-	    return layout_data.glyphs_count;
+		return layout_data.glyphs_count;
 	};
 
 	#region jsDoc
@@ -324,13 +360,13 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph = function(_glyph_index)
 	{
-	    var _data = layout_data;
-	    if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+		var _data = layout_data;
+		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
+			return undefined;
+		}
+		
 		var _glyphs = _data.glyphs;
-	    var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
+		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		var _line = {
 			text         : _glyphs[_index + __WW_Layout_Glyph.Char],
 			index        : _glyphs[_index + __WW_Layout_Glyph.Index],
@@ -341,8 +377,8 @@ function WWTextLayout() constructor {
 			width        : _glyphs[_index + __WW_Layout_Glyph.Width],
 			height       : _glyphs[_index + __WW_Layout_Glyph.Height],
 		}
-	    
-	    return _line;
+		
+		return _line;
 	};
 
 	#region jsDoc
@@ -353,12 +389,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_char = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Char]
 	};
@@ -371,12 +407,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_index = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Index]
 	};
@@ -389,7 +425,7 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_buffer_index = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_data.glyphs_count == 0) {
 			return 0;
@@ -405,8 +441,8 @@ function WWTextLayout() constructor {
 			var _buffer_index = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Index]
 			var _buffer_size = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Size]
 			return _buffer_index + _buffer_size;
-	    }
-	    
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Index]
 	};
@@ -419,12 +455,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_buffer_size = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Size]
 	};
@@ -437,12 +473,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_x = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.X]
 	};
@@ -455,12 +491,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_y = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Y]
 	};
@@ -473,12 +509,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_width = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Width]
 	};
@@ -491,12 +527,12 @@ function WWTextLayout() constructor {
 	#endregion
 	static get_glyph_height = function(_glyph_index)
 	{
-	    var _data = layout_data;
+		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-	        return undefined;
-	    }
-	    
+			return undefined;
+		}
+		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 		return _data.glyphs[_index + __WW_Layout_Glyph.Height]
 	};
@@ -512,14 +548,14 @@ function WWTextLayout() constructor {
 	/// @returns {Real}
 	#endregion
 	static get_glyph_for_buffer_index = function(_buffer_index) {
-	    var _glyphs = layout_data.glyphs;
-	    var _count = layout_data.glyphs_count;
+		var _glyphs = layout_data.glyphs;
+		var _count = layout_data.glyphs_count;
 		
-	    var _i = 0;
+		var _i = 0;
 		repeat (_count) {
-	        
+			
 			var _start = _glyphs[_i + __WW_Layout_Glyph.Buffer_Index];
-	        var _end = _start + _glyphs[_i + __WW_Layout_Glyph.Buffer_Size] - 1;
+			var _end = _start + _glyphs[_i + __WW_Layout_Glyph.Buffer_Size] - 1;
 			
 			if (_buffer_index >= _start)
 			&& (_buffer_index <= _end) {
@@ -529,7 +565,7 @@ function WWTextLayout() constructor {
 			_i += __WW_Layout_Glyph.__Size__;
 			
 		}
-	    return -1;
+		return -1;
 	};
 
 	#endregion

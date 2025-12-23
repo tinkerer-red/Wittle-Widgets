@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"regex_input",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"regex_input",
+  "parent":{
+    "name":"Helper",
+    "path":"folders/_Libraries/RegEx/_internal/Helper.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

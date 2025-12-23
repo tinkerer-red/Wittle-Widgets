@@ -5,8 +5,8 @@
 /// @returns {Struct.WWTextBoxV3}
 #endregion
 function WWTextBoxV3() : WWCore() constructor {
-    debug_name = "WWTextBase";
-    
+	debug_name = "WWTextBase";
+	
 	#region Components
 		
 		hotkeys  = new WWHotkeyManager(); //doesnt need to be added as a child
@@ -24,9 +24,9 @@ function WWTextBoxV3() : WWCore() constructor {
 		
 	#endregion
 	
-    #region Public
+	#region Public
 		
-        #region Builder Functions
+		#region Builder Functions
 			
 			#region Text
 				
@@ -90,26 +90,26 @@ function WWTextBoxV3() : WWCore() constructor {
 				}
 				
 				#region jsDoc
-                /// @func   set_wrap_width()
-                /// @desc   Sets if word wrapping is enabled, true will wrap words to next line.
-                /// @param  {Bool} should_wrap
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_wrap_enabled = function(_should_wrap) {
-                    renderer.set_wrap_enabled(_should_wrap);
-                    return self;
-                };
-                
-                #region jsDoc
-                /// @func   set_line_sep()
-                /// @desc   Sets the extra spacing between wrapped lines (in pixels).
-                /// @param  {Real} _line_sep_pixels
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_line_sep = function(_line_sep_pixels) {
-                    renderer.set_line_sep(_line_sep_pixels);
-                    return self;
-                };
+				/// @func   set_wrap_width()
+				/// @desc   Sets if word wrapping is enabled, true will wrap words to next line.
+				/// @param  {Bool} should_wrap
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_wrap_enabled = function(_should_wrap) {
+					renderer.set_wrap_enabled(_should_wrap);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_line_sep()
+				/// @desc   Sets the extra spacing between wrapped lines (in pixels).
+				/// @param  {Real} _line_sep_pixels
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_line_sep = function(_line_sep_pixels) {
+					renderer.set_line_sep(_line_sep_pixels);
+					return self;
+				};
 				
 			#endregion
 			
@@ -139,26 +139,26 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_allowed_char = function(_allowed_char = undefined) {
-			    if (is_undefined(_allowed_char)) {
-			        var _allowed = __build_allowed_char__(renderer.get_font());
+				if (is_undefined(_allowed_char)) {
+					var _allowed = __build_allowed_char__(renderer.get_font());
 					buffer.set_allowed_char(_allowed);
-			    }
-			    else {
-			        var _allowed = {};
-			        __allowed_char_set__ = true;
-			        string_foreach(_allowed_char, method(_allowed, function(_char, _pos) {
-			            self[$ _char] = true;
-			        }));
+				}
+				else {
+					var _allowed = {};
+					__allowed_char_set__ = true;
+					string_foreach(_allowed_char, method(_allowed, function(_char, _pos) {
+						self[$ _char] = true;
+					}));
 					
 					buffer.set_allowed_char(_allowed);
-			    }
+				}
 				
 				// Infer keyboard type if none has been set by user
-			    if (!__keyboard_type_set__) {
-			        __keyboard_type__ = __infer_keyboard_type__(_allowed_char);
-			    }
+				if (!__keyboard_type_set__) {
+					__keyboard_type__ = __infer_keyboard_type__(_allowed_char);
+				}
 				
-			    return self;
+				return self;
 			}
 			
 			#region jsDoc
@@ -171,19 +171,19 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			static set_keyboard_type = function(_keyboard_type = undefined) {
 				if (is_undefined(_keyboard_type)) {
-			        if (__allowed_char_set__) {
+					if (__allowed_char_set__) {
 						__keyboard_type__ = __infer_keyboard_type__(buffer.get_allowed_char());
 					}
 					else {
 						__keyboard_type__ = kbv_type_default;
 					}
-			    }
-			    else {
+				}
+				else {
 					__keyboard_type_set__ = true;
-			        __keyboard_type__ = kbv_type_default;
-			    }
+					__keyboard_type__ = kbv_type_default;
+				}
 				
-			    return self;
+				return self;
 			}
 			
 			#region jsDoc
@@ -338,11 +338,146 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 			#endregion
 			
+			#region Syntax Highlight
+				
+				#region jsDoc
+				/// @func   set_format_range()
+				/// @desc   Applies formatting directly into glyph records for the logical index range.
+				///         This mutates the current layout glyphs. If the layout is dirty, it will be rebuilt first.
+				///         Range is [start_index, end_index) 0-based.
+				///         Pass undefined for any field you do not want to change.
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Constant.Color|Undefined} _color_value
+				/// @param  {Real|Undefined} _alpha_value
+				/// @param  {Asset.GMFont|Real|Undefined} _font_asset_or_minus1
+				/// @param  {Real|Undefined} _style_value
+				/// @param  {Real|Undefined} _size_mul
+				/// @param  {Real|Undefined} _underline_value
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_format_range = function(
+					_start_index,
+					_end_index,
+					_color_value,
+					_alpha_value,
+					_font_asset_or_minus1,
+					_style_value,
+					_size_mul,
+					_underline_value
+				) {
+					renderer.set_format_range(
+						_start_index,
+						_end_index,
+						_color_value,
+						_alpha_value,
+						_font_asset_or_minus1,
+						_style_value,
+						_size_mul,
+						_underline_value
+					)
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   clear_format_range()
+				/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static clear_format_range = function(_start_index, _end_index) { 
+					renderer.set_format_range(_start_index, _end_index);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_color_range()
+				/// @desc   Sets per-glyph color for the logical index range [start,end).
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Constant.Color} _color_value
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_color_range = function(_start_index, _end_index, _color_value) {
+					renderer.set_format_range(_start_index, _end_index, _color_value, undefined, undefined, undefined, undefined, undefined);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_alpha_range()
+				/// @desc   Sets per-glyph alpha for the logical index range [start,end).
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Real} _alpha_value
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_alpha_range = function(_start_index, _end_index, _alpha_value) {
+					renderer.set_format_range(_start_index, _end_index, undefined, _alpha_value, undefined, undefined, undefined, undefined);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_font_range()
+				/// @desc   Sets per-glyph font override for [start,end).
+				///         Use -1 to clear override and use renderer font.
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Asset.GMFont|Real} _font_asset_or_minus1
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_font_range = function(_start_index, _end_index, _font_asset_or_minus1) {
+					renderer.set_format_range(_start_index, _end_index, undefined, undefined, _font_asset_or_minus1, undefined, undefined, undefined);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_style_range()
+				/// @desc   Sets per-glyph style enum for [start,end).
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Real} _style_value
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_style_range = function(_start_index, _end_index, _style_value) {
+					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style_value, undefined, undefined);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_size_range()
+				/// @desc   Sets per-glyph size multiplier for [start,end).
+				///         Values <= 0 clamp to 1.
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Real} _size_mul
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_size_range = function(_start_index, _end_index, _size_mul) {
+					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, _size_mul, undefined);
+					return self;
+				};
+				
+				#region jsDoc
+				/// @func   set_glyph_underline_range()
+				/// @desc   Sets per-glyph underline enum for [start,end).
+				/// @param  {Real} _start_index
+				/// @param  {Real} _end_index
+				/// @param  {Real} _underline_value
+				/// @returns {Struct.WWTextRendererBase}
+				#endregion
+				static set_glyph_underline_range = function(_start_index, _end_index, _underline_value) {
+					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, undefined, _underline_value);
+					return self;
+				};
+				
+			#endregion
+			
 		#endregion
 		
-        #region Events
+		#region Events
 			
-            events.select    = variable_get_hash("select"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			events.select    = variable_get_hash("select"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
 			static on_select = function(_func) {
 				add_event_listener(events.select, _func);
 				return self;
@@ -380,11 +515,11 @@ function WWTextBoxV3() : WWCore() constructor {
 			on_interact(function(_data) {
 				// stay focused if mouse is on component
 				if (__word_selection_mode__) {
-			        __update_word_selection_drag__();
-			    }
+					__update_word_selection_drag__();
+				}
 				else {
-			        __check_minput__(true);
-			    }
+					__check_minput__(true);
+				}
 			})
 			on_long_press(function(_data) {
 				// Phone support for selecting text
@@ -394,7 +529,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__word_selection_mode__ = false;
 			})
 			on_double_click(function(_data) {
-			    var _loc = __compute_word_boundaries__(cursor.get_index());
+				var _loc = __compute_word_boundaries__(cursor.get_index());
 				
 				// Activate the selection.
 				cursor.set_highlight_active(true);
@@ -403,9 +538,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.set_highlight_start_index(_loc.index_start);
 				cursor.set_highlight_end_index(_loc.index_end);
 				__cursor_set_index_synced__(_loc.index_end, true);
-			    
+				
 				__word_anchor_start__ = _loc.index_start;
-			    __word_anchor_end__   = _loc.index_end;
+				__word_anchor_end__   = _loc.index_end;
 				__word_selection_mode__ = true;
 			});
 			
@@ -441,7 +576,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			//});
 			
 		#endregion
-        
+		
 		#region Hotkeys
 			//TODO: ADD THESE
 			//Ctrl+Insert = Copy = Ctrl+C (currently works as fas as i can tell)
@@ -607,30 +742,37 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region Deletion — Backspace, Delete, Ctrl+Delete
 			#region No modifier
 			hotkeys.register([vk_backspace], function() {
-			    if (is_read_only) return;
+				if (is_read_only) return;
 				
-			    // If selection exists: delete selection
-			    if (__delete_selection_if_any__(true, true)) return;
+				// If selection exists: delete selection
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				
-			    // No selection: delete character before cursor
-			    var _index = cursor.get_index();
-			    if (_index <= 0) return;
+				// No selection: delete character before cursor
+				var _index = cursor.get_index();
+				if (_index <= 0) return;
 				
-			    var _prev_index = _index - 1;
-			    var _buf_start  = renderer.get_buffer_index_from_index(_prev_index);
-			    var _buf_end    = renderer.get_buffer_index_from_index(_index);
+				var _prev_index = _index - 1;
+				var _buf_start  = renderer.get_buffer_index_from_index(_prev_index);
+				var _buf_end    = renderer.get_buffer_index_from_index(_index);
 				
 				buffer.erase(_buf_start, _buf_end);
 				__force_rebuild__();
 				__history_add_record__();
 				__cursor_set_index_synced__(_prev_index, false, false);
+				trigger_event(events.change);
 			});
 
 			hotkeys.register([vk_delete], function() {
 				if (is_read_only) return;
 				
 				// If selection exists: delete selection
-				if (__delete_selection_if_any__(true, true)) return;
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				
 				// No selection: delete character at cursor
 				var _index = cursor.get_index();
@@ -645,6 +787,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				buffer.erase(_buf_start, _buf_end);
 				__force_rebuild__();
 				__history_add_record__();
+				trigger_event(events.change);
 			});
 
 			#endregion
@@ -654,7 +797,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				if (is_read_only) return;
 				
 				// If selection exists; normal delete
-				if (__delete_selection_if_any__(true, true)) return;
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				
 				// Compute previous word boundary
 				var _index = cursor.get_index();
@@ -670,27 +816,32 @@ function WWTextBoxV3() : WWCore() constructor {
 				__force_rebuild__();
 				__history_add_record__();
 				__cursor_set_index_synced__(_start, false, false);
+				trigger_event(events.change);
 			});
 			hotkeys.register([vk_control, vk_delete], function() {
-			    if (is_read_only) return;
+				if (is_read_only) return;
 				
-			    // Selection; normal delete
-			    if (__delete_selection_if_any__(true, true)) return;
+				// Selection; normal delete
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				
-			    // Compute next word boundary
-			    var _index = cursor.get_index();
+				// Compute next word boundary
+				var _index = cursor.get_index();
 				var _pointed_index = min(_index+1, renderer.get_glyph_count());
 				
 				var _bounds = __compute_word_boundaries__(_pointed_index, false);
-			    var _end = _bounds.index_end;
+				var _end = _bounds.index_end;
 				
-			    var _buffer_start = renderer.get_buffer_index_from_index(_index);
-			    var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				var _buffer_start = renderer.get_buffer_index_from_index(_index);
+				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
 				
-			    buffer.erase(_buffer_start, _buffer_end);
+				buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
 				__history_add_record__();
 				__cursor_set_index_synced__(_index);
+				trigger_event(events.change);
 			});
 
 			#endregion
@@ -710,7 +861,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				// NOTE! This actually shouldnt delete anything normally and should
 				// early out, at least this is the results from a few text boxes tested
 				// like discord. however it makes more sense to just delete delection
-				if (__delete_selection_if_any__(true, true)) return;
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				///////////////////////////////////////////////////////////////////////
 				
 				
@@ -726,6 +880,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__force_rebuild__();
 				cursor.set_highlight_active(false);
 				__history_add_record__();
+				trigger_event(events.change);
 			});
 			hotkeys.register([vk_control, vk_shift, vk_delete],    function() {
 				if (is_read_only) return;
@@ -735,7 +890,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				// NOTE! This actually shouldnt delete anything normally and should
 				// early out, at least this is the results from a few text boxes tested
 				// like discord. however it makes more sense to just delete delection
-				if (__delete_selection_if_any__(true, true)) return;
+				if (__delete_selection_if_any__(true, true)) {
+					trigger_event(events.change);
+					return;
+				}
 				///////////////////////////////////////////////////////////////////////
 				
 				// Delete until end of line, preserve `\n` line breaks, and stop on force wrapped
@@ -755,6 +913,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.set_highlight_active(false);
 				__force_rebuild__();
 				__history_add_record__();
+				trigger_event(events.change);
 			});
 			#endregion
 			#endregion
@@ -812,6 +971,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				__force_rebuild__();
 				
 				__history_add_record__();
+				trigger_event(events.change);
 			});
 			
 			hotkeys.register([vk_control, ord("Z")], function() {
@@ -893,7 +1053,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 		#endregion
 		
-        #region Variables
+		#region Variables
 			
 			is_focusable = true;
 			is_read_only = false;
@@ -901,9 +1061,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			tab_exits_text = false;
 			
 		#endregion
-        
-        #region Functions
-            
+		
+		#region Functions
+			
 			#region jsDoc
 			/// @func    get_text()
 			/// @desc    Returns the text from the textbox
@@ -1068,7 +1228,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real} x
 				#endregion
 				static index_to_x = function(_index) {
-				    return renderer.index_to_x(_index);
+					return renderer.index_to_x(_index);
 				};
 				#region jsDoc
 				/// @func    index_to_y()
@@ -1077,7 +1237,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real} y
 				#endregion
 				static index_to_y = function(_index) {
-				    return renderer.index_to_y(_index);
+					return renderer.index_to_y(_index);
 				};
 				#region jsDoc
 				/// @func    xy_to_index()
@@ -1087,7 +1247,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real}
 				#endregion
 				static xy_to_index = function(_x, _y) {
-				    return renderer.xy_to_index(_x, _y);
+					return renderer.xy_to_index(_x, _y);
 				};
 			
 				#region jsDoc
@@ -1097,7 +1257,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real} line
 				#endregion
 				static index_to_line = function(_index) {
-				    return renderer.index_to_line(_index);
+					return renderer.index_to_line(_index);
 				}
 				#region jsDoc
 				/// @func    index_to_col()
@@ -1106,7 +1266,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real} line
 				#endregion
 				static index_to_col = function(_index) {
-				    return renderer.index_to_col(_index);
+					return renderer.index_to_col(_index);
 				};
 				#region jsDoc
 				/// @func    line_col_to_index()
@@ -1116,17 +1276,17 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real}
 				#endregion
 				static line_col_to_index = function(_line, _col) {
-				    return renderer.line_col_to_index(_line, _col);
+					return renderer.line_col_to_index(_line, _col);
 				};
 			
 			#endregion
 			
-        #endregion
+		#endregion
 		
-    #endregion
-    
-    #region Private
-        
+	#endregion
+	
+	#region Private
+		
 		#region Variables
 			
 			__allowed_char_set__ = false; // Indicates whether allowed characters have been explicitly set.
@@ -1154,23 +1314,23 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region Allowing Char
 			
 				#region jsDoc
-			    /// @func    __build_allowed_char__()
-			    /// @desc    Returns a struct of allowed characters from the supplied font.
-			    /// @self    WWTextBase
-			    /// @param   {Asset.GMFont} _font : The font to build the allowed character list.
-			    /// @returns {Struct} Allowed Characters Struct
-			    #endregion
+				/// @func    __build_allowed_char__()
+				/// @desc    Returns a struct of allowed characters from the supplied font.
+				/// @self    WWTextBase
+				/// @param   {Asset.GMFont} _font : The font to build the allowed character list.
+				/// @returns {Struct} Allowed Characters Struct
+				#endregion
 				static __build_allowed_char__ = function(_font, _include_nl=true) {
-			        var _info = font_get_info(_font);
-			        var _output = {};
+					var _info = font_get_info(_font);
+					var _output = {};
 					struct_foreach(_info.glyphs, method(_output, function(_key, _value){
 						self[$ _key] = true;
 					}));
-			        
+					
 					if (_include_nl) _output[$ "\n"] = true;
 					
-			        return _output;
-			    }
+					return _output;
+				}
 				
 				#region jsDoc
 				/// @func    __infer_keyboard_type__
@@ -1187,88 +1347,88 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real} kbv_type_* constant
 				#endregion
 				static __infer_keyboard_type__ = function(_allowed) {
-				    // Defensive defaults
-				    if (is_undefined(_allowed) || _allowed == "") {
-				        return kbv_type_default;
-				    }
+					// Defensive defaults
+					if (is_undefined(_allowed) || _allowed == "") {
+						return kbv_type_default;
+					}
 					
-				    // Local helpers (all ASCII-safe)
-				    static __has__ = function(_pool, _ch) {
-				        return string_pos(_ch, _pool) > 0;
-				    };
-				    static __all_in__ = function(_pool, _set) {
-				        var idx = 1, len = string_length(_pool);
-				        while (idx <= len) {
-				            var ch = string_char_at(_pool, idx);
-				            if (string_pos(ch, _set) == 0) return false;
-				            idx += 1;
-				        }
-				        return true;
-				    };
-				    static __is_subset_of__ = __all_in__;
-				    static __is_ascii_only__ = function(_pool) {
-				        var idx = 1, len = string_length(_pool);
-				        while (idx <= len) {
-				            var ch = string_char_at(_pool, idx);
-				            if (ord(ch) < 0 || ord(ch) > 127) return false;
-				            idx += 1;
-				        }
-				        return true;
-				    };
+					// Local helpers (all ASCII-safe)
+					static __has__ = function(_pool, _ch) {
+						return string_pos(_ch, _pool) > 0;
+					};
+					static __all_in__ = function(_pool, _set) {
+						var idx = 1, len = string_length(_pool);
+						while (idx <= len) {
+							var ch = string_char_at(_pool, idx);
+							if (string_pos(ch, _set) == 0) return false;
+							idx += 1;
+						}
+						return true;
+					};
+					static __is_subset_of__ = __all_in__;
+					static __is_ascii_only__ = function(_pool) {
+						var idx = 1, len = string_length(_pool);
+						while (idx <= len) {
+							var ch = string_char_at(_pool, idx);
+							if (ord(ch) < 0 || ord(ch) > 127) return false;
+							idx += 1;
+						}
+						return true;
+					};
 
-				    var pool = _allowed;
+					var pool = _allowed;
 
-				    // Canonical class sets
-				    var digits         = "0123456789";
-				    var phone_punct    = "+-() #*";
-				    var decimal_punct  = "+-.";
-				    var ascii_letters  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-				    var letters_spaces = ascii_letters + " -'";
-				    var url_marks      = ":/.?&#%=_~-";
-				    var email_marks    = "@._-+";
+					// Canonical class sets
+					var digits         = "0123456789";
+					var phone_punct    = "+-() #*";
+					var decimal_punct  = "+-.";
+					var ascii_letters  = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+					var letters_spaces = ascii_letters + " -'";
+					var url_marks      = ":/.?&#%=_~-";
+					var email_marks    = "@._-+";
 
-				    // 1) Strict numbers: palette contains only digits
-				    if (__is_subset_of__(pool, digits)) {
-				        return kbv_type_numbers;
-				    }
+					// 1) Strict numbers: palette contains only digits
+					if (__is_subset_of__(pool, digits)) {
+						return kbv_type_numbers;
+					}
 
-				    // 2) Phone: digits plus common phone punctuation, and no letters
-				    if (__is_subset_of__(pool, digits + phone_punct)) {
-				        return kbv_type_phone;
-				    }
+					// 2) Phone: digits plus common phone punctuation, and no letters
+					if (__is_subset_of__(pool, digits + phone_punct)) {
+						return kbv_type_phone;
+					}
 
-				    // 3) E-mail: must allow '@' and '.', forbid spaces, and be subset of a sane email set
-				    if (__has__(pool, "@") && __has__(pool, ".")
-				    && !__has__(pool, " ")
-				    && __is_subset_of__(pool, ascii_letters + digits + email_marks)) {
-				        return kbv_type_email;
-				    }
+					// 3) E-mail: must allow '@' and '.', forbid spaces, and be subset of a sane email set
+					if (__has__(pool, "@") && __has__(pool, ".")
+					&& !__has__(pool, " ")
+					&& __is_subset_of__(pool, ascii_letters + digits + email_marks)) {
+						return kbv_type_email;
+					}
 
-				    // 4) URL: must allow ':' or '/', forbid spaces, and be subset of a sane url set
-				    if ((__has__(pool, ":") || __has__(pool, "/"))
-				    && !__has__(pool, " ")
-				    && __is_subset_of__(pool, ascii_letters + digits + url_marks)) {
-				        return kbv_type_url;
-				    }
+					// 4) URL: must allow ':' or '/', forbid spaces, and be subset of a sane url set
+					if ((__has__(pool, ":") || __has__(pool, "/"))
+					&& !__has__(pool, " ")
+					&& __is_subset_of__(pool, ascii_letters + digits + url_marks)) {
+						return kbv_type_url;
+					}
 
-				    // 5) Decimal-ish numeric input: digits plus "+-." (still best served by numbers pad)
-				    if (__is_subset_of__(pool, digits + decimal_punct)) {
-				        // GM does not have a dedicated "decimal" keyboard, numbers is the closest
-				        return kbv_type_numbers;
-				    }
+					// 5) Decimal-ish numeric input: digits plus "+-." (still best served by numbers pad)
+					if (__is_subset_of__(pool, digits + decimal_punct)) {
+						// GM does not have a dedicated "decimal" keyboard, numbers is the closest
+						return kbv_type_numbers;
+					}
 
-				    // 6) ASCII-only palette (no non-ascii glyphs)
-				    if (__is_ascii_only__(pool)) {
-				        // If it looks like a name field (letters, spaces, dash, apostrophe, no digits), prefer phone_name
-				        if (__is_subset_of__(pool, letters_spaces)) {
-				            // Android will fall back to ASCII automatically if phone_name is not supported
-				            return kbv_type_phone_name;
-				        }
-				        return kbv_type_ascii;
-				    }
+					// 6) ASCII-only palette (no non-ascii glyphs)
+					if (__is_ascii_only__(pool)) {
+						// If it looks like a name field (letters, spaces, dash, apostrophe, no digits), prefer phone_name
+						if (__is_subset_of__(pool, letters_spaces)) {
+							// Android will fall back to ASCII automatically if phone_name is not supported
+							return kbv_type_phone_name;
+						}
+						return kbv_type_ascii;
+					}
 
-				    // 7) Default catch-all
-				    return kbv_type_default;
+					// 7) Default catch-all
+					return kbv_type_default;
 				};
 
 			#endregion
@@ -1448,7 +1608,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					static __struct = { index_start: 0, index_end: 0 };
 					
 					// Shared word breakers constant.
-				    static __word_breakers = "\n\r\t ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
+					static __word_breakers = "\n\r\t ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
 					static __white_spaces = "\n\r\t ";
 					
 					// Basic safety: if renderer has no lines, just collapse.
@@ -1602,16 +1762,16 @@ function WWTextBoxV3() : WWCore() constructor {
 				};
 				
 				#region jsDoc
-			    /// @func    __insert_string_at_cursor__()
-			    /// @desc    Inserts a new string at the cursor position, respecting allowed characters.
-			    /// @self    WWTextInputSingle
-			    /// @param   {String} _str : The string to insert.
-			    /// @returns {undefined}
-			    #endregion
+				/// @func    __insert_string_at_cursor__()
+				/// @desc    Inserts a new string at the cursor position, respecting allowed characters.
+				/// @self    WWTextInputSingle
+				/// @param   {String} _str : The string to insert.
+				/// @returns {undefined}
+				#endregion
 				static __insert_string_at_cursor__ = function(_str) {
-				    // sanitize input
-				    var _new_str = buffer.__filter_allowed__(_str);
-				    
+					// sanitize input
+					var _new_str = buffer.__filter_allowed__(_str);
+					
 					var _str_byte_len = string_byte_length(_new_str);
 					
 					__delete_selection_if_any__(true, true);
@@ -1624,6 +1784,8 @@ function WWTextBoxV3() : WWCore() constructor {
 					__force_rebuild__();
 					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
 					__cursor_set_index_synced__(_new_index);
+					
+					trigger_event(events.change);
 				}
 				
 				#region jsDoc
@@ -1672,12 +1834,12 @@ function WWTextBoxV3() : WWCore() constructor {
 				};
 				
 				#region jsDoc
-			    /// @func    __clipboard_get_text__()
-			    /// @desc    Retrieves text from the clipboard for pasting into the input field.
-			    /// @self    WWTextInputSingle
-			    /// @returns {String}
-			    #endregion
-			    static __clipboard_get_text__ = function() {
+				/// @func    __clipboard_get_text__()
+				/// @desc    Retrieves text from the clipboard for pasting into the input field.
+				/// @self    WWTextInputSingle
+				/// @returns {String}
+				#endregion
+				static __clipboard_get_text__ = function() {
 					if (clipboard_has_text()) {
 						var _pasted_string = clipboard_get_text();
 						//text was coppied from outside the program clear layout data
@@ -1685,28 +1847,28 @@ function WWTextBoxV3() : WWCore() constructor {
 							//clear layout data
 						}
 						__global_clipboard_container__.text = _pasted_string;
-			        }
+					}
 					else if (__global_clipboard_container__.text != "") {
 						var _pasted_string = __global_clipboard_container__.text;
 					}
 					else {
 						//nothing has been coppied.... maybe print a warning?
 					}
-			        
+					
 					return _pasted_string;
-			    }
+				}
 				
 				#region jsDoc
-			    /// @func    __clipboard_set_text__()
-			    /// @desc    Sets the clipboard text.
-			    /// @self    WWTextInputSingle
-			    /// @returns {String}
-			    #endregion
-			    static __clipboard_set_text__ = function(_str) {
-			        __global_clipboard_container__.text = _str;
+				/// @func    __clipboard_set_text__()
+				/// @desc    Sets the clipboard text.
+				/// @self    WWTextInputSingle
+				/// @returns {String}
+				#endregion
+				static __clipboard_set_text__ = function(_str) {
+					__global_clipboard_container__.text = _str;
 					//TODO: update or clear layout data aswell
 					clipboard_set_text(_str);
-			    }
+				}
 				
 			#endregion
 			
@@ -1720,8 +1882,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Struct} A history snapshot.
 				#endregion
 				static __history_record_create__ = function(_content, _cursor_index, _highlight_active, _highlight_start_index, _highlight_end_index) constructor {
-				    content = _content;
-				    cursor_index  = _cursor_index;
+					content = _content;
+					cursor_index  = _cursor_index;
 					highlight_active = _highlight_active;
 					highlight_start_index = _highlight_start_index;
 					highlight_end_index = _highlight_end_index;
@@ -1734,31 +1896,31 @@ function WWTextBoxV3() : WWCore() constructor {
 				#endregion
 				static __history_add_record__ = function() {
 
-				    var _next_index = __historic_records_loc__ + 1;
+					var _next_index = __historic_records_loc__ + 1;
 
-				    // If not at end of history, truncate forward history
-				    if (_next_index < array_length(__historic_records__)) {
-				        array_resize(__historic_records__, _next_index);
-				    }
+					// If not at end of history, truncate forward history
+					if (_next_index < array_length(__historic_records__)) {
+						array_resize(__historic_records__, _next_index);
+					}
 
-				    // Create new snapshot
-				    var _record = new __history_record_create__(
-				        buffer.get_text(),
-				        cursor.get_index(),
+					// Create new snapshot
+					var _record = new __history_record_create__(
+						buffer.get_text(),
+						cursor.get_index(),
 						cursor.get_highlight_active(),
-					    cursor.get_highlight_start_index(),
-					    cursor.get_highlight_end_index(),
+						cursor.get_highlight_start_index(),
+						cursor.get_highlight_end_index(),
 					);
 
-				    array_push(__historic_records__, _record);
+					array_push(__historic_records__, _record);
 
-				    // Enforce max history limit
-				    if (array_length(__historic_records__) > __history_records_limit__) {
-				        array_delete(__historic_records__, 0, 1);
-				        _next_index -= 1;
-				    }
+					// Enforce max history limit
+					if (array_length(__historic_records__) > __history_records_limit__) {
+						array_delete(__historic_records__, 0, 1);
+						_next_index -= 1;
+					}
 
-				    __historic_records_loc__ = _next_index;
+					__historic_records_loc__ = _next_index;
 				};
 				
 				#region jsDoc
@@ -1768,10 +1930,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				#endregion
 				static __history_update_latest_cursor__ = function() {
 					var _record = __historic_records__[__historic_records_loc__];
-				    _record.cursor_index = cursor.get_index();
-				    _record.highlight_active = cursor.get_highlight_active();
-				    _record.highlight_start_index = cursor.get_highlight_start_index();
-				    _record.highlight_end_index = cursor.get_highlight_end_index();
+					_record.cursor_index = cursor.get_index();
+					_record.highlight_active = cursor.get_highlight_active();
+					_record.highlight_start_index = cursor.get_highlight_start_index();
+					_record.highlight_end_index = cursor.get_highlight_end_index();
 				};
 				
 				#region jsDoc
@@ -1783,24 +1945,26 @@ function WWTextBoxV3() : WWCore() constructor {
 				#endregion
 				static __history_jump__ = function(_change) {
 
-				    var _target = __historic_records_loc__ + _change;
+					var _target = __historic_records_loc__ + _change;
 
-				    // Bounds check
-				    if (_target < 0 || _target >= array_length(__historic_records__)) {
-				        return;
-				    }
+					// Bounds check
+					if (_target < 0 || _target >= array_length(__historic_records__)) {
+						return;
+					}
 
-				    var _record = __historic_records__[_target];
+					var _record = __historic_records__[_target];
 
-				    buffer.set_text(_record.content);
-				    cursor.set_index(_record.cursor_index);
-				    cursor.set_highlight_active(_record.highlight_active);
-				    cursor.set_highlight_start_index(_record.highlight_start_index);
-				    cursor.set_highlight_end_index(_record.highlight_end_index);
+					buffer.set_text(_record.content);
+					cursor.set_index(_record.cursor_index);
+					cursor.set_highlight_active(_record.highlight_active);
+					cursor.set_highlight_start_index(_record.highlight_start_index);
+					cursor.set_highlight_end_index(_record.highlight_end_index);
 					
-				    __historic_records_loc__ = _target;
+					__historic_records_loc__ = _target;
 
-				    __force_rebuild__();
+					__force_rebuild__();
+					
+					trigger_event(events.change);
 				};
 				
 			#endregion
@@ -1832,32 +1996,32 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				//if (_old_index == _new_index) return;
 				
-			    cursor.set_index(_new_index);
+				cursor.set_index(_new_index);
 				
 				var _selection_is_non_zero = _new_index != cursor.get_highlight_start_index();
 				
 				
-			    if (_shift_select && _selection_is_non_zero) {
-			        if (!cursor.get_highlight_active()) {
-			            cursor.set_highlight_start_index(_old_index);
-			            cursor.set_highlight_end_index(_new_index);
-			            cursor.set_highlight_active(true);
-			        }
-			        cursor.set_highlight_end_index(_new_index);
-			    }
-			    else {
-			        cursor.set_highlight_active(false);
-			        cursor.set_highlight_start_index(_new_index);
-			        cursor.set_highlight_end_index(_new_index);
-			    }
+				if (_shift_select && _selection_is_non_zero) {
+					if (!cursor.get_highlight_active()) {
+						cursor.set_highlight_start_index(_old_index);
+						cursor.set_highlight_end_index(_new_index);
+						cursor.set_highlight_active(true);
+					}
+					cursor.set_highlight_end_index(_new_index);
+				}
+				else {
+					cursor.set_highlight_active(false);
+					cursor.set_highlight_start_index(_new_index);
+					cursor.set_highlight_end_index(_new_index);
+				}
 
-			    if (_update_width) {
-			        cursor_last_width = renderer.get_x_from_index(_new_index);
-			    }
+				if (_update_width) {
+					cursor_last_width = renderer.get_x_from_index(_new_index);
+				}
 
-			    if (_update_history) {
-			        __history_update_latest_cursor__();
-			    }
+				if (_update_history) {
+					__history_update_latest_cursor__();
+				}
 				
 			};
 			
@@ -1869,35 +2033,35 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @returns {Bool} True if something was deleted, false otherwise
 			#endregion
 			static __delete_selection_if_any__ = function(_force_rebuild = true, _push_history = true) {
-			    if (!cursor.get_highlight_active()) return false;
+				if (!cursor.get_highlight_active()) return false;
 
-			    var _start_index = cursor.get_highlight_start_index();
-			    var _end_index = cursor.get_highlight_end_index();
+				var _start_index = cursor.get_highlight_start_index();
+				var _end_index = cursor.get_highlight_end_index();
 
-			    var _buffer_start = renderer.get_buffer_index_from_index(_start_index);
-			    var _buffer_end = renderer.get_buffer_index_from_index(_end_index);
+				var _buffer_start = renderer.get_buffer_index_from_index(_start_index);
+				var _buffer_end = renderer.get_buffer_index_from_index(_end_index);
 
-			    buffer.erase(_buffer_start, _buffer_end);
+				buffer.erase(_buffer_start, _buffer_end);
 				
-			    if (_push_history) {
-			        __history_add_record__();
-			    }
+				if (_push_history) {
+					__history_add_record__();
+				}
 				
 				var _new_index = min(_start_index, _end_index);
-			    __cursor_set_index_synced__(_new_index, false, false);
+				__cursor_set_index_synced__(_new_index, false, false);
 				
 				if (_force_rebuild) {
-			        __force_rebuild__();
-			    }
-			    
-			    return true;
+					__force_rebuild__();
+				}
+				
+				return true;
 			};
 
 		#endregion
 		
 		
 		
-    #endregion
+	#endregion
 	
 }
 

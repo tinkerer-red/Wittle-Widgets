@@ -531,6 +531,17 @@ function WWTextBoxV3() : WWCore() constructor {
 			on_double_click(function(_data) {
 				var _loc = __compute_word_boundaries__(cursor.get_index());
 				
+				var _index = cursor.get_index();
+				var _line = renderer.get_line_from_index(_index);
+				
+				//if the line contains only a line break just put the cursor at start of line
+				if (renderer.get_line_width(_line) == 0) {
+					var _start = renderer.get_line_index_start(_line);
+					__cursor_set_index_synced__(_start, false);
+					return
+				}
+				
+				
 				// Activate the selection.
 				cursor.set_highlight_active(true);
 				
@@ -541,6 +552,37 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				__word_anchor_start__ = _loc.index_start;
 				__word_anchor_end__   = _loc.index_end;
+				__word_selection_mode__ = true;
+			});
+			on_triple_click(function(_data) {
+				//this could be paragraph selection or line selection depending...
+				var _index = cursor.get_index();
+				var _line = renderer.get_line_from_index(_index);
+				var _start = renderer.get_line_index_start(_line);
+				var _end = renderer.get_line_index_end(_line);
+				
+				//if the line contains only a line break just put the cursor at start of line
+				if (renderer.get_line_width(_line) == 0) {
+					__cursor_set_index_synced__(_start, false);
+					return
+				}
+				
+				//if it anything except the last line avoid including the line break glyph
+				if (_line+1 < renderer.get_line_count()) {
+					_end -= 1;
+				}
+				
+				
+				// Activate the selection.
+				cursor.set_highlight_active(true);
+				
+				// Set selection: highlight from startPos to endPos in the current line.
+				cursor.set_highlight_start_index(_start);
+				cursor.set_highlight_end_index(_end);
+				__cursor_set_index_synced__(_end, true);
+				
+				__word_anchor_start__ = _start;
+				__word_anchor_end__   = _end;
 				__word_selection_mode__ = true;
 			});
 			
@@ -2058,8 +2100,6 @@ function WWTextBoxV3() : WWCore() constructor {
 			};
 
 		#endregion
-		
-		
 		
 	#endregion
 	

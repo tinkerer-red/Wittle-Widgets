@@ -794,7 +794,7 @@ build_ui_text_boxes = function(){
 	var _text_1 =
 		"Quick input, no wrapping.\n" +
 		"Try arrow keys, selection, and backspace.\n\n" +
-		"Tip: This is perfect for chat or command barsW";
+		"Tip: This is perfect for chat or command bars";
 
 	var _textbox_1 = new WWTextBoxV3()
 	    .set_offset(_panel1_x - _card_pad + _textbox_xoff, _panel1_y - _card_pad + _textbox_yoff)

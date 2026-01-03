@@ -331,6 +331,7 @@ function WWCore() constructor {
 			events.long_press = variable_get_hash("long_press");
 			events.released   = variable_get_hash("released");
 			events.double_click = variable_get_hash("double_click");
+			events.triple_click = variable_get_hash("triple_click");
 			static on_pressed = function(_func) {
 				add_event_listener(events.pressed, _func);
 				return self;
@@ -349,6 +350,10 @@ function WWCore() constructor {
 			}
 			static on_double_click = function(_func) {
 				add_event_listener(events.double_click, _func);
+				return self;
+			}
+			static on_triple_click = function(_func) {
+				add_event_listener(events.triple_click, _func);
 				return self;
 			}
 			#endregion
@@ -1265,8 +1270,9 @@ function WWCore() constructor {
 			__user_input__ = variable_clone(__default_user_input__);
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
-			__click_held_timer__ = 0;
-			__last_click_time__  = 0;
+			__click_held_timer__ = 0; //long press timer
+			__last_click_time__  = 0; //timer to measure the previous click time for double and triple clicks
+			__last_click_was_double__ = false; //used to differenciate between double and triple clicks
 			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
 			__is_focused__ = false; // is currently the component capturing the input, and accepting keyboard inputs
 			__is_hovered__ = false; // is currently consuming the input through depth order (the mouse projected down onto this component, instead of others)
@@ -1347,7 +1353,22 @@ function WWCore() constructor {
 				__last_click_time__ = current_time;
 				__click_held_timer__ = current_time;
 				
-				if (_double_trigger) trigger_event(self.events.double_click);
+				//tripple click
+				if (__last_click_was_double__) {
+					__last_click_was_double__ = false;
+					trigger_event(self.events.triple_click);
+					return;
+				}
+				
+				//double click
+				if (_double_trigger) {
+					__last_click_was_double__ = true
+					trigger_event(self.events.double_click);
+					return;
+				}
+				
+				//reset
+				__last_click_was_double__ = false;
 			})
 			on_interact_enter(function(){
 				if (!is_enabled || !is_focusable) {

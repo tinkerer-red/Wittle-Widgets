@@ -858,24 +858,27 @@ build_ui_text_boxes = function(){
 	    .set_size(_card_width, _header_height)
 	    .set_background_color(_card_hdr);
 	root.add(_card3_hdr);
-
+	
 	var _caption_3 = new WWLabel()
 	    .set_offset(_panel3_x - _card_pad + 10, _panel3_y - _card_pad + 5)
 	    .set_size(_card_width - 20, _header_height)
 	    .set_text("3) Code editor - wrap off, tabs, indentation")
 	    .set_text_color(_caption_color);
 	root.add(_caption_3);
-
-	var _text_3 = 
-		"function demo_example() {\n" +
-		"\tvar _counter_value = 0;\n" +
-		"\tvar _message_text = \"Hello from WWTextBoxV3\";\n\n" +
-		"\tif (_counter_value == 0) {\n" +
-		"\t\t_message_text += \" - ready\";\n" +
-		"\t}\n\n" +
-		"\t// Try selecting across lines and deleting.\n" +
-		"\treturn _message_text;\n" +
-		"}\n";
+	
+	var _text_3 =
+	    "function demo_example() {\n" +
+	    "\tvar _counter_value = 0;          //underline this line uses a normal underline\n" +
+	    "\tvar _message_text = \"Hello from WWTextBoxV3\";\n\n" +
+	    "\tif (_counter_value == 0) {        //warn this branch is suspicious\n" +
+	    "\t\t_message_text += \" - ready\";\n" +
+	    "\t}\n\n" +
+	    "\tif (_counter_value < 0) {         //error this should never happen\n" +
+	    "\t\t_message_text = undefined;\n" +
+	    "\t}\n\n" +
+	    "\t// Try selecting across lines and deleting.\n" +
+	    "\treturn _message_text;             //err forced error underline test\n" +
+	    "}\n";
 	
 	var _textbox_3 = new WWTextBoxV3()
 	    .set_offset(_panel3_x - _card_pad + _textbox_xoff, _panel3_y - _card_pad + _textbox_yoff)
@@ -891,6 +894,7 @@ build_ui_text_boxes = function(){
 	ww_apply_demo_syntax_to_textbox(_textbox_3);
 	
 	root.add(_textbox_3);
+	
 	
 	// -------------------------------------------------------------
 	// Panel 4

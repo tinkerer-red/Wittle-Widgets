@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MsdfSetShader",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MsdfSetShader",
+  "parent":{
+    "name":"Functions",
+    "path":"folders/_Libraries/MSDF/Functions.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

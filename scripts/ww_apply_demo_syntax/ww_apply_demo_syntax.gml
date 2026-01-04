@@ -9,14 +9,15 @@
 /// @returns {Struct.WWTextBoxV3}
 #endregion
 function ww_apply_demo_syntax_to_textbox(_textbox) {
-	// Apply once now
+
+    // Apply once now
     ww_apply_demo_syntax(_textbox);
-	
+
     // Re-apply whenever the textbox text changes (because glyphs are rebuilt)
     _textbox.on_change(method(_textbox, function(_input) {
         ww_apply_demo_syntax(self);
     }));
-    
+
     return _textbox;
 }
 
@@ -24,7 +25,7 @@ function ww_apply_demo_syntax_to_textbox(_textbox) {
 /// @func   ww_apply_demo_syntax()
 /// @desc   Reads the textbox current text, highlights via regex_hljs_gml_highlight(),
 ///         and applies formatting ranges to the renderer.
-/// @param  {Struct.WWTextBoxv3} _textbox
+/// @param  {Struct.WWTextBoxV3} _textbox
 #endregion
 function ww_apply_demo_syntax(_textbox) {
 
@@ -71,7 +72,7 @@ function ww_apply_demo_syntax(_textbox) {
         col_braces: #FFB871
     };
 
-    // Highlight -> spans: { start, "end", scope } where start/end are 0-based
+    // Highlight -> spans: { start, end, scope } where start/end are 0-based
     var _spans = regex_hljs_gml_highlight(_text);
     var _span_count = array_length(_spans);
 
@@ -94,6 +95,128 @@ function ww_apply_demo_syntax(_textbox) {
 
         _si += 1;
     }
+
+    // Demo underline / squiggle tests using comment markers
+    ww__apply_demo_comment_underlines(_textbox, _text);
+}
+
+#region jsDoc
+/// @func   ww__find_line_end_0()
+/// @desc   Given a 0-based index into _text, returns the 0-based exclusive end
+///         of the line (up to but not including '\n').
+/// @param  {String} _text
+/// @param  {Real} _start_0
+/// @returns {Real}
+#endregion
+function ww__find_line_end_0(_text, _start_0) {
+
+    var _len = string_length(_text);
+    if (_start_0 < 0 || _start_0 >= _len) {
+        return _start_0;
+    }
+
+    // string_pos is 1-based
+    var _substr = string_copy(_text, _start_0 + 1, _len);
+    var _nl_1 = string_pos("\n", _substr);
+
+    if (_nl_1 <= 0) {
+        return _len;
+    }
+
+    return _start_0 + (_nl_1 - 1);
+}
+
+#region jsDoc
+/// @func   ww__apply_comment_underline()
+/// @desc   Applies underline enum to lines containing a specific comment tag.
+///         Underline range is from tag start to end-of-line.
+/// @param  {Struct.WWTextBoxV3} _textbox
+/// @param  {String} _text
+/// @param  {String} _tag
+/// @param  {Real} _underline_enum
+#endregion
+function ww__apply_comment_underline(_textbox, _text, _tag, _underline_enum) {
+
+    var _text_len = string_length(_text);
+    if (_text_len <= 0) {
+        return;
+    }
+
+    var _working_text = _text;
+
+    while (true) {
+
+        var _found_1 = string_pos(_tag, _working_text);
+        if (_found_1 <= 0) {
+            break;
+        }
+
+        var _start_0 = _found_1 - 1;
+        var _end_0_excl = ww__find_line_end_0(_working_text, _start_0);
+
+        if (_end_0_excl > _start_0) {
+            _textbox.set_glyph_underline_range(_start_0, _end_0_excl, _underline_enum);
+        }
+
+        // Mask this occurrence so we can safely search for the next one
+        _working_text =
+            string_copy(_working_text, 1, _start_0) +
+            string_repeat(" ", string_length(_tag)) +
+            string_copy(
+                _working_text,
+                _start_0 + string_length(_tag) + 1,
+                _text_len
+            );
+    }
+}
+
+#region jsDoc
+/// @func   ww__apply_demo_comment_underlines()
+/// @desc   Demo underline tests using comment markers:
+///         //underline  -> straight underline
+///         //warning or //warn -> warning squiggle
+///         //error or //err    -> error squiggle
+/// @param  {Struct.WWTextBoxV3} _textbox
+/// @param  {String} _text
+#endregion
+function ww__apply_demo_comment_underlines(_textbox, _text) {
+
+    if (is_undefined(_textbox) || _text == "") {
+        return;
+    }
+
+    ww__apply_comment_underline(
+        _textbox,
+        _text,
+        "//underline",
+        __WW_Text_Glyph_Underline.Line
+    );
+
+    ww__apply_comment_underline(
+        _textbox,
+        _text,
+        "//warning",
+        __WW_Text_Glyph_Underline.Warning
+    );
+    ww__apply_comment_underline(
+        _textbox,
+        _text,
+        "//warn",
+        __WW_Text_Glyph_Underline.Warning
+    );
+
+    ww__apply_comment_underline(
+        _textbox,
+        _text,
+        "//error",
+        __WW_Text_Glyph_Underline.Error
+    );
+    ww__apply_comment_underline(
+        _textbox,
+        _text,
+        "//err",
+        __WW_Text_Glyph_Underline.Error
+    );
 }
 
 #region jsDoc
@@ -156,7 +279,6 @@ function ww__set_color_span_1(_renderer, _start_1, _end_1_inclusive, _col) {
         return;
     }
 
-    // Only call if supported (keeps demo robust)
     if (!is_undefined(_renderer.set_glyph_color_range)) {
         _renderer.set_glyph_color_range(_start_0, _end_0_excl, _col);
     }
@@ -177,7 +299,6 @@ function ww__set_color_span_0(_textbox, _start_0, _end_0_excl, _col) {
     }
 
     _textbox.set_glyph_color_range(_start_0, _end_0_excl, _col);
-    
 }
 
 #region jsDoc
@@ -189,12 +310,10 @@ function ww__set_color_span_0(_textbox, _start_0, _end_0_excl, _col) {
 #endregion
 function ww__scope_to_color(_scope, _theme) {
 
-    // Fast path
     if (_scope == "" || is_undefined(_scope)) {
         return _theme.col_default;
     }
 
-    // Common hljs scopes for GML rulesets
     if (_scope == "comment") return _theme.col_comments;
     if (_scope == "string") return _theme.col_strings;
     if (_scope == "number") return _theme.col_values;
@@ -202,38 +321,32 @@ function ww__scope_to_color(_scope, _theme) {
     if (_scope == "keyword") return _theme.col_keywords;
     if (_scope == "literal") return _theme.col_values;
 
-    // hljs sometimes uses either "built_in" or "builtin"
     if (_scope == "built_in") return _theme.col_functions;
     if (_scope == "builtin") return _theme.col_functions;
 
-    // language vars like self/other/all/noone/global, etc
     if (_scope == "variable.language") return _theme.col_builtin_variables;
 
-    // Some grammars tag types/enums/symbols distinctly
     if (_scope == "type") return _theme.col_enums;
     if (_scope == "symbol") return _theme.col_constants;
     if (_scope == "meta") return _theme.col_macros;
 
-    // Titles are often used for function/script names in hljs grammars
     if (_scope == "title") return _theme.col_script_names;
     if (_scope == "title.function") return _theme.col_functions;
-	
-	if (_scope == "meta.func.call") return _theme.col_functions;
-	if (_scope == "meta.function.decl") return _theme.col_functions;
-	
-	if (_scope == "meta.enum.decl") return _theme.col_enums;
-	
-	if (_scope == "meta.macro") return _theme.col_macros;
-	if (_scope == "meta.macro.pair") return _theme.col_macros;
-	
-	if (_scope == "meta.prop.access") return _theme.col_struct_member;
-	if (_scope == "meta.prop.invoke") return _theme.col_struct_member;
-	if (_scope == "meta.struct.member") return _theme.col_struct_member;
-	
-	if (_scope == "variable.constant") return _theme.col_constants;
 
+    if (_scope == "meta.func.call") return _theme.col_functions;
+    if (_scope == "meta.function.decl") return _theme.col_functions;
 
-    // Fallback
+    if (_scope == "meta.enum.decl") return _theme.col_enums;
+
+    if (_scope == "meta.macro") return _theme.col_macros;
+    if (_scope == "meta.macro.pair") return _theme.col_macros;
+
+    if (_scope == "meta.prop.access") return _theme.col_struct_member;
+    if (_scope == "meta.prop.invoke") return _theme.col_struct_member;
+    if (_scope == "meta.struct.member") return _theme.col_struct_member;
+
+    if (_scope == "variable.constant") return _theme.col_constants;
+
     return _theme.col_normal_text;
 }
 

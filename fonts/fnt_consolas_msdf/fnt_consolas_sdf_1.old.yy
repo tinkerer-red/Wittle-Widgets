@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_consolas_10",
+  "%Name":"fnt_consolas_11",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":12,
@@ -117,7 +117,7 @@
   "last":0,
   "lineHeight":16,
   "maintainGms1Font":false,
-  "name":"fnt_consolas_10",
+  "name":"fnt_consolas_11",
   "parent":{
     "name":"Assets",
     "path":"folders/_Libraries/Wittle Widgets/Assets.yy",

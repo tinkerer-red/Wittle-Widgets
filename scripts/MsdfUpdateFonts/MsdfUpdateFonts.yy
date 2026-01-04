@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MsdfUpdateFonts",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MsdfUpdateFonts",
+  "parent":{
+    "name":"Functions",
+    "path":"folders/_Libraries/MSDF/Functions.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

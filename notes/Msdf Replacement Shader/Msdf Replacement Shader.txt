@@ -1,0 +1,72 @@
+// 1. Navigate to your runtime's directory. This is a hidden system file so you either need to turn
+//   on hidden system files in Windows Explorer or you can enter the path directly. The path for
+//   runtime 2024.11.0.227 is:
+//   
+//     C:\ProgramData\GameMakerStudio2\Cache\runtimes\runtime-2024.11.0.227
+// 
+// 2. Overwrite the following file with the contents of this Note:
+//   
+//     \bin\ProjectImports\__yy_sdf_shader\shaders\__yy_sdf_shader\__yy_sdf_shader.fsh
+// 
+// 3. If you're looking to build for MacOS or iOS then you'll need to replace the equivalent shader
+//    on your Mac development shader.
+
+varying vec2 v_vTexcoord;
+varying vec4 v_vColour;
+
+float median(vec3 v)
+{
+    return max(min(v.x, v.y), min(max(v.x, v.y), v.z));
+}
+
+float getBaseDist(vec4 colour)
+{
+    if (all(equal(colour.rgb, vec3(1.0))))
+    {
+        //GM's native SDF fonts have white as their base colour
+        return colour.a;
+    }
+    else
+    {
+        //Otherwise, we use MSDF logic
+        return median(colour.rgb);
+    }
+}
+
+void main()
+{
+    vec4 texcol = texture2D( gm_BaseTexture, v_vTexcoord );
+    
+    float spread = fwidth(texcol.a);    
+    spread = max(spread * 0.75, 0.001);    
+    texcol.a = smoothstep(0.5 - spread, 0.5 + spread, getBaseDist(texcol));            
+    
+    vec4 combinedcol = vec4(v_vColour.rgb, v_vColour.a*texcol.a);
+    DoAlphaTest(combinedcol);    
+            
+    gl_FragColor = combinedcol;
+}
+
+///////
+// Original shader follows:
+///////
+
+////
+//// SDF fragment shader
+////
+//varying vec2 v_vTexcoord;
+//varying vec4 v_vColour;
+//
+//void main()
+//{
+//    vec4 texcol = texture2D( gm_BaseTexture, v_vTexcoord );
+//    
+//    float spread = fwidth(texcol.a);    
+//    spread = max(spread * 0.75, 0.001);    
+//    texcol.a = smoothstep(0.5 - spread, 0.5 + spread, texcol.a);            
+//    
+//    vec4 combinedcol = v_vColour * texcol;
+//    DoAlphaTest(combinedcol);    
+//            
+//    gl_FragColor = combinedcol;
+//}

@@ -1,0 +1,166 @@
+// 1. Navigate to your runtime's directory. This is a hidden system file so you either need to turn
+//   on hidden system files in Windows Explorer or you can enter the path directly. The path for
+//   runtime 2024.11.0.227 is:
+//   
+//     C:\ProgramData\GameMakerStudio2\Cache\runtimes\runtime-2024.11.0.227
+// 
+// 2. Overwrite the following file with the contents of this Note:
+//   
+//     \bin\ProjectImports\__yy_sdf_effect_shader\shaders\__yy_sdf_effect_shader\__yy_sdf_effect_shader.fsh
+// 
+// 3. If you're looking to build for MacOS or iOS then you'll need to replace the equivalent shader
+//    on your Mac development shader.
+
+varying vec2 v_vTexcoord;
+varying vec4 v_vColour;
+
+// SDF values are measured from 0 (at the outer edge) to 1 which is the innermost point that can be represented
+uniform bool gm_SDF_DrawGlow;               // whether the glow effect is enabled
+uniform vec2 gm_SDF_Glow_MinMax;            // the SDF range across which the glow fades
+uniform vec4 gm_SDF_Glow_Col;               // the colour of the glow
+
+uniform bool gm_SDF_DrawOutline;            // whether the outline effect is enabled
+uniform float gm_SDF_Outline_Thresh;        // the SDF distance which represents the outer edge of the outline
+uniform vec4 gm_SDF_Outline_Col;            // the colour of the outline
+
+uniform float gm_SDF_Core_Thresh;           // the SDF distance which represents the outer edge the shape
+uniform vec4 gm_SDF_Core_Col;               // the colour of the core part of the shape
+
+float median(vec3 v)
+{
+    return max(min(v.x, v.y), min(max(v.x, v.y), v.z));
+}
+
+float getBaseDist(vec4 colour)
+{
+    if (all(equal(colour.rgb, vec3(1.0))))
+    {
+        //GM's native SDF fonts have white as their base colour
+        return colour.a;
+    }
+    else
+    {
+        //Otherwise, we use MSDF logic
+        return median(colour.rgb);
+    }
+}
+
+void main()
+{
+    vec4 texcol = texture2D( gm_BaseTexture, v_vTexcoord );
+        
+    float pixelspread = fwidth(texcol.a);    
+    pixelspread = max(pixelspread * 0.75, 0.001);    
+    
+    float blendfactor;
+    vec4 currcol = vec4(0.0, 0.0, 0.0, -1.0);
+    
+    // Handle glow effect
+    if (gm_SDF_DrawGlow)
+    {        
+        if (texcol.a > gm_SDF_Glow_MinMax.x)
+        {
+            currcol = gm_SDF_Glow_Col;
+            currcol.a *= smoothstep(gm_SDF_Glow_MinMax.x, gm_SDF_Glow_MinMax.y, getBaseDist(texcol));
+        }
+    }    
+    
+    // Handle outline effect
+    if (gm_SDF_DrawOutline)
+    {
+        if (texcol.a > (gm_SDF_Outline_Thresh - pixelspread))
+        {            
+            blendfactor = smoothstep(gm_SDF_Outline_Thresh - pixelspread, gm_SDF_Outline_Thresh + pixelspread, getBaseDist(texcol));
+            if (currcol.a < 0.0)
+            {
+                currcol = vec4(gm_SDF_Outline_Col.r,gm_SDF_Outline_Col.g,gm_SDF_Outline_Col.b, 0.0);
+            }
+            currcol = mix(currcol, gm_SDF_Outline_Col, blendfactor);
+        }
+    }
+    
+    // Handle inner core
+    blendfactor = smoothstep(gm_SDF_Core_Thresh - pixelspread, gm_SDF_Core_Thresh + pixelspread, getBaseDist(texcol));
+    
+    if (currcol.a < 0.0)
+    {
+        currcol = vec4(gm_SDF_Core_Col.r,gm_SDF_Core_Col.g,gm_SDF_Core_Col.b, 0.0);
+    }
+    texcol = mix(currcol, gm_SDF_Core_Col, blendfactor);    
+    
+    vec4 combinedcol = v_vColour * texcol;
+    DoAlphaTest(combinedcol);    
+            
+    gl_FragColor = combinedcol;
+}
+
+///////
+// Original shader follows:
+///////
+
+////
+//// SDF (with effects) fragment shader
+////
+//varying vec2 v_vTexcoord;
+//varying vec4 v_vColour;
+//
+//// SDF values are measured from 0 (at the outer edge) to 1 which is the innermost point that can be represented
+//uniform bool gm_SDF_DrawGlow;                // whether the glow effect is enabled
+//uniform vec2 gm_SDF_Glow_MinMax;            // the SDF range across which the glow fades
+//uniform vec4 gm_SDF_Glow_Col;                // the colour of the glow
+//
+//uniform bool gm_SDF_DrawOutline;            // whether the outline effect is enabled
+//uniform float gm_SDF_Outline_Thresh;        // the SDF distance which represents the outer edge of the outline
+//uniform vec4 gm_SDF_Outline_Col;            // the colour of the outline
+//
+//uniform float gm_SDF_Core_Thresh;            // the SDF distance which represents the outer edge the shape
+//uniform vec4 gm_SDF_Core_Col;                // the colour of the core part of the shape
+//
+//void main()
+//{
+//    vec4 texcol = texture2D( gm_BaseTexture, v_vTexcoord );
+//        
+//    float pixelspread = fwidth(texcol.a);    
+//    pixelspread = max(pixelspread * 0.75, 0.001);    
+//    
+//    float blendfactor;
+//    vec4 currcol = vec4(0.0, 0.0, 0.0, -1.0);
+//    
+//    // Handle glow effect
+//    if (gm_SDF_DrawGlow)
+//    {        
+//        if (texcol.a > gm_SDF_Glow_MinMax.x)
+//        {
+//            currcol = gm_SDF_Glow_Col;
+//            currcol.a *= smoothstep(gm_SDF_Glow_MinMax.x, gm_SDF_Glow_MinMax.y, texcol.a);
+//        }
+//    }    
+//    
+//    // Handle outline effect
+//    if (gm_SDF_DrawOutline)
+//    {
+//        if (texcol.a > (gm_SDF_Outline_Thresh - pixelspread))
+//        {            
+//            blendfactor = smoothstep(gm_SDF_Outline_Thresh - pixelspread, gm_SDF_Outline_Thresh + pixelspread, texcol.a);
+//            if (currcol.a < 0.0)
+//            {
+//                currcol = vec4(gm_SDF_Outline_Col.r,gm_SDF_Outline_Col.g,gm_SDF_Outline_Col.b, 0.0);
+//            }
+//            currcol = mix(currcol, gm_SDF_Outline_Col, blendfactor);
+//        }
+//    }
+//    
+//    // Handle inner core
+//    blendfactor = smoothstep(gm_SDF_Core_Thresh - pixelspread, gm_SDF_Core_Thresh + pixelspread, texcol.a);
+//    
+//    if (currcol.a < 0.0)
+//    {
+//        currcol = vec4(gm_SDF_Core_Col.r,gm_SDF_Core_Col.g,gm_SDF_Core_Col.b, 0.0);
+//    }
+//    texcol = mix(currcol, gm_SDF_Core_Col, blendfactor);    
+//    
+//    vec4 combinedcol = v_vColour * texcol;
+//    DoAlphaTest(combinedcol);    
+//            
+//    gl_FragColor = combinedcol;
+//}

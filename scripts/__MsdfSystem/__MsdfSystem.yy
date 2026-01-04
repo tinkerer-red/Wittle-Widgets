@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__MsdfSystem",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__MsdfSystem",
+  "parent":{
+    "name":"(System)",
+    "path":"folders/_Libraries/MSDF/(System).yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

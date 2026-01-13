@@ -10,8 +10,8 @@
   "name":"oGUIController",
   "overriddenProperties":[],
   "parent":{
-    "name":"_system",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/_system.yy",
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
   },
   "parentObjectId":null,
   "persistent":false,

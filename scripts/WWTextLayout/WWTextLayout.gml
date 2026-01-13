@@ -15,9 +15,10 @@ function WWTextLayout() constructor {
 	layout_data.content_width = 0;
 	layout_data.content_height = 0;
 	
-	/// @func add_line(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped)
+	/// @func add_line(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment)
 	/// @desc Record a single laid-out line in the layout.
-	static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped) {
+	/// @param {Real} _alignment : 0=left (default), 1=center, 2=right
+	static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment = 0) {
 		var _data = layout_data;
 		var _lines = _data.lines;
 		
@@ -28,7 +29,8 @@ function WWTextLayout() constructor {
 			_width,
 			_height,
 			_yoff,
-			_force_wrapped
+			_force_wrapped,
+			_alignment
 		)
 		
 		// Update content bounds
@@ -56,7 +58,13 @@ function WWTextLayout() constructor {
 		Height,
 		Y_Offset,
 		Force_Wraped,
+		Alignment,
 		__Size__
+	}
+	enum __WW_Text_Alignment {
+		Left,
+		Center,
+		Right
 	}
 	
 	#region jsDoc
@@ -129,7 +137,6 @@ function WWTextLayout() constructor {
 
 		return _glyph_index;
 	};
-
 	enum __WW_Layout_Glyph {
 		Char,
 		Index,
@@ -214,7 +221,8 @@ function WWTextLayout() constructor {
 			width        : _lines[_index + __WW_Layout_Line.Width],
 			height       : _lines[_index + __WW_Layout_Line.Height],
 			y_offset     : _lines[_index + __WW_Layout_Line.Y_Offset],
-			force_wraped : _lines[_index + __WW_Layout_Line.Force_Wraped]
+			force_wraped : _lines[_index + __WW_Layout_Line.Force_Wraped],
+			alignment    : _lines[_index + __WW_Layout_Line.Alignment]
 		}
 		
 		return _line;
@@ -337,6 +345,65 @@ function WWTextLayout() constructor {
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
 		return _data.lines[_index + __WW_Layout_Line.Force_Wraped]
+	};
+	
+	#region jsDoc
+	/// @func    get_line_alignment(_line_index)
+	/// @desc    Returns the alignment for this line: 0=left, 1=center, 2=right.
+	/// @param   {Real} _line_index : Zero-based line index.
+	/// @returns {Real}
+	#endregion
+	static get_line_alignment = function(_line_index) {
+		var _data = layout_data;
+		
+		if (_line_index < 0 || _line_index >= _data.lines_count) {
+			return undefined;
+		}
+		
+		var _index = _line_index * __WW_Layout_Line.__Size__;
+		return _data.lines[_index + __WW_Layout_Line.Alignment]
+	};
+	
+	#region jsDoc
+	/// @func    get_line_x_offset(_line_index, _available_width)
+	/// @desc    Calculates the horizontal offset for a line based on its alignment.
+	///          Use this offset when rendering glyphs to apply alignment.
+	/// @param   {Real} _line_index : Zero-based line index.
+	/// @param   {Real} _available_width : The container width to align within.
+	/// @returns {Real} : X offset to add to all glyphs on this line (0 for left-aligned).
+	#endregion
+	static get_line_x_offset = function(_line_index, _available_width) {
+		var _data = layout_data;
+		
+		if (_line_index < 0 || _line_index >= _data.lines_count) {
+			return 0;
+		}
+		
+		var _base = _line_index * __WW_Layout_Line.__Size__;
+		var _alignment = _data.lines[_base + __WW_Layout_Line.Alignment];
+		var _line_width = _data.lines[_base + __WW_Layout_Line.Width];
+		
+		// 0 = left (default)
+		if (_alignment == __WW_Text_Alignment.Left) {
+			return 0;
+		}
+		
+		var _remaining_space = _available_width - _line_width;
+		if (_remaining_space <= 0) {
+			return 0;
+		}
+		
+		// 1 = center
+		if (_alignment == __WW_Text_Alignment.Center) {
+			return _remaining_space * 0.5;
+		}
+		
+		// 2 = right
+		if (_alignment == __WW_Text_Alignment.Right) {
+			return _remaining_space;
+		}
+		
+		return 0;
 	};
 	
 	#endregion
@@ -567,7 +634,69 @@ function WWTextLayout() constructor {
 		}
 		return -1;
 	};
+	
+	#region jsDoc
+	/// @func    apply_line_alignment()
+	/// @desc    Mutates glyph X positions in-place based on each line's alignment.
+	///          This must be called after all lines/glyphs are added, and before VB build.
+	/// @param   {Real} _available_width
+	/// @returns {Struct.WWTextLayout}
+	#endregion
+	static apply_line_alignment = function(_available_width) {
 
+	    if (is_undefined(_available_width)) { return self; }
+	    if (_available_width <= 0) { return self; }
+
+	    var _layout_data = layout_data;
+
+	    var _lines = _layout_data.lines;
+	    var _glyphs = _layout_data.glyphs;
+
+	    var _line_count = _layout_data.lines_count;
+	    var _glyph_count = _layout_data.glyphs_count;
+
+	    if (_line_count <= 0) { return self; }
+	    if (_glyph_count <= 0) { return self; }
+		
+	    var _line_index = 0;
+	    repeat (_line_count) {
+
+	        var _line_base = _line_index * __WW_Layout_Line.__Size__;
+
+	        var _line_start = _lines[_line_base + __WW_Layout_Line.Start_Index];
+	        var _line_end = _lines[_line_base + __WW_Layout_Line.End_Index];
+	        var _line_alignment = _lines[_line_base + __WW_Layout_Line.Alignment];
+			
+	        // Fast skip: left alignment
+	        if (_line_alignment == __WW_Text_Alignment.Left) {
+	            _line_index += 1;
+	            continue;
+	        }
+			
+			var _xoff = get_line_x_offset(_line_index, _available_width);
+			
+			if (_xoff != 0) {
+				var _count = _line_end - _line_start;
+				var _glyph_base = _line_start * __WW_Layout_Glyph.__Size__;
+				repeat(_count) {
+					
+					var _char_val = _glyphs[_glyph_base + __WW_Layout_Glyph.Char];
+
+	                // Do not move control glyphs
+	                if (_char_val != "\n" && _char_val != "\r" && _char_val != "") {
+	                    _glyphs[_glyph_base + __WW_Layout_Glyph.X] += _xoff;
+	                }
+					
+					_glyph_base += __WW_Layout_Glyph.__Size__;
+				}
+			}
+			
+	        _line_index += 1;
+	    }
+
+	    return self;
+	};
+	
 	#endregion
 	
 }

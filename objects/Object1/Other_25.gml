@@ -682,6 +682,7 @@ build_ui_inline_test = function(){
 }
 
 build_ui_text_boxes = function(){
+
 	// Root GUI
 	root = new WWCore()
 	    .set_offset(0, 0)
@@ -689,270 +690,471 @@ build_ui_text_boxes = function(){
 	    .set_background_color(c_black)
 	    .set_enabled(true);
 
-	// -------------------------------------------------------------
-	// Theme (higher contrast, less "flat grey")
-	// -------------------------------------------------------------
-	var _page_bg = make_color_rgb(16, 16, 18);
+	#region Theme
 
-	var _card_bg = make_color_rgb(46, 46, 52);
-	var _card_hdr = make_color_rgb(34, 34, 38);
+		var _page_bg = make_color_rgb(16, 16, 18);
 
-	var _textbox_bg = make_color_rgb(24, 24, 26);
+		var _card_bg = make_color_rgb(46, 46, 52);
+		var _card_hdr = make_color_rgb(34, 34, 38);
 
-	var _subtitle_color = make_color_rgb(180, 180, 190);
-	var _caption_color = make_color_rgb(220, 220, 230);
+		var _textbox_bg = make_color_rgb(24, 24, 26);
 
-	var _footer_bg = make_color_rgb(34, 34, 38);
-	var _footer_color = make_color_rgb(200, 200, 210);
+		var _subtitle_color = make_color_rgb(180, 180, 190);
+		var _caption_color = make_color_rgb(220, 220, 230);
 
-	// -------------------------------------------------------------
-	// Page backdrop
-	// -------------------------------------------------------------
-	var _page_backdrop = new WWCore()
-	    .set_offset(12, 12)
-	    .set_size(1256, 696)
-	    .set_background_color(_page_bg);
-	root.add(_page_backdrop);
+		var _footer_bg = make_color_rgb(34, 34, 38);
+		var _footer_color = make_color_rgb(200, 200, 210);
 
-	// -------------------------------------------------------------
-	// Title + Subheader
-	// -------------------------------------------------------------
-	var _title_label = new WWLabel()
-	    .set_offset(24, 14)
-	    .set_size(1232, 30)
-	    .set_text("WWTextBoxV3 Demo - 4 configurations")
-	    .set_text_color(c_white)
-	    .set_text_font(fGUIDefaultBig);
-	root.add(_title_label);
+	#endregion
 
-	var _subtitle_label = new WWLabel()
-	    .set_offset(24, 46)
-	    .set_size(1232, 20)
-	    .set_text("Selection, wrapping, fonts, and color themes. Each box is interactive.")
-	    .set_text_color(_subtitle_color);
-	root.add(_subtitle_label);
+	#region Page backdrop
 
-	// -------------------------------------------------------------
-	// Layout constants
-	// -------------------------------------------------------------
-	var _margin_left = 24;
-	var _margin_top = 88;
-	var _gap_x = 18;
-	var _gap_y = 18;
+		var _page_backdrop = new WWCore()
+		    .set_offset(12, 12)
+		    .set_size(1256, 696)
+		    .set_background_color(_page_bg);
+		root.add(_page_backdrop);
 
-	var _panel_width = 600;
-	var _panel_height = 300;
+	#endregion
 
-	var _panel1_x = _margin_left;
-	var _panel1_y = _margin_top;
+	#region Title + Subheader
 
-	var _panel2_x = _margin_left + _panel_width + _gap_x;
-	var _panel2_y = _margin_top;
+		var _title_label = new WWLabel()
+		    .set_offset(24, 14)
+		    .set_size(1232, 30)
+		    .set_text("WWTextBoxV3 Demo - Renderer Pairs")
+		    .set_text_color(c_white)
+		    .set_text_font(fnt_ww_default_big);
+		root.add(_title_label);
 
-	var _panel3_x = _margin_left;
-	var _panel3_y = _margin_top + _panel_height + _gap_y;
+		var _subtitle_label = new WWLabel()
+		    .set_offset(24, 46)
+		    .set_size(1232, 20)
+		    .set_text("Each panel: left is Base (input), right is a target renderer. Checkboxes toggle each box.")
+		    .set_text_color(_subtitle_color);
+		root.add(_subtitle_label);
 
-	var _panel4_x = _margin_left + _panel_width + _gap_x;
-	var _panel4_y = _margin_top + _panel_height + _gap_y;
+	#endregion
 
-	// Card geometry
-	var _card_pad = 12;
-	var _header_height = 26;
-	var _textbox_inset = 12;
+	#region Layout constants
 
-	var _card_width = _panel_width + (_card_pad * 2);
-	var _card_height = _panel_height + (_card_pad * 2);
+		var _margin_left = 24;
+		var _margin_top = 88;
+		var _gap_x = 18;
+		var _gap_y = 18;
 
-	var _textbox_xoff = _textbox_inset;
-	var _textbox_yoff = _header_height + _textbox_inset;
+		var _panel_width = 600;
+		var _panel_height = 190;
 
-	var _textbox_width = _card_width - (_textbox_inset * 2);
-	var _textbox_height = _card_height - _header_height - (_textbox_inset * 2);
+		var _card_pad = 12;
+		var _header_height = 26;
+		var _textbox_inset = 12;
 
-	// -------------------------------------------------------------
-	// Panel 1
-	// -------------------------------------------------------------
-	var _card1 = new WWCore()
-	    .set_offset(_panel1_x - _card_pad, _panel1_y - _card_pad)
-	    .set_size(_card_width, _card_height)
-	    .set_background_color(_card_bg);
-	root.add(_card1);
+		var _card_width = _panel_width + (_card_pad * 2);
+		var _card_height = _panel_height + (_card_pad * 2);
 
-	var _card1_hdr = new WWCore()
-	    .set_offset(_panel1_x - _card_pad, _panel1_y - _card_pad)
-	    .set_size(_card_width, _header_height)
-	    .set_background_color(_card_hdr);
-	root.add(_card1_hdr);
+		var _textbox_xoff = _textbox_inset;
+		var _textbox_yoff = _header_height + _textbox_inset;
 
-	var _caption_1 = new WWLabel()
-	    .set_offset(_panel1_x - _card_pad + 10, _panel1_y - _card_pad + 5)
-	    .set_size(_card_width - 20, _header_height)
-	    .set_text("1) No wrap - short text, fast caret movement")
-	    .set_text_color(_caption_color);
-	root.add(_caption_1);
+		var _content_width = _card_width - (_textbox_inset * 2);
+		var _content_height = _card_height - _header_height - (_textbox_inset * 2);
 
-	var _text_1 =
-		"Quick input, no wrapping.\n" +
-		"Try arrow keys, selection, and backspace.\n\n" +
-		"Tip: This is perfect for chat or command bars";
+		var _textbox_gap = 10;
+		var _half_width = floor((_content_width - _textbox_gap) * 0.5);
 
-	var _textbox_1 = new WWTextBoxV3()
-	    .set_offset(_panel1_x - _card_pad + _textbox_xoff, _panel1_y - _card_pad + _textbox_yoff)
-	    .set_size(_textbox_width, _textbox_height)
-	    .set_background_color(_textbox_bg)
-	    .set_text(_text_1)
-	    .set_text_color(c_white)
-	    .set_highlight_color(c_aqua)
-	    .set_cursor_color(c_white)
-	    .set_wrap_enabled(false);
-	root.add(_textbox_1);
+	#endregion
 
-	// -------------------------------------------------------------
-	// Panel 2
-	// -------------------------------------------------------------
-	var _card2 = new WWCore()
-	    .set_offset(_panel2_x - _card_pad, _panel2_y - _card_pad)
-	    .set_size(_card_width, _card_height)
-	    .set_background_color(_card_bg);
-	root.add(_card2);
+	#region Panel positions (3 rows x 2 cols)
 
-	var _card2_hdr = new WWCore()
-	    .set_offset(_panel2_x - _card_pad, _panel2_y - _card_pad)
-	    .set_size(_card_width, _header_height)
-	    .set_background_color(_card_hdr);
-	root.add(_card2_hdr);
+		var _panel1_x = _margin_left;
+		var _panel1_y = _margin_top;
 
-	var _caption_2 = new WWLabel()
-	    .set_offset(_panel2_x - _card_pad + 10, _panel2_y - _card_pad + 5)
-	    .set_size(_card_width - 20, _header_height)
-	    .set_text("2) Wrap enabled - paragraph formatting")
-	    .set_text_color(_caption_color);
-	root.add(_caption_2);
+		var _panel2_x = _margin_left + _panel_width + _gap_x;
+		var _panel2_y = _margin_top;
 
-	var _text_2 =
-		"Word wrap is enabled here. Type a long sentence and watch the layout rebuild.\n\n" +
-		"This mode is ideal for notes, rich text, and long descriptions.";
+		var _panel3_x = _margin_left;
+		var _panel3_y = _margin_top + _panel_height + _gap_y;
 
-	var _textbox_2 = new WWTextBoxV3()
-	    .set_offset(_panel2_x - _card_pad + _textbox_xoff, _panel2_y - _card_pad + _textbox_yoff)
-	    .set_size(_textbox_width, _textbox_height)
-	    .set_background_color(_textbox_bg)
-	    .set_text(_text_2)
-	    .set_text_color(c_white)
-	    .set_highlight_color(c_lime)
-	    .set_cursor_color(c_white)
-	    .set_wrap_enabled(true);
-	root.add(_textbox_2);
+		var _panel4_x = _margin_left + _panel_width + _gap_x;
+		var _panel4_y = _margin_top + _panel_height + _gap_y;
 
-	// -------------------------------------------------------------
-	// Panel 3
-	// -------------------------------------------------------------
-	var _card3 = new WWCore()
-	    .set_offset(_panel3_x - _card_pad, _panel3_y - _card_pad)
-	    .set_size(_card_width, _card_height)
-	    .set_background_color(_card_bg);
-	root.add(_card3);
+		var _panel5_x = _margin_left;
+		var _panel5_y = _margin_top + (_panel_height + _gap_y) * 2;
 
-	var _card3_hdr = new WWCore()
-	    .set_offset(_panel3_x - _card_pad, _panel3_y - _card_pad)
-	    .set_size(_card_width, _header_height)
-	    .set_background_color(_card_hdr);
-	root.add(_card3_hdr);
-	
-	var _caption_3 = new WWLabel()
-	    .set_offset(_panel3_x - _card_pad + 10, _panel3_y - _card_pad + 5)
-	    .set_size(_card_width - 20, _header_height)
-	    .set_text("3) Code editor - wrap off, tabs, indentation")
-	    .set_text_color(_caption_color);
-	root.add(_caption_3);
-	
-	var _text_3 =
-	    "function demo_example() {\n" +
-	    "\tvar _counter_value = 0;          //underline this line uses a normal underline\n" +
-	    "\tvar _message_text = \"Hello from WWTextBoxV3\";\n\n" +
-	    "\tif (_counter_value == 0) {        //warn this branch is suspicious\n" +
-	    "\t\t_message_text += \" - ready\";\n" +
-	    "\t}\n\n" +
-	    "\tif (_counter_value < 0) {         //error this should never happen\n" +
-	    "\t\t_message_text = undefined;\n" +
-	    "\t}\n\n" +
-	    "\t// Try selecting across lines and deleting.\n" +
-	    "\treturn _message_text;             //err forced error underline test\n" +
-	    "}\n";
-	
-	var _textbox_3 = new WWTextBoxV3()
-	    .set_offset(_panel3_x - _card_pad + _textbox_xoff, _panel3_y - _card_pad + _textbox_yoff)
-	    .set_size(_textbox_width, _textbox_height)
-	    .set_background_color(#222222)
-	    .set_text_font(fnt_consolas_10)
-	    .set_text(_text_3)
-	    .set_text_color(c_white)
-	    .set_highlight_color(#78848A)
-	    .set_cursor_color(c_white)
-	    .set_wrap_enabled(false);
-	
-	ww_apply_demo_syntax_to_textbox(_textbox_3);
-	
-	root.add(_textbox_3);
-	
-	
-	// -------------------------------------------------------------
-	// Panel 4
-	// -------------------------------------------------------------
-	var _card4 = new WWCore()
-	    .set_offset(_panel4_x - _card_pad, _panel4_y - _card_pad)
-	    .set_size(_card_width, _card_height)
-	    .set_background_color(_card_bg);
-	root.add(_card4);
+		var _panel6_x = _margin_left + _panel_width + _gap_x;
+		var _panel6_y = _margin_top + (_panel_height + _gap_y) * 2;
 
-	var _card4_hdr = new WWCore()
-	    .set_offset(_panel4_x - _card_pad, _panel4_y - _card_pad)
-	    .set_size(_card_width, _header_height)
-	    .set_background_color(_card_hdr);
-	root.add(_card4_hdr);
+	#endregion
 
-	var _caption_4 = new WWLabel()
-	    .set_offset(_panel4_x - _card_pad + 10, _panel4_y - _card_pad + 5)
-	    .set_size(_card_width - 20, _header_height)
-	    .set_text("4) Styled - different font/theme, wrap on")
-	    .set_text_color(_caption_color);
-	root.add(_caption_4);
+	#region Demo texts
 
-	var _text_4 =
-		"Styled demo:\n" +
-		"- Different highlight color\n" +
-		"- Different background color\n" +
-		"- Wrap enabled for comfortable reading\n\n" +
-		"Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-		"Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n\n" +
-		"Try pasting a big chunk of text here.";
+		var _text_base =
+			"Base input on the left.\n" +
+			"Type here and the right side mirrors.\n\n" +
+			"Try selection, backspace, and multi-line edits.\n";
 
-	var _textbox_4 = new WWTextBoxV3()
-	    .set_offset(_panel4_x - _card_pad + _textbox_xoff, _panel4_y - _card_pad + _textbox_yoff)
-	    .set_size(_textbox_width, _textbox_height)
-	    .set_background_color(make_color_rgb(22, 22, 30))
-	    .set_text(_text_4)
-	    .set_text_color(c_white)
-	    .set_highlight_color(c_fuchsia)
-	    .set_cursor_color(c_white)
-	    .set_wrap_enabled(true);
-	root.add(_textbox_4);
+		var _text_advanced =
+			"Advanced demo input:\n" +
+			"Tabs:\n" +
+			"\tOne\n" +
+			"\tTwo\n\n" +
+			"Whitespace markers and underline runs should be visible on the right.\n";
 
-	// -------------------------------------------------------------
-	// Footer
-	// -------------------------------------------------------------
-	var _footer_back = new WWCore()
-	    .set_offset(24, 684)
-	    .set_size(1232, 24)
-	    .set_background_color(_footer_bg);
-	root.add(_footer_back);
+		var _text_scribble =
+			"Scribble-ish input idea:\n" +
+			"[color=#ffcc00]Colored[/color] [b]Bold[/b] [i]Italic[/i]\n" +
+			"Underlines: [u]line[/u]\n";
 
-	var _footer_label = new WWLabel()
-	    .set_offset(34, 688)
-	    .set_size(1212, 18)
-	    .set_text("Hint: Shift+Arrow selects. Test Backspace/Delete near wraps. Tabs are preserved in the code sample.")
-	    .set_text_color(_footer_color);
-	root.add(_footer_label);
+		var _text_bbcode =
+		    "Godot-style BBCode demo:\n" +
+		    "\n" +
+		    "[b]Bold text[/b]\n" +
+		    "[i]Italic text[/i]\n" +
+		    "[u]Underlined text[/u]\n" +
+		    "[warn]Warning underline[/warn]\n" +
+		    "[err]Error underline[/err]\n" +
+		    "\n" +
+		    "[color=#66ccff]Colored text (#66ccff)[/color]\n" +
+		    "[color=#ff6666]Another color (#ff6666)[/color]\n" +
+		    "[alpha=0.5]Half alpha text[/alpha]\n" +
+		    "[size=1.5]Scaled text (1.5x)[/size]\n" +
+		    "\n" +
+		    "[url]URL styled text[/url]\n" +
+		    "[url=https://example.com]URL with target[/url]\n" +
+		    "\n" +
+		    "[code]var x = 10;\nvar y = x * 2;[/code]\n" +
+		    "\n" +
+		    "Line break test:[br]Second line after br\n" +
+		    "\n" +
+		    "Paragraph test:[p]New paragraph starts here\n" +
+		    "\n" +
+		    "[left]Left aligned text[/left]\n" +
+		    "[center]Centered text[/center]\n" +
+		    "[right]Right aligned text[/right]\n";
+
+
+			var _text_markdown =
+			    "Markdown feature demo:\n" +
+			    "\n" +
+			    "# H1 Heading\n" +
+			    "## H2 Heading\n" +
+			    "### H3 Heading\n" +
+			    "\n" +
+			    "Normal text with **bold**, *italic*, **bold *italic inside* bold**, and ~~strikethrough~~.\n" +
+			    "\n" +
+			    "> Blockquote line 1\n" +
+			    "> Blockquote line 2\n" +
+			    ">\n" +
+			    "> Blockquote with **bold** and `inline_code`.\n" +
+			    "\n" +
+			    "Ordered list:\n" +
+			    "1. First item\n" +
+			    "2. Second item\n" +
+			    "3. Third item\n" +
+			    "\n" +
+			    "Unordered list:\n" +
+			    "- First item\n" +
+			    "- Second item\n" +
+			    "- Third item\n" +
+			    "\n" +
+			    "Task list:\n" +
+			    "- [x] Write the press release\n" +
+			    "- [ ] Update the website\n" +
+			    "- [ ] Contact the media\n" +
+			    "\n" +
+			    "Link: [Example](https://www.example.com)\n" +
+			    "Image: ![Alt text](image.jpg)\n" +
+			    "\n" +
+			    "---\n" +
+			    "\n" +
+			    "Table:\n" +
+			    "| Syntax | Description |\n" +
+			    "| ----------- | ----------- |\n" +
+			    "| Header | Title |\n" +
+			    "| Paragraph | Text |\n" +
+			    "\n" +
+			    "Fenced code block:\n" +
+			    "```\n" +
+			    "{\n" +
+			    "  \"firstName\": \"John\",\n" +
+			    "  \"lastName\": \"Smith\",\n" +
+			    "  \"age\": 25\n" +
+			    "}\n" +
+			    "```\n";
+
+
+		var _text_gml =
+			"function demo_example() {\n" +
+			"\tvar _counter_value = 0;\n" +
+			"\tvar _message_text = \"Hello\";\n\n" +
+			"\tif (_counter_value == 0) {\n" +
+			"\t\t_message_text += \" - ready\";\n" +
+			"\t}\n\n" +
+			"\treturn _message_text;\n" +
+			"}\n";
+
+	#endregion
+
+	#region Panel helper context
+
+		var _panel_ctx = {
+			root_ref: root,
+
+			card_bg: _card_bg,
+			card_hdr: _card_hdr,
+			caption_color: _caption_color,
+			text_bg: _textbox_bg,
+
+			card_pad: _card_pad,
+			card_width: _card_width,
+			card_height: _card_height,
+
+			header_height: _header_height,
+			text_xoff: _textbox_xoff,
+			text_yoff: _textbox_yoff,
+
+			content_height: _content_height,
+			half_width: _half_width,
+			text_gap: _textbox_gap
+		};
+
+		#region jsDoc
+		/// @func   _panel_make_pair(_panel_x, _panel_y, _title_text, _left_text, _left_setup_fn, _right_setup_fn)
+		/// @desc   Builds one panel containing two textboxes (left + right) and two checkboxes.
+		///         Left drives right via on_text_change.
+		///         Renderers are assigned explicitly via set_renderer().
+		#endregion
+		var _panel_make_pair = method(_panel_ctx, function(
+			_panel_x,
+			_panel_y,
+			_title_text,
+			_left_text,
+			_left_setup_fn,
+			_right_setup_fn
+		) {
+			var _root = root_ref;
+
+			var _card_back = new WWCore()
+			    .set_offset(_panel_x - card_pad, _panel_y - card_pad)
+			    .set_size(card_width, card_height)
+			    .set_background_color(card_bg);
+			_root.add(_card_back);
+
+			var _card_hdr_back = new WWCore()
+			    .set_offset(_panel_x - card_pad, _panel_y - card_pad)
+			    .set_size(card_width, header_height)
+			    .set_background_color(card_hdr);
+			_root.add(_card_hdr_back);
+
+			var _caption_label = new WWLabel()
+			    .set_offset(_panel_x - card_pad + 10, _panel_y - card_pad + 5)
+			    .set_size(card_width - 20, header_height)
+			    .set_text(_title_text)
+			    .set_text_color(caption_color);
+			_root.add(_caption_label);
+
+			var _left_x = _panel_x - card_pad + text_xoff;
+			var _left_y = _panel_y - card_pad + text_yoff;
+
+			var _right_x = _left_x + half_width + text_gap;
+			var _right_y = _left_y;
+
+			var _textbox_left = new WWTextBoxV3()
+			    .set_offset(_left_x, _left_y)
+			    .set_size(half_width, content_height)
+			    .set_background_color(text_bg)
+			    .set_text(_left_text)
+			    .set_text_color(c_white)
+			    .set_highlight_color(#78848A)
+			    .set_cursor_color(c_white)
+			    .set_wrap_enabled(true);
+
+			var _textbox_right = new WWTextBoxV3()
+			    .set_offset(_right_x, _right_y)
+			    .set_size(half_width, content_height)
+			    .set_background_color(text_bg)
+			    .set_text(_left_text)
+			    .set_text_color(c_white)
+			    .set_highlight_color(#78848A)
+			    .set_cursor_color(c_white)
+			    .set_wrap_enabled(true);
+			
+			//_textbox_right.is_focusable = false;
+			
+			if (is_callable(_left_setup_fn)) {
+				_left_setup_fn(_textbox_left);
+			}
+			if (is_callable(_right_setup_fn)) {
+				_right_setup_fn(_textbox_right);
+			}
+			
+			// Live mirroring: left -> right
+			_textbox_left.on_change(method({ left_ref: _textbox_left, right_ref: _textbox_right }, function() {
+				right_ref.set_text(left_ref.get_text());
+			}));
+			
+			_root.add(_textbox_left);
+			_root.add(_textbox_right);
+
+			var _checkbox_size = 18;
+
+			var _checkbox_left = new WWCheckbox()
+			    .set_offset((_panel_x - card_pad) + (card_width - 10 - (_checkbox_size * 2) - 8), (_panel_y - card_pad) + 4)
+			    .set_size(_checkbox_size, _checkbox_size)
+			    .set_value(true)
+			    .set_callback(method({ textbox_ref: _textbox_left }, function(_is_checked) {
+			    	textbox_ref.set_active(_is_checked);
+			    }));
+
+			var _checkbox_right = new WWCheckbox()
+			    .set_offset((_panel_x - card_pad) + (card_width - 10 - _checkbox_size), (_panel_y - card_pad) + 4)
+			    .set_size(_checkbox_size, _checkbox_size)
+			    .set_value(true)
+			    .set_callback(method({ textbox_ref: _textbox_right }, function(_is_checked) {
+			    	textbox_ref.set_active(_is_checked);
+			    }));
+
+			_root.add(_checkbox_left);
+			_root.add(_checkbox_right);
+			
+			return {
+				text_left: _textbox_left,
+				text_right: _textbox_right,
+				check_left: _checkbox_left,
+				check_right: _checkbox_right
+			};
+		});
+
+	#endregion
+
+	#region Panels
+
+		// Panel 1: Base -> Base (right wraps on)
+		_panel_make_pair(
+			_panel1_x,
+			_panel1_y,
+			"1) Base -> Base (mirror, different wrap)",
+			_text_base,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(true);
+			}
+		);
+
+		// Panel 2: Base -> Advanced (renderer owns advanced-only features)
+		_panel_make_pair(
+			_panel2_x,
+			_panel2_y,
+			"2) Base -> Advanced (whitespace, font, underline demo)",
+			_text_advanced,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(true);
+				
+				// Font is a textbox concern, keep it here
+				_textbox_instance.set_text_font(fnt_ww_consolas_10);
+				
+				// Advanced-only toggles live on the renderer instance now
+				var _renderer = _textbox_instance.get_renderer();
+				_renderer.set_whitespace_visible(true);
+				_renderer.set_whitespace_alpha(0.45);
+				
+				// If you want to demo underline runs, do it via the renderer too:
+				// _renderer.set_format_range(... underline ...)
+			}
+		);
+
+		// Panel 3: Base -> Scribble (wire renderer when ready)
+		_panel_make_pair(
+			_panel3_x,
+			_panel3_y,
+			"3) Base -> Scribble",
+			_text_scribble,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				//_textbox_instance.set_renderer(WWTextRendererScribble);
+				//_textbox_instance.set_wrap_enabled(true);
+			}
+		);
+
+		// Panel 4: Base -> BBCode
+		_panel_make_pair(
+			_panel4_x,
+			_panel4_y,
+			"4) Base -> BBCode",
+			_text_bbcode,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBBCode);
+				_textbox_instance.set_wrap_enabled(true);
+			}
+		);
+
+		// Panel 5: Base -> Markdown (wire renderer when ready)
+		_panel_make_pair(
+			_panel5_x,
+			_panel5_y,
+			"5) Base -> Markdown",
+			_text_markdown,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererMarkdown);
+				_textbox_instance.set_wrap_enabled(true);
+			}
+		);
+
+		// Panel 6: Base -> GML (wire renderer when ready)
+		_panel_make_pair(
+			_panel6_x,
+			_panel6_y,
+			"6) Base -> GML",
+			_text_gml,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+				_textbox_instance.set_text_font(fnt_ww_consolas_10);
+			},
+			function(_textbox_instance) {
+				//_textbox_instance.set_renderer(WWTextRendererGML);
+				_textbox_instance.set_wrap_enabled(false);
+				_textbox_instance.set_text_font(fnt_ww_consolas_10);
+			}
+		);
+
+	#endregion
+
+	#region Footer
+
+		var _footer_back = new WWCore()
+		    .set_offset(24, 684)
+		    .set_size(1232, 24)
+		    .set_background_color(_footer_bg);
+		root.add(_footer_back);
+
+		var _footer_label = new WWLabel()
+		    .set_offset(34, 688)
+		    .set_size(1212, 18)
+		    .set_text("Left drives right. Renderers are assigned explicitly via set_renderer().")
+		    .set_text_color(_footer_color);
+		root.add(_footer_label);
+
+	#endregion
 };
-
-

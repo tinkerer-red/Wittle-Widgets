@@ -1,6 +1,6 @@
 #region jsDoc
 /// @func    WWTextRendererBase()
-/// @desc    Unified text renderer component. Responsible for:
+/// @desc    Basic text renderer component. Responsible for:
 ///          - Text source (textbox buffer or caption)
 ///          - Layout build (lines + glyphs)
 ///          - Metrics + hit testing helpers
@@ -8,8 +8,8 @@
 ///          Does NOT implement markup parsing or diagnostics underlines.
 /// @returns {Struct.WWTextRendererBase}
 #endregion
-function WWTextRendererBase() : WWCore() constructor {
-    debug_name = "WWTextRendererBase";
+function WWTextRendererCore() : WWCore() constructor {
+    debug_name = "WWTextRendererCore";
 
     #region Public
 
@@ -23,7 +23,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 ///         is no text in the buffer, or when the renderer is used
                 ///         for static labels.
                 /// @param  {String} _text
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_caption = function(_text) {
                     var _new_text = string(_text);
@@ -43,7 +43,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_font()
                 /// @desc   Sets the font used for rendering. Also marks layout dirty.
                 /// @param  {Asset.GMFont} _font_asset
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_font = function(_font_asset) {
                     if (font == _font_asset) {
@@ -58,7 +58,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_font_fallbacks()
                 /// @desc   Sets an ordered list of fallback fonts (highest priority first).
                 /// @param  {Array<Asset.GMFont>} _font_array
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_font_fallbacks = function(_font_array) {
                     font_fallbacks = _font_array;
@@ -70,7 +70,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_text_color()
                 /// @desc   Sets the color used to render text.
                 /// @param  {Constant.Color} _color_value
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_text_color = function(_color_value) {
                     if (color == _color_value) {
@@ -85,7 +85,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_text_alpha()
                 /// @desc   Sets the alpha used to render text.
                 /// @param  {Real} _alpha_value
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_text_alpha = function(_alpha_value) {
                     if (alpha == _alpha_value) {
@@ -104,7 +104,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_wrap_enabled()
                 /// @desc   Sets if word wrapping is enabled.
                 /// @param  {Bool} _should_wrap
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_wrap_enabled = function(_should_wrap) {
                     should_wrap = _should_wrap;
@@ -116,7 +116,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_line_sep()
                 /// @desc   Sets the extra spacing between wrapped lines (in pixels).
                 /// @param  {Real} _line_sep_pixels
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_line_sep = function(_line_sep_pixels) {
                     line_sep = _line_sep_pixels;
@@ -128,7 +128,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_tab_size_spaces()
                 /// @desc   Sets how many spaces per tab stop (usually 2 or 4).
                 /// @param  {Real} _space_count
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_tab_size_spaces = function(_space_count) {
                     var _space_count_int = floor(_space_count);
@@ -147,7 +147,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_tab_use_stops()
                 /// @desc   If enabled, a tab advances to the next tab stop.
                 /// @param  {Bool} _use_stops
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_tab_use_stops = function(_use_stops) {
                     if (tab_use_stops == _use_stops) {
@@ -159,42 +159,6 @@ function WWTextRendererBase() : WWCore() constructor {
                     return self;
                 };
 				
-				#region Whitespace visibility
-					
-		            whitespace_visible = false;
-		            whitespace_color = c_gray;
-		            whitespace_alpha = 0.35;
-		            whitespace_marker_space = ".";
-		            whitespace_marker_tab = ">";
-
-		            static set_whitespace_visible = function(_is_visible) {
-		                if (whitespace_visible == _is_visible) {
-		                    return self;
-		                }
-		                whitespace_visible = _is_visible;
-		                __mark_vb_dirty__();
-		                return self;
-		            };
-
-		            static set_whitespace_color = function(_color_value) {
-		                if (whitespace_color == _color_value) {
-		                    return self;
-		                }
-		                whitespace_color = _color_value;
-		                __mark_vb_dirty__();
-		                return self;
-		            };
-
-		            static set_whitespace_alpha = function(_alpha_value) {
-		                if (whitespace_alpha == _alpha_value) {
-		                    return self;
-		                }
-		                whitespace_alpha = _alpha_value;
-		                __mark_vb_dirty__();
-		                return self;
-		            };
-
-		        #endregion
             #endregion
 
         #endregion
@@ -219,165 +183,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 __draw_text_vb__(x, y);
             });
 
-        
-            #region Markup / formatting options
-
-                #region jsDoc
-                /// @func    set_formatting_enabled()
-                /// @desc    Enable or disable per-glyph formatting (style/size/font overrides).
-                /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_formatting_enabled = function(_enabled) {
-
-                    _enabled = (_enabled == true);
-
-                    if (formatting_enabled == _enabled) {
-                        return self;
-                    }
-
-                    formatting_enabled = _enabled;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-            #endregion
-
-            #region Whitespace visualization
-
-                #region jsDoc
-                /// @func    set_whitespace_visible()
-                /// @desc    Toggle visualization of spaces/tabs using marker glyphs.
-                /// @param   {Bool} _visible
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_visible = function(_visible) {
-
-                    _visible = (_visible == true);
-
-                    if (whitespace_visible == _visible) {
-                        return self;
-                    }
-
-                    whitespace_visible = _visible;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_whitespace_markers()
-                /// @desc    Set marker characters used for space and tab.
-                /// @param   {String} _space_marker
-                /// @param   {String} _tab_marker
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_markers = function(_space_marker, _tab_marker) {
-
-                    if (is_string(_space_marker) && string_length(_space_marker) > 0) {
-                        whitespace_marker_space = string_char_at(_space_marker, 1);
-                    }
-
-                    if (is_string(_tab_marker) && string_length(_tab_marker) > 0) {
-                        whitespace_marker_tab = string_char_at(_tab_marker, 1);
-                    }
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_whitespace_color()
-                /// @desc    Set whitespace marker color and alpha.
-                /// @param   {Real} _color_value
-                /// @param   {Real} _alpha_value
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_color = function(_color_value, _alpha_value=undefined) {
-
-                    whitespace_color = _color_value;
-
-                    if (!is_undefined(_alpha_value)) {
-                        whitespace_alpha = _alpha_value;
-                    }
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-            #endregion
-
-            #region Underline options
-
-                #region jsDoc
-                /// @func    set_underline_enabled()
-                /// @desc    Enable or disable underline rendering.
-                /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_enabled = function(_enabled) {
-
-                    _enabled = (_enabled == true);
-
-                    if (underline_enabled == _enabled) {
-                        return self;
-                    }
-
-                    underline_enabled = _enabled;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_offset()
-                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
-                /// @param   {Real} _offset
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_offset = function(_offset) {
-
-                    underline_y_offset = _offset;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_thickness()
-                /// @desc    Set thickness for plain underline in pixels.
-                /// @param   {Real} _thickness
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_thickness = function(_thickness) {
-
-                    underline_thickness = _thickness;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_sprites()
-                /// @desc    Set sprites used for underline styles.
-                /// @param   {Asset.GMSprite} _sprite_white
-                /// @param   {Asset.GMSprite} _sprite_warning
-                /// @param   {Asset.GMSprite} _sprite_error
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
-
-                    underline_sprite_white = _sprite_white;
-                    underline_sprite_warning = _sprite_warning;
-                    underline_sprite_error = _sprite_error;
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-            #endregion
-#endregion
+        #endregion
 
         #region Variables
 
@@ -388,24 +194,6 @@ function WWTextRendererBase() : WWCore() constructor {
             color = c_white;
             alpha = 1;
 
-
-            // Formatting / diagnostics (optional)
-            formatting_enabled = true;
-
-            // Whitespace visualization
-            whitespace_visible = false;
-            whitespace_marker_space = ".";
-            whitespace_marker_tab = ">";
-            whitespace_color = c_gray;
-            whitespace_alpha = 0.5;
-
-            // Underlines
-            underline_enabled = true;
-            underline_y_offset = 0;
-            underline_thickness = 1;
-            underline_sprite_white = spr_ww_pixel;
-            underline_sprite_warning = spr_ww_underline_warning;
-            underline_sprite_error = spr_ww_underline_error;
             // Layout
             should_wrap = false;
             line_sep = -1;
@@ -1849,355 +1637,41 @@ function WWTextRendererBase() : WWCore() constructor {
 
         #endregion
 
-        
-        #region VB emit styled glyph
-
-            static __vb_emit_glyph_styled_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp, _size_mul, _style) {
-
-                if (_char == "" || is_undefined(_font_data)) {
-                    return false;
-                }
-
-                if (_size_mul <= 0) {
-                    return false;
-                }
-
-                var _glyph_info = _font_data.info.glyphs[$ _char];
-                if (is_undefined(_glyph_info)) {
-                    return false;
-                }
-
-                var _gx = _glyph_info.x;
-                var _gy = _glyph_info.y;
-                var _gw = _glyph_info.w;
-                var _gh = _glyph_info.h;
-
-                if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
-                    return false;
-                }
-
-                var _uv_w = texture_get_texel_width(_font_data.tex);
-                var _uv_h = texture_get_texel_height(_font_data.tex);
-
-                var _u0 = _gx * _uv_w;
-                var _v0 = _gy * _uv_h;
-                var _u1 = (_gx + _gw) * _uv_w;
-                var _v1 = (_gy + _gh) * _uv_h;
-
-                var _xoff = _glyph_info.offset * _size_mul;
-                var _yoff = _glyph_info.yoffset * _size_mul;
-
-                var _w = _gw * _size_mul;
-                var _h = _gh * _size_mul;
-
-                var _x0 = floor(_pos_x + _xoff);
-                var _y0 = floor(_pos_y + _yoff);
-                var _x1 = floor(_x0 + _w);
-                var _y1 = floor(_y0 + _h);
-
-                var _italic = ((_style == __WW_Text_Glyph_Style.Italic) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
-
-                var _slant_top = 0;
-                var _slant_bottom = 0;
-
-                if (_italic) {
-                    _slant_top = 2 * _size_mul;
-                    _slant_bottom = -1 * _size_mul;
-                }
-
-                vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                vertex_position(_vb_buffer, floor(_x1 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u1, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                vertex_position(_vb_buffer, floor(_x0 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u0, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
-
-                var _bold = ((_style == __WW_Text_Glyph_Style.Bold) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
-
-                if (_bold) {
-
-                    var _bold_offset = 1 * _size_mul;
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-                }
-
-                return true;
-            };
-
-        #endregion
-
-        #region Underline flush span
-
-            static __ul_flush_span__ = function(_span_state) {
-
-                if (!_span_state.active) {
-                    return;
-                }
-
-                if (!underline_enabled) {
-                    _span_state.active = false;
-                    return;
-                }
-
-                if (_span_state.under == __WW_Text_Glyph_Underline.None) {
-                    _span_state.active = false;
-                    return;
-                }
-
-                var _width = _span_state.x1 - _span_state.x0;
-                if (_width <= 0) {
-                    _span_state.active = false;
-                    return;
-                }
-
-                var _spr = underline_sprite_white;
-
-                if (_span_state.under == __WW_Text_Glyph_Underline.Warning) {
-                    _spr = underline_sprite_warning;
-                } else if (_span_state.under == __WW_Text_Glyph_Underline.Error) {
-                    _spr = underline_sprite_error;
-                } else if (_span_state.under == 4) {
-                    _spr = underline_sprite_white;
-                }
-
-                if (is_undefined(_spr) || !sprite_exists(_spr)) {
-                    _span_state.active = false;
-                    return;
-                }
-
-                var _tex = sprite_get_texture(_spr, 0);
-                var _spr_uvs = sprite_get_uvs(_spr, 0);
-
-                var _u0 = _spr_uvs[0];
-                var _v0 = _spr_uvs[1];
-                var _u1 = _spr_uvs[2];
-                var _v1 = _spr_uvs[3];
-
-                var _x0 = floor(_span_state.x0);
-                var _x1 = floor(_span_state.x1);
-                var _y0 = floor(_span_state.y);
-
-                // Plain underline: one stretched quad, thickness controlled by renderer
-                if (_span_state.under == __WW_Text_Glyph_Underline.Line || _span_state.under == 4) {
-
-                    var _thick = underline_thickness;
-                    if (_thick < 1) { _thick = 1; }
-
-                    var _y1 = floor(_y0 + _thick);
-
-                    var _res_plain = __vb_get_batch_for_material__(_tex, _spr_uvs, 0);
-                    var _vb_plain = _res_plain.batch.buffer;
-
-                    vertex_position(_vb_plain, _x0, _y0);
-                    vertex_texcoord(_vb_plain, _u0, _v0);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_plain, _x1, _y0);
-                    vertex_texcoord(_vb_plain, _u1, _v0);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_plain, _x1, _y1);
-                    vertex_texcoord(_vb_plain, _u1, _v1);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_plain, _x0, _y0);
-                    vertex_texcoord(_vb_plain, _u0, _v0);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_plain, _x1, _y1);
-                    vertex_texcoord(_vb_plain, _u1, _v1);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_plain, _x0, _y1);
-                    vertex_texcoord(_vb_plain, _u0, _v1);
-                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
-
-                    _span_state.active = false;
-                    return;
-                }
-
-                // Squiggles: tiled sprite
-                var _spr_w = sprite_get_width(_spr);
-                if (_spr_w <= 0) { _spr_w = 1; }
-
-                var _spr_h = sprite_get_height(_spr);
-                if (_spr_h <= 0) { _spr_h = 1; }
-
-                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0);
-                var _vb_ul = _res.batch.buffer;
-
-                var _y1s = floor(_y0 + _spr_h);
-
-                var _full_count = floor(_width / _spr_w);
-                var _rem_width = _width - (_full_count * _spr_w);
-
-                var _du = _u1 - _u0;
-
-                var _tile_index = 0;
-                repeat (_full_count) {
-
-                    var _sx0 = floor(_x0 + (_tile_index * _spr_w));
-                    var _sx1 = floor(_sx0 + _spr_w);
-
-                    vertex_position(_vb_ul, _sx0, _y0);
-                    vertex_texcoord(_vb_ul, _u0, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1, _y0);
-                    vertex_texcoord(_vb_ul, _u1, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1, _y1s);
-                    vertex_texcoord(_vb_ul, _u1, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx0, _y0);
-                    vertex_texcoord(_vb_ul, _u0, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1, _y1s);
-                    vertex_texcoord(_vb_ul, _u1, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx0, _y1s);
-                    vertex_texcoord(_vb_ul, _u0, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    _tile_index += 1;
-                }
-
-                if (_rem_width > 0) {
-
-                    var _sx0r = floor(_x0 + (_full_count * _spr_w));
-                    var _sx1r = floor(_sx0r + _rem_width);
-
-                    var _ratio = _rem_width / _spr_w;
-                    if (_ratio < 0) { _ratio = 0; }
-                    if (_ratio > 1) { _ratio = 1; }
-
-                    var _ur1 = _u0 + (_du * _ratio);
-
-                    vertex_position(_vb_ul, _sx0r, _y0);
-                    vertex_texcoord(_vb_ul, _u0, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1r, _y0);
-                    vertex_texcoord(_vb_ul, _ur1, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1r, _y1s);
-                    vertex_texcoord(_vb_ul, _ur1, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx0r, _y0);
-                    vertex_texcoord(_vb_ul, _u0, _v0);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx1r, _y1s);
-                    vertex_texcoord(_vb_ul, _ur1, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-
-                    vertex_position(_vb_ul, _sx0r, _y1s);
-                    vertex_texcoord(_vb_ul, _u0, _v1);
-                    vertex_colour(_vb_ul, _span_state.col, _span_state.alp);
-                }
-
-                _span_state.active = false;
-            };
-
-        #endregion
-
-        #region VB build and draw (unified)
+        #region VB build and draw (core)
 
             static __ensure_vb__ = function() {
-
                 if (!__vb_is_dirty__) {
                     return;
                 }
 
                 __ensure_layout__();
                 __vb_ensure_format__();
-
                 __vb_free__();
                 __build_vb__();
-
                 __vb_is_dirty__ = false;
             };
 
             static __build_vb__ = function() {
-
-                var _old_font = draw_get_font();
-                if (font_exists(font)) {
-                    draw_set_font(font);
-                }
 
                 var _layout_data = __layout__.get_layout_data();
                 var _glyphs = _layout_data.glyphs;
                 var _glyph_count = _layout_data.glyphs_count;
 
                 if (_glyph_count <= 0) {
-                    if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                        draw_set_font(_old_font);
-                    }
+                    return;
+                }
+
+                if (!font_exists(font)) {
                     return;
                 }
 
                 var _default_font_data = __font_get_render_data__(font);
                 if (is_undefined(_default_font_data)) {
-                    if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                        draw_set_font(_old_font);
-                    }
                     return;
                 }
 
-                var _span_state = {
-                    active: false,
-                    under: __WW_Text_Glyph_Underline.None,
-                    x0: 0,
-                    x1: 0,
-                    y: 0,
-                    col: color,
-                    alp: alpha
-                };
+                var _batch_result = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1);
+                var _vb_buffer = _batch_result.batch.buffer;
 
                 var _glyph_index = 0;
                 repeat (_glyph_count) {
@@ -2205,192 +1679,28 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
                     var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
 
-                    if (_char == "\n" || _char == "\r" || _char == "\t") {
-                        __ul_flush_span__(_span_state);
-                        _glyph_index += 1;
-                        continue;
-                    }
-
-                    if (_char == "	" && !whitespace_visible) {
-                        __ul_flush_span__(_span_state);
-                        _glyph_index += 1;
+                    if (_char == "\n" || _char == "\r" || _char == "" || _char == "\t") {
+                        _glyph_index++;
                         continue;
                     }
 
                     var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
                     var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
-                    var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
-                    var _hei = _glyphs[_base + __WW_Layout_Glyph.Height];
 
-                    // Optional whitespace markers
-                    if (whitespace_visible) {
+                    __vb_emit_glyph_basic_to_buffer__(_vb_buffer, _default_font_data, _char, _pos_x, _pos_y, color, alpha);
 
-                        if (_char == " ") {
-
-                            __ul_flush_span__(_span_state);
-
-                            var _cell_w = _wid;
-                            var _mark_char = whitespace_marker_space;
-                            var _mark_w = string_width(_mark_char);
-
-                            var _mark_x = _pos_x;
-                            if (_cell_w > 0 && _mark_w > 0) {
-                                _mark_x = _pos_x + ((_cell_w - _mark_w) * 0.5);
-                            }
-
-                            var _ws_batch = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1);
-
-                            __vb_emit_glyph_styled_to_buffer__(
-                                _ws_batch.batch.buffer,
-                                _default_font_data,
-                                _mark_char,
-                                _mark_x,
-                                _pos_y,
-                                whitespace_color,
-                                whitespace_alpha,
-                                1,
-                                __WW_Text_Glyph_Style.Regular
-                            );
-
-                            _glyph_index += 1;
-                            continue;
-                        }
-
-                        if (_char == "	") {
-
-                            __ul_flush_span__(_span_state);
-
-                            var _mark_char2 = whitespace_marker_tab;
-
-                            var _ws_batch2 = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1);
-
-                            __vb_emit_glyph_styled_to_buffer__(
-                                _ws_batch2.batch.buffer,
-                                _default_font_data,
-                                _mark_char2,
-                                _pos_x,
-                                _pos_y,
-                                whitespace_color,
-                                whitespace_alpha,
-                                1,
-                                __WW_Text_Glyph_Style.Regular
-                            );
-
-                            _glyph_index += 1;
-                            continue;
-                        }
-                    }
-
-                    var _final_color = _glyphs[_base + __WW_Layout_Glyph.Color];
-                    var _final_alpha = _glyphs[_base + __WW_Layout_Glyph.Alpha];
-                    var _final_font = _glyphs[_base + __WW_Layout_Glyph.Font];
-                    var _final_style = _glyphs[_base + __WW_Layout_Glyph.Style];
-                    var _final_size = _glyphs[_base + __WW_Layout_Glyph.Size_Mul];
-                    var _final_under = _glyphs[_base + __WW_Layout_Glyph.Underline];
-
-                    if (is_undefined(_final_color)) { _final_color = color; }
-                    if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
-                    if (is_undefined(_final_style)) { _final_style = __WW_Text_Glyph_Style.Regular; }
-                    if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
-                    if (is_undefined(_final_under)) { _final_under = __WW_Text_Glyph_Underline.None; }
-
-                    if (!formatting_enabled) {
-                        _final_style = __WW_Text_Glyph_Style.Regular;
-                        _final_size = 1;
-                    }
-
-                    if (!underline_enabled) {
-                        _final_under = __WW_Text_Glyph_Underline.None;
-                    }
-
-                    var _font_data = __glyph_resolve_font_data__(_final_font, _char);
-                    if (is_undefined(_font_data)) {
-                        __ul_flush_span__(_span_state);
-                        _glyph_index += 1;
-                        continue;
-                    }
-
-                    var _glyph_batch = __vb_get_batch_for_material__(_font_data.tex, _font_data.uvs, 1);
-
-                    __vb_emit_glyph_styled_to_buffer__(
-                        _glyph_batch.batch.buffer,
-                        _font_data,
-                        _char,
-                        _pos_x,
-                        _pos_y,
-                        _final_color,
-                        _final_alpha,
-                        _final_size,
-                        _final_style
-                    );
-
-                    // Optional underline accumulation
-                    if (_final_under != __WW_Text_Glyph_Underline.None) {
-
-                        var _underline_y = _pos_y + _hei + underline_y_offset;
-                        if (_final_under == 4) {
-                            _underline_y = _pos_y + floor(_hei * 0.5) + underline_y_offset;
-                        }
-
-                        if (!_span_state.active) {
-
-                            _span_state.active = true;
-                            _span_state.under = _final_under;
-                            _span_state.x0 = _pos_x;
-                            _span_state.x1 = _pos_x + _wid;
-                            _span_state.y = _underline_y;
-                            _span_state.col = _final_color;
-                            _span_state.alp = _final_alpha;
-
-                        } else {
-
-                            var _same_type = (_span_state.under == _final_under);
-                            var _same_col = (_span_state.col == _final_color);
-                            var _same_alp = (_span_state.alp == _final_alpha);
-                            var _same_y = (_span_state.y == _underline_y);
-
-                            if (!_same_type || !_same_col || !_same_alp || !_same_y) {
-
-                                __ul_flush_span__(_span_state);
-
-                                _span_state.active = true;
-                                _span_state.under = _final_under;
-                                _span_state.x0 = _pos_x;
-                                _span_state.x1 = _pos_x + _wid;
-                                _span_state.y = _underline_y;
-                                _span_state.col = _final_color;
-                                _span_state.alp = _final_alpha;
-
-                            } else {
-
-                                _span_state.x1 = _pos_x + _wid;
-                            }
-                        }
-
-                    } else {
-
-                        __ul_flush_span__(_span_state);
-                    }
-
-                    _glyph_index += 1;
+                    _glyph_index++;
                 }
-
-                __ul_flush_span__(_span_state);
 
                 var _batch_count = array_length(__draw_batches__);
                 var _batch_index = 0;
                 repeat (_batch_count) {
                     vertex_end(__draw_batches__[_batch_index].buffer);
-                    _batch_index += 1;
-                }
-
-                if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                    draw_set_font(_old_font);
+                    _batch_index++;
                 }
             };
 
             static __draw_text_vb__ = function(_origin_x, _origin_y) {
-
                 __ensure_vb__();
 
                 var _old_mat = matrix_get(matrix_world);
@@ -2403,22 +1713,20 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _batch_index = 0;
 
                 repeat (_batch_count) {
-
                     var _batch = __draw_batches__[_batch_index];
 
-                    if (!is_undefined(_batch) && !is_undefined(_batch.material)) {
+                    if (_batch.layer == 1) {
                         _batch.material.draw(_origin_x, _origin_y);
                     }
 
-                    _batch_index += 1;
+                    _batch_index++;
                 }
 
-                gpu_set_tex_filter(_old_filt);
                 matrix_set(matrix_world, _old_mat);
+                gpu_set_tex_filter(_old_filt);
             };
 
         #endregion
-
 
         #region Cleanup
 

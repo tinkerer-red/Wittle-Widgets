@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextLayout",
   "parent":{
-    "name":"TextBoxV3",
-    "path":"folders/TextBoxV3.yy",
+    "name":"LayoutHandler",
+    "path":"folders/TextBoxV3/LayoutHandler.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

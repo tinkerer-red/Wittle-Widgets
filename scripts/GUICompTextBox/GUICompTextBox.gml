@@ -223,7 +223,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 		
 		#region Variables
 			
-			draw_set_font(fGUIDefault)
+			draw_set_font(fnt_ww_default_small)
 			
 			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
 			
@@ -235,7 +235,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			draw = {
 				refresh_surf : false,	// refresh surface
 				display_cursor : 30,	// display cursor
-				font : fGUIDefault,		// font
+				font : fnt_ww_default_small,		// font
 				font_color : /*#*/0xDEDDDC,	// font color
 				highlight_region_color: /*#*/0xD8680A, //the color of the selection box when highlighting
 				text_background_color: /*#*/0x3F3936, //the background rectangle
@@ -245,7 +245,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				//y_start : 0,					// y start
 				//width : 0,			// draw width
 				//height : 0,			// draw height
-				line_height : font_get_info(fGUIDefault).size,			// line height
+				line_height : font_get_info(fnt_ww_default_small).size,			// line height
 				scroll_width : 4,			// scrollbar width
 				scroll_height : 0,		// scrollbar height
 				scrollbar_y : 0,			// scrollbar y
@@ -2415,6 +2415,6 @@ static __textbox_format_newline__ = function(_str) { static __run_once__ = trace
 	
 	copy_function  = __textbox_copy_string__;
 	paste_function = __textbox_paste_string__;
-	__allowed_char__ = __build_allowed_char__(fGUIDefault);
+	__allowed_char__ = __build_allowed_char__(fnt_ww_default_small);
 	set_text("");
 }

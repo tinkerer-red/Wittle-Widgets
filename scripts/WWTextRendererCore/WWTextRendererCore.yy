@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompTextBox",
+  "%Name":"WWTextRendererCore",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompTextBox",
+  "name":"WWTextRendererCore",
   "parent":{
     "name":"__Deprecated",
     "path":"folders/__Deprecated.yy",

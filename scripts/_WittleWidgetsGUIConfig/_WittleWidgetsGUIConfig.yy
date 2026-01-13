@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"_WittleWidgetsGUIConfig",
   "parent":{
-    "name":"Wittle Widgets",
-    "path":"folders/_Libraries/Wittle Widgets.yy",
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

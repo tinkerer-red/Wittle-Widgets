@@ -1120,6 +1120,8 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static step = function(_input=undefined) {
+				if (!is_active) return;
+				
 				_input ??= {
 					consumed : false,
 				};
@@ -1145,6 +1147,8 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static draw = function(_input=undefined, _debug=false) {
+				if (!is_active) return;
+				
 				_input ??= {
 					consumed : false,
 				};

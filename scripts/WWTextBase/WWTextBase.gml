@@ -727,7 +727,7 @@ function WWTextBase() : WWCore() constructor {
 				buffer  : buffer_create(16384, buffer_grow, 1), // The buffer which contains the text
 				content : "", // The main text string displayed or edited in the component.
 				caption : "", // The text string displayed by default when field is empty, will also effect how consoles display a header for the on screen keyboard.
-				font : fGUIDefault, // The font asset used for rendering text.
+				font : fnt_ww_default_small, // The font asset used for rendering text.
 				alpha : 1, 
 				color : c_white, // The color used to draw the text.
 			}

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextBuffer",
   "parent":{
-    "name":"TextBoxV3",
-    "path":"folders/TextBoxV3.yy",
+    "name":"Buffers",
+    "path":"folders/TextBoxV3/Buffers.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

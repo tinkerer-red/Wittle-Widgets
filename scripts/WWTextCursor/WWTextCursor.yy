@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextCursor",
   "parent":{
-    "name":"TextBoxV3",
-    "path":"folders/TextBoxV3.yy",
+    "name":"Cursors",
+    "path":"folders/TextBoxV3/Cursors.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextRendererBase",
   "parent":{
-    "name":"TextBoxV3",
-    "path":"folders/TextBoxV3.yy",
+    "name":"Renderers",
+    "path":"folders/TextBoxV3/Renderers.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

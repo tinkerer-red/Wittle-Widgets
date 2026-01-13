@@ -18,9 +18,10 @@ function WWTextBoxV3() : WWCore() constructor {
 		buffer  .__set_textbox__(self);
 		renderer.__set_textbox__(self);
 		
-		cursor.add([renderer]);
+		//render the cursor behind the renderer, but step the renderer before the cursor
+		//cursor.add([renderer]);
 		
-		add([buffer, cursor]);
+		add([buffer, cursor, renderer]);
 		
 	#endregion
 	
@@ -93,7 +94,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @func   set_wrap_width()
 				/// @desc   Sets if word wrapping is enabled, true will wrap words to next line.
 				/// @param  {Bool} should_wrap
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_wrap_enabled = function(_should_wrap) {
 					renderer.set_wrap_enabled(_should_wrap);
@@ -104,7 +105,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @func   set_line_sep()
 				/// @desc   Sets the extra spacing between wrapped lines (in pixels).
 				/// @param  {Real} _line_sep_pixels
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_line_sep = function(_line_sep_pixels) {
 					renderer.set_line_sep(_line_sep_pixels);
@@ -354,7 +355,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real|Undefined} _style_value
 				/// @param  {Real|Undefined} _size_mul
 				/// @param  {Real|Undefined} _underline_value
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_format_range = function(
 					_start_index,
@@ -384,7 +385,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static clear_format_range = function(_start_index, _end_index) { 
 					renderer.set_format_range(_start_index, _end_index);
@@ -397,7 +398,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Constant.Color} _color_value
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_color_range = function(_start_index, _end_index, _color_value) {
 					renderer.set_format_range(_start_index, _end_index, _color_value, undefined, undefined, undefined, undefined, undefined);
@@ -410,7 +411,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Real} _alpha_value
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_alpha_range = function(_start_index, _end_index, _alpha_value) {
 					renderer.set_format_range(_start_index, _end_index, undefined, _alpha_value, undefined, undefined, undefined, undefined);
@@ -424,7 +425,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Asset.GMFont|Real} _font_asset_or_minus1
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_font_range = function(_start_index, _end_index, _font_asset_or_minus1) {
 					renderer.set_format_range(_start_index, _end_index, undefined, undefined, _font_asset_or_minus1, undefined, undefined, undefined);
@@ -437,7 +438,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Real} _style_value
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_style_range = function(_start_index, _end_index, _style_value) {
 					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style_value, undefined, undefined);
@@ -451,7 +452,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Real} _size_mul
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_size_range = function(_start_index, _end_index, _size_mul) {
 					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, _size_mul, undefined);
@@ -464,7 +465,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
 				/// @param  {Real} _underline_value
-				/// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_glyph_underline_range = function(_start_index, _end_index, _underline_value) {
 					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, undefined, _underline_value);
@@ -473,6 +474,48 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 			#endregion
 			
+			#region jsDoc
+			/// @func    set_renderer()
+			/// @desc    Assign a text renderer to this textbox.
+			///          You may pass:
+			///          - a renderer instance (recommended)
+			///          - a constructor function (it will be called with no args)
+			///          - undefined (clears renderer)
+			///          When swapped:
+			///          - old renderer is detached (set_active(false), removed from children if supported)
+			///          - new renderer is attached, positioned to (0,0) within textbox content area
+			/// @param   {Struct|Function|Undefined} _renderer_or_ctor
+			/// @param   {Bool} _owns_instance
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
+			static set_renderer = function(_renderer_constructor) {
+				var _old_renderer = renderer;
+				
+				//if same instance early out
+				if (instanceof(_old_renderer) == script_get_name(_renderer_constructor)) {
+					return self
+				}
+				
+				_old_renderer.__cleanup__();
+				
+				
+				// Create or assign new
+			    var _new_renderer = new _renderer_constructor();
+				renderer = _new_renderer;
+				
+			    // Attach
+			    _new_renderer.__set_textbox__(self);
+				_new_renderer.set_offset(0, 0);
+			    _new_renderer.set_size(width, height);
+			    _new_renderer.set_active(is_active);
+			    
+				// Add as child so it receives WW events/draw
+				remove(_old_renderer);
+			    add(_new_renderer);
+			    
+			    return self;
+			};
+
 		#endregion
 		
 		#region Events
@@ -1263,6 +1306,15 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region Renderer Geometry
 				
+				#region jsDoc
+				/// @func    get_renderer()
+				/// @desc    Returns the active renderer instance.
+				/// @returns {Struct|Undefined}
+				#endregion
+				static get_renderer = function() {
+				    return renderer;
+				};
+
 				#region jsDoc
 				/// @func    index_to_x()
 				/// @desc    Convert a buffer index into gui x coordinate

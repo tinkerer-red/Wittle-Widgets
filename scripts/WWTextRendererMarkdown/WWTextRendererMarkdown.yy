@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"GUICompTextBox",
+  "%Name":"WWTextRendererMarkdown",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"GUICompTextBox",
+  "name":"WWTextRendererMarkdown",
   "parent":{
-    "name":"__Deprecated",
-    "path":"folders/__Deprecated.yy",
+    "name":"Renderers",
+    "path":"folders/TextBoxV3/Renderers.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

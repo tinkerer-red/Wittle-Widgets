@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"GUICompRadioMenu",
   "parent":{
-    "name":"_Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components.yy",
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

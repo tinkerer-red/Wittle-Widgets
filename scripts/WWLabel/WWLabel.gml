@@ -76,7 +76,7 @@ function WWLabel() : WWCore() constructor {
 			
 			text = {
 					content : "<undefined>",
-					font : fGUIDefault,
+					font : fnt_ww_default_small,
 					alpha : 1,
 					color : c_white,
 				}

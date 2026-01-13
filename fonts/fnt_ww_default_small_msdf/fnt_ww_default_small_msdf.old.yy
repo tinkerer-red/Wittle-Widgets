@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_ww_default_small",
+  "%Name":"fnt_ww_default_small_msdf",
   "AntiAlias":0,
   "applyKerning":0,
   "ascender":13,
@@ -118,7 +118,7 @@
   "last":0,
   "lineHeight":17,
   "maintainGms1Font":false,
-  "name":"fnt_ww_default_small",
+  "name":"fnt_ww_default_small_msdf",
   "parent":{
     "name":"Fonts",
     "path":"folders/_Libraries/Wittle Widgets/Assets/Fonts.yy",
@@ -135,6 +135,9 @@
   "sdfSpread":8,
   "size":12.0,
   "styleName":"Regular",
+  "tags":[
+    "msdf",
+  ],
   "textureGroupId":{
     "name":"Default",
     "path":"texturegroups/Default",

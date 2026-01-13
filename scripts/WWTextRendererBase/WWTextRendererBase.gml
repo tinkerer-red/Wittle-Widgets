@@ -921,6 +921,11 @@ function WWTextRendererBase() : WWCore() constructor {
             __font_texw_cache__ = {};
             __font_texh_cache__ = {};
 
+            // Per-font SDF/MSDF cache
+            __font_sdf_enabled_cache__ = {};
+            __font_sdf_spread_cache__ = {};
+            __font_sdf_shader_cache__ = {};
+
             // Tab metrics cached per rebuild
             __space_width__ = 0;
             __tab_width__ = 0;
@@ -952,7 +957,7 @@ function WWTextRendererBase() : WWCore() constructor {
             /// @param  {Real} _layer
             /// @returns {Struct} { batch, created }
             #endregion
-            static __vb_get_batch_for_material__ = function(_tex, _uvs, _layer) {
+            static __vb_get_batch_for_material__ = function(_tex, _uvs, _layer, _shader, _spread) {
 
                 var _u0 = 0;
                 var _v0 = 0;
@@ -975,7 +980,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     if (_batch.layer == _layer) {
                         var _material = _batch.material;
 
-                        if (!is_undefined(_material) && _material.tex == _tex) {
+                        if (!is_undefined(_material) && _material.tex == _tex && _material.shader == _shader && _material.spread == _spread) {
                             var _material_uvs = _material.uvs;
 
                             if (is_array(_material_uvs) && array_length(_material_uvs) >= 4) {
@@ -990,15 +995,24 @@ function WWTextRendererBase() : WWCore() constructor {
                 }
 
                 var _vertex_buffer = vertex_create_buffer();
-                var _closure = { vb: _vertex_buffer, tex: _tex };
+                var _closure = { vb: _vertex_buffer, tex: _tex, shader: _shader, spread: _spread };
 
                 var _draw_fn = method(_closure, function(_x, _y) {
-                    vertex_submit(vb, pr_trianglelist, tex);
+					if (!is_undefined(shader)) {
+						shader_set(shader);
+						vertex_submit(vb, pr_trianglelist, tex);
+                        shader_reset();
+                    }
+					else {
+                        vertex_submit(vb, pr_trianglelist, tex);
+                    }
                 });
 
                 var _new_material = new WWMaterial(_draw_fn);
                 _new_material.tex = _tex;
                 _new_material.uvs = _uvs;
+                _new_material.shader = _shader;
+                _new_material.spread = _spread;
 
                 var _new_batch = {
                     material: _new_material,
@@ -1718,7 +1732,19 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _tex = font_get_texture(_font_asset);
                     var _uvs = font_get_uvs(_font_asset);
 
+                    var _sdf_enabled = _info.sdfEnabled;
+                    var _sdf_spread = 0;
+                    var _sdf_shader = undefined;
+                    
+					if (_sdf_enabled) {
+                        _sdf_spread = _info.sdfSpread;
+                        _sdf_shader = (asset_has_any_tag(_font_asset, "msdf")) ? shd_ww_msdf : shd_ww_sdf;
+                    }
+
                     __font_info_cache__[$ _font_asset] = _info;
+                    __font_sdf_enabled_cache__[$ _font_asset] = _sdf_enabled;
+                    __font_sdf_spread_cache__[$ _font_asset] = _sdf_spread;
+                    __font_sdf_shader_cache__[$ _font_asset] = _sdf_shader;
                     __font_uv_cache__[$ _font_asset] = _uvs;
                     __font_tex_cache__[$ _font_asset] = _tex;
                     __font_texw_cache__[$ _font_asset] = texture_get_width(_tex);
@@ -1730,7 +1756,11 @@ function WWTextRendererBase() : WWCore() constructor {
                     tex: __font_tex_cache__[$ _font_asset],
                     uvs: __font_uv_cache__[$ _font_asset],
                     tex_w: __font_texw_cache__[$ _font_asset],
-                    tex_h: __font_texh_cache__[$ _font_asset]
+                    tex_h: __font_texh_cache__[$ _font_asset],
+
+                    sdf_enabled: __font_sdf_enabled_cache__[$ _font_asset],
+                    sdf_spread: __font_sdf_spread_cache__[$ _font_asset],
+                    sdf_shader: __font_sdf_shader_cache__[$ _font_asset]
                 };
             };
 
@@ -1786,66 +1816,72 @@ function WWTextRendererBase() : WWCore() constructor {
 
             static __vb_emit_glyph_basic_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp) {
 
-                if (_char == "" || is_undefined(_font_data)) {
-                    return false;
-                }
+			    if (_char == "" || is_undefined(_font_data)) {
+			        return false;
+			    }
 
-                var _glyph_info = _font_data.info.glyphs[$ _char];
-                if (is_undefined(_glyph_info)) {
-                    return false;
-                }
+			    var _glyph_info = _font_data.info.glyphs[$ _char];
+			    if (is_undefined(_glyph_info)) {
+			        return false;
+			    }
 
-                var _gx = _glyph_info.x;
-                var _gy = _glyph_info.y;
-                var _gw = _glyph_info.w;
-                var _gh = _glyph_info.h;
+			    var _gx = _glyph_info.x;
+			    var _gy = _glyph_info.y;
+			    var _gw = _glyph_info.w;
+			    var _gh = _glyph_info.h;
 
-                if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
-                    return false;
-                }
+			    if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
+			        return false;
+			    }
 
-                var _uv_w = texture_get_texel_width(_font_data.tex);
-                var _uv_h = texture_get_texel_height(_font_data.tex);
+			    var _uv_w = texture_get_texel_width(_font_data.tex);
+			    var _uv_h = texture_get_texel_height(_font_data.tex);
 
-                var _u0 = _gx * _uv_w;
-                var _v0 = _gy * _uv_h;
-                var _u1 = (_gx + _gw) * _uv_w;
-                var _v1 = (_gy + _gh) * _uv_h;
+			    var _u0 = _gx * _uv_w;
+			    var _v0 = _gy * _uv_h;
+			    var _u1 = (_gx + _gw) * _uv_w;
+			    var _v1 = (_gy + _gh) * _uv_h;
 
-                var _xoff = _glyph_info.offset;
-                var _yoff = _glyph_info.yoffset;
+			    var _padding = 0;
+			    if (!is_undefined(_font_data.info) && _font_data.info.sdfEnabled) {
+			        _padding = _font_data.info.sdfSpread;
+			    }
 
-                var _x0 = _pos_x + _xoff;
-                var _y0 = _pos_y + _yoff;
-                var _x1 = _x0 + _gw;
-                var _y1 = _y0 + _gh;
+			    var _xoff = _glyph_info.offset - _padding;
+			    var _yoff = _glyph_info.yoffset - _padding;
 
-                vertex_position(_vb_buffer, _x0, _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    var _x0 = _pos_x + _xoff;
+			    var _y0 = _pos_y + _yoff;
+			    var _x1 = _x0 + _gw;
+			    var _y1 = _y0 + _gh;
 
-                vertex_position(_vb_buffer, _x1, _y0);
-                vertex_texcoord(_vb_buffer, _u1, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, _x0, _y0);
+			    vertex_texcoord(_vb_buffer, _u0, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, _x1, _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, _x1, _y0);
+			    vertex_texcoord(_vb_buffer, _u1, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, _x0, _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, _x1, _y1);
+			    vertex_texcoord(_vb_buffer, _u1, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, _x1, _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, _x0, _y0);
+			    vertex_texcoord(_vb_buffer, _u0, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, _x0, _y1);
-                vertex_texcoord(_vb_buffer, _u0, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, _x1, _y1);
+			    vertex_texcoord(_vb_buffer, _u1, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                return true;
-            };
+			    vertex_position(_vb_buffer, _x0, _y1);
+			    vertex_texcoord(_vb_buffer, _u0, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
+
+			    return true;
+			};
+
 
         #endregion
 
@@ -1854,114 +1890,88 @@ function WWTextRendererBase() : WWCore() constructor {
 
             static __vb_emit_glyph_styled_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp, _size_mul, _style) {
 
-                if (_char == "" || is_undefined(_font_data)) {
-                    return false;
-                }
+			    if (_char == "" || is_undefined(_font_data)) {
+			        return false;
+			    }
 
-                if (_size_mul <= 0) {
-                    return false;
-                }
+			    if (_size_mul <= 0) {
+			        return false;
+			    }
 
-                var _glyph_info = _font_data.info.glyphs[$ _char];
-                if (is_undefined(_glyph_info)) {
-                    return false;
-                }
+			    var _glyph_info = _font_data.info.glyphs[$ _char];
+			    if (is_undefined(_glyph_info)) {
+			        return false;
+			    }
 
-                var _gx = _glyph_info.x;
-                var _gy = _glyph_info.y;
-                var _gw = _glyph_info.w;
-                var _gh = _glyph_info.h;
+			    var _gx = _glyph_info.x;
+			    var _gy = _glyph_info.y;
+			    var _gw = _glyph_info.w;
+			    var _gh = _glyph_info.h;
 
-                if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
-                    return false;
-                }
+			    if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
+			        return false;
+			    }
 
-                var _uv_w = texture_get_texel_width(_font_data.tex);
-                var _uv_h = texture_get_texel_height(_font_data.tex);
+			    var _uv_w = texture_get_texel_width(_font_data.tex);
+			    var _uv_h = texture_get_texel_height(_font_data.tex);
 
-                var _u0 = _gx * _uv_w;
-                var _v0 = _gy * _uv_h;
-                var _u1 = (_gx + _gw) * _uv_w;
-                var _v1 = (_gy + _gh) * _uv_h;
+			    var _u0 = _gx * _uv_w;
+			    var _v0 = _gy * _uv_h;
+			    var _u1 = (_gx + _gw) * _uv_w;
+			    var _v1 = (_gy + _gh) * _uv_h;
 
-                var _xoff = _glyph_info.offset * _size_mul;
-                var _yoff = _glyph_info.yoffset * _size_mul;
+			    var _padding = 0;
+			    if (!is_undefined(_font_data.info) && _font_data.info.sdfEnabled) {
+			        _padding = _font_data.info.sdfSpread * _size_mul;
+			    }
 
-                var _w = _gw * _size_mul;
-                var _h = _gh * _size_mul;
+			    var _xoff = (_glyph_info.offset * _size_mul) - _padding;
+			    var _yoff = (_glyph_info.yoffset * _size_mul) - _padding;
 
-                var _x0 = floor(_pos_x + _xoff);
-                var _y0 = floor(_pos_y + _yoff);
-                var _x1 = floor(_x0 + _w);
-                var _y1 = floor(_y0 + _h);
+			    var _w = _gw * _size_mul;
+			    var _h = _gh * _size_mul;
 
-                var _italic = ((_style == __WW_Text_Glyph_Style.Italic) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
+			    var _x0 = floor(_pos_x + _xoff);
+			    var _y0 = floor(_pos_y + _yoff);
+			    var _x1 = floor(_x0 + _w);
+			    var _y1 = floor(_y0 + _h);
 
-                var _slant_top = 0;
-                var _slant_bottom = 0;
+			    var _italic = ((_style == __WW_Text_Glyph_Style.Italic) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
 
-                if (_italic) {
-                    _slant_top = 2 * _size_mul;
-                    _slant_bottom = -1 * _size_mul;
-                }
+			    var _slant_top = 0;
+			    var _slant_bottom = 0;
 
-                vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    if (_italic) {
+			        _slant_top = 2 * _size_mul;
+			        _slant_bottom = -1 * _size_mul;
+			    }
 
-                vertex_position(_vb_buffer, floor(_x1 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u1, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
+			    vertex_texcoord(_vb_buffer, _u0, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, floor(_x1 + _slant_top), _y0);
+			    vertex_texcoord(_vb_buffer, _u1, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
-                vertex_texcoord(_vb_buffer, _u0, _v0);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
+			    vertex_texcoord(_vb_buffer, _u1, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u1, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
+			    vertex_texcoord(_vb_buffer, _u0, _v0);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                vertex_position(_vb_buffer, floor(_x0 + _slant_bottom), _y1);
-                vertex_texcoord(_vb_buffer, _u0, _v1);
-                vertex_colour(_vb_buffer, _col, _alp);
+			    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
+			    vertex_texcoord(_vb_buffer, _u1, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                var _bold = ((_style == __WW_Text_Glyph_Style.Bold) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
+			    vertex_position(_vb_buffer, floor(_x0 + _slant_bottom), _y1);
+			    vertex_texcoord(_vb_buffer, _u0, _v1);
+			    vertex_colour(_vb_buffer, _col, _alp);
 
-                if (_bold) {
-
-                    var _bold_offset = 1 * _size_mul;
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_top + _bold_offset), floor(_y0 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v0);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u1, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-
-                    vertex_position(_vb_buffer, floor(_x0 + _slant_bottom + _bold_offset), floor(_y1 - _bold_offset));
-                    vertex_texcoord(_vb_buffer, _u0, _v1);
-                    vertex_colour(_vb_buffer, _col, _alp);
-                }
-
-                return true;
-            };
+			    return true;
+			};
 
         #endregion
 
@@ -2024,7 +2034,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     var _y1 = floor(_y0 + _thick);
 
-                    var _res_plain = __vb_get_batch_for_material__(_tex, _spr_uvs, 0);
+                    var _res_plain = __vb_get_batch_for_material__(_tex, _spr_uvs, 0, undefined, 0);
                     var _vb_plain = _res_plain.batch.buffer;
 
                     vertex_position(_vb_plain, _x0, _y0);
@@ -2062,7 +2072,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _spr_h = sprite_get_height(_spr);
                 if (_spr_h <= 0) { _spr_h = 1; }
 
-                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0);
+                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0, undefined, 0);
                 var _vb_ul = _res.batch.buffer;
 
                 var _y1s = floor(_y0 + _spr_h);
@@ -2238,7 +2248,7 @@ function WWTextRendererBase() : WWCore() constructor {
                                 _mark_x = _pos_x + ((_cell_w - _mark_w) * 0.5);
                             }
 
-                            var _ws_batch = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1);
+                            var _ws_batch = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1, _default_font_data.sdf_shader, _default_font_data.sdf_spread);
 
                             __vb_emit_glyph_styled_to_buffer__(
                                 _ws_batch.batch.buffer,
@@ -2262,7 +2272,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
                             var _mark_char2 = whitespace_marker_tab;
 
-                            var _ws_batch2 = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1);
+                            var _ws_batch2 = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1, _default_font_data.sdf_shader, _default_font_data.sdf_spread);
 
                             __vb_emit_glyph_styled_to_buffer__(
                                 _ws_batch2.batch.buffer,
@@ -2310,7 +2320,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         continue;
                     }
 
-                    var _glyph_batch = __vb_get_batch_for_material__(_font_data.tex, _font_data.uvs, 1);
+                    var _glyph_batch = __vb_get_batch_for_material__(_font_data.tex, _font_data.uvs, 1, _font_data.sdf_shader, _font_data.sdf_spread);
 
                     __vb_emit_glyph_styled_to_buffer__(
                         _glyph_batch.batch.buffer,

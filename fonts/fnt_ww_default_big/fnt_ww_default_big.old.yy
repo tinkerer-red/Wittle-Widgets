@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fGUIDefaultBig",
+  "%Name":"fnt_ww_default_big",
   "AntiAlias":0,
   "applyKerning":0,
   "ascender":20,
@@ -118,10 +118,10 @@
   "last":0,
   "lineHeight":26,
   "maintainGms1Font":false,
-  "name":"fGUIDefaultBig",
+  "name":"fnt_ww_default_big",
   "parent":{
-    "name":"Assets",
-    "path":"folders/_Libraries/Wittle Widgets/Assets.yy",
+    "name":"Fonts",
+    "path":"folders/_Libraries/Wittle Widgets/Assets/Fonts.yy",
   },
   "pointRounding":0,
   "ranges":[

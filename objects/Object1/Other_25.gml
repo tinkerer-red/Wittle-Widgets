@@ -1118,6 +1118,7 @@ build_ui_text_boxes = function(){
 			function(_textbox_instance) {
 				_textbox_instance.set_renderer(WWTextRendererMarkdown);
 				_textbox_instance.set_wrap_enabled(true);
+				_textbox_instance.set_text_font(fnt_ww_default_small_msdf);
 			}
 		);
 
@@ -1130,12 +1131,12 @@ build_ui_text_boxes = function(){
 			function(_textbox_instance) {
 				_textbox_instance.set_renderer(WWTextRendererBase);
 				_textbox_instance.set_wrap_enabled(false);
-				_textbox_instance.set_text_font(fnt_ww_consolas_10);
+				_textbox_instance.set_text_font(fnt_ww_default_small);
 			},
 			function(_textbox_instance) {
 				//_textbox_instance.set_renderer(WWTextRendererGML);
 				_textbox_instance.set_wrap_enabled(false);
-				_textbox_instance.set_text_font(fnt_ww_consolas_10);
+				_textbox_instance.set_text_font(fnt_ww_default_small_msdf);
 			}
 		);
 

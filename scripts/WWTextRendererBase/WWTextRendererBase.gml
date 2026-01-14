@@ -1750,7 +1750,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     __font_texw_cache__[$ _font_asset] = texture_get_width(_tex);
                     __font_texh_cache__[$ _font_asset] = texture_get_height(_tex);
                 }
-
+				
                 return {
                     info: __font_info_cache__[$ _font_asset],
                     tex: __font_tex_cache__[$ _font_asset],

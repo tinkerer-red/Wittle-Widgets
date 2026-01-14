@@ -828,27 +828,31 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region No modifier
 			hotkeys.register([vk_backspace], function() {
 				if (is_read_only) return;
-				
-				// If selection exists: delete selection
+
+				// If selection exists: delete selection (this now snapshots correctly)
 				if (__delete_selection_if_any__(true, true)) {
 					trigger_event(events.change);
 					return;
 				}
-				
-				// No selection: delete character before cursor
+
 				var _index = cursor.get_index();
 				if (_index <= 0) return;
-				
-				var _prev_index = _index - 1;
-				var _buf_start  = renderer.get_buffer_index_from_index(_prev_index);
-				var _buf_end    = renderer.get_buffer_index_from_index(_index);
-				
+
+				var _prev = _index - 1;
+
+				var _buf_start = renderer.get_buffer_index_from_index(_prev);
+				var _buf_end = renderer.get_buffer_index_from_index(_index);
+
 				buffer.erase(_buf_start, _buf_end);
+
+				// Post-delete cursor position must be set BEFORE snapshot.
+				__cursor_set_index_synced__(_prev, false, false);
+
 				__force_rebuild__();
 				__history_add_record__();
-				__cursor_set_index_synced__(_prev_index, false, false);
 				trigger_event(events.change);
 			});
+
 
 			hotkeys.register([vk_delete], function() {
 				if (is_read_only) return;
@@ -894,13 +898,16 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _bounds = __compute_word_boundaries__(_pointed_index, false);
 				var _start = _bounds.index_start;
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_start);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_index);
-				
+				var _buffer_start = renderer.get_buffer_index_from_index(_index);
+				var _buffer_end = renderer.get_buffer_index_from_index(_end);
+
 				buffer.erase(_buffer_start, _buffer_end);
+
+				// Cursor should remain at _index for this forward-delete variant
+				__cursor_set_index_synced__(_index, false, false);
+
 				__force_rebuild__();
 				__history_add_record__();
-				__cursor_set_index_synced__(_start, false, false);
 				trigger_event(events.change);
 			});
 			hotkeys.register([vk_control, vk_delete], function() {
@@ -1166,10 +1173,26 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static clear_text = function() {
+				if (is_read_only) return;
+
+				// Nothing to do
+				if (buffer.get_text() == "") {
+					cursor.set_index(0);
+					cursor.set_highlight_active(false);
+					__history_update_latest_cursor__();
+					return;
+				}
+
 				buffer.clear_text();
+
 				cursor.set_index(0);
 				cursor.set_highlight_active(false);
-				__history_update_latest_cursor__();
+				cursor.set_highlight_start_index(0);
+				cursor.set_highlight_end_index(0);
+
+				__force_rebuild__();
+				__history_add_record__();
+				trigger_event(events.change);
 			}
 			
 			#region Sizing
@@ -1863,24 +1886,38 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {undefined}
 				#endregion
 				static __insert_string_at_cursor__ = function(_str) {
+
 					// sanitize input
 					var _new_str = buffer.__filter_allowed__(_str);
-					
+					if (_new_str == "") return false;
+
 					var _str_byte_len = string_byte_length(_new_str);
-					
-					__delete_selection_if_any__(true, true);
-					
+
+					// If replacing a selection, delete it WITHOUT pushing history.
+					// We want a single atomic record for "replace selection with text".
+					__delete_selection_if_any__(false, false);
+
 					var _index = cursor.get_index();
 					var _buffer_index = renderer.get_glyph_buffer_index(_index);
-					
+
 					// insert the text
 					buffer.insert(_buffer_index, _new_str);
+
+					// rebuild once after all mutations
 					__force_rebuild__();
-					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len)
-					__cursor_set_index_synced__(_new_index);
-					
+
+					// move cursor to final position (do not mutate latest record cursor)
+					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len);
+					__cursor_set_index_synced__(_new_index, false, false);
+
+					// snapshot AFTER everything is settled
+					__history_add_record__();
+
 					trigger_event(events.change);
+					return true;
 				}
+
+
 				
 				#region jsDoc
 				/// @func    __update_word_selection_drag__
@@ -2132,24 +2169,32 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _start_index = cursor.get_highlight_start_index();
 				var _end_index = cursor.get_highlight_end_index();
 
-				var _buffer_start = renderer.get_buffer_index_from_index(_start_index);
-				var _buffer_end = renderer.get_buffer_index_from_index(_end_index);
+				var _min_index = min(_start_index, _end_index);
+				var _max_index = max(_start_index, _end_index);
+
+				var _buffer_start = renderer.get_buffer_index_from_index(_min_index);
+				var _buffer_end = renderer.get_buffer_index_from_index(_max_index);
 
 				buffer.erase(_buffer_start, _buffer_end);
-				
-				if (_push_history) {
-					__history_add_record__();
-				}
-				
-				var _new_index = min(_start_index, _end_index);
-				__cursor_set_index_synced__(_new_index, false, false);
-				
+
+				// Cursor + selection must reflect the post-delete state BEFORE snapshot.
+				cursor.set_highlight_active(false);
+				cursor.set_highlight_start_index(_min_index);
+				cursor.set_highlight_end_index(_min_index);
+
+				__cursor_set_index_synced__(_min_index, false, false);
+
 				if (_force_rebuild) {
 					__force_rebuild__();
 				}
-				
+
+				if (_push_history) {
+					__history_add_record__();
+				}
+
 				return true;
 			};
+
 
 		#endregion
 		

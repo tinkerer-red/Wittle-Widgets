@@ -228,6 +228,9 @@
   "sdfSpread":8,
   "size":10.0,
   "styleName":"Regular",
+  "tags":[
+    "msdf",
+  ],
   "textureGroupId":{
     "name":"Default",
     "path":"texturegroups/Default",

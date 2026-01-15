@@ -804,7 +804,8 @@ build_ui_text_boxes = function(){
 			"Scribble-ish input idea:\n" +
 			"[color=#ffcc00]Colored[/color] [b]Bold[/b] [i]Italic[/i]\n" +
 			"Underlines: [u]line[/u]\n";
-
+		
+		#region BBCode
 		var _text_bbcode =
 		    "Godot-style BBCode demo:\n" +
 		    "\n" +
@@ -831,58 +832,127 @@ build_ui_text_boxes = function(){
 		    "[left]Left aligned text[/left]\n" +
 		    "[center]Centered text[/center]\n" +
 		    "[right]Right aligned text[/right]\n";
+		#endregion
+		
+		#region Markdown
+		var _text_markdown =
+			"Markdown feature demo:\n" +
+			"\n" +
+			"# H1 Heading\n" +
+			"## H2 Heading\n" +
+			"### H3 Heading\n" +
+			"\n" +
+			"Normal text with **bold**, *italic*, **bold *italic inside* bold**, and ~~strikethrough~~.\n" +
+			"\n" +
+			"> Blockquote line 1\n" +
+			"> Blockquote line 2\n" +
+			">\n" +
+			"> Blockquote with **bold** and `inline_code`.\n" +
+			"\n" +
+			"Ordered list:\n" +
+			"1. First item\n" +
+			"2. Second item\n" +
+			"3. Third item\n" +
+			"\n" +
+			"Unordered list:\n" +
+			"- First item\n" +
+			"- Second item\n" +
+			"- Third item\n" +
+			"\n" +
+			"Task list:\n" +
+			"- [x] Write the press release\n" +
+			"- [ ] Update the website\n" +
+			"- [ ] Contact the media\n" +
+			"\n" +
+			"Link: [Example](https://www.example.com)\n" +
+			"Image: ![Alt text](image.jpg)\n" +
+			"\n" +
+			"---\n" +
+			"\n" +
+			"Table:\n" +
+			"| Syntax | Description |\n" +
+			"| ----------- | ----------- |\n" +
+			"| Header | Title |\n" +
+			"| Paragraph | Text |\n" +
+			"\n" +
+			"Fenced code block:\n" +
+			"```\n" +
+			"{\n" +
+			"  \"firstName\": \"John\",\n" +
+			"  \"lastName\": \"Smith\",\n" +
+			"  \"age\": 25\n" +
+			"}\n" +
+			"```\n";
+		#endregion
 
+		#region CSS
+		var _text_css = string_replace_all(@'<style>
+/* Theme-like rules */
+.root        { color:#d8dee9; opacity:1; font-size:1em; font-family:ui; }
+.muted       { color:#9aa4b2; opacity:0.85; }
+.strong      { font-weight:bold; }
+.emph        { font-style:italic; }
+.link        { color:#7aa2f7; text-decoration:underline; }
+.warn        { color:#ffcc66; text-decoration:underline; background-color:#332a10; opacity:0.95; }
+.error       { color:#ff5c5c; text-decoration:underline; background-color:#3a1010; opacity:1; }
+.strike      { text-decoration:line-through; opacity:0.9; }
+.code        { font-family:mono; background-color:#1b1f2a; opacity:1; }
+.pill        { background-color:#203049; color:#cde8ff; opacity:1; font-weight:bold; }
+.hi_green    { background-color:#103a22; color:#b6ffcf; }
+.hi_pink     { background-color:#3a1030; color:#ffd1f0; }
+.big         { font-size:1.35em; }
+.small       { font-size:0.85em; }
+</style><span class="root">CSS Renderer Demo - inline styles + classes + decorations + backgrounds
 
-			var _text_markdown =
-			    "Markdown feature demo:\n" +
-			    "\n" +
-			    "# H1 Heading\n" +
-			    "## H2 Heading\n" +
-			    "### H3 Heading\n" +
-			    "\n" +
-			    "Normal text with **bold**, *italic*, **bold *italic inside* bold**, and ~~strikethrough~~.\n" +
-			    "\n" +
-			    "> Blockquote line 1\n" +
-			    "> Blockquote line 2\n" +
-			    ">\n" +
-			    "> Blockquote with **bold** and `inline_code`.\n" +
-			    "\n" +
-			    "Ordered list:\n" +
-			    "1. First item\n" +
-			    "2. Second item\n" +
-			    "3. Third item\n" +
-			    "\n" +
-			    "Unordered list:\n" +
-			    "- First item\n" +
-			    "- Second item\n" +
-			    "- Third item\n" +
-			    "\n" +
-			    "Task list:\n" +
-			    "- [x] Write the press release\n" +
-			    "- [ ] Update the website\n" +
-			    "- [ ] Contact the media\n" +
-			    "\n" +
-			    "Link: [Example](https://www.example.com)\n" +
-			    "Image: ![Alt text](image.jpg)\n" +
-			    "\n" +
-			    "---\n" +
-			    "\n" +
-			    "Table:\n" +
-			    "| Syntax | Description |\n" +
-			    "| ----------- | ----------- |\n" +
-			    "| Header | Title |\n" +
-			    "| Paragraph | Text |\n" +
-			    "\n" +
-			    "Fenced code block:\n" +
-			    "```\n" +
-			    "{\n" +
-			    "  \"firstName\": \"John\",\n" +
-			    "  \"lastName\": \"Smith\",\n" +
-			    "  \"age\": 25\n" +
-			    "}\n" +
-			    "```\n";
+<span class="muted">This is muted text (class rule: color + opacity).</span>
+<span class="strong">This is bold (class rule).</span>
+<span class="emph">This is italic (class rule).</span>
+<span class="strong emph">This is bold+italic (combined classes).</span>
 
+Inline override beats class:
+<span class="muted" style="color:#ffffff; opacity:1">Muted class but forced to bright white with opacity 1.</span>
 
+Underline and strike are independent:
+<span class="link">Underlined like a link</span> and
+<span class="strike">strike-through for edits</span> and
+<span class="link strike">underline + strike together at the same time</span>.
+
+Background highlights:
+<span class="hi_green">green highlight</span>,
+<span class="hi_pink">pink highlight</span>,
+<span class="pill">PILL TAG</span>,
+and <span class="code">inline code with mono font + background</span>.
+
+Opacity demo (same color, different opacity):
+<span style="color:#7aa2f7; opacity:1">100%</span>
+<span style="color:#7aa2f7; opacity:0.7">70%</span>
+<span style="color:#7aa2f7; opacity:0.4">40%</span>
+
+Warning / Error style blocks:
+<span class="warn">WARNING: This is a warning span with underline + background.</span>
+<span class="error">ERROR: This is an error span with underline + background.</span>
+
+Font size demo:
+<span class="small">Small text (0.85em)</span>,
+<span class="root">Normal text (1.0em)</span>,
+<span class="big">Big text (1.35em)</span>.
+
+Tabs (if your parser keeps literal tabs):
+	Column A	Column B	Column C
+	Alpha		Bravo		Charlie
+	One		Two		Three
+
+Wrapping stress test:
+This line contains a veryLongIdentifierThatShouldWrapOnlyIfItCannotFitInsideTheWidthOfTheTextbox and also a URL-like token:
+https://example.com/some/really/really/really/long/path/that/keeps/going/forever
+
+Nested spans (stack behavior):
+Normal <span class="strong">bold <span class="code">bold+code</span> back to bold</span> back to normal.
+
+End of demo.
+</span>', "\r", "");
+		#endregion
+		
 		var _text_gml =
 			"function demo_example() {\n" +
 			"\tvar _counter_value = 0;\n" +
@@ -1029,27 +1099,11 @@ build_ui_text_boxes = function(){
 
 	#region Panels
 
-		// Panel 1: Base -> Base (right wraps on)
+		// Panel 2: Base -> Advanced (renderer owns advanced-only features)
 		_panel_make_pair(
 			_panel1_x,
 			_panel1_y,
-			"1) Base -> Base (mirror, different wrap)",
-			_text_base,
-			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
-				_textbox_instance.set_wrap_enabled(false);
-			},
-			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
-				_textbox_instance.set_wrap_enabled(true);
-			}
-		);
-
-		// Panel 2: Base -> Advanced (renderer owns advanced-only features)
-		_panel_make_pair(
-			_panel2_x,
-			_panel2_y,
-			"2) Base -> Advanced (whitespace, font, underline demo)",
+			"1) Base -> Advanced (whitespace, font, underline demo)",
 			_text_advanced,
 			function(_textbox_instance) {
 				_textbox_instance.set_renderer(WWTextRendererBase);
@@ -1067,33 +1121,14 @@ build_ui_text_boxes = function(){
 				var _renderer = _textbox_instance.get_renderer();
 				_renderer.set_whitespace_visible(true);
 				_renderer.set_whitespace_alpha(0.45);
-				
-				// If you want to demo underline runs, do it via the renderer too:
-				// _renderer.set_format_range(... underline ...)
 			}
 		);
 
-		// Panel 3: Base -> Scribble (wire renderer when ready)
+		// Panel 2: Base -> BBCode
 		_panel_make_pair(
-			_panel3_x,
-			_panel3_y,
-			"3) Base -> Scribble",
-			_text_scribble,
-			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
-				_textbox_instance.set_wrap_enabled(false);
-			},
-			function(_textbox_instance) {
-				//_textbox_instance.set_renderer(WWTextRendererScribble);
-				//_textbox_instance.set_wrap_enabled(true);
-			}
-		);
-
-		// Panel 4: Base -> BBCode
-		_panel_make_pair(
-			_panel4_x,
-			_panel4_y,
-			"4) Base -> BBCode",
+			_panel2_x,
+			_panel2_y,
+			"2) Base -> BBCode",
 			_text_bbcode,
 			function(_textbox_instance) {
 				_textbox_instance.set_renderer(WWTextRendererBase);
@@ -1105,11 +1140,11 @@ build_ui_text_boxes = function(){
 			}
 		);
 
-		// Panel 5: Base -> Markdown (wire renderer when ready)
+		// Panel 3: Base -> Markdown
 		_panel_make_pair(
-			_panel5_x,
-			_panel5_y,
-			"5) Base -> Markdown",
+			_panel3_x,
+			_panel3_y,
+			"3) Base -> Markdown",
 			_text_markdown,
 			function(_textbox_instance) {
 				_textbox_instance.set_renderer(WWTextRendererBase);
@@ -1119,6 +1154,40 @@ build_ui_text_boxes = function(){
 				_textbox_instance.set_renderer(WWTextRendererMarkdown);
 				_textbox_instance.set_wrap_enabled(true);
 				_textbox_instance.set_text_font(fnt_ww_default_small_msdf);
+			}
+		);
+
+		// Panel 4: Base -> CSS
+		_panel_make_pair(
+			_panel4_x,
+			_panel4_y,
+			"4) Base -> CSS",
+			_text_css,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(true);
+				_textbox_instance.set_text_font(fnt_ww_consolas_msdf);
+			},
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererCSS);
+				_textbox_instance.set_wrap_enabled(true);
+				_textbox_instance.set_text_font(fnt_ww_consolas_msdf);
+			}
+		);
+
+		// Panel 5: Base -> Scribble (wire renderer when ready)
+		_panel_make_pair(
+			_panel5_x,
+			_panel5_y,
+			"5) Base -> Scribble",
+			_text_scribble,
+			function(_textbox_instance) {
+				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_wrap_enabled(false);
+			},
+			function(_textbox_instance) {
+				//_textbox_instance.set_renderer(WWTextRendererScribble);
+				//_textbox_instance.set_wrap_enabled(true);
 			}
 		);
 

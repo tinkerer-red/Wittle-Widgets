@@ -376,7 +376,79 @@ function WWTextRendererBase() : WWCore() constructor {
                     return self;
                 }
 
+            
+
+            #region Strike-through options
+
+                #region jsDoc
+                /// @func    set_strike_enabled()
+                /// @desc    Enable or disable strike-through rendering.
+                /// @param   {Bool} _enabled
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_strike_enabled = function(_enabled) {
+
+                    _enabled = (_enabled == true);
+
+                    if (strike_enabled == _enabled) {
+                        return self;
+                    }
+
+                    strike_enabled = _enabled;
+                    __mark_vb_dirty__();
+
+                    return self;
+                }
+
+                #region jsDoc
+                /// @func    set_strike_offset()
+                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
+                /// @param   {Real} _offset
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_strike_offset = function(_offset) {
+
+                    strike_y_offset = _offset;
+                    __mark_vb_dirty__();
+
+                    return self;
+                }
+
+                #region jsDoc
+                /// @func    set_strike_thickness()
+                /// @desc    Set thickness for plain strike-through in pixels.
+                /// @param   {Real} _thickness
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_strike_thickness = function(_thickness) {
+
+                    strike_thickness = _thickness;
+                    __mark_vb_dirty__();
+
+                    return self;
+                }
+
+                #region jsDoc
+                /// @func    set_strike_sprites()
+                /// @desc    Set sprites used for strike-through styles.
+                /// @param   {Asset.GMSprite} _sprite_white
+                /// @param   {Asset.GMSprite} _sprite_warning
+                /// @param   {Asset.GMSprite} _sprite_error
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_strike_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
+
+                    strike_sprite_white = _sprite_white;
+                    strike_sprite_warning = _sprite_warning;
+                    strike_sprite_error = _sprite_error;
+
+                    __mark_vb_dirty__();
+                    return self;
+                }
+
             #endregion
+
+#endregion
 #endregion
 
         #region Variables
@@ -406,6 +478,17 @@ function WWTextRendererBase() : WWCore() constructor {
             underline_sprite_white = spr_ww_pixel;
             underline_sprite_warning = spr_ww_underline_warning;
             underline_sprite_error = spr_ww_underline_error;
+
+            // Strike-through
+            strike_enabled = true;
+            strike_y_offset = 0;
+            strike_thickness = 1;
+            strike_sprite_white = spr_ww_pixel;
+            strike_sprite_warning = spr_ww_underline_warning;
+            strike_sprite_error = spr_ww_underline_error;
+
+            // Background (inline)
+            background_sprite = spr_ww_pixel;
             // Layout
             should_wrap = false;
             line_sep = -1;
@@ -1185,6 +1268,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _visual_remaining = 0;
 
 			    var _visual_color = color;
+				var _visual_back_color = undefined;
+				var _visual_back_alpha = undefined;
+				var _visual_strike = __WW_Text_Glyph_Strike.None;
 			    var _visual_alpha = alpha;
 			    var _visual_underline = __WW_Text_Glyph_Underline.None;
 
@@ -1212,6 +1298,10 @@ function WWTextRendererBase() : WWCore() constructor {
 					_visual_color = is_undefined(_run.color) ? color : _run.color;
 					_visual_alpha = is_undefined(_run.alpha) ? alpha : _run.alpha;
 					_visual_underline = is_undefined(_run.underline) ? __WW_Text_Glyph_Underline.None : _run.underline;
+
+					_visual_back_color = _run[$ "back_color"];
+					_visual_back_alpha = _run[$ "back_alpha"];
+					_visual_strike = _run[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
 			    }
 
 			    // ---------------------------------
@@ -1291,6 +1381,10 @@ function WWTextRendererBase() : WWCore() constructor {
 						_visual_color = is_undefined(_run.color) ? color : _run.color;
 						_visual_alpha = is_undefined(_run.alpha) ? alpha : _run.alpha;
 						_visual_underline = is_undefined(_run.underline) ? __WW_Text_Glyph_Underline.None : _run.underline;
+
+						_visual_back_color = _run[$ "back_color"];
+						_visual_back_alpha = _run[$ "back_alpha"];
+						_visual_strike = _run[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
 			        }
 
 			        // Select measurement font (only update caches when font changes)
@@ -1317,7 +1411,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			        var _char_val = string_char_at(_str, _logical_index + 1);
 
 			        // Newline: include as glyph slot, end the line INCLUDING the newline
-			        if (_char_val == "\n" || _char_val == "\r") {
+			        if (_char_val == "\n") {
 
 			            var _fallback_height_scaled = _active_font_height * _metric_size_mul;
 			            if (_fallback_height_scaled > _line_height) { _line_height = _fallback_height_scaled; }
@@ -1508,6 +1602,10 @@ function WWTextRendererBase() : WWCore() constructor {
 					_visual_alpha = is_undefined(_run.alpha) ? alpha : _run.alpha;
 					_visual_underline = is_undefined(_run.underline) ? __WW_Text_Glyph_Underline.None : _run.underline;
 
+					_visual_back_color = _run[$ "back_color"];
+					_visual_back_alpha = _run[$ "back_alpha"];
+					_visual_strike = _run[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
+
 			    }
 				else {
 			        _visual_remaining = 999999999;
@@ -1564,6 +1662,10 @@ function WWTextRendererBase() : WWCore() constructor {
 							_visual_color = is_undefined(_run.color) ? color : _run.color;
 							_visual_alpha = is_undefined(_run.alpha) ? alpha : _run.alpha;
 							_visual_underline = is_undefined(_run.underline) ? __WW_Text_Glyph_Underline.None : _run.underline;
+
+							_visual_back_color = _run[$ "back_color"];
+						_visual_back_alpha = _run[$ "back_alpha"];
+						_visual_strike = _run[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
 			            }
 
 			            // Select font + refresh caches when it changes
@@ -2154,6 +2256,248 @@ function WWTextRendererBase() : WWCore() constructor {
                 _span_state.active = false;
             };
 
+
+
+        #region Background flush span
+
+            static __bg_flush_span__ = function(_span_state) {
+
+                if (!_span_state.active) {
+                    return;
+                }
+
+                if (_span_state.wid <= 0 || _span_state.hei <= 0) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                if (is_undefined(background_sprite) || !sprite_exists(background_sprite)) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                var _tex = sprite_get_texture(background_sprite, 0);
+                var _spr_uvs = sprite_get_uvs(background_sprite, 0);
+
+                var _u0 = _spr_uvs[0];
+                var _v0 = _spr_uvs[1];
+                var _u1 = _spr_uvs[2];
+                var _v1 = _spr_uvs[3];
+
+                var _x0 = floor(_span_state.x0);
+                var _x1 = floor(_span_state.x1);
+                var _y0 = floor(_span_state.y0);
+                var _y1 = floor(_span_state.y1);
+
+                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0, undefined, 0);
+                var _vb_bg = _res.batch.buffer;
+
+                vertex_position(_vb_bg, _x0, _y0);
+                vertex_texcoord(_vb_bg, _u0, _v0);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                vertex_position(_vb_bg, _x1, _y0);
+                vertex_texcoord(_vb_bg, _u1, _v0);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                vertex_position(_vb_bg, _x1, _y1);
+                vertex_texcoord(_vb_bg, _u1, _v1);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                vertex_position(_vb_bg, _x0, _y0);
+                vertex_texcoord(_vb_bg, _u0, _v0);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                vertex_position(_vb_bg, _x1, _y1);
+                vertex_texcoord(_vb_bg, _u1, _v1);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                vertex_position(_vb_bg, _x0, _y1);
+                vertex_texcoord(_vb_bg, _u0, _v1);
+                vertex_colour(_vb_bg, _span_state.col, _span_state.alp);
+
+                _span_state.active = false;
+            };
+
+        #endregion
+
+        #region Strike-through flush span
+
+            static __st_flush_span__ = function(_span_state) {
+
+                if (!_span_state.active) {
+                    return;
+                }
+
+                if (!strike_enabled) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                if (_span_state.kind == __WW_Text_Glyph_Strike.None) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                var _width = _span_state.x1 - _span_state.x0;
+                if (_width <= 0) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                var _spr = strike_sprite_white;
+
+                if (_span_state.kind == __WW_Text_Glyph_Strike.Warning) {
+                    _spr = strike_sprite_warning;
+                } else if (_span_state.kind == __WW_Text_Glyph_Strike.Error) {
+                    _spr = strike_sprite_error;
+                } else if (_span_state.kind == __WW_Text_Glyph_Strike.Squiggle) {
+                    _spr = strike_sprite_warning;
+                }
+
+                if (is_undefined(_spr) || !sprite_exists(_spr)) {
+                    _span_state.active = false;
+                    return;
+                }
+
+                var _tex = sprite_get_texture(_spr, 0);
+                var _spr_uvs = sprite_get_uvs(_spr, 0);
+
+                var _u0 = _spr_uvs[0];
+                var _v0 = _spr_uvs[1];
+                var _u1 = _spr_uvs[2];
+                var _v1 = _spr_uvs[3];
+
+                var _x0 = floor(_span_state.x0);
+                var _x1 = floor(_span_state.x1);
+                var _y0 = floor(_span_state.y);
+
+                // Plain strike: one stretched quad
+                if (_span_state.kind == __WW_Text_Glyph_Strike.Line) {
+
+                    var _thick = strike_thickness;
+                    if (_thick < 1) { _thick = 1; }
+
+                    var _y1 = floor(_y0 + _thick);
+
+                    var _res_plain = __vb_get_batch_for_material__(_tex, _spr_uvs, 2, undefined, 0);
+                    var _vb_plain = _res_plain.batch.buffer;
+
+                    vertex_position(_vb_plain, _x0, _y0);
+                    vertex_texcoord(_vb_plain, _u0, _v0);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_plain, _x1, _y0);
+                    vertex_texcoord(_vb_plain, _u1, _v0);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_plain, _x1, _y1);
+                    vertex_texcoord(_vb_plain, _u1, _v1);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_plain, _x0, _y0);
+                    vertex_texcoord(_vb_plain, _u0, _v0);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_plain, _x1, _y1);
+                    vertex_texcoord(_vb_plain, _u1, _v1);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_plain, _x0, _y1);
+                    vertex_texcoord(_vb_plain, _u0, _v1);
+                    vertex_colour(_vb_plain, _span_state.col, _span_state.alp);
+
+                    _span_state.active = false;
+                    return;
+                }
+
+                // Squiggles: tiled sprite
+                var _spr_w = sprite_get_width(_spr);
+                if (_spr_w <= 0) { _spr_w = 1; }
+
+                var _spr_h = sprite_get_height(_spr);
+                if (_spr_h <= 0) { _spr_h = 1; }
+
+                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 2, undefined, 0);
+                var _vb_st = _res.batch.buffer;
+
+                var _y1s = floor(_y0 + _spr_h);
+
+                var _full_count = floor(_width / _spr_w);
+                var _rem_width = _width - (_full_count * _spr_w);
+
+                var _du = _u1 - _u0;
+
+                var _tile_index = 0;
+                repeat (_full_count) {
+
+                    var _sx0 = floor(_x0 + (_tile_index * _spr_w));
+                    var _sx1 = floor(_sx0 + _spr_w);
+
+                    vertex_position(_vb_st, _sx0, _y0);
+                    vertex_texcoord(_vb_st, _u0, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1, _y0);
+                    vertex_texcoord(_vb_st, _u1, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1, _y1s);
+                    vertex_texcoord(_vb_st, _u1, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx0, _y0);
+                    vertex_texcoord(_vb_st, _u0, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1, _y1s);
+                    vertex_texcoord(_vb_st, _u1, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx0, _y1s);
+                    vertex_texcoord(_vb_st, _u0, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    _tile_index += 1;
+                }
+
+                if (_rem_width > 0) {
+
+                    var _sx0r = floor(_x0 + (_tile_index * _spr_w));
+                    var _sx1r = floor(_sx0r + _rem_width);
+
+                    var _ur1 = _u0 + (_du * (_rem_width / _spr_w));
+
+                    vertex_position(_vb_st, _sx0r, _y0);
+                    vertex_texcoord(_vb_st, _u0, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1r, _y0);
+                    vertex_texcoord(_vb_st, _ur1, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1r, _y1s);
+                    vertex_texcoord(_vb_st, _ur1, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx0r, _y0);
+                    vertex_texcoord(_vb_st, _u0, _v0);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx1r, _y1s);
+                    vertex_texcoord(_vb_st, _ur1, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+
+                    vertex_position(_vb_st, _sx0r, _y1s);
+                    vertex_texcoord(_vb_st, _u0, _v1);
+                    vertex_colour(_vb_st, _span_state.col, _span_state.alp);
+                }
+
+                _span_state.active = false;
+            };
+
+        #endregion
+
         #endregion
 
         #region VB build and draw (unified)
@@ -2199,9 +2543,31 @@ function WWTextRendererBase() : WWCore() constructor {
                     return;
                 }
 
-                var _span_state = {
+                var _ul_span_state = {
                     active: false,
                     under: __WW_Text_Glyph_Underline.None,
+                    x0: 0,
+                    x1: 0,
+                    y: 0,
+                    col: color,
+                    alp: alpha
+                };
+
+                var _bg_span_state = {
+                    active: false,
+                    x0: 0,
+                    x1: 0,
+                    y0: 0,
+                    y1: 0,
+                    wid: 0,
+                    hei: 0,
+                    col: c_white,
+                    alp: 1
+                };
+
+                var _st_span_state = {
+                    active: false,
+                    kind: __WW_Text_Glyph_Strike.None,
                     x0: 0,
                     x1: 0,
                     y: 0,
@@ -2216,13 +2582,17 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
 
                     if (_char == "\n" || _char == "\r" || _char == "\t") {
-                        __ul_flush_span__(_span_state);
+                        __bg_flush_span__(_bg_span_state);
+                        __st_flush_span__(_st_span_state);
+                        __ul_flush_span__(_ul_span_state);
                         _glyph_index += 1;
                         continue;
                     }
 
-                    if (_char == "	" && !whitespace_visible) {
-                        __ul_flush_span__(_span_state);
+                    if (_char == "\t" && !whitespace_visible) {
+                        __bg_flush_span__(_bg_span_state);
+                        __st_flush_span__(_st_span_state);
+                        __ul_flush_span__(_ul_span_state);
                         _glyph_index += 1;
                         continue;
                     }
@@ -2232,14 +2602,52 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
                     var _hei = _glyphs[_base + __WW_Layout_Glyph.Height];
 
+                    var _final_color = _glyphs[_base + __WW_Layout_Glyph.Color];
+                    var _final_alpha = _glyphs[_base + __WW_Layout_Glyph.Alpha];
+                    var _final_font = _glyphs[_base + __WW_Layout_Glyph.Font];
+                    var _final_style = _glyphs[_base + __WW_Layout_Glyph.Style];
+                    var _final_size = _glyphs[_base + __WW_Layout_Glyph.Size_Mul];
+                    var _final_under = _glyphs[_base + __WW_Layout_Glyph.Underline];
+                    var _final_back_col = _glyphs[_base + __WW_Layout_Glyph.Back_Color];
+                    var _final_back_alp = _glyphs[_base + __WW_Layout_Glyph.Back_Alpha];
+                    var _final_strike = _glyphs[_base + __WW_Layout_Glyph.Strike];
+
+                    if (is_undefined(_final_color)) { _final_color = color; }
+                    if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
+                    if (is_undefined(_final_style)) { _final_style = __WW_Text_Glyph_Style.Regular; }
+                    if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
+                    if (is_undefined(_final_under)) { _final_under = __WW_Text_Glyph_Underline.None; }
+                    if (is_undefined(_final_strike)) { _final_strike = __WW_Text_Glyph_Strike.None; }
+
+                    if (is_undefined(_final_back_col)) {
+                        _final_back_alp = undefined;
+                    } else if (is_undefined(_final_back_alp)) {
+                        _final_back_alp = 1;
+                    }
+
+                    if (!formatting_enabled) {
+                        _final_style = __WW_Text_Glyph_Style.Regular;
+                        _final_size = 1;
+                    }
+
+                    if (!underline_enabled) {
+                        _final_under = __WW_Text_Glyph_Underline.None;
+                    }
+
+                    if (!strike_enabled) {
+                        _final_strike = __WW_Text_Glyph_Strike.None;
+                    }
+
                     // Optional whitespace markers
                     if (whitespace_visible) {
 
                         if (_char == " ") {
 
-                            __ul_flush_span__(_span_state);
+                            __bg_flush_span__(_bg_span_state);
+                            __st_flush_span__(_st_span_state);
+                            __ul_flush_span__(_ul_span_state);
 
-                            var _cell_w = _wid;
+                            var _cell_w = _wid * _final_size;
                             var _mark_char = whitespace_marker_space;
                             var _mark_w = string_width(_mark_char);
 
@@ -2266,9 +2674,11 @@ function WWTextRendererBase() : WWCore() constructor {
                             continue;
                         }
 
-                        if (_char == "	") {
+                        if (_char == "\t") {
 
-                            __ul_flush_span__(_span_state);
+                            __bg_flush_span__(_bg_span_state);
+                            __st_flush_span__(_st_span_state);
+                            __ul_flush_span__(_ul_span_state);
 
                             var _mark_char2 = whitespace_marker_tab;
 
@@ -2291,31 +2701,64 @@ function WWTextRendererBase() : WWCore() constructor {
                         }
                     }
 
-                    var _final_color = _glyphs[_base + __WW_Layout_Glyph.Color];
-                    var _final_alpha = _glyphs[_base + __WW_Layout_Glyph.Alpha];
-                    var _final_font = _glyphs[_base + __WW_Layout_Glyph.Font];
-                    var _final_style = _glyphs[_base + __WW_Layout_Glyph.Style];
-                    var _final_size = _glyphs[_base + __WW_Layout_Glyph.Size_Mul];
-                    var _final_under = _glyphs[_base + __WW_Layout_Glyph.Underline];
+                    // Background accumulation (draw behind glyphs)
+                    if (!is_undefined(_final_back_col)) {
 
-                    if (is_undefined(_final_color)) { _final_color = color; }
-                    if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
-                    if (is_undefined(_final_style)) { _final_style = __WW_Text_Glyph_Style.Regular; }
-                    if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
-                    if (is_undefined(_final_under)) { _final_under = __WW_Text_Glyph_Underline.None; }
+                        var _bg_x0 = _pos_x;
+                        var _bg_x1 = _pos_x + (_wid * _final_size);
+                        var _bg_y0 = _pos_y;
+                        var _bg_y1 = _pos_y + (_hei * _final_size);
 
-                    if (!formatting_enabled) {
-                        _final_style = __WW_Text_Glyph_Style.Regular;
-                        _final_size = 1;
-                    }
+                        if (!_bg_span_state.active) {
 
-                    if (!underline_enabled) {
-                        _final_under = __WW_Text_Glyph_Underline.None;
+                            _bg_span_state.active = true;
+                            _bg_span_state.x0 = _bg_x0;
+                            _bg_span_state.x1 = _bg_x1;
+                            _bg_span_state.y0 = _bg_y0;
+                            _bg_span_state.y1 = _bg_y1;
+                            _bg_span_state.wid = _bg_x1 - _bg_x0;
+                            _bg_span_state.hei = _bg_y1 - _bg_y0;
+                            _bg_span_state.col = _final_back_col;
+                            _bg_span_state.alp = _final_back_alp;
+
+                        } else {
+
+                            var _same_col_bg = (_bg_span_state.col == _final_back_col);
+                            var _same_alp_bg = (_bg_span_state.alp == _final_back_alp);
+                            var _same_y0_bg = (_bg_span_state.y0 == _bg_y0);
+                            var _same_y1_bg = (_bg_span_state.y1 == _bg_y1);
+
+                            if (!_same_col_bg || !_same_alp_bg || !_same_y0_bg || !_same_y1_bg) {
+
+                                __bg_flush_span__(_bg_span_state);
+
+                                _bg_span_state.active = true;
+                                _bg_span_state.x0 = _bg_x0;
+                                _bg_span_state.x1 = _bg_x1;
+                                _bg_span_state.y0 = _bg_y0;
+                                _bg_span_state.y1 = _bg_y1;
+                                _bg_span_state.wid = _bg_x1 - _bg_x0;
+                                _bg_span_state.hei = _bg_y1 - _bg_y0;
+                                _bg_span_state.col = _final_back_col;
+                                _bg_span_state.alp = _final_back_alp;
+
+                            } else {
+
+                                _bg_span_state.x1 = _bg_x1;
+                                _bg_span_state.wid = _bg_span_state.x1 - _bg_span_state.x0;
+                            }
+                        }
+
+                    } else {
+
+                        __bg_flush_span__(_bg_span_state);
                     }
 
                     var _font_data = __glyph_resolve_font_data__(_final_font, _char);
                     if (is_undefined(_font_data)) {
-                        __ul_flush_span__(_span_state);
+                        __bg_flush_span__(_bg_span_state);
+                        __st_flush_span__(_st_span_state);
+                        __ul_flush_span__(_ul_span_state);
                         _glyph_index += 1;
                         continue;
                     }
@@ -2337,55 +2780,99 @@ function WWTextRendererBase() : WWCore() constructor {
                     // Optional underline accumulation
                     if (_final_under != __WW_Text_Glyph_Underline.None) {
 
-                        var _underline_y = _pos_y + _hei + underline_y_offset;
-                        if (_final_under == 4) {
-                            _underline_y = _pos_y + floor(_hei * 0.5) + underline_y_offset;
-                        }
+                        var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
 
-                        if (!_span_state.active) {
+                        if (!_ul_span_state.active) {
 
-                            _span_state.active = true;
-                            _span_state.under = _final_under;
-                            _span_state.x0 = _pos_x;
-                            _span_state.x1 = _pos_x + _wid;
-                            _span_state.y = _underline_y;
-                            _span_state.col = _final_color;
-                            _span_state.alp = _final_alpha;
+                            _ul_span_state.active = true;
+                            _ul_span_state.under = _final_under;
+                            _ul_span_state.x0 = _pos_x;
+                            _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+                            _ul_span_state.y = _underline_y;
+                            _ul_span_state.col = _final_color;
+                            _ul_span_state.alp = _final_alpha;
 
                         } else {
 
-                            var _same_type = (_span_state.under == _final_under);
-                            var _same_col = (_span_state.col == _final_color);
-                            var _same_alp = (_span_state.alp == _final_alpha);
-                            var _same_y = (_span_state.y == _underline_y);
+                            var _same_type = (_ul_span_state.under == _final_under);
+                            var _same_col = (_ul_span_state.col == _final_color);
+                            var _same_alp = (_ul_span_state.alp == _final_alpha);
+                            var _same_y = (_ul_span_state.y == _underline_y);
 
                             if (!_same_type || !_same_col || !_same_alp || !_same_y) {
 
-                                __ul_flush_span__(_span_state);
+                                __ul_flush_span__(_ul_span_state);
 
-                                _span_state.active = true;
-                                _span_state.under = _final_under;
-                                _span_state.x0 = _pos_x;
-                                _span_state.x1 = _pos_x + _wid;
-                                _span_state.y = _underline_y;
-                                _span_state.col = _final_color;
-                                _span_state.alp = _final_alpha;
+                                _ul_span_state.active = true;
+                                _ul_span_state.under = _final_under;
+                                _ul_span_state.x0 = _pos_x;
+                                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+                                _ul_span_state.y = _underline_y;
+                                _ul_span_state.col = _final_color;
+                                _ul_span_state.alp = _final_alpha;
 
                             } else {
 
-                                _span_state.x1 = _pos_x + _wid;
+                                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
                             }
                         }
 
                     } else {
 
-                        __ul_flush_span__(_span_state);
+                        __ul_flush_span__(_ul_span_state);
+                    }
+
+                    // Optional strike-through accumulation (independent from underline)
+                    if (_final_strike != __WW_Text_Glyph_Strike.None) {
+
+                        var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
+
+                        if (!_st_span_state.active) {
+
+                            _st_span_state.active = true;
+                            _st_span_state.kind = _final_strike;
+                            _st_span_state.x0 = _pos_x;
+                            _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                            _st_span_state.y = _strike_y;
+                            _st_span_state.col = _final_color;
+                            _st_span_state.alp = _final_alpha;
+
+                        } else {
+
+                            var _same_kind = (_st_span_state.kind == _final_strike);
+                            var _same_col_st = (_st_span_state.col == _final_color);
+                            var _same_alp_st = (_st_span_state.alp == _final_alpha);
+                            var _same_y_st = (_st_span_state.y == _strike_y);
+
+                            if (!_same_kind || !_same_col_st || !_same_alp_st || !_same_y_st) {
+
+                                __st_flush_span__(_st_span_state);
+
+                                _st_span_state.active = true;
+                                _st_span_state.kind = _final_strike;
+                                _st_span_state.x0 = _pos_x;
+                                _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                                _st_span_state.y = _strike_y;
+                                _st_span_state.col = _final_color;
+                                _st_span_state.alp = _final_alpha;
+
+                            } else {
+
+                                _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                            }
+                        }
+
+                    } else {
+
+                        __st_flush_span__(_st_span_state);
                     }
 
                     _glyph_index += 1;
                 }
 
-                __ul_flush_span__(_span_state);
+                __bg_flush_span__(_bg_span_state);
+                __st_flush_span__(_st_span_state);
+                __ul_flush_span__(_ul_span_state);
 
                 var _batch_count = array_length(__draw_batches__);
                 var _batch_index = 0;

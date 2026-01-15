@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextRendererCSS",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextRendererCSS",
+  "parent":{
+    "name":"Renderers",
+    "path":"folders/TextBoxV3/Renderers.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

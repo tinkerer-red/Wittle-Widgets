@@ -61,14 +61,15 @@ function WWTextLayout() constructor {
 		Alignment,
 		__Size__
 	}
+	
 	enum __WW_Text_Alignment {
 		Left,
 		Center,
 		Right
 	}
-	
+
 	#region jsDoc
-	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _color, _alpha, _font, _style, _size_mul, _underline)
+	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _color, _alpha, _font, _style, _size_mul, _underline, _back_color, _back_alpha, _strike)
 	/// @desc    Adds a glyph record to the layout. This glyph may represent a full Unicode cluster.
 	/// @param   {String} _char          : Representative character or cluster.
 	/// @param   {Real}   _index         : Logical text index (cluster index).
@@ -100,7 +101,10 @@ function WWTextLayout() constructor {
 		_font,
 		_style,
 		_size_mul,
-		_underline
+		_underline,
+		_back_color,
+		_back_alpha,
+		_strike
 	) {
 		var _data = layout_data;
 		var _glyphs = _data.glyphs;
@@ -122,7 +126,10 @@ function WWTextLayout() constructor {
 			_font,
 			_style,
 			_size_mul,
-			_underline
+			_underline,
+			_back_color,
+			_back_alpha,
+			_strike
 		);
 
 		// update content bounds
@@ -153,6 +160,9 @@ function WWTextLayout() constructor {
 		Style,
 		Size_Mul,
 		Underline,
+		Back_Color,
+		Back_Alpha,
+		Strike,
 
 		__Size__
 	}
@@ -209,7 +219,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= layout_data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _lines = _data.lines;
@@ -238,7 +248,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return "";
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -255,7 +265,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -272,7 +282,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -289,7 +299,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -306,7 +316,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -323,7 +333,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -340,7 +350,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -357,7 +367,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_line_index < 0 || _line_index >= _data.lines_count) {
-			return undefined;
+			return __WW_Text_Alignment.Left;
 		}
 		
 		var _index = _line_index * __WW_Layout_Line.__Size__;
@@ -477,7 +487,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
@@ -525,7 +535,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
@@ -543,7 +553,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
@@ -561,7 +571,7 @@ function WWTextLayout() constructor {
 		var _data = layout_data;
 		
 		if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-			return undefined;
+			return 0;
 		}
 		
 		var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
@@ -699,4 +709,13 @@ function WWTextLayout() constructor {
 	
 	#endregion
 	
+}
+
+
+enum __WW_Text_Glyph_Strike {
+	None,
+	Line,
+	Squiggle,
+	Warning,
+	Error
 }

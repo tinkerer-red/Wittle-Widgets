@@ -630,6 +630,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                 var _bold = false;
                 var _italic = false;
 				var _strike = false;
+				var _underline = false;
 
                 var _in_code_inline = false;
                 var _in_code_block = false;
@@ -1308,12 +1309,12 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                     if (_char_val == "~" && _pos_src + 1 <= _src_len && string_char_at(_src_text, _pos_src + 1) == "~" && !_in_code_inline && !_in_code_block) {
 
                         if ((string_length(_plain)) > (_span_start)) {
-                    array_push(_spans, {
-                        start_index: _span_start,
-                        end_index: string_length(_plain),
-                        state: __text_state_clone__(_state)
-                    });
-                }
+		                    array_push(_spans, {
+		                        start_index: _span_start,
+		                        end_index: string_length(_plain),
+		                        state: __text_state_clone__(_state)
+		                    });
+		                }
 
                         _strike = !_strike;
 
@@ -1324,12 +1325,32 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                             _state.strike = __WW_Text_Glyph_Strike.None;
                         }
 
-_span_start = string_length(_plain);
+						_span_start = string_length(_plain);
 
                         _pos_src += 2;
                         continue;
                     }
-
+					
+					// Underline __text__
+                    if (_char_val == "_" && _pos_src + 1 <= _src_len && string_char_at(_src_text, _pos_src + 1) == "_" && !_in_code_inline && !_in_code_block) {
+						if ((string_length(_plain)) > (_span_start)) {
+		                    array_push(_spans, {
+		                        start_index: _span_start,
+		                        end_index: string_length(_plain),
+		                        state: __text_state_clone__(_state)
+		                    });
+		                }
+						
+                        _underline = !_underline;
+						
+                        // Strikethrough is its own channel (can coexist with underline).
+                        _state.underline = (_underline) ? __WW_Text_Glyph_Underline.Line : __WW_Text_Glyph_Strike.None;
+                        
+						_span_start = string_length(_plain);
+                        _pos_src += 2;
+                        continue;
+                    }
+					
                     // Emphasis with asterisks and underscores (GFM-style approximations)
                     if ((_char_val == "*" || _char_val == "_") && !_in_code_inline && !_in_code_block) {
 
@@ -1406,7 +1427,8 @@ _span_start = string_length(_plain);
                         _at_line_start = false;
                         continue;
                     }
-                    // Image: ![alt](src) -> emit [alt]
+                    
+					// Image: ![alt](src) -> emit [alt]
                     if (_char_val == "!" && _pos_src + 1 <= _src_len && string_char_at(_src_text, _pos_src + 1) == "[") {
 
                         var _alt_start_src = _pos_src + 2;

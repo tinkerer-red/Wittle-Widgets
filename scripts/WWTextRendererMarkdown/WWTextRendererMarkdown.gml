@@ -109,8 +109,9 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
             /// @param   {Real} _h3_size
             /// @returns {Struct.WWTextRendererMarkdown}
             #endregion
-            static set_markdown_heading_sizes = function(_h1_size, _h2_size, _h3_size) {
+            static set_markdown_heading_sizes = function(_hs_size, _h1_size, _h2_size, _h3_size) {
 
+                markdown_hs_size = _hs_size;
                 markdown_h1_size = _h1_size;
                 markdown_h2_size = _h2_size;
                 markdown_h3_size = _h3_size;
@@ -139,6 +140,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
             markdown_code_font = fnt_ww_consolas_10;
 
+            markdown_hs_size = 0.75;
             markdown_h1_size = 2;
             markdown_h2_size = 1.5;
             markdown_h3_size = 1.25;
@@ -871,30 +873,41 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         }
 
                         // Heading (#, ##, ###) must be followed by space
-                        if (__md_starts_with__(_src_text, "### ", _pos_src) || __md_starts_with__(_src_text, "## ", _pos_src) || __md_starts_with__(_src_text, "# ", _pos_src)) {
+						var _is_header_s = __md_starts_with__(_src_text, "-# ", _pos_src);
+						var _is_header_1 = __md_starts_with__(_src_text, "# ", _pos_src);
+						var _is_header_2 = __md_starts_with__(_src_text, "## ", _pos_src);
+						var _is_header_3 = __md_starts_with__(_src_text, "### ", _pos_src);
+						
+                        if (_is_header_s || _is_header_1 || _is_header_2 || _is_header_3) {
 
                             if ((string_length(_plain)) > (_span_start)) {
-                    array_push(_spans, {
-                        start_index: _span_start,
-                        end_index: string_length(_plain),
-                        state: __text_state_clone__(_state)
-                    });
-                }
+			                    array_push(_spans, {
+			                        start_index: _span_start,
+			                        end_index: string_length(_plain),
+			                        state: __text_state_clone__(_state)
+			                    });
+			                }
 
                             _bold = false;
                             _italic = false;
 
                             var _new_size = 1;
 
-                            if (__md_starts_with__(_src_text, "### ", _pos_src)) {
+                            if (_is_header_3) {
                                 _new_size = markdown_h3_size;
                                 _pos_src += 4;
-                            } else if (__md_starts_with__(_src_text, "## ", _pos_src)) {
+                            }
+							else if (_is_header_2) {
                                 _new_size = markdown_h2_size;
                                 _pos_src += 3;
-                            } else {
+							}
+							else if (_is_header_1) {
                                 _new_size = markdown_h1_size;
                                 _pos_src += 2;
+                            }
+							else { //if (_is_header_s) {
+                                _new_size = markdown_hs_size;
+                                _pos_src += 3;
                             }
 
                             _state.size_mul = _new_size;

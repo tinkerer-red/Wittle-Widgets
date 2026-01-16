@@ -7,6 +7,7 @@ function WWTextLayout() constructor {
 	// Owned lists: when layout_data is destroyed, these lists are also destroyed.
 	layout_data.lines  = [];
 	layout_data.glyphs = [];
+	layout_data.spans  = [];
 	
 	layout_data.lines_count  = 0;
 	layout_data.glyphs_count = 0;
@@ -50,26 +51,9 @@ function WWTextLayout() constructor {
 		// Return index of this line if you want to keep a handle
 		return _line_index;
 	};
-	enum __WW_Layout_Line {
-		Text,
-		Start_Index,
-		End_Index,
-		Width,
-		Height,
-		Y_Offset,
-		Force_Wraped,
-		Alignment,
-		__Size__
-	}
-	
-	enum __WW_Text_Alignment {
-		Left,
-		Center,
-		Right
-	}
 
 	#region jsDoc
-	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _color, _alpha, _font, _style, _size_mul, _underline, _back_color, _back_alpha, _strike)
+	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _span_index)
 	/// @desc    Adds a glyph record to the layout. This glyph may represent a full Unicode cluster.
 	/// @param   {String} _char          : Representative character or cluster.
 	/// @param   {Real}   _index         : Logical text index (cluster index).
@@ -79,93 +63,66 @@ function WWTextLayout() constructor {
 	/// @param   {Real}   _y             : Y position in layout space.
 	/// @param   {Real}   _width         : Glyph width.
 	/// @param   {Real}   _height        : Glyph height.
-	/// @param   {Constant.Color} _color : Glyph color (baked per-glyph).
-	/// @param   {Real}   _alpha         : Glyph alpha (baked per-glyph).
-	/// @param   {Asset.GMFont} _font    : Font asset to render this glyph with (or -1 to mean "use renderer font").
-	/// @param   {Real}   _style         : Style enum (Regular/Bold/Italic/Bold_Italic).
-	/// @param   {Real}   _size_mul      : Size multiplier (1 is normal).
-	/// @param   {Real}   _underline     : Underline enum (None/Regular/Warning/Error).
+	/// @param   {Real}   _span_index    : Index into layout_data.spans for formatting/appearance.
 	/// @returns {Real}                  : Glyph slot index.
 	#endregion
 	static add_glyph = function(
-		_char,
-		_index,
-		_buffer_index,
-		_buffer_size,
-		_x,
-		_y,
-		_width,
-		_height,
-		_color,
-		_alpha,
-		_font,
-		_style,
-		_size_mul,
-		_underline,
-		_back_color,
-		_back_alpha,
-		_strike
+	    _char,
+	    _index,
+	    _buffer_index,
+	    _buffer_size,
+	    _x,
+	    _y,
+	    _width,
+	    _height,
+	    _span_index
 	) {
-		var _data = layout_data;
-		var _glyphs = _data.glyphs;
+	    var _data = layout_data;
+	    var _glyphs = _data.glyphs;
 
-		if (_size_mul <= 0) { _size_mul = 1; }
+	    array_push(
+	        _glyphs,
+	        _char,
+	        _index,
+	        _buffer_index,
+	        _buffer_size,
+	        _x,
+	        _y,
+	        _width,
+	        _height,
+	        _span_index
+	    );
 
-		array_push(
-			_glyphs,
-			_char,
-			_index,
-			_buffer_index,
-			_buffer_size,
-			_x,
-			_y,
-			_width,
-			_height,
-			_color,
-			_alpha,
-			_font,
-			_style,
-			_size_mul,
-			_underline,
-			_back_color,
-			_back_alpha,
-			_strike
-		);
+	    // update content bounds
+	    var _r = _x + _width;
+	    var _b = _y + _height;
 
-		// update content bounds
-		var _r = _x + _width;
-		var _b = _y + _height;
+	    if (_r > _data.content_width)  _data.content_width = _r;
+	    if (_b > _data.content_height) _data.content_height = _b;
 
-		if (_r > _data.content_width)  _data.content_width = _r;
-		if (_b > _data.content_height) _data.content_height = _b;
+	    var _glyph_index = _data.glyphs_count;
+	    _data.glyphs_count++;
 
-		var _glyph_index = _data.glyphs_count;
-		_data.glyphs_count++;
-
-		return _glyph_index;
+	    return _glyph_index;
 	};
-	enum __WW_Layout_Glyph {
-		Char,
-		Index,
-		Buffer_Index,
-		Buffer_Size,
-		X,
-		Y,
-		Width,
-		Height,
-		// Formatting (baked per glyph)
-		Color,
-		Alpha,
-		Font,
-		Style,
-		Size_Mul,
-		Underline,
-		Back_Color,
-		Back_Alpha,
-		Strike,
+	
+	#region jsDoc
+	/// @func    set_spans(_spans)
+	/// @desc    Sets the span array used by glyph records (formatting/appearance).
+	/// @param   {Array<Struct>} _spans
+	#endregion
+	static set_spans = function(_spans) {
+	    layout_data.spans = _spans;
+	};
 
-		__Size__
-	}
+	#region jsDoc
+	/// @func    get_spans()
+	/// @desc    Returns the current span array used by glyph records.
+	/// @returns {Array<Struct>}
+	#endregion
+	static get_spans = function() {
+	    return layout_data.spans;
+	};
 
 	#region Basic layout getters
 	
@@ -453,6 +410,7 @@ function WWTextLayout() constructor {
 				y            : _glyphs[_index + __WW_Layout_Glyph.Y],
 				width        : _glyphs[_index + __WW_Layout_Glyph.Width],
 				height       : _glyphs[_index + __WW_Layout_Glyph.Height],
+				span_index   : _glyphs[_index + __WW_Layout_Glyph.Span],
 			}
 		
 			return _line;

@@ -132,110 +132,35 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
         // Stylesheet map: class name -> style delta struct
         static __css_class_styles__ = undefined;
 
-        // ---------------------------------
-        // Style state helpers
-        // ---------------------------------
+		// ---------------------------------
+		// Style state helpers (canonical base state + align_value)
+		// ---------------------------------
 
-        static __css_state_make_default__ = function() {
-            return {
-                color_value: undefined,
-                alpha_value: undefined,
+		static __css_state_copy__ = function(_state) {
+			var _copy = __text_state_clone__(_state);
+			_copy.align_value = _state.align_value;
+			return _copy;
+		};
 
-                back_color_value: undefined,
-                back_alpha_value: undefined,
+		static __css_state_equals_align__ = function(_state_a, _state_b) {
+			return (_state_a.align_value == _state_b.align_value);
+		};
 
-                font_asset_or_minus1: -1,
-                style_value: __WW_Text_Glyph_Style.Regular,
-                size_mul: 1,
+		// ---------------------------------
+		// Span helpers
+		// ---------------------------------
 
-                underline_value: __WW_Text_Glyph_Underline.None,
+		static __css_push_span__ = function(_span_list, _span_start, _span_end, _state) {
+			if (_span_end <= _span_start) return;
 
-                strike_value: __WW_Text_Glyph_Strike.None,
+			array_push(_span_list, {
+				start_index: _span_start,
+				end_index: _span_end,
+				state: __css_state_copy__(_state)
+			});
+		};
 
-                // 0=left, 1=center, 2=right
-                align_value: 0
-            };
-        };
-
-        static __css_state_copy__ = function(_state) {
-            return {
-                color_value: _state.color_value,
-                alpha_value: _state.alpha_value,
-                back_color_value: _state.back_color_value,
-                back_alpha_value: _state.back_alpha_value,
-                font_asset_or_minus1: _state.font_asset_or_minus1,
-                style_value: _state.style_value,
-                size_mul: _state.size_mul,
-                underline_value: _state.underline_value,
-                strike_value: _state.strike_value,
-                align_value: _state.align_value
-            };
-        };
-
-        static __css_state_equals_span__ = function(_state_a, _state_b) {
-            return (
-                _state_a.font_asset_or_minus1 == _state_b.font_asset_or_minus1
-                && _state_a.style_value == _state_b.style_value
-                && _state_a.size_mul == _state_b.size_mul
-                && _state_a.color_value == _state_b.color_value
-                && _state_a.alpha_value == _state_b.alpha_value
-                && _state_a.underline_value == _state_b.underline_value
-                && _state_a.back_color_value == _state_b.back_color_value
-                && _state_a.back_alpha_value == _state_b.back_alpha_value
-                && _state_a.strike_value == _state_b.strike_value
-            );
-        };
-
-        static __css_state_equals_align__ = function(_state_a, _state_b) {
-            return (_state_a.align_value == _state_b.align_value);
-        };
-
-        // ---------------------------------
-        // Span helpers
-        // ---------------------------------
-
-        static __css_push_span__ = function(_span_list, _span_start, _span_end, _state) {
-            if (_span_end <= _span_start) return;
-
-            array_push(_span_list, {
-                start_index: _span_start,
-                end_index: _span_end,
-                state: __css_state_copy__(_state)
-            });
-        };
-
-        static __css_span_state_to_span_run__ = function(_span_len, _state) {
-            var _final_color = _state.color_value;
-            if (is_undefined(_final_color)) { _final_color = color; }
-            var _final_alpha = _state.alpha_value;
-            if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
-            var _final_size = _state.size_mul;
-            if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
-            var _final_underline = _state.underline_value;
-            if (is_undefined(_final_underline)) { _final_underline = __WW_Text_Glyph_Underline.None; }
-            var _final_strike = _state.strike_value;
-            if (is_undefined(_final_strike)) { _final_strike = __WW_Text_Glyph_Strike.None; }
-            var _run = {
-                index_count: _span_len,
-                font_asset_or_minus1: _state.font_asset_or_minus1,
-                style_value: _state.style_value,
-                size_mul: _final_size,
-                color: _final_color,
-                alpha: _final_alpha,
-                underline: _final_underline
-            };
-            _run[$ "back_color"] = _state.back_color_value; _run[$ "back_alpha"] = _state.back_alpha_value;
-            _run[$ "strike"] = _final_strike;
-            return _run;
-        };
-        static __css_span_state_to_align_run__ = function(_span_len, _state) {
-            return {
-                index_count: _span_len,
-                align_value: _state.align_value
-            };
-        };
-
-        // ---------------------------------
+		// ---------------------------------
         // Stylesheet parsing (class rules only)
         // ---------------------------------
 
@@ -313,30 +238,30 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
         static __css_style_delta_make__ = function() {
             return {
                 has_color: false,
-                color_value: undefined,
+                color: undefined,
 
                 has_alpha: false,
-                alpha_value: undefined,
+                alpha: undefined,
 
                 has_back_color: false,
-                back_color_value: undefined,
+                back_color: undefined,
                 has_back_alpha: false,
-                back_alpha_value: undefined,
+                back_alpha: undefined,
 
                 has_font: false,
-                font_asset_or_minus1: -1,
+                font_asset: font,
 
                 has_style: false,
-                style_value: __WW_Text_Glyph_Style.Regular,
+                style: __WW_Text_Glyph_Style.Regular,
 
                 has_size_mul: false,
                 size_mul: 1,
 
                 has_underline: false,
-                underline_value: __WW_Text_Glyph_Underline.None,
+                underline: __WW_Text_Glyph_Underline.None,
 
                 has_strike: false,
-                strike_value: __WW_Text_Glyph_Strike.None,
+                strike: __WW_Text_Glyph_Strike.None,
 
                 has_align: false,
                 align_value: 0,
@@ -353,17 +278,17 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
         static __css_apply_delta_to_state__ = function(_state, _delta, _is_global_allowed) {
 
-            if (_delta.has_color) _state.color_value = _delta.color_value;
-            if (_delta.has_alpha) _state.alpha_value = _delta.alpha_value;
+            if (_delta.has_color) _state.color = _delta.color;
+            if (_delta.has_alpha) _state.alpha = _delta.alpha;
 
-            if (_delta.has_back_color) _state.back_color_value = _delta.back_color_value;
-            if (_delta.has_back_alpha) _state.back_alpha_value = _delta.back_alpha_value;
+            if (_delta.has_back_color) _state.back_color = _delta.back_color;
+            if (_delta.has_back_alpha) _state.back_alpha = _delta.back_alpha;
 
-            if (_delta.has_font) _state.font_asset_or_minus1 = _delta.font_asset_or_minus1;
-            if (_delta.has_style) _state.style_value = _delta.style_value;
+            if (_delta.has_font) _state.font_asset = _delta.font;
+            if (_delta.has_style) _state.style = _delta.style;
             if (_delta.has_size_mul) _state.size_mul = _delta.size_mul;
-            if (_delta.has_underline) _state.underline_value = _delta.underline_value;
-            if (_delta.has_strike) _state.strike_value = _delta.strike_value;
+            if (_delta.has_underline) _state.underline = _delta.underline;
+            if (_delta.has_strike) _state.strike = _delta.strike;
             if (_delta.has_align) _state.align_value = _delta.align_value;
 
             // Global-only properties (only apply when allowed by caller)
@@ -542,20 +467,20 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
             if (_has_none) {
                 _delta.has_underline = true;
-                _delta.underline_value = __WW_Text_Glyph_Underline.None;
+                _delta.underline = __WW_Text_Glyph_Underline.None;
                 _delta.has_strike = true;
-                _delta.strike_value = __WW_Text_Glyph_Strike.None;
+                _delta.strike = __WW_Text_Glyph_Strike.None;
                 return;
             }
 
             if (_has_underline) {
                 _delta.has_underline = true;
-                _delta.underline_value = __WW_Text_Glyph_Underline.Line;
+                _delta.underline = __WW_Text_Glyph_Underline.Line;
             }
 
             if (_has_strike) {
                 _delta.has_strike = true;
-                _delta.strike_value = __WW_Text_Glyph_Strike.Line;
+                _delta.strike = __WW_Text_Glyph_Strike.Line;
             }
         };
 
@@ -605,18 +530,18 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                     var _col = __css_parse_color__(_val);
                     if (!is_undefined(_col)) {
                         _delta.has_color = true;
-                        _delta.color_value = _col;
+                        _delta.color = _col;
                     }
                 }
                 else if (_prop == "opacity") {
                     _delta.has_alpha = true;
-                    _delta.alpha_value = __css_parse_opacity__(_val);
+                    _delta.alpha = __css_parse_opacity__(_val);
                 }
                 else if (_prop == "background" || _prop == "background-color") {
                     var _bcol = __css_parse_color__(_val);
                     if (!is_undefined(_bcol)) {
                         _delta.has_back_color = true;
-                        _delta.back_color_value = _bcol;
+                        _delta.back_color = _bcol;
                         // If user provides rgba() alpha, they likely intend opacity too, but we do not parse alpha from rgba here.
                     }
                 }
@@ -626,11 +551,11 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 }
                 else if (_prop == "font-weight") {
                     _delta.has_style = true;
-                    _delta.style_value = __css_parse_font_weight_style__(_val, undefined, _delta.style_value);
+                    _delta.style = __css_parse_font_weight_style__(_val, undefined, _delta.style);
                 }
                 else if (_prop == "font-style") {
                     _delta.has_style = true;
-                    _delta.style_value = __css_parse_font_weight_style__(undefined, _val, _delta.style_value);
+                    _delta.style = __css_parse_font_weight_style__(undefined, _val, _delta.style);
                 }
                 else if (_prop == "font-family") {
 
@@ -650,7 +575,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                         var _font_id = css_font_resolver(_family);
                         if (!is_undefined(_font_id)) {
                             _delta.has_font = true;
-                            _delta.font_asset_or_minus1 = _font_id;
+                            _delta.font_asset = _font_id;
                         }
                     }
                 }
@@ -921,7 +846,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
             var _spans = [];
             var _align_runs = [];
 
-            var _state = __css_state_make_default__();
+            var _state = __text_state_make_default__();
             var _stack = [];
 
             var _span_start = 0;
@@ -1003,7 +928,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                     }
                 }
 
- if (_tag.is_close) {
+				if (_tag.is_close) {
 
                     // Pop until matching tag
                     var _top = array_length(_stack) - 1;
@@ -1028,16 +953,16 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
                 // Tag built-ins
                 if (_name == "b") {
-                    _next_state.style_value = __css_parse_font_weight_style__("bold", undefined, _next_state.style_value);
+                    _next_state.style = __css_parse_font_weight_style__("bold", undefined, _next_state.style);
                 }
                 else if (_name == "i") {
-                    _next_state.style_value = __css_parse_font_weight_style__(undefined, "italic", _next_state.style_value);
+                    _next_state.style = __css_parse_font_weight_style__(undefined, "italic", _next_state.style);
                 }
                 else if (_name == "u") {
-                    _next_state.underline_value = __WW_Text_Glyph_Underline.Line;
+                    _next_state.underline = __WW_Text_Glyph_Underline.Line;
                 }
                 else if (_name == "s") {
-                    _next_state.strike_value = __WW_Text_Glyph_Strike.Line;
+                    _next_state.strike = __WW_Text_Glyph_Strike.Line;
                 }
 
                 // Class + style attributes
@@ -1091,10 +1016,10 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 var _span_state = _span.state;
 
                 // Span merge (single definitive stream)
-                if (_i == 0 || __css_state_equals_span__(_curr_span_state, _span_state)) {
+                if (_i == 0 || __text_state_equals_span__(_curr_span_state, _span_state)) {
                     _span_count_accum += _span_len;
                 } else {
-                    array_push(_span_runs, __css_span_state_to_span_run__(_span_count_accum, _curr_span_state));
+                    array_push(_span_runs, __text_span_run_from_state__(_span_count_accum, _curr_span_state));
                     _curr_span_state = _span_state;
                     _span_count_accum = _span_len;
                 }
@@ -1103,7 +1028,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 if (_i == 0 || __css_state_equals_align__(_curr_align_state, _span_state)) {
                     _align_count += _span_len;
                 } else {
-                    array_push(_align_out, __css_span_state_to_align_run__(_align_count, _curr_align_state));
+                    array_push(_align_out, __text_align_run_from_state__(_align_count, _curr_align_state));
                     _curr_align_state = _span_state;
                     _align_count = _span_len;
                 }
@@ -1113,11 +1038,11 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
             // Flush tails
             if (_span_count_accum > 0) {
-                array_push(_span_runs, __css_span_state_to_span_run__(_span_count_accum, _curr_span_state));
+                array_push(_span_runs, __text_span_run_from_state__(_span_count_accum, _curr_span_state));
             }
 
             if (_align_count > 0) {
-                array_push(_align_out, __css_span_state_to_align_run__(_align_count, _curr_align_state));
+                array_push(_align_out, __text_align_run_from_state__(_align_count, _curr_align_state));
             }
 
             __css_plain_text__ = _plain;
@@ -1213,8 +1138,8 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
                 var _default_spans = [{
                     index_count: string_length(_source_text),
-                    font_asset_or_minus1: -1,
-                    style_value: __WW_Text_Glyph_Style.Regular,
+                    font_asset: font,
+                    style: __WW_Text_Glyph_Style.Regular,
                     size_mul: 1,
                     color: color,
                     alpha: alpha,

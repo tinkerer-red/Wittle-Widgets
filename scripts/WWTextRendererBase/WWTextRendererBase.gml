@@ -253,27 +253,7 @@ function WWTextRendererBase() : WWCore() constructor {
 		        #endregion
 				
 				#region Underline options
-
-	                #region jsDoc
-	                /// @func    set_underline_enabled()
-	                /// @desc    Enable or disable underline rendering.
-	                /// @param   {Bool} _enabled
-	                /// @returns {Struct.WWTextRendererBase}
-	                #endregion
-	                static set_underline_enabled = function(_enabled) {
-
-	                    _enabled = (_enabled == true);
-
-	                    if (underline_enabled == _enabled) {
-	                        return self;
-	                    }
-
-	                    underline_enabled = _enabled;
-	                    __mark_vb_dirty__();
-
-	                    return self;
-	                }
-
+					
 	                #region jsDoc
 	                /// @func    set_underline_offset()
 	                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
@@ -323,27 +303,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	            #endregion
 				
 				#region Strike-through options
-
-	                #region jsDoc
-	                /// @func    set_strike_enabled()
-	                /// @desc    Enable or disable strike-through rendering.
-	                /// @param   {Bool} _enabled
-	                /// @returns {Struct.WWTextRendererBase}
-	                #endregion
-	                static set_strike_enabled = function(_enabled) {
-
-	                    _enabled = (_enabled == true);
-
-	                    if (strike_enabled == _enabled) {
-	                        return self;
-	                    }
-
-	                    strike_enabled = _enabled;
-	                    __mark_vb_dirty__();
-
-	                    return self;
-	                }
-
+	                
 	                #region jsDoc
 	                /// @func    set_strike_offset()
 	                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
@@ -444,7 +404,6 @@ function WWTextRendererBase() : WWCore() constructor {
             whitespace_alpha = 0.5;
 			
             // Underlines
-            underline_enabled = true;
             underline_y_offset = 0;
             underline_thickness = 1;
             underline_sprite_white = spr_ww_pixel;
@@ -452,7 +411,6 @@ function WWTextRendererBase() : WWCore() constructor {
             underline_sprite_error = spr_ww_underline_error;
 
             // Strike-through
-            strike_enabled = true;
             strike_y_offset = 0;
             strike_thickness = 1;
             strike_sprite_white = spr_ww_pixel;
@@ -970,16 +928,7 @@ function WWTextRendererBase() : WWCore() constructor {
             __draw_batches__ = [];
 
             // Per-font info cache
-            __font_info_cache__ = {};
-            __font_uv_cache__ = {};
-            __font_tex_cache__ = {};
-            __font_texw_cache__ = {};
-            __font_texh_cache__ = {};
-
-            // Per-font SDF/MSDF cache
-            __font_sdf_enabled_cache__ = {};
-            __font_sdf_spread_cache__ = {};
-            __font_sdf_shader_cache__ = {};
+            __font_cache__ = {};
 
             // Tab metrics cached per rebuild
             __space_width__ = 0;
@@ -1181,18 +1130,19 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 __display_text__ = _text_value;
 
-                var _default_spans = [{
-                    index_count: string_length(_text_value),
-                    font_asset_or_minus1: -1,
-                    style_value: __WW_Text_Glyph_Style.Regular,
-                    size_mul: 1,
-                    color: color,
-                    alpha: alpha,
-                    underline: __WW_Text_Glyph_Underline.None,
-                    strike: __WW_Text_Glyph_Strike.None,
-                    back_color: color,
-                    back_alpha: 0
-                }];
+				var _default_spans = [{
+				    index_count: string_length(_text_value),
+				    font_asset: font,
+					style: __WW_Text_Glyph_Style.Regular,
+				    size_mul: 1,
+				    color: color,
+				    alpha: alpha,
+				    underline: __WW_Text_Glyph_Underline.None,
+				    strike: __WW_Text_Glyph_Strike.None,
+				    back_color: 0,
+				    back_alpha: 0
+				}];
+
 
                 __layout__ = __build_layout__(_text_value, _default_spans);
 
@@ -1212,6 +1162,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			static __build_layout__ = function(_str, _spans=undefined) {
 
 			    var _layout = new WWTextLayout();
+				_layout.set_spans(_spans);
 
 			    if (_str == "") {
 
@@ -1247,7 +1198,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _metric_remaining = 0;
 
 			    var _metric_font_override = -1;
-			    var _metric_style_value = __WW_Text_Glyph_Style.Regular;
+			    var _metric_style = __WW_Text_Glyph_Style.Regular;
 			    var _metric_size_mul = 1;
 
 			    var _visual_run_count = array_length(_visual_runs);
@@ -1268,9 +1219,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			        _metric_remaining = _metric_run0.index_count;
 
-			        _metric_font_override = is_undefined(_metric_run0.font_asset_or_minus1) ? -1 : _metric_run0.font_asset_or_minus1;
-			        _metric_style_value = is_undefined(_metric_run0.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run0.style_value;
-			        _metric_size_mul = is_undefined(_metric_run0.size_mul) ? 1 : _metric_run0.size_mul;
+			        _metric_font_override = _metric_run0.font_asset;
+			        _metric_style = _metric_run0.style;
+			        _metric_size_mul = _metric_run0.size_mul;
 
 			        if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
 			    }
@@ -1349,9 +1300,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            _metric_remaining = _metric_runn.index_count;
 
-			            _metric_font_override = is_undefined(_metric_runn.font_asset_or_minus1) ? -1 : _metric_runn.font_asset_or_minus1;
-			            _metric_style_value = is_undefined(_metric_runn.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_runn.style_value;
-			            _metric_size_mul = is_undefined(_metric_runn.size_mul) ? 1 : _metric_runn.size_mul;
+			            _metric_font_override = _metric_runn.font_asset;
+			            _metric_style = _metric_runn.style;
+			            _metric_size_mul = _metric_runn.size_mul;
 
 			            if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
 			        }
@@ -1565,9 +1516,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			        _metric_remaining = _metric_run2.index_count;
 
-			        _metric_font_override = is_undefined(_metric_run2.font_asset_or_minus1) ? -1 : _metric_run2.font_asset_or_minus1;
-			        _metric_style_value = is_undefined(_metric_run2.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run2.style_value;
-			        _metric_size_mul = is_undefined(_metric_run2.size_mul) ? 1 : _metric_run2.size_mul;
+			        _metric_font_override = _metric_run2.font_asset;
+			        _metric_style = _metric_run2.style;
+			        _metric_size_mul = _metric_run2.size_mul;
 
 			        if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
 
@@ -1575,7 +1526,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			        _metric_remaining = 999999999;
 			        _metric_font_override = -1;
-			        _metric_style_value = __WW_Text_Glyph_Style.Regular;
+			        _metric_style = __WW_Text_Glyph_Style.Regular;
 			        _metric_size_mul = 1;
 			    }
 
@@ -1630,9 +1581,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			                _metric_remaining = _metric_run3.index_count;
 
-			                _metric_font_override = is_undefined(_metric_run3.font_asset_or_minus1) ? -1 : _metric_run3.font_asset_or_minus1;
-			                _metric_style_value = is_undefined(_metric_run3.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run3.style_value;
-			                _metric_size_mul = is_undefined(_metric_run3.size_mul) ? 1 : _metric_run3.size_mul;
+			                _metric_font_override = _metric_run3.font_asset;
+			                _metric_style = _metric_run3.style;
+			                _metric_size_mul = _metric_run3.size_mul;
 
 			                if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
 			            }
@@ -1684,25 +1635,19 @@ function WWTextRendererBase() : WWCore() constructor {
 			                var _fallback_scaled = _active_font_height * _metric_size_mul;
 			                if (_fallback_scaled > _max_height) { _max_height = _fallback_scaled; }
 
-			                _layout.add_glyph(
-			                    _char_emit,
-			                    _emit_index,
-			                    _emit_index,
-			                    1,
-			                    _cursor_x,
-			                    _current_y,
-			                    0,
-			                    0,
-			                    _visual_color,
-			                    _visual_alpha,
-			                    _metric_font_override,
-			                    _metric_style_value,
-			                    _metric_size_mul,
-			                    _visual_underline,
-			                    _visual_back_color,
-			                    _visual_back_alpha,
-			                    _visual_strike
-			                );
+							var _span_index_nl = _visual_run_index;
+
+							_layout.add_glyph(
+							    _char_emit,
+							    _emit_index,
+							    _emit_index,
+							    1,
+							    _cursor_x,
+							    _current_y,
+							    0,
+							    0,
+							    _span_index_nl
+							);
 
 			                _metric_remaining -= 1;
 			                _visual_remaining -= 1;
@@ -1737,25 +1682,20 @@ function WWTextRendererBase() : WWCore() constructor {
 			            var _scaled_hei = _base_hei * _metric_size_mul;
 			            if (_scaled_hei > _max_height) { _max_height = _scaled_hei; }
 
-			            _layout.add_glyph(
-			                _char_emit,
-			                _emit_index,
-			                _emit_index,
-			                1,
-			                _cursor_x,
-			                _current_y,
-			                _base_wid,
-			                _base_hei,
-			                _visual_color,
-			                _visual_alpha,
-			                _metric_font_override,
-			                _metric_style_value,
-			                _metric_size_mul,
-			                _visual_underline,
-			                _visual_back_color,
-			                _visual_back_alpha,
-			                _visual_strike
-			            );
+						var _span_index = _visual_run_index;
+
+						_layout.add_glyph(
+						    _char_emit,
+						    _emit_index,
+						    _emit_index,
+						    1,
+						    _cursor_x,
+						    _current_y,
+						    _base_wid,
+						    _base_hei,
+						    _span_index
+						);
+
 
 			            _cursor_x += (_base_wid * _metric_size_mul);
 
@@ -1813,97 +1753,102 @@ function WWTextRendererBase() : WWCore() constructor {
 
         #region Font render data
 
-            static __font_get_render_data__ = function(_font_asset) {
+			static __font_get_render_data__ = function(_font_asset) {
 
-                if (is_undefined(__font_info_cache__[$ _font_asset])) {
+			    var _cached = __font_cache__[$ _font_asset];
+			    if (!is_undefined(_cached)) {
+			        return _cached;
+			    }
 
-                    var _info = font_get_info(_font_asset);
+			    // Important: we also want to cache "missing" fonts to avoid repeated work.
+			    // We cannot store "undefined" in a struct slot and later distinguish "not present",
+			    // so we store a sentinel struct.
+			    var _sentinel = __font_cache__[$ ("__missing__" + string(_font_asset))];
+			    if (!is_undefined(_sentinel)) {
+			        return undefined;
+			    }
 
-                    if (is_undefined(_info)) {
-                        __font_info_cache__[$ _font_asset] = undefined;
-                        return undefined;
-                    }
+			    var _info = font_get_info(_font_asset);
+			    if (is_undefined(_info)) {
+			        __font_cache__[$ ("__missing__" + string(_font_asset))] = { missing: true };
+			        return undefined;
+			    }
 
-                    var _tex = font_get_texture(_font_asset);
-                    var _uvs = font_get_uvs(_font_asset);
+			    var _tex = font_get_texture(_font_asset);
+			    var _uvs = font_get_uvs(_font_asset);
 
-                    var _sdf_enabled = _info.sdfEnabled;
-                    var _sdf_spread = 0;
-                    var _sdf_shader = undefined;
-                    
-					if (_sdf_enabled) {
-                        _sdf_spread = _info.sdfSpread;
-                        _sdf_shader = (asset_has_any_tag(_font_asset, "msdf")) ? shd_ww_msdf : shd_ww_sdf;
-                    }
+			    var _sdf_enabled = (_info.sdfEnabled == true);
+			    var _sdf_spread = 0;
+			    var _sdf_shader = undefined;
 
-                    __font_info_cache__[$ _font_asset] = _info;
-                    __font_sdf_enabled_cache__[$ _font_asset] = _sdf_enabled;
-                    __font_sdf_spread_cache__[$ _font_asset] = _sdf_spread;
-                    __font_sdf_shader_cache__[$ _font_asset] = _sdf_shader;
-                    __font_uv_cache__[$ _font_asset] = _uvs;
-                    __font_tex_cache__[$ _font_asset] = _tex;
-                    __font_texw_cache__[$ _font_asset] = texture_get_width(_tex);
-                    __font_texh_cache__[$ _font_asset] = texture_get_height(_tex);
-                }
-				
-                return {
-                    info: __font_info_cache__[$ _font_asset],
-                    tex: __font_tex_cache__[$ _font_asset],
-                    uvs: __font_uv_cache__[$ _font_asset],
-                    tex_w: __font_texw_cache__[$ _font_asset],
-                    tex_h: __font_texh_cache__[$ _font_asset],
+			    if (_sdf_enabled) {
+			        _sdf_spread = _info.sdfSpread;
+			        _sdf_shader = (asset_has_any_tag(_font_asset, "msdf")) ? shd_ww_msdf : shd_ww_sdf;
+			    }
 
-                    sdf_enabled: __font_sdf_enabled_cache__[$ _font_asset],
-                    sdf_spread: __font_sdf_spread_cache__[$ _font_asset],
-                    sdf_shader: __font_sdf_shader_cache__[$ _font_asset]
-                };
-            };
+			    var _tex_width = texture_get_width(_tex);
+			    var _tex_height = texture_get_height(_tex);
 
-            static __glyph_resolve_font_data__ = function(_font_override_or_minus1, _char) {
+			    // Precompute texel size once per font texture.
+			    var _texel_w = texture_get_texel_width(_tex);
+			    var _texel_h = texture_get_texel_height(_tex);
 
-                if (!is_undefined(_font_override_or_minus1) && _font_override_or_minus1 != -1 && font_exists(_font_override_or_minus1)) {
+			    var _render_data = {
+			        info: _info,
+			        glyphs: _info.glyphs,
 
-                    var _data1 = __font_get_render_data__(_font_override_or_minus1);
+			        tex: _tex,
+			        uvs: _uvs,
+			        tex_w: _tex_width,
+			        tex_h: _tex_height,
+			        texel_w: _texel_w,
+			        texel_h: _texel_h,
 
-                    if (!is_undefined(_data1) && !is_undefined(_data1.info.glyphs[$ _char])) {
-                        return _data1;
-                    }
-                }
+			        sdf_enabled: _sdf_enabled,
+			        sdf_spread: _sdf_spread,
+			        sdf_shader: _sdf_shader
+			    };
 
-                if (font_exists(font)) {
+			    __font_cache__[$ _font_asset] = _render_data;
+			    return _render_data;
+			};
+			
+			static __glyph_resolve_font_data__ = function(_font_asset, _char, _default_font_data) {
 
-                    var _data2 = __font_get_render_data__(font);
+			    // Try the requested font first
+			    var _data = __font_get_render_data__(_font_asset);
+			    if (!is_undefined(_data) && !is_undefined(_data.info.glyphs[$ _char])) {
+			        return _data;
+			    }
 
-                    if (!is_undefined(_data2) && !is_undefined(_data2.info.glyphs[$ _char])) {
-                        return _data2;
-                    }
-                }
+			    // Try renderer default font next (already fetched by caller)
+			    if (!is_undefined(_default_font_data) && !is_undefined(_default_font_data.info.glyphs[$ _char])) {
+			        return _default_font_data;
+			    }
 
-                var _fallbacks = font_fallbacks;
+			    // Fallbacks
+			    var _fallbacks = font_fallbacks;
+			    if (is_array(_fallbacks)) {
 
-                if (is_array(_fallbacks)) {
+			        var _count = array_length(_fallbacks);
+			        var _index = 0;
 
-                    var _count = array_length(_fallbacks);
-                    var _index = 0;
+			        repeat (_count) {
 
-                    repeat (_count) {
-                        var _fb = _fallbacks[_index];
+			            var _fb = _fallbacks[_index];
+			            _index += 1;
 
-                        if (!is_undefined(_fb) && font_exists(_fb)) {
+			            if (font_exists(_fb)) {
+			                var _fb_data = __font_get_render_data__(_fb);
+			                if (!is_undefined(_fb_data) && !is_undefined(_fb_data.info.glyphs[$ _char])) {
+			                    return _fb_data;
+			                }
+			            }
+			        }
+			    }
 
-                            var _data3 = __font_get_render_data__(_fb);
-
-                            if (!is_undefined(_data3) && !is_undefined(_data3.info.glyphs[$ _char])) {
-                                return _data3;
-                            }
-                        }
-
-                        _index++;
-                    }
-                }
-
-                return undefined;
-            };
+			    return undefined;
+			};
 
         #endregion
 
@@ -1929,8 +1874,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			        return false;
 			    }
 
-			    var _uv_w = texture_get_texel_width(_font_data.tex);
-			    var _uv_h = texture_get_texel_height(_font_data.tex);
+			    var _uv_w = _font_data.texel_w;
+				var _uv_h = _font_data.texel_h;
 
 			    var _u0 = _gx * _uv_w;
 			    var _v0 = _gy * _uv_h;
@@ -1979,130 +1924,179 @@ function WWTextRendererBase() : WWCore() constructor {
 			
 			#region Text State Helpers
 
-			    #region jsDoc
-			    /// @func   __text_state_make_default__()
-			    /// @desc   Creates a complete default text state from the renderer's current settings.
-			    /// @returns {Struct}
-			    #endregion
-			    static __text_state_make_default__ = function() {
-			        return {
-			            font_asset_or_minus1: -1,
-			            style_value: __WW_Text_Glyph_Style.Regular,
-			            size_mul: 1,
-			            color: color,
-			            alpha: alpha,
-			            underline: __WW_Text_Glyph_Underline.None,
-			            strike: __WW_Text_Glyph_Strike.None,
-			            back_color: undefined,
-			            back_alpha: undefined
-			        };
-			    };
+				#region jsDoc
+				/// @func   __text_state_make_default__()
+				/// @desc   Creates a complete default text state from the renderer's current settings.
+				/// @returns {Struct}
+				#endregion
+				static __text_state_make_default__ = function() {
+					return {
+					    font_asset: font,
+					    style: __WW_Text_Glyph_Style.Regular,
+					    size_mul: 1,
 
-			    #region jsDoc
-			    /// @func   __text_state_clone__()
-			    /// @desc   Clones a complete text state struct (all expected keys must exist).
-			    /// @param  {Struct} _state
-			    /// @returns {Struct}
-			    #endregion
-			    static __text_state_clone__ = function(_state) {
-			        return {
-			            font_asset_or_minus1: _state.font_asset_or_minus1,
-			            style_value: _state.style_value,
-			            size_mul: _state.size_mul,
-			            color: _state.color,
-			            alpha: _state.alpha,
-			            underline: _state.underline,
-			            strike: _state.strike,
-			            back_color: _state.back_color,
-			            back_alpha: _state.back_alpha
-			        };
-			    };
+					    color: color,
+					    alpha: alpha,
 
-			    #region jsDoc
-			    /// @func   __text_state_apply_patch__()
-			    /// @desc   Applies a partial patch struct to an existing complete text state.
-			    ///         Only keys present in _patch are applied.
-			    /// @param  {Struct} _state
-			    /// @param  {Struct} _patch
-			    #endregion
-			    static __text_state_apply_patch__ = function(_state, _patch) {
+					    underline: __WW_Text_Glyph_Underline.None,
+					    strike: __WW_Text_Glyph_Strike.None,
 
-			        var _value = undefined;
+					    back_color: 0,
+					    back_alpha: 0,
 
-			        _value = _patch[$ "font_asset_or_minus1"];
-			        if (!is_undefined(_value)) _state.font_asset_or_minus1 = _value;
+					    // Layout concern - included in state so all renderers can drive it.
+					    align_value: 0
+					};
+				};
 
-			        _value = _patch[$ "style_value"];
-			        if (!is_undefined(_value)) _state.style_value = _value;
+				#region jsDoc
+				/// @func   __text_state_clone__()
+				/// @desc   Clones a complete text state struct (all expected keys must exist).
+				/// @param  {Struct} _state
+				/// @returns {Struct}
+				#endregion
+				static __text_state_clone__ = function(_state) {
+					return {
+						font_asset: _state.font_asset,
+						style: _state.style,
+						size_mul: _state.size_mul,
 
-			        _value = _patch[$ "size_mul"];
-			        if (!is_undefined(_value)) _state.size_mul = _value;
+						color: _state.color,
+						alpha: _state.alpha,
 
-			        _value = _patch[$ "color"];
-			        if (!is_undefined(_value)) _state.color = _value;
+						underline: _state.underline,
+						strike: _state.strike,
 
-			        _value = _patch[$ "alpha"];
-			        if (!is_undefined(_value)) _state.alpha = _value;
+						back_color: _state.back_color,
+						back_alpha: _state.back_alpha,
+						
+						align_value: _state.align_value
+					};
+				};
 
-			        _value = _patch[$ "underline"];
-			        if (!is_undefined(_value)) _state.underline = _value;
+				static __text_state_equals_span__ = function(_state_a, _state_b) {
+				    return (
+				        _state_a.font_asset == _state_b.font_asset
+				        && _state_a.style == _state_b.style
+				        && _state_a.size_mul == _state_b.size_mul
+				        && _state_a.color == _state_b.color
+				        && _state_a.alpha == _state_b.alpha
+				        && _state_a.underline == _state_b.underline
+				        && _state_a.strike == _state_b.strike
+				        && _state_a.back_color == _state_b.back_color
+				        && _state_a.back_alpha == _state_b.back_alpha
+				    );
+				};
 
-			        _value = _patch[$ "strike"];
-			        if (!is_undefined(_value)) _state.strike = _value;
+				static __text_state_equals_align__ = function(_state_a, _state_b) {
+				    return (_state_a.align_value == _state_b.align_value);
+				};
+				
+				#region jsDoc
+				/// @func   __text_state_apply_patch__()
+				/// @desc   Applies a partial patch struct to an existing complete text state.
+				///         Only keys present in _patch are applied.
+				/// @param  {Struct} _state
+				/// @param  {Struct} _patch
+				#endregion
+				static __text_state_apply_patch__ = function(_state, _patch) {
 
-			        _value = _patch[$ "back_color"];
-			        if (!is_undefined(_value)) _state.back_color = _value;
+					var _value = undefined;
 
-			        _value = _patch[$ "back_alpha"];
-			        if (!is_undefined(_value)) _state.back_alpha = _value;
-			    };
+					_value = _patch[$ "font_asset"];
+					if (!is_undefined(_value)) _state.font_asset = _value;
 
-			    #region jsDoc
-			    /// @func   __text_state_clone_patch__()
-			    /// @desc   Returns a clone of _state with _patch applied.
-			    /// @param  {Struct} _state
-			    /// @param  {Struct} _patch
-			    /// @returns {Struct}
-			    #endregion
-			    static __text_state_clone_patch__ = function(_state, _patch) {
+					_value = _patch[$ "style"];
+					if (!is_undefined(_value)) _state.style = _value;
 
-			        var _result = __text_state_clone__(_state);
-			        __text_state_apply_patch__(_result, _patch);
-			        return _result;
-			    };
+					_value = _patch[$ "size_mul"];
+					if (!is_undefined(_value)) _state.size_mul = _value;
 
+					_value = _patch[$ "color"];
+					if (!is_undefined(_value)) _state.color = _value;
+
+					_value = _patch[$ "alpha"];
+					if (!is_undefined(_value)) _state.alpha = _value;
+
+					_value = _patch[$ "underline"];
+					if (!is_undefined(_value)) _state.underline = _value;
+
+					_value = _patch[$ "strike"];
+					if (!is_undefined(_value)) _state.strike = _value;
+
+					_value = _patch[$ "back_color"];
+					if (!is_undefined(_value)) _state.back_color = _value;
+
+					_value = _patch[$ "back_alpha"];
+					if (!is_undefined(_value)) _state.back_alpha = _value;
+					
+					_value = _patch[$ "align_value"];
+					if (!is_undefined(_value)) _state.align_value = _value;
+				};
+
+				#region jsDoc
+				/// @func   __text_state_clone_patch__()
+				/// @desc   Clones a complete text state then applies a patch.
+				/// @param  {Struct} _state
+				/// @param  {Struct} _patch
+				/// @returns {Struct}
+				#endregion
+				static __text_state_clone_patch__ = function(_state, _patch) {
+					var _result = __text_state_clone__(_state);
+					__text_state_apply_patch__(_result, _patch);
+					return _result;
+				};
+
+				#region jsDoc
+				/// @func   __text_span_run_from_state__()
+				/// @desc   Converts a complete text state into a layout span run.
+				/// @param  {Real} _index_count
+				/// @param  {Struct} _state
+				/// @returns {Struct}
+				#endregion
+				static __text_span_run_from_state__ = function(_index_count, _state) {
+					return {
+						index_count: _index_count,
+
+						font_asset: _state.font_asset,
+						style: _state.style,
+						size_mul: _state.size_mul,
+
+						color: _state.color,
+						alpha: _state.alpha,
+
+						underline: _state.underline,
+						strike: _state.strike,
+
+						back_color: _state.back_color,
+						back_alpha: _state.back_alpha
+					};
+				};
+				
+				static __text_align_run_from_state__ = function(_index_count, _state) {
+				    return {
+				        index_count: _index_count,
+				        align_value: _state.align_value
+				    };
+				};
+				
 			#endregion
-
+			
         #endregion
         
         #region VB emit styled glyph
 
             static __vb_emit_glyph_styled_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp, _size_mul, _style) {
 
-			    if (_char == "" || is_undefined(_font_data)) {
-			        return false;
-			    }
-
-			    if (_size_mul <= 0) {
-			        return false;
-			    }
-
 			    var _glyph_info = _font_data.info.glyphs[$ _char];
-			    if (is_undefined(_glyph_info)) {
-			        return false;
-			    }
-
+			    
 			    var _gx = _glyph_info.x;
 			    var _gy = _glyph_info.y;
 			    var _gw = _glyph_info.w;
 			    var _gh = _glyph_info.h;
 
-			    if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
-			        return false;
-			    }
-
-			    var _uv_w = texture_get_texel_width(_font_data.tex);
-			    var _uv_h = texture_get_texel_height(_font_data.tex);
+			    var _uv_w = _font_data.texel_w;
+				var _uv_h = _font_data.texel_h;
 
 			    var _u0 = _gx * _uv_w;
 			    var _v0 = _gy * _uv_h;
@@ -2110,7 +2104,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _v1 = (_gy + _gh) * _uv_h;
 
 			    var _padding = 0;
-			    if (!is_undefined(_font_data.info) && _font_data.info.sdfEnabled) {
+			    if (_font_data.info.sdfEnabled) {
 			        _padding = _font_data.info.sdfSpread * _size_mul;
 			    }
 
@@ -2131,31 +2125,31 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _slant_bottom = 0;
 
 			    if (_italic) {
-			        _slant_top = 2 * _size_mul;
-			        _slant_bottom = -1 * _size_mul;
+			        _slant_top = ceil(2 * _size_mul);
+			        _slant_bottom = floor(-1 * _size_mul);
 			    }
 
-			    vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
+			    vertex_position(_vb_buffer, _x0 + _slant_top, _y0);
 			    vertex_texcoord(_vb_buffer, _u0, _v0);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, floor(_x1 + _slant_top), _y0);
+			    vertex_position(_vb_buffer, _x1 + _slant_top, _y0);
 			    vertex_texcoord(_vb_buffer, _u1, _v0);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
+			    vertex_position(_vb_buffer, _x1 + _slant_bottom, _y1);
 			    vertex_texcoord(_vb_buffer, _u1, _v1);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, floor(_x0 + _slant_top), _y0);
+			    vertex_position(_vb_buffer, _x0 + _slant_top, _y0);
 			    vertex_texcoord(_vb_buffer, _u0, _v0);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, floor(_x1 + _slant_bottom), _y1);
+			    vertex_position(_vb_buffer, _x1 + _slant_bottom, _y1);
 			    vertex_texcoord(_vb_buffer, _u1, _v1);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, floor(_x0 + _slant_bottom), _y1);
+			    vertex_position(_vb_buffer, _x0 + _slant_bottom, _y1);
 			    vertex_texcoord(_vb_buffer, _u0, _v1);
 			    vertex_colour(_vb_buffer, _col, _alp);
 
@@ -2171,12 +2165,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 if (!_span_state.active) {
                     return;
                 }
-
-                if (!underline_enabled) {
-                    _span_state.active = false;
-                    return;
-                }
-
+                
                 if (_span_state.under == __WW_Text_Glyph_Underline.None) {
                     _span_state.active = false;
                     return;
@@ -2415,12 +2404,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 if (!_span_state.active) {
                     return;
                 }
-
-                if (!strike_enabled) {
-                    _span_state.active = false;
-                    return;
-                }
-
+                
                 if (_span_state.kind == __WW_Text_Glyph_Strike.None) {
                     _span_state.active = false;
                     return;
@@ -2602,375 +2586,432 @@ function WWTextRendererBase() : WWCore() constructor {
                 __vb_is_dirty__ = false;
             };
 
-            static __build_vb__ = function() {
-
-                var _old_font = draw_get_font();
-                if (font_exists(font)) {
-                    draw_set_font(font);
-                }
-
-                var _layout_data = __layout__.get_layout_data();
-                var _glyphs = _layout_data.glyphs;
-                var _glyph_count = _layout_data.glyphs_count;
-
-                if (_glyph_count <= 0) {
-                    if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                        draw_set_font(_old_font);
-                    }
-                    return;
-                }
-
-                var _default_font_data = __font_get_render_data__(font);
-                if (is_undefined(_default_font_data)) {
-                    if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                        draw_set_font(_old_font);
-                    }
-                    return;
-                }
-
-                var _ul_span_state = {
-                    active: false,
-                    under: __WW_Text_Glyph_Underline.None,
-                    x0: 0,
-                    x1: 0,
-                    y: 0,
-                    col: color,
-                    alp: alpha
-                };
-
-                var _bg_span_state = {
-                    active: false,
-                    x0: 0,
-                    x1: 0,
-                    y0: 0,
-                    y1: 0,
-                    wid: 0,
-                    hei: 0,
-                    col: c_white,
-                    alp: 1
-                };
-
-                var _st_span_state = {
-                    active: false,
-                    kind: __WW_Text_Glyph_Strike.None,
-                    x0: 0,
-                    x1: 0,
-                    y: 0,
-                    col: color,
-                    alp: alpha
-                };
-
-                var _glyph_index = 0;
-                repeat (_glyph_count) {
-
-                    var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
-                    var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
-
-                    if (_char == "\n" || _char == "\r") {
-                        __bg_flush_span__(_bg_span_state);
-                        __st_flush_span__(_st_span_state);
-                        __ul_flush_span__(_ul_span_state);
-                        _glyph_index += 1;
-                        continue;
-                    }
-
-                    if (_char == "\t" && !whitespace_visible) {
-                        __bg_flush_span__(_bg_span_state);
-                        __st_flush_span__(_st_span_state);
-                        __ul_flush_span__(_ul_span_state);
-                        _glyph_index += 1;
-                        continue;
-                    }
-
-                    var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
-                    var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
-                    var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
-                    var _hei = _glyphs[_base + __WW_Layout_Glyph.Height];
-
-                    var _final_color = _glyphs[_base + __WW_Layout_Glyph.Color];
-                    var _final_alpha = _glyphs[_base + __WW_Layout_Glyph.Alpha];
-                    var _final_font = _glyphs[_base + __WW_Layout_Glyph.Font];
-                    var _final_style = _glyphs[_base + __WW_Layout_Glyph.Style];
-                    var _final_size = _glyphs[_base + __WW_Layout_Glyph.Size_Mul];
-                    var _final_under = _glyphs[_base + __WW_Layout_Glyph.Underline];
-                    var _final_back_col = _glyphs[_base + __WW_Layout_Glyph.Back_Color];
-                    var _final_back_alp = _glyphs[_base + __WW_Layout_Glyph.Back_Alpha];
-                    var _final_strike = _glyphs[_base + __WW_Layout_Glyph.Strike];
-
-                    if (is_undefined(_final_color)) { _final_color = color; }
-                    if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
-                    if (is_undefined(_final_style)) { _final_style = __WW_Text_Glyph_Style.Regular; }
-                    if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
-                    if (is_undefined(_final_under)) { _final_under = __WW_Text_Glyph_Underline.None; }
-                    if (is_undefined(_final_strike)) { _final_strike = __WW_Text_Glyph_Strike.None; }
-
-                    if (is_undefined(_final_back_col)) {
-                        _final_back_alp = undefined;
-                    } else if (is_undefined(_final_back_alp)) {
-                        _final_back_alp = 1;
-                    }
-
-                    if (!formatting_enabled) {
-                        _final_style = __WW_Text_Glyph_Style.Regular;
-                        _final_size = 1;
-                    }
-
-                    if (!underline_enabled) {
-                        _final_under = __WW_Text_Glyph_Underline.None;
-                    }
-
-                    if (!strike_enabled) {
-                        _final_strike = __WW_Text_Glyph_Strike.None;
-                    }
-
-                    // Optional whitespace markers
-                    if (whitespace_visible) {
-
-                        if (_char == " ") {
-
-                            __bg_flush_span__(_bg_span_state);
-                            __st_flush_span__(_st_span_state);
-                            __ul_flush_span__(_ul_span_state);
-
-                            var _cell_w = _wid * _final_size;
-                            var _mark_char = whitespace_marker_space;
-                            var _mark_w = string_width(_mark_char);
-
-                            var _mark_x = _pos_x;
-                            if (_cell_w > 0 && _mark_w > 0) {
-                                _mark_x = _pos_x + ((_cell_w - _mark_w) * 0.5);
-                            }
-
-                            var _ws_batch = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1, _default_font_data.sdf_shader, _default_font_data.sdf_spread);
-
-                            __vb_emit_glyph_styled_to_buffer__(
-                                _ws_batch.batch.buffer,
-                                _default_font_data,
-                                _mark_char,
-                                _mark_x,
-                                _pos_y,
-                                whitespace_color,
-                                whitespace_alpha,
-                                1,
-                                __WW_Text_Glyph_Style.Regular
-                            );
-
-                            _glyph_index += 1;
-                            continue;
-                        }
-
-                        if (_char == "\t") {
-
-                            __bg_flush_span__(_bg_span_state);
-                            __st_flush_span__(_st_span_state);
-                            __ul_flush_span__(_ul_span_state);
-
-                            var _mark_char2 = whitespace_marker_tab;
-
-                            var _ws_batch2 = __vb_get_batch_for_material__(_default_font_data.tex, _default_font_data.uvs, 1, _default_font_data.sdf_shader, _default_font_data.sdf_spread);
-
-                            __vb_emit_glyph_styled_to_buffer__(
-                                _ws_batch2.batch.buffer,
-                                _default_font_data,
-                                _mark_char2,
-                                _pos_x,
-                                _pos_y,
-                                whitespace_color,
-                                whitespace_alpha,
-                                1,
-                                __WW_Text_Glyph_Style.Regular
-                            );
-
-                            _glyph_index += 1;
-                            continue;
-                        }
-                    }
-
-                    // Background accumulation (draw behind glyphs)
-                    if (!is_undefined(_final_back_col)) {
-
-                        var _bg_x0 = _pos_x;
-                        var _bg_x1 = _pos_x + (_wid * _final_size);
-                        var _bg_y0 = _pos_y;
-                        var _bg_y1 = _pos_y + (_hei * _final_size);
-
-                        if (!_bg_span_state.active) {
-
-                            _bg_span_state.active = true;
-                            _bg_span_state.x0 = _bg_x0;
-                            _bg_span_state.x1 = _bg_x1;
-                            _bg_span_state.y0 = _bg_y0;
-                            _bg_span_state.y1 = _bg_y1;
-                            _bg_span_state.wid = _bg_x1 - _bg_x0;
-                            _bg_span_state.hei = _bg_y1 - _bg_y0;
-                            _bg_span_state.col = _final_back_col;
-                            _bg_span_state.alp = _final_back_alp;
-
-                        } else {
-
-                            var _same_col_bg = (_bg_span_state.col == _final_back_col);
-                            var _same_alp_bg = (_bg_span_state.alp == _final_back_alp);
-                            var _same_y0_bg = (_bg_span_state.y0 == _bg_y0);
-                            var _same_y1_bg = (_bg_span_state.y1 == _bg_y1);
-
-                            if (!_same_col_bg || !_same_alp_bg || !_same_y0_bg || !_same_y1_bg) {
-
-                                __bg_flush_span__(_bg_span_state);
-
-                                _bg_span_state.active = true;
-                                _bg_span_state.x0 = _bg_x0;
-                                _bg_span_state.x1 = _bg_x1;
-                                _bg_span_state.y0 = _bg_y0;
-                                _bg_span_state.y1 = _bg_y1;
-                                _bg_span_state.wid = _bg_x1 - _bg_x0;
-                                _bg_span_state.hei = _bg_y1 - _bg_y0;
-                                _bg_span_state.col = _final_back_col;
-                                _bg_span_state.alp = _final_back_alp;
-
-                            } else {
-
-                                _bg_span_state.x1 = _bg_x1;
-                                _bg_span_state.wid = _bg_span_state.x1 - _bg_span_state.x0;
-                            }
-                        }
-
-                    } else {
-
-                        __bg_flush_span__(_bg_span_state);
-                    }
-
-                    var _font_data = __glyph_resolve_font_data__(_final_font, _char);
-                    if (is_undefined(_font_data)) {
-                        __bg_flush_span__(_bg_span_state);
-                        __st_flush_span__(_st_span_state);
-                        __ul_flush_span__(_ul_span_state);
-                        _glyph_index += 1;
-                        continue;
-                    }
-
-                    var _glyph_batch = __vb_get_batch_for_material__(_font_data.tex, _font_data.uvs, 1, _font_data.sdf_shader, _font_data.sdf_spread);
-
-                    __vb_emit_glyph_styled_to_buffer__(
-                        _glyph_batch.batch.buffer,
-                        _font_data,
-                        _char,
-                        _pos_x,
-                        _pos_y,
-                        _final_color,
-                        _final_alpha,
-                        _final_size,
-                        _final_style
-                    );
-
-                    // Optional underline accumulation
-                    if (_final_under != __WW_Text_Glyph_Underline.None) {
-
-                        var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
-
-                        if (!_ul_span_state.active) {
-
-                            _ul_span_state.active = true;
-                            _ul_span_state.under = _final_under;
-                            _ul_span_state.x0 = _pos_x;
-                            _ul_span_state.x1 = _pos_x + (_wid * _final_size);
-                            _ul_span_state.y = _underline_y;
-                            _ul_span_state.col = _final_color;
-                            _ul_span_state.alp = _final_alpha;
-
-                        } else {
-
-                            var _same_type = (_ul_span_state.under == _final_under);
-                            var _same_col = (_ul_span_state.col == _final_color);
-                            var _same_alp = (_ul_span_state.alp == _final_alpha);
-                            var _same_y = (_ul_span_state.y == _underline_y);
-
-                            if (!_same_type || !_same_col || !_same_alp || !_same_y) {
-
-                                __ul_flush_span__(_ul_span_state);
-
-                                _ul_span_state.active = true;
-                                _ul_span_state.under = _final_under;
-                                _ul_span_state.x0 = _pos_x;
-                                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
-                                _ul_span_state.y = _underline_y;
-                                _ul_span_state.col = _final_color;
-                                _ul_span_state.alp = _final_alpha;
-
-                            } else {
-
-                                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
-                            }
-                        }
-
-                    } else {
-
-                        __ul_flush_span__(_ul_span_state);
-                    }
-
-                    // Optional strike-through accumulation (independent from underline)
-                    if (_final_strike != __WW_Text_Glyph_Strike.None) {
-
-                        var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
-
-                        if (!_st_span_state.active) {
-
-                            _st_span_state.active = true;
-                            _st_span_state.kind = _final_strike;
-                            _st_span_state.x0 = _pos_x;
-                            _st_span_state.x1 = _pos_x + (_wid * _final_size);
-                            _st_span_state.y = _strike_y;
-                            _st_span_state.col = _final_color;
-                            _st_span_state.alp = _final_alpha;
-
-                        } else {
-
-                            var _same_kind = (_st_span_state.kind == _final_strike);
-                            var _same_col_st = (_st_span_state.col == _final_color);
-                            var _same_alp_st = (_st_span_state.alp == _final_alpha);
-                            var _same_y_st = (_st_span_state.y == _strike_y);
-
-                            if (!_same_kind || !_same_col_st || !_same_alp_st || !_same_y_st) {
-
-                                __st_flush_span__(_st_span_state);
-
-                                _st_span_state.active = true;
-                                _st_span_state.kind = _final_strike;
-                                _st_span_state.x0 = _pos_x;
-                                _st_span_state.x1 = _pos_x + (_wid * _final_size);
-                                _st_span_state.y = _strike_y;
-                                _st_span_state.col = _final_color;
-                                _st_span_state.alp = _final_alpha;
-
-                            } else {
-
-                                _st_span_state.x1 = _pos_x + (_wid * _final_size);
-                            }
-                        }
-
-                    } else {
-
-                        __st_flush_span__(_st_span_state);
-                    }
-
-                    _glyph_index += 1;
-                }
-
-                __bg_flush_span__(_bg_span_state);
-                __st_flush_span__(_st_span_state);
-                __ul_flush_span__(_ul_span_state);
-
-                var _batch_count = array_length(__draw_batches__);
-                var _batch_index = 0;
-                repeat (_batch_count) {
-                    vertex_end(__draw_batches__[_batch_index].buffer);
-                    _batch_index += 1;
-                }
-
-                if (font_exists(_old_font) && _old_font != draw_get_font()) {
-                    draw_set_font(_old_font);
-                }
-            };
-			
+			static __build_vb__ = function() {
+				
+			    var _old_font = draw_get_font();
+			    if (font_exists(font)) {
+			        draw_set_font(font);
+			    }
+
+			    var _layout_data = __layout__.get_layout_data();
+			    var _glyphs = _layout_data.glyphs;
+			    var _glyph_count = _layout_data.glyphs_count;
+
+			    if (_glyph_count <= 0) {
+			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
+			            draw_set_font(_old_font);
+			        }
+			        _timers[4] += get_timer()-___time;
+			        return;
+			    }
+
+			    var _spans = _layout_data.spans;
+
+			    var _default_font_data = __font_get_render_data__(font);
+			    if (is_undefined(_default_font_data)) {
+			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
+			            draw_set_font(_old_font);
+			        }
+			        _timers[4] += get_timer()-___time;
+			        return;
+			    }
+
+			    // Hoist feature flags
+			    var _use_formatting = formatting_enabled;
+			    var _use_whitespace = whitespace_visible;
+
+			    // Precompute marker widths once
+			    var _ws_space_marker = whitespace_marker_space;
+			    var _ws_tab_marker = whitespace_marker_tab;
+
+			    var _ws_space_width = 0;
+			    if (_use_whitespace) {
+			        _ws_space_width = string_width(_ws_space_marker);
+			    }
+
+			    // Cache whitespace batch once (no string keys)
+			    var _ws_batch_buffer = -1;
+			    if (_use_whitespace) {
+			        var _ws_batch = __vb_get_batch_for_material__(
+			            _default_font_data.tex,
+			            _default_font_data.uvs,
+			            1,
+			            _default_font_data.sdf_shader,
+			            _default_font_data.sdf_spread
+			        );
+			        _ws_batch_buffer = _ws_batch.batch.buffer;
+			    }
+
+			    var _ul_span_state = {
+			        active: false,
+			        under: __WW_Text_Glyph_Underline.None,
+			        x0: 0,
+			        x1: 0,
+			        y: 0,
+			        col: color,
+			        alp: alpha
+			    };
+
+			    var _bg_span_state = {
+			        active: false,
+			        x0: 0,
+			        x1: 0,
+			        y0: 0,
+			        y1: 0,
+			        wid: 0,
+			        hei: 0,
+			        col: c_white,
+			        alp: 1
+			    };
+
+			    var _st_span_state = {
+			        active: false,
+			        kind: __WW_Text_Glyph_Strike.None,
+			        x0: 0,
+			        x1: 0,
+			        y: 0,
+			        col: color,
+			        alp: alpha
+			    };
+
+			    // Font resolution cache per-char (avoid repeated fallback scanning)
+			    var _font_data_by_char = {};
+
+			    // Batch reuse (avoid calling __vb_get_batch_for_material__ when unchanged)
+			    var _last_tex = -1;
+			    var _last_uvs = undefined;
+			    var _last_shader = undefined;
+			    var _last_spread = 0;
+			    var _last_batch_buffer = -1;
+
+			    var _glyph_index = 0;
+			    repeat (_glyph_count) {
+
+			        var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
+
+			        var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
+			        if (_char == "\n" || _char == "\r") {
+			            __bg_flush_span__(_bg_span_state);
+			            __st_flush_span__(_st_span_state);
+			            __ul_flush_span__(_ul_span_state);
+			            _glyph_index += 1;
+			            continue;
+			        }
+
+			        if (_char == "\t" && !_use_whitespace) {
+			            __bg_flush_span__(_bg_span_state);
+			            __st_flush_span__(_st_span_state);
+			            __ul_flush_span__(_ul_span_state);
+			            _glyph_index += 1;
+			            continue;
+			        }
+
+			        var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
+			        var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
+			        var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
+			        var _hei = _glyphs[_base + __WW_Layout_Glyph.Height];
+
+			        var _span_index = _glyphs[_base + __WW_Layout_Glyph.Span];
+			        var _span = _spans[_span_index];
+
+			        // Pull style from span (dot accessors)
+			        var _final_color = _span.color;
+			        var _final_alpha = _span.alpha;
+
+			        var _final_font = _span.font_asset;
+			        var _final_style = _span.style;
+			        var _final_size = _span.size_mul;
+
+			        var _final_under = _span.underline;
+			        var _final_strike = _span.strike;
+
+			        var _final_back_col = _span.back_color;
+			        var _final_back_alp = _span.back_alpha;
+
+			        if (!_use_formatting) {
+			            _final_style = __WW_Text_Glyph_Style.Regular;
+			            _final_size = 1;
+			        }
+					
+			        // Optional whitespace markers
+			        if (_use_whitespace) {
+
+			            if (_char == " ") {
+
+			                __bg_flush_span__(_bg_span_state);
+			                __st_flush_span__(_st_span_state);
+			                __ul_flush_span__(_ul_span_state);
+
+			                var _cell_w = _wid * _final_size;
+
+			                var _mark_x = _pos_x;
+			                if (_cell_w > 0 && _ws_space_width > 0) {
+			                    _mark_x = _pos_x + ((_cell_w - _ws_space_width) * 0.5);
+			                }
+
+			                __vb_emit_glyph_styled_to_buffer__(
+			                    _ws_batch_buffer,
+			                    _default_font_data,
+			                    _ws_space_marker,
+			                    _mark_x,
+			                    _pos_y,
+			                    whitespace_color,
+			                    whitespace_alpha,
+			                    1,
+			                    __WW_Text_Glyph_Style.Regular
+			                );
+
+			                _glyph_index += 1;
+			                continue;
+			            }
+
+			            if (_char == "\t") {
+
+			                __bg_flush_span__(_bg_span_state);
+			                __st_flush_span__(_st_span_state);
+			                __ul_flush_span__(_ul_span_state);
+
+			                __vb_emit_glyph_styled_to_buffer__(
+			                    _ws_batch_buffer,
+			                    _default_font_data,
+			                    _ws_tab_marker,
+			                    _pos_x,
+			                    _pos_y,
+			                    whitespace_color,
+			                    whitespace_alpha,
+			                    1,
+			                    __WW_Text_Glyph_Style.Regular
+			                );
+
+			                _glyph_index += 1;
+			                continue;
+			            }
+			        }
+
+			        // Background accumulation (alpha 0 means none)
+			        if (_final_back_alp > 0) {
+
+			            var _bg_x0 = _pos_x;
+			            var _bg_x1 = _pos_x + (_wid * _final_size);
+			            var _bg_y0 = _pos_y;
+			            var _bg_y1 = _pos_y + (_hei * _final_size);
+
+			            if (!_bg_span_state.active) {
+
+			                _bg_span_state.active = true;
+			                _bg_span_state.x0 = _bg_x0;
+			                _bg_span_state.x1 = _bg_x1;
+			                _bg_span_state.y0 = _bg_y0;
+			                _bg_span_state.y1 = _bg_y1;
+			                _bg_span_state.wid = _bg_x1 - _bg_x0;
+			                _bg_span_state.hei = _bg_y1 - _bg_y0;
+			                _bg_span_state.col = _final_back_col;
+			                _bg_span_state.alp = _final_back_alp;
+
+			            } else {
+
+			                var _same_col_bg = (_bg_span_state.col == _final_back_col);
+			                var _same_alp_bg = (_bg_span_state.alp == _final_back_alp);
+			                var _same_y0_bg = (_bg_span_state.y0 == _bg_y0);
+			                var _same_y1_bg = (_bg_span_state.y1 == _bg_y1);
+
+			                if (!_same_col_bg || !_same_alp_bg || !_same_y0_bg || !_same_y1_bg) {
+
+			                    __bg_flush_span__(_bg_span_state);
+
+			                    _bg_span_state.active = true;
+			                    _bg_span_state.x0 = _bg_x0;
+			                    _bg_span_state.x1 = _bg_x1;
+			                    _bg_span_state.y0 = _bg_y0;
+			                    _bg_span_state.y1 = _bg_y1;
+			                    _bg_span_state.wid = _bg_x1 - _bg_x0;
+			                    _bg_span_state.hei = _bg_y1 - _bg_y0;
+			                    _bg_span_state.col = _final_back_col;
+			                    _bg_span_state.alp = _final_back_alp;
+
+			                } else {
+
+			                    _bg_span_state.x1 = _bg_x1;
+			                    _bg_span_state.wid = _bg_span_state.x1 - _bg_span_state.x0;
+			                }
+			            }
+
+			        } else {
+
+			            __bg_flush_span__(_bg_span_state);
+			        }
+
+			        // Resolve font data (cached by char)
+			        var _font_data = _font_data_by_char[$ _char];
+
+			        if (is_undefined(_font_data)) {
+
+			            _font_data = __glyph_resolve_font_data__(_final_font, _char, _default_font_data);
+
+			            if (is_undefined(_font_data)) {
+			                _font_data_by_char[$ _char] = 0;
+			            } else {
+			                _font_data_by_char[$ _char] = _font_data;
+			            }
+			        }
+
+			        if (_font_data == 0) {
+			            __bg_flush_span__(_bg_span_state);
+			            __st_flush_span__(_st_span_state);
+			            __ul_flush_span__(_ul_span_state);
+			            _glyph_index += 1;
+			            continue;
+			        }
+
+			        // Batch reuse: only call when material changes
+			        var _need_batch = true;
+
+			        if (_font_data.tex == _last_tex &&
+			            _font_data.uvs == _last_uvs &&
+			            _font_data.sdf_shader == _last_shader &&
+			            _font_data.sdf_spread == _last_spread) {
+			            _need_batch = false;
+			        }
+
+			        if (_need_batch) {
+
+			            var _glyph_batch = __vb_get_batch_for_material__(
+			                _font_data.tex,
+			                _font_data.uvs,
+			                1,
+			                _font_data.sdf_shader,
+			                _font_data.sdf_spread
+			            );
+
+			            _last_tex = _font_data.tex;
+			            _last_uvs = _font_data.uvs;
+			            _last_shader = _font_data.sdf_shader;
+			            _last_spread = _font_data.sdf_spread;
+			            _last_batch_buffer = _glyph_batch.batch.buffer;
+			        }
+
+			        __vb_emit_glyph_styled_to_buffer__(
+			            _last_batch_buffer,
+			            _font_data,
+			            _char,
+			            _pos_x,
+			            _pos_y,
+			            _final_color,
+			            _final_alpha,
+			            _final_size,
+			            _final_style
+			        );
+
+			        // Underline
+			        if (_final_under != __WW_Text_Glyph_Underline.None) {
+
+			            var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
+
+			            if (!_ul_span_state.active) {
+
+			                _ul_span_state.active = true;
+			                _ul_span_state.under = _final_under;
+			                _ul_span_state.x0 = _pos_x;
+			                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+			                _ul_span_state.y = _underline_y;
+			                _ul_span_state.col = _final_color;
+			                _ul_span_state.alp = _final_alpha;
+
+			            } else {
+
+			                var _same_type = (_ul_span_state.under == _final_under);
+			                var _same_col = (_ul_span_state.col == _final_color);
+			                var _same_alp = (_ul_span_state.alp == _final_alpha);
+			                var _same_y = (_ul_span_state.y == _underline_y);
+
+			                if (!_same_type || !_same_col || !_same_alp || !_same_y) {
+
+			                    __ul_flush_span__(_ul_span_state);
+
+			                    _ul_span_state.active = true;
+			                    _ul_span_state.under = _final_under;
+			                    _ul_span_state.x0 = _pos_x;
+			                    _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+			                    _ul_span_state.y = _underline_y;
+			                    _ul_span_state.col = _final_color;
+			                    _ul_span_state.alp = _final_alpha;
+
+			                } else {
+
+			                    _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+			                }
+			            }
+
+			        } else {
+
+			            __ul_flush_span__(_ul_span_state);
+			        }
+
+			        // Strike
+			        if (_final_strike != __WW_Text_Glyph_Strike.None) {
+
+			            var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
+
+			            if (!_st_span_state.active) {
+
+			                _st_span_state.active = true;
+			                _st_span_state.kind = _final_strike;
+			                _st_span_state.x0 = _pos_x;
+			                _st_span_state.x1 = _pos_x + (_wid * _final_size);
+			                _st_span_state.y = _strike_y;
+			                _st_span_state.col = _final_color;
+			                _st_span_state.alp = _final_alpha;
+
+			            } else {
+
+			                var _same_kind = (_st_span_state.kind == _final_strike);
+			                var _same_col_st = (_st_span_state.col == _final_color);
+			                var _same_alp_st = (_st_span_state.alp == _final_alpha);
+			                var _same_y_st = (_st_span_state.y == _strike_y);
+
+			                if (!_same_kind || !_same_col_st || !_same_alp_st || !_same_y_st) {
+
+			                    __st_flush_span__(_st_span_state);
+
+			                    _st_span_state.active = true;
+			                    _st_span_state.kind = _final_strike;
+			                    _st_span_state.x0 = _pos_x;
+			                    _st_span_state.x1 = _pos_x + (_wid * _final_size);
+			                    _st_span_state.y = _strike_y;
+			                    _st_span_state.col = _final_color;
+			                    _st_span_state.alp = _final_alpha;
+
+			                } else {
+
+			                    _st_span_state.x1 = _pos_x + (_wid * _final_size);
+			                }
+			            }
+
+			        } else {
+
+			            __st_flush_span__(_st_span_state);
+			        }
+
+			        _glyph_index += 1;
+			    }
+
+			    __bg_flush_span__(_bg_span_state);
+			    __st_flush_span__(_st_span_state);
+			    __ul_flush_span__(_ul_span_state);
+
+			    var _batch_count = array_length(__draw_batches__);
+			    var _batch_index = 0;
+			    repeat (_batch_count) {
+			        vertex_end(__draw_batches__[_batch_index].buffer);
+			        _batch_index += 1;
+			    }
+
+			    if (font_exists(_old_font) && _old_font != draw_get_font()) {
+			        draw_set_font(_old_font);
+			    }
+				
+			};
+	
             static __draw_selection_highlight__ = function() {
 
                 if (is_undefined(__textbox_parent__)) {

@@ -951,7 +951,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			    var _metric_remaining = 0;
 
 			    var _metric_font_override = -1;
-			    var _metric_style_value = __WW_Text_Glyph_Style.Regular;
+			    var _metric_style = __WW_Text_Glyph_Style.Regular;
 			    var _metric_size_mul = 1;
 
 			    var _visual_run_count = array_length(_visual_runs);
@@ -970,7 +970,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			        _metric_remaining = _metric_run0.index_count;
 
 			        _metric_font_override = is_undefined(_metric_run0.font_asset_or_minus1) ? -1 : _metric_run0.font_asset_or_minus1;
-			        _metric_style_value = is_undefined(_metric_run0.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run0.style_value;
+			        _metric_style = is_undefined(_metric_run0.style) ? __WW_Text_Glyph_Style.Regular : _metric_run0.style;
 			        _metric_size_mul = is_undefined(_metric_run0.size_mul) ? 1 : _metric_run0.size_mul;
 
 			        if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
@@ -1047,7 +1047,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			            _metric_remaining = _metric_runn.index_count;
 
 			            _metric_font_override = is_undefined(_metric_runn.font_asset_or_minus1) ? -1 : _metric_runn.font_asset_or_minus1;
-			            _metric_style_value = is_undefined(_metric_runn.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_runn.style_value;
+			            _metric_style = is_undefined(_metric_runn.style) ? __WW_Text_Glyph_Style.Regular : _metric_runn.style;
 			            _metric_size_mul = is_undefined(_metric_runn.size_mul) ? 1 : _metric_runn.size_mul;
 
 			            if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
@@ -1259,7 +1259,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			        _metric_remaining = _metric_run2.index_count;
 
 			        _metric_font_override = is_undefined(_metric_run2.font_asset_or_minus1) ? -1 : _metric_run2.font_asset_or_minus1;
-			        _metric_style_value = is_undefined(_metric_run2.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run2.style_value;
+			        _metric_style = is_undefined(_metric_run2.style) ? __WW_Text_Glyph_Style.Regular : _metric_run2.style;
 			        _metric_size_mul = is_undefined(_metric_run2.size_mul) ? 1 : _metric_run2.size_mul;
 
 			        if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
@@ -1268,7 +1268,7 @@ function WWTextRendererCore() : WWCore() constructor {
 
 			        _metric_remaining = 999999999;
 			        _metric_font_override = -1;
-			        _metric_style_value = __WW_Text_Glyph_Style.Regular;
+			        _metric_style = __WW_Text_Glyph_Style.Regular;
 			        _metric_size_mul = 1;
 			    }
 
@@ -1320,7 +1320,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			                _metric_remaining = _metric_run3.index_count;
 
 			                _metric_font_override = is_undefined(_metric_run3.font_asset_or_minus1) ? -1 : _metric_run3.font_asset_or_minus1;
-			                _metric_style_value = is_undefined(_metric_run3.style_value) ? __WW_Text_Glyph_Style.Regular : _metric_run3.style_value;
+			                _metric_style = is_undefined(_metric_run3.style) ? __WW_Text_Glyph_Style.Regular : _metric_run3.style;
 			                _metric_size_mul = is_undefined(_metric_run3.size_mul) ? 1 : _metric_run3.size_mul;
 
 			                if (_metric_size_mul <= 0) { _metric_size_mul = 1; }
@@ -1381,7 +1381,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			                    _visual_color,
 			                    _visual_alpha,
 			                    _metric_font_override,
-			                    _metric_style_value,
+			                    _metric_style,
 			                    _metric_size_mul,
 			                    _visual_underline
 			                );
@@ -1431,7 +1431,7 @@ function WWTextRendererCore() : WWCore() constructor {
 			                _visual_color,
 			                _visual_alpha,
 			                _metric_font_override,
-			                _metric_style_value,
+			                _metric_style,
 			                _metric_size_mul,
 			                _visual_underline
 			            );

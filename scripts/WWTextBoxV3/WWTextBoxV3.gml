@@ -351,8 +351,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param  {Real} _end_index
 				/// @param  {Constant.Color|Undefined} _color_value
 				/// @param  {Real|Undefined} _alpha_value
-				/// @param  {Asset.GMFont|Real|Undefined} _font_asset_or_minus1
-				/// @param  {Real|Undefined} _style_value
+				/// @param  {Asset.GMFont|Undefined} _font_asset
+				/// @param  {Real|Undefined} _style
 				/// @param  {Real|Undefined} _size_mul
 				/// @param  {Real|Undefined} _underline_value
 				/// @returns {Struct.WWTextBoxV3}
@@ -362,8 +362,8 @@ function WWTextBoxV3() : WWCore() constructor {
 					_end_index,
 					_color_value,
 					_alpha_value,
-					_font_asset_or_minus1,
-					_style_value,
+					_font_asset,
+					_style,
 					_size_mul,
 					_underline_value
 				) {
@@ -372,8 +372,8 @@ function WWTextBoxV3() : WWCore() constructor {
 						_end_index,
 						_color_value,
 						_alpha_value,
-						_font_asset_or_minus1,
-						_style_value,
+						_font_asset,
+						_style,
 						_size_mul,
 						_underline_value
 					)
@@ -437,11 +437,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @desc   Sets per-glyph style enum for [start,end).
 				/// @param  {Real} _start_index
 				/// @param  {Real} _end_index
-				/// @param  {Real} _style_value
+				/// @param  {Real} _style
 				/// @returns {Struct.WWTextBoxV3}
 				#endregion
-				static set_glyph_style_range = function(_start_index, _end_index, _style_value) {
-					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style_value, undefined, undefined);
+				static set_glyph_style_range = function(_start_index, _end_index, _style) {
+					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style, undefined, undefined);
 					return self;
 				};
 				

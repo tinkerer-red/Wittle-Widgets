@@ -90,12 +90,12 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
             #region jsDoc
             /// @func    set_markdown_code_font()
             /// @desc    Set font used for inline code and fenced code blocks. Use -1 to disable override.
-            /// @param   {Asset.GMFont|Real} _font_asset_or_minus1
+			/// @param   {Asset.GMFont} _font_asset
             /// @returns {Struct.WWTextRendererMarkdown}
             #endregion
-            static set_markdown_code_font = function(_font_asset_or_minus1) {
+            static set_markdown_code_font = function(_font_asset) {
 
-                markdown_code_font = _font_asset_or_minus1;
+                markdown_code_font = _font_asset;
 
                 __mark_dirty__();
                 return self;
@@ -318,7 +318,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 return __WW_Text_Glyph_Style.Regular;
             };
 
-                        static __md_build_runs_from_spans__ = function(_plain_len, _spans, _default_state) {
+			static __md_build_runs_from_spans__ = function(_plain_len, _spans, _default_state) {
 
                 __md_spans__ = [];
 
@@ -331,8 +331,8 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 var _pos_index = 0;
 
                 // Current run state
-                var _run_font = _default_state.font_asset_or_minus1;
-                var _run_style = _default_state.style_value;
+                var _run_font = _default_state.font_asset;
+                var _run_style = _default_state.style;
                 var _run_size = _default_state.size_mul;
 
                 var _run_color = _default_state.color;
@@ -348,8 +348,8 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 while (_pos_index < _plain_len) {
 
                     // Desired state at this index (later spans win)
-                    var _want_font = _default_state.font_asset_or_minus1;
-                    var _want_style = _default_state.style_value;
+                    var _want_font = _default_state.font_asset;
+                    var _want_style = _default_state.style;
                     var _want_size = _default_state.size_mul;
 
                     var _want_color = _default_state.color;
@@ -377,8 +377,8 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                         var _sp_state = _sp.state;
 
-                        _want_font = _sp_state.font_asset_or_minus1;
-                        _want_style = _sp_state.style_value;
+                        _want_font = _sp_state.font_asset;
+                        _want_style = _sp_state.style;
                         _want_size = _sp_state.size_mul;
 
                         _want_color = _sp_state.color;
@@ -427,8 +427,8 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         if (_run_count > 0) {
                             array_push(__md_spans__, {
                                 index_count: _run_count,
-                                font_asset_or_minus1: _run_font,
-                                style_value: _run_style,
+                                font_asset: _run_font,
+                                style: _run_style,
                                 size_mul: _run_size,
                                 color: _run_color,
                                 alpha: _run_alpha,
@@ -462,8 +462,8 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 if (_tail_count > 0) {
                     array_push(__md_spans__, {
                         index_count: _tail_count,
-                        font_asset_or_minus1: _run_font,
-                        style_value: _run_style,
+                        font_asset: _run_font,
+                        style: _run_style,
                         size_mul: _run_size,
                         color: _run_color,
                         alpha: _run_alpha,
@@ -475,7 +475,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 }
             };
 
-static __md_get_line_end_pos__ = function(_text, _start_pos1) {
+			static __md_get_line_end_pos__ = function(_text, _start_pos1) {
 
 			    var _text_len = string_length(_text);
 			    var _pos = _start_pos1;
@@ -804,10 +804,10 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
 						            var _table_plain_end = string_length(_plain);
 
 						            // Span the whole emitted table with code font
-						            var _table_metric_state = __text_state_clone_patch__(_state, { style_value: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
+						            var _table_metric_state = __text_state_clone_patch__(_state, { style: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
 
                             if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
-                                __text_state_apply_patch__(_table_metric_state, { font_asset_or_minus1: markdown_code_font });
+                                __text_state_apply_patch__(_table_metric_state, { font_asset: markdown_code_font });
                             }
 
 						            if ((_table_plain_end) > (_table_plain_start)) {
@@ -850,15 +850,15 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                                 _italic = false;
                                 _in_code_inline = false;
 
-                                _state.style_value = __WW_Text_Glyph_Style.Regular;
+                                _state.style = __WW_Text_Glyph_Style.Regular;
                                 _state.size_mul = 1;
 
-                                if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
-                                    _state.font_asset_or_minus1 = markdown_code_font;
-                                }
+								if (!is_undefined(markdown_code_font)) {
+								    _state.font_asset = markdown_code_font;
+								}
                             } else {
-                                _state.font_asset_or_minus1 = -1;
-                                _state.style_value = __WW_Text_Glyph_Style.Regular;
+                                _state.font_asset = font;
+                                _state.style = __WW_Text_Glyph_Style.Regular;
                                 _state.size_mul = 1;
                             }
 
@@ -911,7 +911,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                             }
 
                             _state.size_mul = _new_size;
-                            _state.style_value = __md_normalize_style__(_bold, _italic);
+                            _state.style = __md_normalize_style__(_bold, _italic);
 
                             _span_start = string_length(_plain);
                             _at_line_start = false;
@@ -980,7 +980,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _rule_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    style: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: markdown_quote_alpha,
@@ -1029,7 +1029,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _lead_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    style: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: 1,
@@ -1066,7 +1066,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _quote_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    style: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: markdown_quote_alpha,
@@ -1108,7 +1108,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _bul_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    style: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: 1,
@@ -1154,7 +1154,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _lead_start2,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    style: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: 1,
@@ -1220,25 +1220,25 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         _italic = false;
                         _strike = false;
 
-                        __text_state_apply_patch__(_state, {
-                            font_asset_or_minus1: -1,
-                            style_value: __WW_Text_Glyph_Style.Regular,
-                            size_mul: 1,
-                            color: color,
-                            alpha: alpha,
-                            underline: __WW_Text_Glyph_Underline.None,
-                            strike: __WW_Text_Glyph_Strike.None,
-                            back_color: undefined,
-                            back_alpha: undefined
-                        });
-
+						__text_state_apply_patch__(_state, {
+							font_asset: font,
+							style: __WW_Text_Glyph_Style.Regular,
+							size_mul: 1,
+							color: color,
+							alpha: alpha,
+							underline: __WW_Text_Glyph_Underline.None,
+							strike: __WW_Text_Glyph_Strike.None,
+							back_color: 0,
+							back_alpha: 0
+						});
+						
                         _span_start = string_length(_plain) - 1;
 
                         _at_line_start = true;
 
                         // End of a table line: keep code font only within the line
                         if (_table_line_has_pipe) {
-                            _state.font_asset_or_minus1 = -1;
+                            _state.font_asset = font;
                         }
 
                         _pos_src += 1;
@@ -1290,10 +1290,10 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                             var _code_plain_start = string_length(_plain);
                             _plain += _code_text;
 
-                            var _code_state = __text_state_clone_patch__(_state, { style_value: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
+                            var _code_state = __text_state_clone_patch__(_state, { style: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
 
                             if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
-                                __text_state_apply_patch__(_code_state, { font_asset_or_minus1: markdown_code_font });
+                                __text_state_apply_patch__(_code_state, { font_asset: markdown_code_font });
                             }
 
                             if ((string_length(_plain)) > (_code_plain_start)) {
@@ -1432,7 +1432,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                             }
                         }
 
-                        _state.style_value = __md_normalize_style__(_bold, _italic);
+                        _state.style = __md_normalize_style__(_bold, _italic);
 
                         _span_start = string_length(_plain);
 
@@ -1472,7 +1472,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _img_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: __WW_Text_Glyph_Style.Italic,
+                                    style: __WW_Text_Glyph_Style.Italic,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: 1,
@@ -1520,7 +1520,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                         start_index: _title_plain_start,
                         end_index: string_length(_plain),
                         state: __text_state_clone_patch__(_state, {
-                                    style_value: _state.style_value,
+                                    style: _state.style,
                                     size_mul: _state.size_mul,
                                     color: markdown_link_color,
                                     alpha: markdown_link_alpha,
@@ -1567,7 +1567,7 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
 
         #region Override layout builder hook
 
-                                    static __ensure_layout__ = function() {
+			static __ensure_layout__ = function() {
 
                 if (!__is_dirty__) { return; }
 
@@ -1584,8 +1584,8 @@ static __md_get_line_end_pos__ = function(_text, _start_pos1) {
                     var _default_state = __text_state_make_default__();
                     var _default_spans = [{
                         index_count: string_length(_text_value),
-                        font_asset_or_minus1: _default_state.font_asset_or_minus1,
-                        style_value: _default_state.style_value,
+                        font_asset: _default_state.font_asset,
+                        style: _default_state.style,
                         size_mul: _default_state.size_mul,
                         color: _default_state.color,
                         alpha: _default_state.alpha,

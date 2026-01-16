@@ -1,3 +1,4 @@
+/*
 #region jsDoc
 /// @func    WWTextRendererAdvanced()
 /// @desc    Advanced renderer extending Core. Adds:
@@ -62,7 +63,7 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
             /// @param  {Constant.Color|Undefined} _color_value
             /// @param  {Real|Undefined} _alpha_value
             /// @param  {Asset.GMFont|Real|Undefined} _font_asset_or_minus1
-            /// @param  {Real|Undefined} _style_value
+            /// @param  {Real|Undefined} _style
             /// @param  {Real|Undefined} _size_mul
             /// @param  {Real|Undefined} _underline_value
             /// @returns {Struct.WWTextRendererAdvanced}
@@ -73,7 +74,7 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                 _color_value,
                 _alpha_value,
                 _font_asset_or_minus1,
-                _style_value,
+                _style,
                 _size_mul,
                 _underline_value
             ) {
@@ -118,8 +119,8 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                             _glyphs[_base + __WW_Layout_Glyph.Font] = _font_asset_or_minus1;
                         }
 
-                        if (!is_undefined(_style_value)) {
-                            _glyphs[_base + __WW_Layout_Glyph.Style] = _style_value;
+                        if (!is_undefined(_style)) {
+                            _glyphs[_base + __WW_Layout_Glyph.Style] = _style;
                         }
 
                         if (!is_undefined(_size_mul)) {
@@ -742,32 +743,3 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
 }
 
 
-#region jsDoc
-/// @enum   __WW_Text_Glyph_Style
-/// @desc   Font style override for a run.
-///         Bold is implemented by re-drawing the glyph slightly offset.
-///         Italic is implemented by slanting vertices.
-///         These are render-only overrides unless layout is updated too.
-#endregion
-enum __WW_Text_Glyph_Style {
-    Regular,
-    Bold,
-    Italic,
-    Bold_Italic,
-    __SIZE__
-}
-
-
-#region jsDoc
-/// @enum   __WW_Text_Glyph_Underline
-/// @desc   Underline type for a run.
-///         Line uses the white underline sprite.
-///         Warning/Error use squiggle sprites.
-#endregion
-enum __WW_Text_Glyph_Underline {
-    None,
-    Line,
-    Warning,
-    Error,
-    __SIZE__
-}

@@ -45,3 +45,67 @@ function __WWConstants(){
 	
 }
 __WWConstants();
+
+#region Textbox Constants
+
+#region jsDoc
+/// @enum   __WW_Text_Glyph_Style
+/// @desc   Font style override for a run.
+///         Bold is implemented by re-drawing the glyph slightly offset.
+///         Italic is implemented by slanting vertices.
+///         These are render-only overrides unless layout is updated too.
+#endregion
+enum __WW_Text_Glyph_Style {
+    Regular,
+    Bold,
+    Italic,
+    Bold_Italic,
+    __SIZE__
+}
+
+#region jsDoc
+/// @enum   __WW_Text_Glyph_Underline
+/// @desc   Underline type for a run.
+///         Line uses the white underline sprite.
+///         Warning/Error use squiggle sprites.
+#endregion
+enum __WW_Text_Glyph_Underline {
+    None,
+    Line,
+    Warning,
+    Error,
+    __SIZE__
+}
+
+enum __WW_Layout_Line {
+	Text,
+	Start_Index,
+	End_Index,
+	Width,
+	Height,
+	Y_Offset,
+	Force_Wraped,
+	Alignment,
+	__Size__
+}
+	
+enum __WW_Text_Alignment {
+	Left,
+	Center,
+	Right
+}
+
+enum __WW_Layout_Glyph {
+	Char,
+	Index,
+	Buffer_Index,
+	Buffer_Size,
+	X,
+	Y,
+	Width,
+	Height,
+	Span,
+
+	__Size__
+}
+#endregion

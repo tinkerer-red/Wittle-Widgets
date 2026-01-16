@@ -123,18 +123,18 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
 
                 __display_text__ = _source_text;
 
-                var _default_spans = [{
-		            index_count: string_length(_source_text),
-		            font_asset_or_minus1: -1,
-		            style_value: __WW_Text_Glyph_Style.Regular,
-		            size_mul: 1,
-		            color: color,
-		            alpha: alpha,
-		            underline: __WW_Text_Glyph_Underline.None,
-		            back_color: undefined,
-		            back_alpha: undefined,
-		            strike: __WW_Text_Glyph_Strike.None
-		        }];
+				var _default_spans = [{
+				    index_count: string_length(_source_text),
+				    font_asset: font,
+				    style: __WW_Text_Glyph_Style.Regular,
+				    size_mul: 1,
+				    color: color,
+				    alpha: alpha,
+				    underline: __WW_Text_Glyph_Underline.None,
+				    back_color: 0,
+				    back_alpha: 0,
+				    strike: __WW_Text_Glyph_Strike.None
+				}];
 
 				__layout__ = __build_layout__(_source_text, _default_spans);
 	            __content_width__ = __layout__.get_content_width();
@@ -166,44 +166,18 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
 
         #region BBCode state + span helpers
 
-            static __bbcode_state_make_default__ = function() {
-                return {
-                    color_value: undefined,
-                    alpha_value: undefined,
-                    font_asset_or_minus1: -1,
-                    style_value: __WW_Text_Glyph_Style.Regular,
-                    size_mul: 1,
-                    underline_value: __WW_Text_Glyph_Underline.None,
-
-                    // 0=left, 1=center, 2=right (matches WWTextLayout.get_line_x_offset)
-                    align_value: 0
-                };
-            };
-
-            static __bbcode_state_copy__ = function(_state) {
-                return {
-                    color_value: _state.color_value,
-                    alpha_value: _state.alpha_value,
-                    font_asset_or_minus1: _state.font_asset_or_minus1,
-                    style_value: _state.style_value,
-                    size_mul: _state.size_mul,
-                    underline_value: _state.underline_value,
-                    align_value: _state.align_value
-                };
-            };
-
-            static __bbcode_flush_metric_run__ = function(_runs, _state, _run_length) {
+			static __bbcode_flush_metric_run__ = function(_runs, _state, _run_length) {
 
                 if (_run_length <= 0) {
                     return;
                 }
 
-                array_push(_runs, {
-                    index_count: _run_length,
-                    font_asset_or_minus1: _state.font_asset_or_minus1,
-                    style_value: _state.style_value,
-                    size_mul: _state.size_mul
-                });
+				array_push(_runs, {
+				    index_count: _run_length,
+				    font_asset: _state.font_asset,
+				    style: _state.style,
+				    size_mul: _state.size_mul
+				});
             };
 
             static __bbcode_flush_visual_run__ = function(_runs, _state, _run_length) {
@@ -214,9 +188,9 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
 
                 array_push(_runs, {
                     index_count: _run_length,
-                    color: _state.color_value,
-                    alpha: _state.alpha_value,
-                    underline: _state.underline_value
+                    color: _state.color,
+                    alpha: _state.alpha,
+                    underline: _state.underline
                 });
             };
 
@@ -266,24 +240,22 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     var _take_count = _metric_remaining;
                     if (_visual_remaining < _take_count) { _take_count = _visual_remaining; }
 
-                    array_push(_spans, {
-                        index_count: _take_count,
+					var _state = __text_state_make_default__();
+					
+					_state.font_asset = _metric_run.font_asset;
+					_state.style = _metric_run.style;
+					_state.size_mul = _metric_run.size_mul;
+					
+					_state.color = _visual_run.color;
+					_state.alpha = _visual_run.alpha;
+					_state.underline = _visual_run.underline;
+					
+					_state.strike = __WW_Text_Glyph_Strike.None;
+					_state.back_color = 0;
+					_state.back_alpha = 0;
+					
+					array_push(_spans, __text_span_run_from_state__(_take_count, _state));
 
-                        // Metric
-                        font_asset_or_minus1: _metric_run.font_asset_or_minus1,
-                        style_value: _metric_run.style_value,
-                        size_mul: _metric_run.size_mul,
-
-                        // Visual
-                        color: _visual_run.color,
-                        alpha: _visual_run.alpha,
-                        underline: _visual_run.underline,
-
-                        // Optional (not supported by BBCode yet, but definitive)
-                        back_color: undefined,
-                        back_alpha: undefined,
-                        strike: __WW_Text_Glyph_Strike.None
-                    });
 
                     _metric_remaining -= _take_count;
                     _visual_remaining -= _take_count;
@@ -793,7 +765,7 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                 var _visual_runs = [];
                 var _align_runs = [];
 
-                var _state = __bbcode_state_make_default__();
+                var _state = __text_state_make_default__();
 
                 // stack entries: { tag_name, prev_state }
                 var _stack = [];
@@ -1107,12 +1079,12 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [b]
                     __bbcode_tags__[$ "b"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
-                            if (_new_state.style_value == __WW_Text_Glyph_Style.Italic) {
-                                _new_state.style_value = __WW_Text_Glyph_Style.Bold_Italic;
-                            } else if (_new_state.style_value == __WW_Text_Glyph_Style.Regular) {
-                                _new_state.style_value = __WW_Text_Glyph_Style.Bold;
+                            if (_new_state.style == __WW_Text_Glyph_Style.Italic) {
+                                _new_state.style = __WW_Text_Glyph_Style.Bold_Italic;
+                            } else if (_new_state.style == __WW_Text_Glyph_Style.Regular) {
+                                _new_state.style = __WW_Text_Glyph_Style.Bold;
                             }
 
                             return _new_state;
@@ -1122,12 +1094,12 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [i]
                     __bbcode_tags__[$ "i"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
-                            if (_new_state.style_value == __WW_Text_Glyph_Style.Bold) {
-                                _new_state.style_value = __WW_Text_Glyph_Style.Bold_Italic;
-                            } else if (_new_state.style_value == __WW_Text_Glyph_Style.Regular) {
-                                _new_state.style_value = __WW_Text_Glyph_Style.Italic;
+                            if (_new_state.style == __WW_Text_Glyph_Style.Bold) {
+                                _new_state.style = __WW_Text_Glyph_Style.Bold_Italic;
+                            } else if (_new_state.style == __WW_Text_Glyph_Style.Regular) {
+                                _new_state.style = __WW_Text_Glyph_Style.Italic;
                             }
 
                             return _new_state;
@@ -1137,8 +1109,8 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [u]
                     __bbcode_tags__[$ "u"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
-                            _new_state.underline_value = __WW_Text_Glyph_Underline.Line;
+                            var _new_state = _renderer.__text_state_clone__(_state);
+                            _new_state.underline = __WW_Text_Glyph_Underline.Line;
                             return _new_state;
                         }
                     };
@@ -1146,8 +1118,8 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [warn]
                     __bbcode_tags__[$ "warn"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
-                            _new_state.underline_value = __WW_Text_Glyph_Underline.Warning;
+                            var _new_state = _renderer.__text_state_clone__(_state);
+                            _new_state.underline = __WW_Text_Glyph_Underline.Warning;
                             return _new_state;
                         }
                     };
@@ -1155,8 +1127,8 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [err]
                     __bbcode_tags__[$ "err"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
-                            _new_state.underline_value = __WW_Text_Glyph_Underline.Error;
+                            var _new_state = _renderer.__text_state_clone__(_state);
+                            _new_state.underline = __WW_Text_Glyph_Underline.Error;
                             return _new_state;
                         }
                     };
@@ -1168,11 +1140,11 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [color=#rrggbb]
                     __bbcode_tags__[$ "color"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
                             var _col = _renderer.__bbcode_parse_color_ascii__(_arg_string);
                             if (!is_undefined(_col)) {
-                                _new_state.color_value = _col;
+                                _new_state.color = _col;
                             }
 
                             return _new_state;
@@ -1182,13 +1154,13 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [alpha=0..1]
                     __bbcode_tags__[$ "alpha"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
                             var _alp = real(_arg_string);
                             if (_alp < 0) { _alp = 0; }
                             if (_alp > 1) { _alp = 1; }
 
-                            _new_state.alpha_value = _alp;
+                            _new_state.alpha = _alp;
                             return _new_state;
                         }
                     };
@@ -1196,7 +1168,7 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // [size=...]
                     __bbcode_tags__[$ "size"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
                             var _mul = real(_arg_string);
                             if (_mul <= 0) { _mul = 1; }
@@ -1230,10 +1202,10 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // Visual-only for now (underline + light blue). You can extend state/spans later with a link id.
                     __bbcode_tags__[$ "url"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
-                            _new_state.underline_value = __WW_Text_Glyph_Underline.Line;
-                            _new_state.color_value = make_color_rgb(102, 204, 255);
+                            _new_state.underline = __WW_Text_Glyph_Underline.Line;
+                            _new_state.color = make_color_rgb(102, 204, 255);
 
                             return _new_state;
                         },
@@ -1250,10 +1222,10 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // NOTE: uses fnt_consolas_10 as the demo monospace font. Swap to whatever your project standard is.
                     __bbcode_tags__[$ "code"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
 
-                            _new_state.font_asset_or_minus1 = fnt_ww_consolas_10;
-                            _new_state.color_value = make_color_rgb(220, 220, 230);
+                            _new_state.font_asset = fnt_ww_consolas_10;
+                            _new_state.color = make_color_rgb(220, 220, 230);
 
                             return _new_state;
                         },
@@ -1269,7 +1241,7 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
                     // Alignment blocks (paired tags): [left]...[/left], etc.
                     __bbcode_tags__[$ "left"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
                             _new_state.align_value = __WW_Text_Alignment.Left;
                             return _new_state;
                         }
@@ -1277,7 +1249,7 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
 
                     __bbcode_tags__[$ "center"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
                             _new_state.align_value = __WW_Text_Alignment.Center;
                             return _new_state;
                         }
@@ -1285,7 +1257,7 @@ function WWTextRendererBBCode() : WWTextRendererBase() constructor {
 
                     __bbcode_tags__[$ "right"] = {
                         on_open: function(_renderer, _state, _arg_string) {
-                            var _new_state = _renderer.__bbcode_state_copy__(_state);
+                            var _new_state = _renderer.__text_state_clone__(_state);
                             _new_state.align_value = __WW_Text_Alignment.Right;
                             return _new_state;
                         }

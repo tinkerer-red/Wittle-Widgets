@@ -120,7 +120,7 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 			
 	        // 📌 Create Thumb
 	        thumb = new WWSliderThumb()
-	            .set_sprite(s9GUIPixel)
+	            .set_sprite(spr_ww_pixel)
 	            .set_sprite_color(c_white);
 	        add(thumb);
 			

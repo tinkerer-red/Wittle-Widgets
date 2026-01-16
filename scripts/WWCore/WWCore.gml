@@ -1158,7 +1158,7 @@ function WWCore() constructor {
 				//if is_focusable
 				if (background_color_set) {
 					draw_sprite_stretched_ext(
-						s9GUIPixel,
+						spr_ww_pixel,
 						0,
 						x,
 						y,

@@ -143,8 +143,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
             markdown_h2_size = 1.5;
             markdown_h3_size = 1.25;
 
-            __md_metric_runs__ = [];
-            __md_visual_runs__ = [];
+            __md_spans__ = [];
             __md_plain_text__ = "";
 
         #endregion
@@ -302,27 +301,6 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 return 0;
             };
 
-            static __md_push_span__ = function(_spans, _start_index, _end_index, _state) {
-
-                var _count = _end_index - _start_index;
-                if (_count <= 0) {
-                    return;
-                }
-
-                array_push(_spans, {
-                    start_index: _start_index,
-                    end_index: _end_index,
-
-                    font_asset_or_minus1: _state.font_asset_or_minus1,
-                    style_value: _state.style_value,
-                    size_mul: _state.size_mul,
-
-                    color: _state.color,
-                    alpha: _state.alpha,
-                    underline: _state.underline
-                });
-            };
-
             static __md_normalize_style__ = function(_bold_enabled, _italic_enabled) {
                 if (_bold_enabled) {
                     if (_italic_enabled) {
@@ -338,10 +316,9 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 return __WW_Text_Glyph_Style.Regular;
             };
 
-            static __md_build_runs_from_spans__ = function(_plain_len, _spans, _default_metric, _default_visual) {
+                        static __md_build_runs_from_spans__ = function(_plain_len, _spans, _default_state) {
 
-                __md_metric_runs__ = [];
-                __md_visual_runs__ = [];
+                __md_spans__ = [];
 
                 if (_plain_len <= 0) {
                     return;
@@ -351,27 +328,35 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                 var _pos_index = 0;
 
-                var _metric_font = _default_metric.font_asset_or_minus1;
-                var _metric_style = _default_metric.style_value;
-                var _metric_size = _default_metric.size_mul;
+                // Current run state
+                var _run_font = _default_state.font_asset_or_minus1;
+                var _run_style = _default_state.style_value;
+                var _run_size = _default_state.size_mul;
 
-                var _visual_color = _default_visual.color;
-                var _visual_alpha = _default_visual.alpha;
-                var _visual_under = _default_visual.underline;
+                var _run_color = _default_state.color;
+                var _run_alpha = _default_state.alpha;
+                var _run_underline = _default_state.underline;
 
-                var _run_metric_start = 0;
-                var _run_visual_start = 0;
+                var _run_strike = _default_state.strike;
+                var _run_back_color = _default_state.back_color;
+                var _run_back_alpha = _default_state.back_alpha;
+
+                var _run_start = 0;
 
                 while (_pos_index < _plain_len) {
 
-                    // Compute state at this index (later spans win)
-                    var _want_font = _default_metric.font_asset_or_minus1;
-                    var _want_style = _default_metric.style_value;
-                    var _want_size = _default_metric.size_mul;
+                    // Desired state at this index (later spans win)
+                    var _want_font = _default_state.font_asset_or_minus1;
+                    var _want_style = _default_state.style_value;
+                    var _want_size = _default_state.size_mul;
 
-                    var _want_color = _default_visual.color;
-                    var _want_alpha = _default_visual.alpha;
-                    var _want_under = _default_visual.underline;
+                    var _want_color = _default_state.color;
+                    var _want_alpha = _default_state.alpha;
+                    var _want_underline = _default_state.underline;
+
+                    var _want_strike = _default_state.strike;
+                    var _want_back_color = _default_state.back_color;
+                    var _want_back_alpha = _default_state.back_alpha;
 
                     var _scan_index = 0;
                     repeat (_span_count) {
@@ -388,18 +373,26 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                             continue;
                         }
 
-                        if (!is_undefined(_sp.font_asset_or_minus1)) { _want_font = _sp.font_asset_or_minus1; }
-                        if (!is_undefined(_sp.style_value)) { _want_style = _sp.style_value; }
-                        if (!is_undefined(_sp.size_mul) && _sp.size_mul > 0) { _want_size = _sp.size_mul; }
+                        var _sp_state = _sp.state;
 
-                        if (!is_undefined(_sp.color)) { _want_color = _sp.color; }
-                        if (!is_undefined(_sp.alpha)) { _want_alpha = _sp.alpha; }
-                        if (!is_undefined(_sp.underline)) { _want_under = _sp.underline; }
+                        _want_font = _sp_state.font_asset_or_minus1;
+                        _want_style = _sp_state.style_value;
+                        _want_size = _sp_state.size_mul;
+
+                        _want_color = _sp_state.color;
+                        _want_alpha = _sp_state.alpha;
+                        _want_underline = _sp_state.underline;
+
+                        _want_strike = _sp_state.strike;
+                        _want_back_color = _sp_state.back_color;
+                        _want_back_alpha = _sp_state.back_alpha;
 
                         _scan_index += 1;
                     }
 
-                    // Find next boundary where state might change
+                    if (_want_size <= 0) { _want_size = 1; }
+
+                    // Next boundary where state might change
                     var _next_boundary = _plain_len;
 
                     var _scan_index2 = 0;
@@ -409,77 +402,78 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                         if (_pos_index < _sp2.start_index) {
                             if (_sp2.start_index < _next_boundary) { _next_boundary = _sp2.start_index; }
-                        } else if (_pos_index < _sp2.end_index) {
+                        }
+                        else if (_pos_index < _sp2.end_index) {
                             if (_sp2.end_index < _next_boundary) { _next_boundary = _sp2.end_index; }
                         }
 
                         _scan_index2 += 1;
                     }
 
-                    // Emit metric run change
-                    if (_want_font != _metric_font || _want_style != _metric_style || _want_size != _metric_size) {
+                    // Run change (any metric or visual field)
+                    if (_want_font != _run_font
+                        || _want_style != _run_style
+                        || _want_size != _run_size
+                        || _want_color != _run_color
+                        || _want_alpha != _run_alpha
+                        || _want_underline != _run_underline
+                        || _want_strike != _run_strike
+                        || _want_back_color != _run_back_color
+                        || _want_back_alpha != _run_back_alpha) {
 
-                        var _metric_count = _pos_index - _run_metric_start;
-                        if (_metric_count > 0) {
-                            array_push(__md_metric_runs__, {
-                                index_count: _metric_count,
-                                font_asset_or_minus1: _metric_font,
-                                style_value: _metric_style,
-                                size_mul: _metric_size
+                        var _run_count = _pos_index - _run_start;
+                        if (_run_count > 0) {
+                            array_push(__md_spans__, {
+                                index_count: _run_count,
+                                font_asset_or_minus1: _run_font,
+                                style_value: _run_style,
+                                size_mul: _run_size,
+                                color: _run_color,
+                                alpha: _run_alpha,
+                                underline: _run_underline,
+                                strike: _run_strike,
+                                back_color: _run_back_color,
+                                back_alpha: _run_back_alpha
                             });
                         }
 
-                        _metric_font = _want_font;
-                        _metric_style = _want_style;
-                        _metric_size = _want_size;
-                        _run_metric_start = _pos_index;
-                    }
+                        _run_font = _want_font;
+                        _run_style = _want_style;
+                        _run_size = _want_size;
 
-                    // Emit visual run change
-                    if (_want_color != _visual_color || _want_alpha != _visual_alpha || _want_under != _visual_under) {
+                        _run_color = _want_color;
+                        _run_alpha = _want_alpha;
+                        _run_underline = _want_underline;
 
-                        var _visual_count = _pos_index - _run_visual_start;
-                        if (_visual_count > 0) {
-                            array_push(__md_visual_runs__, {
-                                index_count: _visual_count,
-                                color: _visual_color,
-                                alpha: _visual_alpha,
-                                underline: _visual_under
-                            });
-                        }
+                        _run_strike = _want_strike;
+                        _run_back_color = _want_back_color;
+                        _run_back_alpha = _want_back_alpha;
 
-                        _visual_color = _want_color;
-                        _visual_alpha = _want_alpha;
-                        _visual_under = _want_under;
-                        _run_visual_start = _pos_index;
+                        _run_start = _pos_index;
                     }
 
                     _pos_index = _next_boundary;
                 }
 
-                // Flush last runs
-                var _metric_tail = _plain_len - _run_metric_start;
-                if (_metric_tail > 0) {
-                    array_push(__md_metric_runs__, {
-                        index_count: _metric_tail,
-                        font_asset_or_minus1: _metric_font,
-                        style_value: _metric_style,
-                        size_mul: _metric_size
-                    });
-                }
-
-                var _visual_tail = _plain_len - _run_visual_start;
-                if (_visual_tail > 0) {
-                    array_push(__md_visual_runs__, {
-                        index_count: _visual_tail,
-                        color: _visual_color,
-                        alpha: _visual_alpha,
-                        underline: _visual_under
+                // Flush last run
+                var _tail_count = _plain_len - _run_start;
+                if (_tail_count > 0) {
+                    array_push(__md_spans__, {
+                        index_count: _tail_count,
+                        font_asset_or_minus1: _run_font,
+                        style_value: _run_style,
+                        size_mul: _run_size,
+                        color: _run_color,
+                        alpha: _run_alpha,
+                        underline: _run_underline,
+                        strike: _run_strike,
+                        back_color: _run_back_color,
+                        back_alpha: _run_back_alpha
                     });
                 }
             };
-			
-			static __md_get_line_end_pos__ = function(_text, _start_pos1) {
+
+static __md_get_line_end_pos__ = function(_text, _start_pos1) {
 
 			    var _text_len = string_length(_text);
 			    var _pos = _start_pos1;
@@ -621,8 +615,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
             static __md_parse__ = function(_src_text) {
 
                 __md_plain_text__ = "";
-                __md_metric_runs__ = [];
-                __md_visual_runs__ = [];
+                __md_spans__ = [];
 				
                 var _src_len = string_length(_src_text);
                 if (_src_len <= 0) {
@@ -632,14 +625,7 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 var _plain = "";
                 var _spans = [];
 
-                var _state = {
-                    font_asset_or_minus1: -1,
-                    style_value: __WW_Text_Glyph_Style.Regular,
-                    size_mul: 1,
-                    color: color,
-                    alpha: alpha,
-                    underline: __WW_Text_Glyph_Underline.None
-                };
+                var _state = __text_state_make_default__();
 
                 var _bold = false;
                 var _italic = false;
@@ -698,7 +684,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 						        if (__md_is_table_separator_line__(_line_text2)) {
 
 						            // We have a table block. Flush prior span.
-						            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+						            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
 						            // Parse header + rows
 						            var _rows = [];
@@ -809,20 +801,19 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 						            var _table_plain_end = string_length(_plain);
 
 						            // Span the whole emitted table with code font
-						            var _table_metric_state = {
-						                font_asset_or_minus1: -1,
-						                style_value: __WW_Text_Glyph_Style.Regular,
-						                size_mul: 1,
-						                color: _state.color,
-						                alpha: _state.alpha,
-						                underline: _state.underline
-						            };
+						            var _table_metric_state = __text_state_clone_patch__(_state, { style_value: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
 
-						            if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
-						                _table_metric_state.font_asset_or_minus1 = markdown_code_font;
-						            }
+                            if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
+                                __text_state_apply_patch__(_table_metric_state, { font_asset_or_minus1: markdown_code_font });
+                            }
 
-						            __md_push_span__(_spans, _table_plain_start, _table_plain_end, _table_metric_state);
+						            if ((_table_plain_end) > (_table_plain_start)) {
+                    array_push(_spans, {
+                        start_index: _table_plain_start,
+                        end_index: _table_plain_end,
+                        state: _table_metric_state
+                    });
+                }
 
 						            // Resume state from after the table, reset span start to current plain end
 						            _span_start = string_length(_plain);
@@ -840,7 +831,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         if (__md_starts_with__(_src_text, "```", _pos_src)) {
 
                             // Flush span before toggling
-                            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             _in_code_block = !_in_code_block;
 
@@ -875,7 +872,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         // Heading (#, ##, ###) must be followed by space
                         if (__md_starts_with__(_src_text, "### ", _pos_src) || __md_starts_with__(_src_text, "## ", _pos_src) || __md_starts_with__(_src_text, "# ", _pos_src)) {
 
-                            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             _bold = false;
                             _italic = false;
@@ -922,7 +925,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                             if (_only_spaces) {
 
-                                __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                                if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                                 var _rule_start = string_length(_plain);
 
@@ -952,14 +961,19 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                                     draw_set_font(_old_font);
                                 }
 
-                                __md_push_span__(_spans, _rule_start, string_length(_plain), {
-                                    font_asset_or_minus1: _state.font_asset_or_minus1,
+                                if ((string_length(_plain)) > (_rule_start)) {
+                    array_push(_spans, {
+                        start_index: _rule_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
                                     style_value: __WW_Text_Glyph_Style.Regular,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: markdown_quote_alpha,
                                     underline: __WW_Text_Glyph_Underline.None
-                                });
+                                })
+                    });
+                }
 
                                 _span_start = string_length(_plain);
 
@@ -980,7 +994,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                                 if (_left_bracket == "[" && _right_bracket == "]" && _after == " ") {
 
-                                    __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                                    if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                                     var _lead = "- [ ] ";
                                     if (_mark == "x" || _mark == "X") {
@@ -990,14 +1010,19 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                                     var _lead_start = string_length(_plain);
                                     _plain += _lead;
 
-                                    __md_push_span__(_spans, _lead_start, string_length(_plain), {
-                                        font_asset_or_minus1: _state.font_asset_or_minus1,
-                                        style_value: __WW_Text_Glyph_Style.Regular,
-                                        size_mul: 1,
-                                        color: markdown_quote_color,
-                                        alpha: 1,
-                                        underline: __WW_Text_Glyph_Underline.None
-                                    });
+                                    if ((string_length(_plain)) > (_lead_start)) {
+                    array_push(_spans, {
+                        start_index: _lead_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
+                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    size_mul: 1,
+                                    color: markdown_quote_color,
+                                    alpha: 1,
+                                    underline: __WW_Text_Glyph_Underline.None,
+                                })
+                    });
+                }
 
                                     _span_start = string_length(_plain);
 
@@ -1011,19 +1036,30 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         // Blockquote: > (optional space)
                         if (_char_val == ">") {
 
-                            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             var _quote_start = string_length(_plain);
                             _plain += "> ";
 
-                            __md_push_span__(_spans, _quote_start, string_length(_plain), {
-                                font_asset_or_minus1: _state.font_asset_or_minus1,
-                                style_value: __WW_Text_Glyph_Style.Regular,
-                                size_mul: 1,
-                                color: markdown_quote_color,
-                                alpha: markdown_quote_alpha,
-                                underline: __WW_Text_Glyph_Underline.None
-                            });
+                            if ((string_length(_plain)) > (_quote_start)) {
+                    array_push(_spans, {
+                        start_index: _quote_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
+                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    size_mul: 1,
+                                    color: markdown_quote_color,
+                                    alpha: markdown_quote_alpha,
+                                    underline: __WW_Text_Glyph_Underline.None,
+                                })
+                    });
+                }
 
                             _span_start = string_length(_plain);
 
@@ -1042,19 +1078,30 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         // Unordered list: "- " or "* "
                         if (__md_starts_with__(_src_text, "- ", _pos_src) || __md_starts_with__(_src_text, "* ", _pos_src)) {
 
-                            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             var _bul_start = string_length(_plain);
                             _plain += "- ";
 
-                            __md_push_span__(_spans, _bul_start, string_length(_plain), {
-                                font_asset_or_minus1: _state.font_asset_or_minus1,
-                                style_value: __WW_Text_Glyph_Style.Regular,
-                                size_mul: 1,
-                                color: markdown_quote_color,
-                                alpha: 1,
-                                underline: __WW_Text_Glyph_Underline.None
-                            });
+                            if ((string_length(_plain)) > (_bul_start)) {
+                    array_push(_spans, {
+                        start_index: _bul_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
+                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    size_mul: 1,
+                                    color: markdown_quote_color,
+                                    alpha: 1,
+                                    underline: __WW_Text_Glyph_Underline.None,
+                                })
+                    });
+                }
 
                             _span_start = string_length(_plain);
 
@@ -1074,7 +1121,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                             if (_scan_num + 1 <= _src_len) {
                                 if (string_char_at(_src_text, _scan_num) == "." && string_char_at(_src_text, _scan_num + 1) == " ") {
 
-                                    __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                                    if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                                     var _num_len = (_scan_num + 1) - _pos_src + 1;
                                     var _lead_text = string_copy(_src_text, _pos_src, _num_len);
@@ -1082,14 +1135,19 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                                     var _lead_start2 = string_length(_plain);
                                     _plain += _lead_text;
 
-                                    __md_push_span__(_spans, _lead_start2, string_length(_plain), {
-                                        font_asset_or_minus1: _state.font_asset_or_minus1,
-                                        style_value: __WW_Text_Glyph_Style.Regular,
-                                        size_mul: 1,
-                                        color: markdown_quote_color,
-                                        alpha: 1,
-                                        underline: __WW_Text_Glyph_Underline.None
-                                    });
+                                    if ((string_length(_plain)) > (_lead_start2)) {
+                    array_push(_spans, {
+                        start_index: _lead_start2,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
+                                    style_value: __WW_Text_Glyph_Style.Regular,
+                                    size_mul: 1,
+                                    color: markdown_quote_color,
+                                    alpha: 1,
+                                    underline: __WW_Text_Glyph_Underline.None,
+                                })
+                    });
+                }
 
                                     _span_start = string_length(_plain);
 
@@ -1108,7 +1166,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                             _plain += _char_val;
 
-                            __md_push_span__(_spans, _span_start, string_length(_plain) - 1, _state);
+                            if ((string_length(_plain) - 1) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain) - 1,
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             _span_start = string_length(_plain) - 1;
                             _at_line_start = true;
@@ -1130,17 +1194,29 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                         _plain += _char_val;
 
-                        __md_push_span__(_spans, _span_start, string_length(_plain) - 1, _state);
+                        if ((string_length(_plain) - 1) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain) - 1,
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
-                        _state.font_asset_or_minus1 = -1;
-                        _state.size_mul = 1;
                         _bold = false;
                         _italic = false;
-                        _state.style_value = __md_normalize_style__(_bold, _italic);
+                        _strike = false;
 
-                        _state.color = color;
-                        _state.alpha = alpha;
-                        _state.underline = __WW_Text_Glyph_Underline.None;
+                        __text_state_apply_patch__(_state, {
+                            font_asset_or_minus1: -1,
+                            style_value: __WW_Text_Glyph_Style.Regular,
+                            size_mul: 1,
+                            color: color,
+                            alpha: alpha,
+                            underline: __WW_Text_Glyph_Underline.None,
+                            strike: __WW_Text_Glyph_Strike.None,
+                            back_color: undefined,
+                            back_alpha: undefined
+                        });
 
                         _span_start = string_length(_plain) - 1;
 
@@ -1180,7 +1256,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                         if (_closer_pos > 0) {
 
-                            __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                            if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                             // Extract code content between runs (do not parse markdown inside)
                             var _code_start_src = _pos_src + _tick_count;
@@ -1194,20 +1276,19 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                             var _code_plain_start = string_length(_plain);
                             _plain += _code_text;
 
-                            var _code_state = {
-                                font_asset_or_minus1: _state.font_asset_or_minus1,
-                                style_value: __WW_Text_Glyph_Style.Regular,
-                                size_mul: 1,
-                                color: _state.color,
-                                alpha: _state.alpha,
-                                underline: _state.underline
-                            };
+                            var _code_state = __text_state_clone_patch__(_state, { style_value: __WW_Text_Glyph_Style.Regular, size_mul: 1 });
 
                             if (!is_undefined(markdown_code_font) && markdown_code_font != -1) {
-                                _code_state.font_asset_or_minus1 = markdown_code_font;
+                                __text_state_apply_patch__(_code_state, { font_asset_or_minus1: markdown_code_font });
                             }
 
-                            __md_push_span__(_spans, _code_plain_start, string_length(_plain), _code_state);
+                            if ((string_length(_plain)) > (_code_plain_start)) {
+                    array_push(_spans, {
+                        start_index: _code_plain_start,
+                        end_index: string_length(_plain),
+                        state: _code_state
+                    });
+                }
 
                             _span_start = string_length(_plain);
 
@@ -1226,18 +1307,24 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                     // Strikethrough ~~text~~
                     if (_char_val == "~" && _pos_src + 1 <= _src_len && string_char_at(_src_text, _pos_src + 1) == "~" && !_in_code_inline && !_in_code_block) {
 
-                        __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                        if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                         _strike = !_strike;
 
-                        // Use a dedicated underline code (4) that the base renderer treats as a mid-line strike.
+                        // Strikethrough is its own channel (can coexist with underline).
                         if (_strike) {
-                            _state.underline = 4;
+                            _state.strike = __WW_Text_Glyph_Strike.Line;
                         } else {
-                            _state.underline = __WW_Text_Glyph_Underline.None;
+                            _state.strike = __WW_Text_Glyph_Strike.None;
                         }
 
-                        _span_start = string_length(_plain);
+_span_start = string_length(_plain);
 
                         _pos_src += 2;
                         continue;
@@ -1275,7 +1362,13 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                         // Prefer closing if possible (more intuitive for single-pass toggles)
                         var _use_close = _can_close;
 
-                        __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                        if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                         if (_run_count >= 3) {
 
@@ -1326,21 +1419,32 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                                 var _alt_text = string_copy(_src_text, _alt_start_src, _alt_end_src - _alt_start_src);
 
-                                __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                                if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                                 var _img_start = string_length(_plain);
                                 _plain += "[";
                                 _plain += _alt_text;
                                 _plain += "]";
 
-                                __md_push_span__(_spans, _img_start, string_length(_plain), {
-                                    font_asset_or_minus1: _state.font_asset_or_minus1,
+                                if ((string_length(_plain)) > (_img_start)) {
+                    array_push(_spans, {
+                        start_index: _img_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
                                     style_value: __WW_Text_Glyph_Style.Italic,
                                     size_mul: 1,
                                     color: markdown_quote_color,
                                     alpha: 1,
                                     underline: __WW_Text_Glyph_Underline.None
-                                });
+                                })
+                    });
+                }
 
                                 _span_start = string_length(_plain);
 
@@ -1365,19 +1469,30 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
 
                                 var _title_text = string_copy(_src_text, _title_start_src, _title_end_src - _title_start_src);
 
-                                __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                                if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                                 var _title_plain_start = string_length(_plain);
                                 _plain += _title_text;
 
-                                __md_push_span__(_spans, _title_plain_start, string_length(_plain), {
-                                    font_asset_or_minus1: _state.font_asset_or_minus1,
+                                if ((string_length(_plain)) > (_title_plain_start)) {
+                    array_push(_spans, {
+                        start_index: _title_plain_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone_patch__(_state, {
                                     style_value: _state.style_value,
                                     size_mul: _state.size_mul,
                                     color: markdown_link_color,
                                     alpha: markdown_link_alpha,
-                                    underline: markdown_link_underline
-                                });
+                                    underline: markdown_link_underline,
+                                })
+                    });
+                }
 
                                 _span_start = string_length(_plain);
 
@@ -1396,64 +1511,65 @@ function WWTextRendererMarkdown() : WWTextRendererBase() constructor {
                 }
 
                 // Flush
-                __md_push_span__(_spans, _span_start, string_length(_plain), _state);
+                if ((string_length(_plain)) > (_span_start)) {
+                    array_push(_spans, {
+                        start_index: _span_start,
+                        end_index: string_length(_plain),
+                        state: __text_state_clone__(_state)
+                    });
+                }
 
                 __md_plain_text__ = _plain;
 
                 var _plain_len = string_length(_plain);
 
-                var _default_metric = {
-                    font_asset_or_minus1: -1,
-                    style_value: __WW_Text_Glyph_Style.Regular,
-                    size_mul: 1
-                };
+                var _default_state = __text_state_make_default__();
 
-                var _default_visual = {
-                    color: color,
-                    alpha: alpha,
-                    underline: __WW_Text_Glyph_Underline.None
-                };
-
-                __md_build_runs_from_spans__(_plain_len, _spans, _default_metric, _default_visual);
+                __md_build_runs_from_spans__(_plain_len, _spans, _default_state);
             };
 
         #endregion
 
         #region Override layout builder hook
 
-            static __ensure_layout__ = function() {
+                                    static __ensure_layout__ = function() {
 
-                if (!__is_dirty__) {
-                    return;
-                }
+                if (!__is_dirty__) { return; }
 
                 var _text_value = "";
                 if (!is_undefined(__textbox_parent__)) {
                     _text_value = __textbox_parent__.get_text();
                 }
-
-                if (_text_value == "") {
-                    _text_value = caption;
-                }
+                if (_text_value == "") { _text_value = caption; }
 
                 __display_text__ = _text_value;
 
                 if (!markdown_enabled) {
-                    __layout__ = __build_layout__(_text_value);
+
+                    var _default_state = __text_state_make_default__();
+                    var _default_spans = [{
+                        index_count: string_length(_text_value),
+                        font_asset_or_minus1: _default_state.font_asset_or_minus1,
+                        style_value: _default_state.style_value,
+                        size_mul: _default_state.size_mul,
+                        color: _default_state.color,
+                        alpha: _default_state.alpha,
+                        underline: _default_state.underline,
+                        strike: _default_state.strike,
+                        back_color: _default_state.back_color,
+                        back_alpha: _default_state.back_alpha
+                    }];
+
+                    __layout__ = __build_layout__(_text_value, _default_spans);
+
                 } else {
 
                     __md_parse__(_text_value);
-
-                    __layout__ = __build_layout__(
-                        __md_plain_text__,
-                        __md_metric_runs__,
-                        __md_visual_runs__
-                    );
+                    __layout__ = __build_layout__(__md_plain_text__, __md_spans__);
                 }
 
                 __content_width__ = __layout__.get_content_width();
                 __content_height__ = __layout__.get_content_height();
-
                 __is_dirty__ = false;
             };
 

@@ -6,8 +6,7 @@ title = "CSS Demo";
 subtitle = "Left is input. Right is CSS renderer.";
 
 #region text
-text = @'
-<style>
+text = @'<style>
 .root        { color:#d8dee9; opacity:1; font-size:1em; font-family:ui; }
 .muted       { color:#9aa4b2; opacity:0.85; }
 .strong      { font-weight:bold; }
@@ -22,10 +21,7 @@ text = @'
 .hi_pink     { background-color:#3a1030; color:#ffd1f0; }
 .big         { font-size:1.35em; }
 .small       { font-size:0.85em; }
-</style>
-
-<span class="root">
-CSS renderer demo.
+</style><span class="root">CSS renderer demo.
 
 <span class="muted">Muted text using class rules.</span>
 <span class="strong">Bold text.</span>
@@ -67,9 +63,7 @@ Tabs:
 Wrapping stress test:
 ThisLineIsVeryLongAndShouldOnlyWrapWhenTheTextboxIsTooNarrowToContainIt
 
-End of CSS demo.
-</span>
-';
+End of CSS demo.</span>';
 #endregion
 
 left_init = function(_textbox_instance) {

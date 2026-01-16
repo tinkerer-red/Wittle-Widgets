@@ -6,8 +6,7 @@ title = "Markdown Demo";
 subtitle = "Left is input. Right is Markdown renderer.";
 
 #region text
-text = @'
-Markdown renderer demo.
+text = @'Markdown renderer demo.
 
 # Heading level one
 ## Heading level two
@@ -53,8 +52,7 @@ Fenced code block:
 value: 42,
 enabled: true
 }
-```
-';
+```';
 #endregion
 
 left_init = function(_textbox_instance) {

@@ -6,8 +6,7 @@ title = "GML Demo";
 subtitle = "Left is input. Right is GML renderer.";
 
 #region text
-text = @'
-function demo_example() {
+text = @'function demo_example() {
 	var counter_value = 0;
 	var message_text = "Hello";
 
@@ -19,8 +18,7 @@ function demo_example() {
 }
 
 This block is intended to preview
-syntax highlighting and code layout.
-';
+syntax highlighting and code layout.';
 #endregion
 
 left_init = function(_textbox_instance) {

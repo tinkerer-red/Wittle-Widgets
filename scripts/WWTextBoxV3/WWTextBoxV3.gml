@@ -21,7 +21,7 @@ function WWTextBoxV3() : WWCore() constructor {
 		//render the cursor behind the renderer, but step the renderer before the cursor
 		//cursor.add([renderer]);
 		
-		add([buffer, cursor, renderer]);
+		add([buffer, renderer, cursor]);
 		
 	#endregion
 	

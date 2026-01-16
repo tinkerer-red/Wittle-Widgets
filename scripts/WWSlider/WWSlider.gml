@@ -84,7 +84,7 @@ function WWSliderHorzThumb() : WWSliderHorz() constructor {
     debug_name = "WWSliderHorzThumb";
 
     thumb = new WWSliderThumb()
-        .set_sprite(s9GUIPixel)
+        .set_sprite(spr_ww_pixel)
         .set_sprite_color(c_white)
         .set_size(16, 16);
 
@@ -122,7 +122,7 @@ function WWSliderVertThumb() : WWSliderVert() constructor {
     debug_name = "WWSliderVertThumb";
 
     thumb = new WWSliderThumb()
-        .set_sprite(s9GUIPixel)
+        .set_sprite(spr_ww_pixel)
         .set_sprite_color(c_white)
         .set_size(16, 16);
 
@@ -350,10 +350,10 @@ function WWSliderBase() : WWButton() constructor {
 			visible = false;
 			
 			background = new WWSliderBackgroud()
-				.set_sprite(s9GUIPixel)
+				.set_sprite(spr_ww_pixel)
 				.set_sprite_color(c_grey)
 			bar = new WWSliderBar()
-				.set_sprite(s9GUIPixel)
+				.set_sprite(spr_ww_pixel)
 				.set_sprite_color(c_orange)
 			
 			add([background, bar]);

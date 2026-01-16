@@ -47,6 +47,9 @@ function WWTextCursor() : WWCore() constructor {
 			#endregion
 			static set_cursor_visibility = function(_bool) {
 				cursor_visible = _bool;
+				if (_bool) {
+					__blink_reset__();
+				}
 				return self;
 			};
 			
@@ -59,8 +62,9 @@ function WWTextCursor() : WWCore() constructor {
 			static set_index = function(_index_new) {
 				if (index != _index_new) {
 					__is_dirty__ = true;
+					index = _index_new;
+					__blink_reset__();
 				}
-				index = _index_new;
 				return self;
 			};
 			
@@ -108,59 +112,44 @@ function WWTextCursor() : WWCore() constructor {
 		#region Events
 			
 			on_pre_draw(function(){
-				//Update GUI locations
+				// Update GUI locations
 				__update_gui_position__();
-				
-				//Fetch renderer
-				var _renderer = __textbox_parent__.__get_renderer__();
-				
-				var _pre_color = draw_get_color();
-				
-				//Draw highlight
-				if (highlight_active) {
-					draw_set_color(highlight_color);
-					
-					var _start = min(highlight_start_index, highlight_end_index);
-					var _end   = max(highlight_start_index, highlight_end_index);
 
-					var _start_line = _renderer.get_line_from_index(_start);
-					var _end_line   = _renderer.get_line_from_index(_end);
-
-					var _line = _start_line;
-					repeat((_end_line - _start_line) + 1) {
-
-						var _y  = _renderer.get_line_y_offset(_line);
-						var _h  = _renderer.get_line_height(_line)-1;
-						var _w  = _renderer.get_line_width(_line)-1;
-
-						var _range_start = 0;
-						var _range_end   = _w;
-
-						if (_line == _start_line) {
-							_range_start = _renderer.get_x_from_index(_start);
-						}
-
-						if (_line == _end_line) {
-							_range_end = _renderer.get_x_from_index(_end);
-						}
-						
-						draw_rectangle(x+_range_start, y+_y, x+_range_end, y+_y + _h, false);
-
-						_line++;
+				var _is_focused = true;
+				if (__textbox_parent__ != undefined) {
+					_is_focused = true;
+					if (__textbox_parent__.__is_focused__ != undefined) {
+						_is_focused = __textbox_parent__.__is_focused__;
 					}
-					
-					draw_set_color(_pre_color);
+					else if (__textbox_parent__.is_focused != undefined) {
+						_is_focused = __textbox_parent__.is_focused;
+					}
 				}
-				
-				//Draw cursor
-				if (cursor_visible) {
-					draw_set_color(cursor_color);
-					var _line_index = _renderer.get_line_from_index(index)
-					var _glyph_height = _renderer.get_line_height(_line_index);
-					draw_rectangle(x+cursor_x, y+cursor_y, x+cursor_x+1, y+cursor_y+_glyph_height, false);
+				else {
+					_is_focused = false;
 				}
-				
-				draw_set_color(_pre_color);
+
+				// Draw caret
+				if (_is_focused && cursor_visible) {
+					var _blink_visible = __blink_is_visible__();
+					if (_blink_visible) {
+						// Fetch renderer
+						var _renderer = __textbox_parent__.__get_renderer__();
+						var _line_index = _renderer.get_line_from_index(index);
+						var _glyph_height = _renderer.get_line_height(_line_index);
+
+						var _pre_color = draw_get_color();
+						var _pre_alpha = draw_get_alpha();
+						draw_set_color(cursor_color);
+						draw_set_alpha(1);
+
+						// Use a real sprite draw for consistency (HTML5 off-by-one friendliness)
+						draw_sprite_stretched_ext(spr_ww_pixel, 0, x + cursor_x, y + cursor_y, 1, _glyph_height, cursor_color, 1);
+
+						draw_set_alpha(_pre_alpha);
+						draw_set_color(_pre_color);
+					}
+				}
 			})
 			
 		#endregion
@@ -217,6 +206,11 @@ function WWTextCursor() : WWCore() constructor {
 			cursor_y = 0;
 			cursor_visible = true;
 			
+			// Blink
+			__blink_period_ms__ = 1000;
+			__blink_start_ms__ = current_time;
+			__blink_show_ms__ = 500;
+			
 			// Highlight state
 			highlight_active = false;
 			highlight_start_index = 0;
@@ -245,6 +239,33 @@ function WWTextCursor() : WWCore() constructor {
                 __is_dirty__ = true;
             };
             
+						
+			#region jsDoc
+			/// @func   __blink_reset__()
+			/// @desc   Resets the caret blink timer so the caret is immediately visible.
+			#endregion
+			static __blink_reset__ = function() {
+				__blink_start_ms__ = current_time;
+			};
+			
+			#region jsDoc
+			/// @func   __blink_is_visible__()
+			/// @desc   Returns true if the caret should be visible for the current time.
+			#endregion
+			static __blink_is_visible__ = function() {
+				var _elapsed = current_time - __blink_start_ms__;
+				if (_elapsed < 0) {
+					__blink_start_ms__ = current_time;
+					_elapsed = 0;
+				}
+				var _period = __blink_period_ms__;
+				if (_period <= 0) {
+					return true;
+				}
+				var _phase = _elapsed mod _period;
+				return (_phase < __blink_show_ms__);
+			};
+			
 			#region jsDoc
 			/// @func   __update_gui_position__()
 			/// @desc   Resolves GUI x,y from the renderer based on caret index.
@@ -263,12 +284,11 @@ function WWTextCursor() : WWCore() constructor {
 					highlight_end_line   = _renderer.get_line_from_index(highlight_end_index);
 					highlight_end_col    = _renderer.get_col_from_index (highlight_end_index);
 				}
-				
-				
 			};
 			
 			static __set_textbox__ = function(_comp) {
 				__textbox_parent__ = _comp;
+				__blink_reset__();
 				return self;
 			}
 			

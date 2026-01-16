@@ -1303,7 +1303,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 					draw_gui(_input);
 					
 					draw_sprite_stretched_ext(
-							s9GUIPixel,
+							spr_ww_pixel,
 							0,
 							x+region.left,
 							y+region.top,
@@ -1438,7 +1438,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 										//draw the selection box
 										draw_sprite_stretched_ext(
-												s9GUIPixel,
+												spr_ww_pixel,
 												0,
 												_draw_x+min(_selection_x1, _selection_x2),
 												_draw_y+_derivative_y,
@@ -1469,7 +1469,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								var _y_offset = -(_center_y+_center_y);
 								
 								draw_sprite_stretched_ext(
-										s9GUIPixel,
+										spr_ww_pixel,
 										0,
 										_cursor_xoff + get_cursor_x_pos_gui(),
 										_cursor_yoff + get_cursor_y_pos_gui() + _y_offset,

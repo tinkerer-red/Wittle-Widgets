@@ -62,85 +62,85 @@ function WWTextBuffer() : WWCore() constructor {
 			
 			#region Getters
 			
-			#region jsDoc
-			/// @func	get_text()
-			/// @desc	Get the entire text stored in the buffer.
-			/// @returns {String}
-			#endregion
-			static get_text = function() {
-				if (__is_dirty__) {
-					if (buffer_exists(__buffer__)) {
-						buffer_seek(__buffer__, buffer_seek_start, 0);
-						var _text = buffer_read(__buffer__, buffer_text);
-						__content__  = _text;
-						__length__   = string_length(_text);
+				#region jsDoc
+				/// @func	get_text()
+				/// @desc	Get the entire text stored in the buffer.
+				/// @returns {String}
+				#endregion
+				static get_text = function() {
+					if (__is_dirty__) {
+						if (buffer_exists(__buffer__)) {
+							buffer_seek(__buffer__, buffer_seek_start, 0);
+							var _text = buffer_read(__buffer__, buffer_text);
+							__content__  = _text;
+							__length__   = string_length(_text);
+						}
+						else {
+							__content__  = "";
+							__length__   = 0;
+						}
+						__is_dirty__ = false;
 					}
-					else {
-						__content__  = "";
-						__length__   = 0;
+					return __content__;
+				};
+			
+				#region jsDoc
+				/// @func	get_size()
+				/// @desc	Get the number of characters stored in the buffer.
+				///		  (Used by select_all in WWTextBoxV3.)
+				/// @returns {Real}
+				#endregion
+				static get_size = function() {
+					if (__is_dirty__) {
+						if (buffer_exists(__buffer__)) {
+							buffer_seek(__buffer__, buffer_seek_start, 0);
+							var _text = buffer_read(__buffer__, buffer_text);
+							__content__  = _text;
+							__length__   = string_length(_text);
+						} else {
+							__content__  = "";
+							__length__   = 0;
+						}
+						__is_dirty__ = false;
 					}
-					__is_dirty__ = false;
-				}
-				return __content__;
-			};
+					return __length__;
+				};
 			
-			#region jsDoc
-			/// @func	get_size()
-			/// @desc	Get the number of characters stored in the buffer.
-			///		  (Used by select_all in WWTextBoxV3.)
-			/// @returns {Real}
-			#endregion
-			static get_size = function() {
-				if (__is_dirty__) {
-					if (buffer_exists(__buffer__)) {
-						buffer_seek(__buffer__, buffer_seek_start, 0);
-						var _text = buffer_read(__buffer__, buffer_text);
-						__content__  = _text;
-						__length__   = string_length(_text);
-					} else {
-						__content__  = "";
-						__length__   = 0;
+				#region jsDoc
+				/// @func	get_substring()
+				/// @desc	Get a substring using 0-based indices and [start,end) range.
+				/// @param   {Real} _start_index : Inclusive start index (0-based).
+				/// @param   {Real} _end_index   : Exclusive end index (0-based).
+				/// @returns {String}
+				#endregion
+				static get_substring = function(_start_index, _end_index) {
+					var _start_clamp = clamp(_start_index, 0, get_size());
+					var _end_clamp   = clamp(_end_index, 0, get_size());
+		
+					if (_end_clamp < _start_clamp) {
+						var _swap_temp = _start_clamp;
+						_start_clamp   = _end_clamp;
+						_end_clamp	 = _swap_temp;
 					}
-					__is_dirty__ = false;
-				}
-				return __length__;
-			};
+		
+					var _count = _end_clamp - _start_clamp;
+					if (_count <= 0) {
+						return "";
+					}
+		
+					// GameMaker strings are 1-based.
+					var _gm_start = _start_clamp + 1;
+					return string_copy(get_text(), _gm_start, _count);
+				};
 			
-			#region jsDoc
-			/// @func	get_substring()
-			/// @desc	Get a substring using 0-based indices and [start,end) range.
-			/// @param   {Real} _start_index : Inclusive start index (0-based).
-			/// @param   {Real} _end_index   : Exclusive end index (0-based).
-			/// @returns {String}
-			#endregion
-			static get_substring = function(_start_index, _end_index) {
-				var _start_clamp = clamp(_start_index, 0, get_size());
-				var _end_clamp   = clamp(_end_index, 0, get_size());
-		
-				if (_end_clamp < _start_clamp) {
-					var _swap_temp = _start_clamp;
-					_start_clamp   = _end_clamp;
-					_end_clamp	 = _swap_temp;
-				}
-		
-				var _count = _end_clamp - _start_clamp;
-				if (_count <= 0) {
-					return "";
-				}
-		
-				// GameMaker strings are 1-based.
-				var _gm_start = _start_clamp + 1;
-				return string_copy(get_text(), _gm_start, _count);
-			};
-			
-			#region jsDoc
-			/// @func	get_allowed_char()
-			/// @desc	Gets the allowed character struct.
-			/// @returns {Struct}
-			#endregion
-			static get_allowed_char = function() {
-				return __allowed_char_map__;
-			};
+				#region jsDoc
+				/// @func	get_allowed_char()
+				/// @desc	Gets the allowed character struct.
+				/// @returns {Struct}
+				#endregion
+				static get_allowed_char = function() {
+					return __allowed_char_map__;
+				};
 			
 			#endregion
 			
@@ -162,7 +162,6 @@ function WWTextBuffer() : WWCore() constructor {
 				__allowed_char_map__ = undefined;
 				return self;
 			};
-			
 			
 			#region jsDoc
 			/// @func	clear_text()
@@ -296,7 +295,6 @@ function WWTextBuffer() : WWCore() constructor {
 			
 		#endregion
 		
-	
 	#endregion
 	
 	#region Private
@@ -347,6 +345,8 @@ function WWTextBuffer() : WWCore() constructor {
 			
 			static __filter_allowed__ = function(_text) {
 				if (is_undefined(__allowed_char_map__)) {
+					_text = string_replace_all(_text, "\r\n", "\n")
+					_text = string_replace_all(_text, "\r", "\n")
 					return _text;
 				}
 				

@@ -1097,9 +1097,9 @@ function WWTextBase() : WWCore() constructor {
 			            rect_x2 = _x + __string_width(current_text);
 			        }
 					
-			        // Draw the selection rectangle. (Using s9GUIPixel as a 1x1 pixel that can be stretched.)
+			        // Draw the selection rectangle. (Using spr_ww_pixel as a 1x1 pixel that can be stretched.)
 			        draw_sprite_stretched_ext(
-			            s9GUIPixel,
+			            spr_ww_pixel,
 			            0,
 			            min(rect_x1, rect_x2),
 			            draw_y,
@@ -1166,7 +1166,7 @@ function WWTextBase() : WWCore() constructor {
 			    // Draw a vertical line (or sprite) as the cursor.
 			    // Here, get_cursor_width() and get_cursor_height() are assumed to return the dimensions.
 			    draw_sprite_stretched_ext(
-			        s9GUIPixel,
+			        spr_ww_pixel,
 			        0,
 			        cursor_pixel_x,
 			        cursor_pixel_y,

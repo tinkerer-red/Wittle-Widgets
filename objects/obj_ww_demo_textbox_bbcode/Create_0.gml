@@ -6,8 +6,7 @@ title = "BBCode Demo";
 subtitle = "Left is input. Right is BBCode renderer.";
 
 #region text
-text = @'
-BBCode renderer demo.
+text = @'BBCode renderer demo.
 
 [b]Bold text[/b]
 [i]Italic text[/i]
@@ -35,8 +34,7 @@ Paragraph test:[p]New paragraph starts here
 
 [left]Left aligned text[/left]
 [center]Centered text[/center]
-[right]Right aligned text[/right]
-';
+[right]Right aligned text[/right]';
 #endregion
 
 left_init = function(_textbox_instance) {

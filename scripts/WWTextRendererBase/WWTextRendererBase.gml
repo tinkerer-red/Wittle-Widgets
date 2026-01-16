@@ -10,7 +10,7 @@
 #endregion
 function WWTextRendererBase() : WWCore() constructor {
     debug_name = "WWTextRendererBase";
-
+	
     #region Public
 
         #region Builder Functions
@@ -159,31 +159,87 @@ function WWTextRendererBase() : WWCore() constructor {
                     return self;
                 };
 				
+				#region jsDoc
+                /// @func    set_formatting_enabled()
+                /// @desc    Enable or disable per-glyph formatting on advanced renders (style/size/font overrides).
+                /// @param   {Bool} _enabled
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_formatting_enabled = function(_enabled) {
+
+                    _enabled = (_enabled == true);
+
+                    if (formatting_enabled == _enabled) {
+                        return self;
+                    }
+
+                    formatting_enabled = _enabled;
+                    __mark_vb_dirty__();
+
+                    return self;
+                }
+				
 				#region Whitespace visibility
 					
-		            whitespace_visible = false;
-		            whitespace_color = c_gray;
-		            whitespace_alpha = 0.35;
-		            whitespace_marker_space = ".";
-		            whitespace_marker_tab = ">";
+	                #region jsDoc
+	                /// @func    set_whitespace_visible()
+	                /// @desc    Toggle visualization of spaces/tabs using marker glyphs.
+	                /// @param   {Bool} _visible
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_whitespace_visible = function(_visible) {
 
-		            static set_whitespace_visible = function(_is_visible) {
-		                if (whitespace_visible == _is_visible) {
-		                    return self;
-		                }
-		                whitespace_visible = _is_visible;
-		                __mark_vb_dirty__();
-		                return self;
-		            };
+	                    _visible = (_visible == true);
 
-		            static set_whitespace_color = function(_color_value) {
-		                if (whitespace_color == _color_value) {
-		                    return self;
-		                }
-		                whitespace_color = _color_value;
-		                __mark_vb_dirty__();
-		                return self;
-		            };
+	                    if (whitespace_visible == _visible) {
+	                        return self;
+	                    }
+
+	                    whitespace_visible = _visible;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_whitespace_markers()
+	                /// @desc    Set marker characters used for space and tab.
+	                /// @param   {String} _space_marker
+	                /// @param   {String} _tab_marker
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_whitespace_markers = function(_space_marker, _tab_marker) {
+
+	                    if (is_string(_space_marker) && string_length(_space_marker) > 0) {
+	                        whitespace_marker_space = string_char_at(_space_marker, 1);
+	                    }
+
+	                    if (is_string(_tab_marker) && string_length(_tab_marker) > 0) {
+	                        whitespace_marker_tab = string_char_at(_tab_marker, 1);
+	                    }
+
+	                    __mark_vb_dirty__();
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_whitespace_color()
+	                /// @desc    Set whitespace marker color and alpha.
+	                /// @param   {Real} _color_value
+	                /// @param   {Real} _alpha_value
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_whitespace_color = function(_color_value, _alpha_value=undefined) {
+
+	                    whitespace_color = _color_value;
+
+	                    if (!is_undefined(_alpha_value)) {
+	                        whitespace_alpha = _alpha_value;
+	                    }
+
+	                    __mark_vb_dirty__();
+	                    return self;
+	                }
 
 		            static set_whitespace_alpha = function(_alpha_value) {
 		                if (whitespace_alpha == _alpha_value) {
@@ -195,8 +251,149 @@ function WWTextRendererBase() : WWCore() constructor {
 		            };
 
 		        #endregion
-            #endregion
+				
+				#region Underline options
 
+	                #region jsDoc
+	                /// @func    set_underline_enabled()
+	                /// @desc    Enable or disable underline rendering.
+	                /// @param   {Bool} _enabled
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_underline_enabled = function(_enabled) {
+
+	                    _enabled = (_enabled == true);
+
+	                    if (underline_enabled == _enabled) {
+	                        return self;
+	                    }
+
+	                    underline_enabled = _enabled;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_underline_offset()
+	                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
+	                /// @param   {Real} _offset
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_underline_offset = function(_offset) {
+
+	                    underline_y_offset = _offset;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_underline_thickness()
+	                /// @desc    Set thickness for plain underline in pixels.
+	                /// @param   {Real} _thickness
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_underline_thickness = function(_thickness) {
+
+	                    underline_thickness = _thickness;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_underline_sprites()
+	                /// @desc    Set sprites used for underline styles.
+	                /// @param   {Asset.GMSprite} _sprite_white
+	                /// @param   {Asset.GMSprite} _sprite_warning
+	                /// @param   {Asset.GMSprite} _sprite_error
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_underline_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
+
+	                    underline_sprite_white = _sprite_white;
+	                    underline_sprite_warning = _sprite_warning;
+	                    underline_sprite_error = _sprite_error;
+
+	                    __mark_vb_dirty__();
+	                    return self;
+	                }
+
+	            #endregion
+				
+				#region Strike-through options
+
+	                #region jsDoc
+	                /// @func    set_strike_enabled()
+	                /// @desc    Enable or disable strike-through rendering.
+	                /// @param   {Bool} _enabled
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_strike_enabled = function(_enabled) {
+
+	                    _enabled = (_enabled == true);
+
+	                    if (strike_enabled == _enabled) {
+	                        return self;
+	                    }
+
+	                    strike_enabled = _enabled;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_strike_offset()
+	                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
+	                /// @param   {Real} _offset
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_strike_offset = function(_offset) {
+
+	                    strike_y_offset = _offset;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_strike_thickness()
+	                /// @desc    Set thickness for plain strike-through in pixels.
+	                /// @param   {Real} _thickness
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_strike_thickness = function(_thickness) {
+
+	                    strike_thickness = _thickness;
+	                    __mark_vb_dirty__();
+
+	                    return self;
+	                }
+
+	                #region jsDoc
+	                /// @func    set_strike_sprites()
+	                /// @desc    Set sprites used for strike-through styles.
+	                /// @param   {Asset.GMSprite} _sprite_white
+	                /// @param   {Asset.GMSprite} _sprite_warning
+	                /// @param   {Asset.GMSprite} _sprite_error
+	                /// @returns {Struct.WWTextRendererBase}
+	                #endregion
+	                static set_strike_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
+
+	                    strike_sprite_white = _sprite_white;
+	                    strike_sprite_warning = _sprite_warning;
+	                    strike_sprite_error = _sprite_error;
+
+	                    __mark_vb_dirty__();
+	                    return self;
+	                }
+
+	            #endregion
+			
+            #endregion
+			
         #endregion
 
         #region Events
@@ -215,242 +412,17 @@ function WWTextRendererBase() : WWCore() constructor {
                 __ensure_layout__();
             });
 
-            on_post_draw(function(_input) {
-                __draw_text_vb__(x, y);
+            on_pre_draw(function(_input) {
+                __draw_text_vb__(x, y, -1, -1);
+                __draw_selection_highlight__();
             });
 
-        
-            #region Markup / formatting options
-
-                #region jsDoc
-                /// @func    set_formatting_enabled()
-                /// @desc    Enable or disable per-glyph formatting (style/size/font overrides).
-                /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_formatting_enabled = function(_enabled) {
-
-                    _enabled = (_enabled == true);
-
-                    if (formatting_enabled == _enabled) {
-                        return self;
-                    }
-
-                    formatting_enabled = _enabled;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-            #endregion
-
-            #region Whitespace visualization
-
-                #region jsDoc
-                /// @func    set_whitespace_visible()
-                /// @desc    Toggle visualization of spaces/tabs using marker glyphs.
-                /// @param   {Bool} _visible
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_visible = function(_visible) {
-
-                    _visible = (_visible == true);
-
-                    if (whitespace_visible == _visible) {
-                        return self;
-                    }
-
-                    whitespace_visible = _visible;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_whitespace_markers()
-                /// @desc    Set marker characters used for space and tab.
-                /// @param   {String} _space_marker
-                /// @param   {String} _tab_marker
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_markers = function(_space_marker, _tab_marker) {
-
-                    if (is_string(_space_marker) && string_length(_space_marker) > 0) {
-                        whitespace_marker_space = string_char_at(_space_marker, 1);
-                    }
-
-                    if (is_string(_tab_marker) && string_length(_tab_marker) > 0) {
-                        whitespace_marker_tab = string_char_at(_tab_marker, 1);
-                    }
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_whitespace_color()
-                /// @desc    Set whitespace marker color and alpha.
-                /// @param   {Real} _color_value
-                /// @param   {Real} _alpha_value
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_whitespace_color = function(_color_value, _alpha_value=undefined) {
-
-                    whitespace_color = _color_value;
-
-                    if (!is_undefined(_alpha_value)) {
-                        whitespace_alpha = _alpha_value;
-                    }
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-            #endregion
-
-            #region Underline options
-
-                #region jsDoc
-                /// @func    set_underline_enabled()
-                /// @desc    Enable or disable underline rendering.
-                /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_enabled = function(_enabled) {
-
-                    _enabled = (_enabled == true);
-
-                    if (underline_enabled == _enabled) {
-                        return self;
-                    }
-
-                    underline_enabled = _enabled;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_offset()
-                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
-                /// @param   {Real} _offset
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_offset = function(_offset) {
-
-                    underline_y_offset = _offset;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_thickness()
-                /// @desc    Set thickness for plain underline in pixels.
-                /// @param   {Real} _thickness
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_thickness = function(_thickness) {
-
-                    underline_thickness = _thickness;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_underline_sprites()
-                /// @desc    Set sprites used for underline styles.
-                /// @param   {Asset.GMSprite} _sprite_white
-                /// @param   {Asset.GMSprite} _sprite_warning
-                /// @param   {Asset.GMSprite} _sprite_error
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_underline_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
-
-                    underline_sprite_white = _sprite_white;
-                    underline_sprite_warning = _sprite_warning;
-                    underline_sprite_error = _sprite_error;
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-            
-
-            #region Strike-through options
-
-                #region jsDoc
-                /// @func    set_strike_enabled()
-                /// @desc    Enable or disable strike-through rendering.
-                /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_strike_enabled = function(_enabled) {
-
-                    _enabled = (_enabled == true);
-
-                    if (strike_enabled == _enabled) {
-                        return self;
-                    }
-
-                    strike_enabled = _enabled;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_strike_offset()
-                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
-                /// @param   {Real} _offset
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_strike_offset = function(_offset) {
-
-                    strike_y_offset = _offset;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_strike_thickness()
-                /// @desc    Set thickness for plain strike-through in pixels.
-                /// @param   {Real} _thickness
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_strike_thickness = function(_thickness) {
-
-                    strike_thickness = _thickness;
-                    __mark_vb_dirty__();
-
-                    return self;
-                }
-
-                #region jsDoc
-                /// @func    set_strike_sprites()
-                /// @desc    Set sprites used for strike-through styles.
-                /// @param   {Asset.GMSprite} _sprite_white
-                /// @param   {Asset.GMSprite} _sprite_warning
-                /// @param   {Asset.GMSprite} _sprite_error
-                /// @returns {Struct.WWTextRendererBase}
-                #endregion
-                static set_strike_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
-
-                    strike_sprite_white = _sprite_white;
-                    strike_sprite_warning = _sprite_warning;
-                    strike_sprite_error = _sprite_error;
-
-                    __mark_vb_dirty__();
-                    return self;
-                }
-
-            #endregion
-
-#endregion
-#endregion
-
+            on_post_draw(function(_input) {
+                __draw_text_vb__(x, y, 0, undefined);
+            });
+			
+		#endregion
+		
         #region Variables
 
             // Styling
@@ -470,7 +442,7 @@ function WWTextRendererBase() : WWCore() constructor {
             whitespace_marker_tab = ">";
             whitespace_color = c_gray;
             whitespace_alpha = 0.5;
-
+			
             // Underlines
             underline_enabled = true;
             underline_y_offset = 0;
@@ -529,458 +501,458 @@ function WWTextRendererBase() : WWCore() constructor {
 
             #region Location Maths
 
-            #region jsDoc
-            /// @func   get_x_from_index()
-            /// @param  {Real} _index
-            /// @returns {Real}
-            #endregion
-            static get_x_from_index = function(_index) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_x_from_index()
+	            /// @param  {Real} _index
+	            /// @returns {Real}
+	            #endregion
+	            static get_x_from_index = function(_index) {
+	                __ensure_layout__();
 
-                var _line_index = get_line_from_index(_index);
-                var _start_index = __layout__.get_line_index_start(_line_index);
-                var _end_index = __layout__.get_line_index_end(_line_index);
-                var _line_width_val = __layout__.get_line_width(_line_index);
+	                var _line_index = get_line_from_index(_index);
+	                var _start_index = __layout__.get_line_index_start(_line_index);
+	                var _end_index = __layout__.get_line_index_end(_line_index);
+	                var _line_width_val = __layout__.get_line_width(_line_index);
 
-                var _line_len = _end_index - _start_index;
-                if (_line_len <= 0) {
-                    return 0;
-                }
+	                var _line_len = _end_index - _start_index;
+	                if (_line_len <= 0) {
+	                    return 0;
+	                }
 
-                if (_index <= _start_index) {
-                    return 0;
-                }
-                if (_index >= _end_index) {
-                    return _line_width_val;
-                }
+	                if (_index <= _start_index) {
+	                    return 0;
+	                }
+	                if (_index >= _end_index) {
+	                    return _line_width_val;
+	                }
 
-                var _target_index = _index;
-                var _glyph_count = __layout__.get_glyph_count();
-                var _sum_width = 0;
+	                var _target_index = _index;
+	                var _glyph_count = __layout__.get_glyph_count();
+	                var _sum_width = 0;
 
-                var _glyph_index = 0;
-                repeat (_glyph_count) {
-                    var _glyph_logical_index = __layout__.get_glyph_index(_glyph_index);
+	                var _glyph_index = 0;
+	                repeat (_glyph_count) {
+	                    var _glyph_logical_index = __layout__.get_glyph_index(_glyph_index);
 
-                    if (_glyph_logical_index < _start_index) {
-                        _glyph_index++;
-                        continue;
-                    }
-                    if (_glyph_logical_index >= _target_index) {
-                        break;
-                    }
+	                    if (_glyph_logical_index < _start_index) {
+	                        _glyph_index++;
+	                        continue;
+	                    }
+	                    if (_glyph_logical_index >= _target_index) {
+	                        break;
+	                    }
 
-                    _sum_width += __layout__.get_glyph_width(_glyph_index);
-                    _glyph_index++;
-                }
+	                    _sum_width += __layout__.get_glyph_width(_glyph_index);
+	                    _glyph_index++;
+	                }
 
-                return _sum_width;
-            };
+	                return _sum_width;
+	            };
 
-            #region jsDoc
-            /// @func   get_y_from_index()
-            /// @param  {Real} _index
-            /// @returns {Real}
-            #endregion
-            static get_y_from_index = function(_index) {
-                __ensure_layout__();
-                var _line_index = get_line_from_index(_index);
-                return __layout__.get_line_y_offset(_line_index);
-            };
+	            #region jsDoc
+	            /// @func   get_y_from_index()
+	            /// @param  {Real} _index
+	            /// @returns {Real}
+	            #endregion
+	            static get_y_from_index = function(_index) {
+	                __ensure_layout__();
+	                var _line_index = get_line_from_index(_index);
+	                return __layout__.get_line_y_offset(_line_index);
+	            };
 
-            #region jsDoc
-            /// @func   get_index_from_xy()
-            /// @param  {Real} _x
-            /// @param  {Real} _y
-            /// @returns {Real}
-            #endregion
-            static get_index_from_xy = function(_x, _y) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_index_from_xy()
+	            /// @param  {Real} _x
+	            /// @param  {Real} _y
+	            /// @returns {Real}
+	            #endregion
+	            static get_index_from_xy = function(_x, _y) {
+	                __ensure_layout__();
 
-                var _layout = __layout__;
+	                var _layout = __layout__;
 
-                var _target_x = _x - x;
-                var _target_y = clamp(_y - y, 0, get_height());
+	                var _target_x = _x - x;
+	                var _target_y = clamp(_y - y, 0, get_height());
 
-                var _line_count = _layout.get_line_count();
-                var _line_index = 0;
+	                var _line_count = _layout.get_line_count();
+	                var _line_index = 0;
 
-                var _scan_index = 0;
-                repeat (_line_count) {
-                    var _y_offset = _layout.get_line_y_offset(_scan_index);
-                    var _height_val = _layout.get_line_height(_scan_index);
-                    _line_index = _scan_index;
+	                var _scan_index = 0;
+	                repeat (_line_count) {
+	                    var _y_offset = _layout.get_line_y_offset(_scan_index);
+	                    var _height_val = _layout.get_line_height(_scan_index);
+	                    _line_index = _scan_index;
 
-                    if (_target_y >= _y_offset && _target_y < _y_offset + _height_val) {
-                        break;
-                    }
+	                    if (_target_y >= _y_offset && _target_y < _y_offset + _height_val) {
+	                        break;
+	                    }
 
-                    _scan_index++;
-                }
+	                    _scan_index++;
+	                }
 
-                var _start_index = _layout.get_line_index_start(_line_index);
-                var _end_index = _layout.get_line_index_end(_line_index);
-                var _line_width_val = _layout.get_line_width(_line_index);
+	                var _start_index = _layout.get_line_index_start(_line_index);
+	                var _end_index = _layout.get_line_index_end(_line_index);
+	                var _line_width_val = _layout.get_line_width(_line_index);
 
-                if (_target_x <= 0) { return _start_index; }
+	                if (_target_x <= 0) { return _start_index; }
 
-                if (_target_x >= _line_width_val) {
+	                if (_target_x >= _line_width_val) {
 
-                    var _is_forced_wrapped = _layout.get_line_forced_wrapped(_line_index);
-                    var _is_last_line = (_line_index == _line_count - 1);
+	                    var _is_forced_wrapped = _layout.get_line_forced_wrapped(_line_index);
+	                    var _is_last_line = (_line_index == _line_count - 1);
 
-                    if (_is_forced_wrapped || _is_last_line) {
-                        return _end_index;
-                    }
+	                    if (_is_forced_wrapped || _is_last_line) {
+	                        return _end_index;
+	                    }
 
-                    return max(_start_index, _end_index - 1);
-                }
+	                    return max(_start_index, _end_index - 1);
+	                }
 
-                var _index_result = _end_index;
-                var _sum_width = 0;
+	                var _index_result = _end_index;
+	                var _sum_width = 0;
 
-                var _line_len = _end_index - _start_index;
-                var _walk_index = _start_index;
+	                var _line_len = _end_index - _start_index;
+	                var _walk_index = _start_index;
 
-                repeat (_line_len) {
-                    var _glyph_width = _layout.get_glyph_width(_walk_index);
-                    var _mid = _sum_width + (_glyph_width * 0.5);
+	                repeat (_line_len) {
+	                    var _glyph_width = _layout.get_glyph_width(_walk_index);
+	                    var _mid = _sum_width + (_glyph_width * 0.5);
 
-                    if (_target_x < _mid) {
-                        _index_result = _walk_index;
-                        break;
-                    }
+	                    if (_target_x < _mid) {
+	                        _index_result = _walk_index;
+	                        break;
+	                    }
 
-                    _sum_width += _glyph_width;
-                    _index_result = _walk_index + 1;
-                    _walk_index++;
-                }
+	                    _sum_width += _glyph_width;
+	                    _index_result = _walk_index + 1;
+	                    _walk_index++;
+	                }
 
-                return _index_result;
-            };
+	                return _index_result;
+	            };
 
-            #region jsDoc
-            /// @func   get_line_from_index()
-            /// @param  {Real} _index
-            /// @returns {Real}
-            #endregion
-            static get_line_from_index = function(_index) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_line_from_index()
+	            /// @param  {Real} _index
+	            /// @returns {Real}
+	            #endregion
+	            static get_line_from_index = function(_index) {
+	                __ensure_layout__();
 
-                var _line_count = __layout__.get_line_count();
-                if (_line_count <= 0) {
-                    return 0;
-                }
+	                var _line_count = __layout__.get_line_count();
+	                if (_line_count <= 0) {
+	                    return 0;
+	                }
 
-                var _result_line = 0;
-                var _line_index = 0;
-                repeat (_line_count) {
-                    var _start_index = __layout__.get_line_index_start(_line_index);
-                    var _end_index = __layout__.get_line_index_end(_line_index);
+	                var _result_line = 0;
+	                var _line_index = 0;
+	                repeat (_line_count) {
+	                    var _start_index = __layout__.get_line_index_start(_line_index);
+	                    var _end_index = __layout__.get_line_index_end(_line_index);
 
-                    if (_index >= _start_index && _index < _end_index) {
-                        return _line_index;
-                    }
+	                    if (_index >= _start_index && _index < _end_index) {
+	                        return _line_index;
+	                    }
 
-                    if (_index >= _end_index) {
-                        _result_line = _line_index;
-                    }
+	                    if (_index >= _end_index) {
+	                        _result_line = _line_index;
+	                    }
 
-                    _line_index++;
-                }
+	                    _line_index++;
+	                }
 
-                return _result_line;
-            };
+	                return _result_line;
+	            };
 
-            #region jsDoc
-            /// @func   get_col_from_index()
-            /// @param  {Real} _index
-            /// @returns {Real}
-            #endregion
-            static get_col_from_index = function(_index) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_col_from_index()
+	            /// @param  {Real} _index
+	            /// @returns {Real}
+	            #endregion
+	            static get_col_from_index = function(_index) {
+	                __ensure_layout__();
 
-                var _line_index = get_line_from_index(_index);
-                var _start_index = __layout__.get_line_index_start(_line_index);
+	                var _line_index = get_line_from_index(_index);
+	                var _start_index = __layout__.get_line_index_start(_line_index);
 
-                var _col_index = _index - _start_index;
-                if (_col_index < 0) { _col_index = 0; }
-                return _col_index;
-            };
+	                var _col_index = _index - _start_index;
+	                if (_col_index < 0) { _col_index = 0; }
+	                return _col_index;
+	            };
 
-            #region jsDoc
-            /// @func   get_index_from_line_col()
-            /// @param  {Real} _line
-            /// @param  {Real} _col
-            /// @returns {Real}
-            #endregion
-            static get_index_from_line_col = function(_line, _col) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_index_from_line_col()
+	            /// @param  {Real} _line
+	            /// @param  {Real} _col
+	            /// @returns {Real}
+	            #endregion
+	            static get_index_from_line_col = function(_line, _col) {
+	                __ensure_layout__();
 
-                var _line_count = __layout__.get_line_count();
-                if (_line_count <= 0) {
-                    return 0;
-                }
+	                var _line_count = __layout__.get_line_count();
+	                if (_line_count <= 0) {
+	                    return 0;
+	                }
 
-                var _line_index = _line;
-                if (_line_index < 0) { _line_index = 0; }
-                if (_line_index >= _line_count) { _line_index = _line_count - 1; }
+	                var _line_index = _line;
+	                if (_line_index < 0) { _line_index = 0; }
+	                if (_line_index >= _line_count) { _line_index = _line_count - 1; }
 
-                var _start_index = __layout__.get_line_index_start(_line_index);
-                var _end_index = __layout__.get_line_index_end(_line_index);
-                var _line_len = _end_index - _start_index;
+	                var _start_index = __layout__.get_line_index_start(_line_index);
+	                var _end_index = __layout__.get_line_index_end(_line_index);
+	                var _line_len = _end_index - _start_index;
 
-                var _col_index = _col;
-                if (_col_index < 0) { _col_index = 0; }
-                if (_col_index > _line_len) { _col_index = _line_len; }
+	                var _col_index = _col;
+	                if (_col_index < 0) { _col_index = 0; }
+	                if (_col_index > _line_len) { _col_index = _line_len; }
 
-                return _start_index + _col_index;
-            };
+	                return _start_index + _col_index;
+	            };
 
             #endregion
 
             #region Line getters
 
-            static get_line_count = function() {
-                __ensure_layout__();
-                return __layout__.get_line_count();
-            };
+	            static get_line_count = function() {
+	                __ensure_layout__();
+	                return __layout__.get_line_count();
+	            };
 
-            static get_line = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line(_line_index);
-            };
+	            static get_line = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line(_line_index);
+	            };
 
-            static get_line_text = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_text(_line_index);
-            };
+	            static get_line_text = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_text(_line_index);
+	            };
 
-            static get_line_index_start = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_index_start(_line_index);
-            };
+	            static get_line_index_start = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_index_start(_line_index);
+	            };
 
-            static get_line_index_end = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_index_end(_line_index);
-            };
+	            static get_line_index_end = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_index_end(_line_index);
+	            };
 
-            static get_line_width = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_width(_line_index);
-            };
+	            static get_line_width = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_width(_line_index);
+	            };
 
-            static get_line_height = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_height(_line_index);
-            };
+	            static get_line_height = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_height(_line_index);
+	            };
 
-            static get_line_y_offset = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_y_offset(_line_index);
-            };
+	            static get_line_y_offset = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_y_offset(_line_index);
+	            };
 
-            static get_line_forced_wrapped = function(_line_index) {
-                __ensure_layout__();
-                return __layout__.get_line_forced_wrapped(_line_index);
-            };
+	            static get_line_forced_wrapped = function(_line_index) {
+	                __ensure_layout__();
+	                return __layout__.get_line_forced_wrapped(_line_index);
+	            };
 
             #endregion
 
             #region Glyph getters
 
-            static get_glyph_count = function() {
-                __ensure_layout__();
-                return __layout__.get_glyph_count();
-            };
+	            static get_glyph_count = function() {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_count();
+	            };
 
-            static get_glyph = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph(_glyph_index);
-            };
+	            static get_glyph = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph(_glyph_index);
+	            };
 
-            static get_glyph_char = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_char(_glyph_index);
-            };
+	            static get_glyph_char = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_char(_glyph_index);
+	            };
 
-            static get_glyph_index = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_index(_glyph_index);
-            };
+	            static get_glyph_index = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_index(_glyph_index);
+	            };
 
-            static get_glyph_buffer_index = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_buffer_index(_glyph_index);
-            };
+	            static get_glyph_buffer_index = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_buffer_index(_glyph_index);
+	            };
 
-            static get_glyph_buffer_size = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_buffer_size(_glyph_index);
-            };
+	            static get_glyph_buffer_size = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_buffer_size(_glyph_index);
+	            };
 
-            static get_glyph_x = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_x(_glyph_index);
-            };
+	            static get_glyph_x = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_x(_glyph_index);
+	            };
 
-            static get_glyph_y = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_y(_glyph_index);
-            };
+	            static get_glyph_y = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_y(_glyph_index);
+	            };
 
-            static get_glyph_width = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_width(_glyph_index);
-            };
+	            static get_glyph_width = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_width(_glyph_index);
+	            };
 
-            static get_glyph_height = function(_glyph_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_height(_glyph_index);
-            };
+	            static get_glyph_height = function(_glyph_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_height(_glyph_index);
+	            };
 
             #endregion
 
-            #region Buffer region
+            #region Buffer getters
 
-            #region jsDoc
-            /// @func   get_buffer_index_from_index()
-            /// @param  {Real} _index
-            /// @returns {Real}
-            #endregion
-            static get_buffer_index_from_index = function(_index) {
-                __ensure_layout__();
-                return __layout__.get_glyph_buffer_index(_index);
-            };
+	            #region jsDoc
+	            /// @func   get_buffer_index_from_index()
+	            /// @param  {Real} _index
+	            /// @returns {Real}
+	            #endregion
+	            static get_buffer_index_from_index = function(_index) {
+	                __ensure_layout__();
+	                return __layout__.get_glyph_buffer_index(_index);
+	            };
 
-            #region jsDoc
-            /// @func   get_index_from_buffer_index()
-            /// @param  {Real} _buffer_index
-            /// @returns {Real}
-            #endregion
-            static get_index_from_buffer_index = function(_buffer_index) {
-                __ensure_layout__();
+	            #region jsDoc
+	            /// @func   get_index_from_buffer_index()
+	            /// @param  {Real} _buffer_index
+	            /// @returns {Real}
+	            #endregion
+	            static get_index_from_buffer_index = function(_buffer_index) {
+	                __ensure_layout__();
 
-                if (_buffer_index <= 0) { return 0; }
+	                if (_buffer_index <= 0) { return 0; }
 
-                var _glyph_count = __layout__.get_glyph_count();
-                if (_glyph_count <= 0) { return 0; }
+	                var _glyph_count = __layout__.get_glyph_count();
+	                if (_glyph_count <= 0) { return 0; }
 
-                var _last_glyph_index = _glyph_count - 1;
-                var _last_glyph_buffer_start = __layout__.get_glyph_buffer_index(_last_glyph_index);
+	                var _last_glyph_index = _glyph_count - 1;
+	                var _last_glyph_buffer_start = __layout__.get_glyph_buffer_index(_last_glyph_index);
 
-                if (_buffer_index == _last_glyph_buffer_start) {
-                    return __layout__.get_glyph_index(_last_glyph_index);
-                }
+	                if (_buffer_index == _last_glyph_buffer_start) {
+	                    return __layout__.get_glyph_index(_last_glyph_index);
+	                }
 
-                var _last_glyph_buffer_end = _last_glyph_buffer_start + __layout__.get_glyph_buffer_size(_last_glyph_index);
+	                var _last_glyph_buffer_end = _last_glyph_buffer_start + __layout__.get_glyph_buffer_size(_last_glyph_index);
 
-                if (_buffer_index >= _last_glyph_buffer_end) {
-                    return __layout__.get_glyph_index(_last_glyph_index) + 1;
-                }
+	                if (_buffer_index >= _last_glyph_buffer_end) {
+	                    return __layout__.get_glyph_index(_last_glyph_index) + 1;
+	                }
 
-                var _line_count = __layout__.get_line_count();
-                if (_line_count <= 0) {
-                    return 0;
-                }
+	                var _line_count = __layout__.get_line_count();
+	                if (_line_count <= 0) {
+	                    return 0;
+	                }
 
-                var _target_line_index = 0;
-                var _found_line = false;
+	                var _target_line_index = 0;
+	                var _found_line = false;
 
-                var _line_index = 0;
-                repeat (_line_count) {
+	                var _line_index = 0;
+	                repeat (_line_count) {
 
-                    var _glyph_start = __layout__.get_line_index_start(_line_index);
-                    var _glyph_end = __layout__.get_line_index_end(_line_index);
-                    var _glyph_count_line = _glyph_end - _glyph_start;
+	                    var _glyph_start = __layout__.get_line_index_start(_line_index);
+	                    var _glyph_end = __layout__.get_line_index_end(_line_index);
+	                    var _glyph_count_line = _glyph_end - _glyph_start;
 
-                    if (_glyph_count_line > 0) {
+	                    if (_glyph_count_line > 0) {
 
-                        var _first_buf_start = __layout__.get_glyph_buffer_index(_glyph_start);
-                        var _last_glyph_in_line = _glyph_end - 1;
-                        var _last_buf_start = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
-                        var _last_buf_size = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
-                        var _line_buf_end = _last_buf_start + _last_buf_size;
+	                        var _first_buf_start = __layout__.get_glyph_buffer_index(_glyph_start);
+	                        var _last_glyph_in_line = _glyph_end - 1;
+	                        var _last_buf_start = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
+	                        var _last_buf_size = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
+	                        var _line_buf_end = _last_buf_start + _last_buf_size;
 
-                        if (_buffer_index < _first_buf_start) {
-                            _target_line_index = _line_index;
-                            _found_line = true;
-                            break;
-                        }
+	                        if (_buffer_index < _first_buf_start) {
+	                            _target_line_index = _line_index;
+	                            _found_line = true;
+	                            break;
+	                        }
 
-                        if (_buffer_index >= _first_buf_start && _buffer_index < _line_buf_end) {
-                            _target_line_index = _line_index;
-                            _found_line = true;
-                            break;
-                        }
+	                        if (_buffer_index >= _first_buf_start && _buffer_index < _line_buf_end) {
+	                            _target_line_index = _line_index;
+	                            _found_line = true;
+	                            break;
+	                        }
 
-                        _target_line_index = _line_index;
-                    }
+	                        _target_line_index = _line_index;
+	                    }
 
-                    _line_index++;
-                }
+	                    _line_index++;
+	                }
 
-                if (!_found_line) {
-                    var _last_line_index = _line_count - 1;
-                    var _last_glyph_start2 = __layout__.get_line_index_start(_last_line_index);
-                    var _last_glyph_end2 = __layout__.get_line_index_end(_last_line_index);
+	                if (!_found_line) {
+	                    var _last_line_index = _line_count - 1;
+	                    var _last_glyph_start2 = __layout__.get_line_index_start(_last_line_index);
+	                    var _last_glyph_end2 = __layout__.get_line_index_end(_last_line_index);
 
-                    if (_last_glyph_end2 > _last_glyph_start2) {
-                        var _last_glyph2 = _last_glyph_end2 - 1;
-                        return __layout__.get_glyph_index(_last_glyph2) + 1;
-                    }
+	                    if (_last_glyph_end2 > _last_glyph_start2) {
+	                        var _last_glyph2 = _last_glyph_end2 - 1;
+	                        return __layout__.get_glyph_index(_last_glyph2) + 1;
+	                    }
 
-                    return 0;
-                }
+	                    return 0;
+	                }
 
-                var _line_start_index = __layout__.get_line_index_start(_target_line_index);
+	                var _line_start_index = __layout__.get_line_index_start(_target_line_index);
 
-                var _glyph_start_line = __layout__.get_line_index_start(_target_line_index);
-                var _glyph_end_line = __layout__.get_line_index_end(_target_line_index);
-                var _glyph_count_line2 = _glyph_end_line - _glyph_start_line;
+	                var _glyph_start_line = __layout__.get_line_index_start(_target_line_index);
+	                var _glyph_end_line = __layout__.get_line_index_end(_target_line_index);
+	                var _glyph_count_line2 = _glyph_end_line - _glyph_start_line;
 
-                if (_glyph_count_line2 <= 0) {
-                    return _line_start_index;
-                }
+	                if (_glyph_count_line2 <= 0) {
+	                    return _line_start_index;
+	                }
 
-                var _first_buf_start_line = __layout__.get_glyph_buffer_index(_glyph_start_line);
-                if (_buffer_index <= _first_buf_start_line) {
-                    return _line_start_index;
-                }
+	                var _first_buf_start_line = __layout__.get_glyph_buffer_index(_glyph_start_line);
+	                if (_buffer_index <= _first_buf_start_line) {
+	                    return _line_start_index;
+	                }
 
-                var _closest_index = _line_start_index;
+	                var _closest_index = _line_start_index;
 
-                var _glyph_index2 = _glyph_start_line;
-                repeat (_glyph_count_line2) {
+	                var _glyph_index2 = _glyph_start_line;
+	                repeat (_glyph_count_line2) {
 
-                    var _buf_start = __layout__.get_glyph_buffer_index(_glyph_index2);
-                    var _buf_size = __layout__.get_glyph_buffer_size(_glyph_index2);
-                    var _buf_end = _buf_start + _buf_size;
+	                    var _buf_start = __layout__.get_glyph_buffer_index(_glyph_index2);
+	                    var _buf_size = __layout__.get_glyph_buffer_size(_glyph_index2);
+	                    var _buf_end = _buf_start + _buf_size;
 
-                    var _logical_index = __layout__.get_glyph_index(_glyph_index2);
+	                    var _logical_index = __layout__.get_glyph_index(_glyph_index2);
 
-                    if (_buffer_index >= _buf_start && _buffer_index < _buf_end) {
-                        return _logical_index;
-                    }
+	                    if (_buffer_index >= _buf_start && _buffer_index < _buf_end) {
+	                        return _logical_index;
+	                    }
 
-                    if (_buffer_index < _buf_start) {
-                        return _logical_index;
-                    }
+	                    if (_buffer_index < _buf_start) {
+	                        return _logical_index;
+	                    }
 
-                    _closest_index = _logical_index + 1;
-                    _glyph_index2++;
-                }
+	                    _closest_index = _logical_index + 1;
+	                    _glyph_index2++;
+	                }
 
-                return _closest_index;
-            };
+	                return _closest_index;
+	            };
 
             #endregion
 
         #endregion
 
     #endregion
-
+	
     #region Private
 
         #region Variables
@@ -1014,7 +986,7 @@ function WWTextRendererBase() : WWCore() constructor {
             __tab_width__ = 0;
 			
 			__textbox_parent__ = undefined;
-			__layout__ = __build_layout__("");
+			__layout__ = __build_layout__("", []);
 			
         #endregion
 
@@ -1209,7 +1181,20 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 __display_text__ = _text_value;
 
-                __layout__ = __build_layout__(_text_value);
+                var _default_spans = [{
+                    index_count: string_length(_text_value),
+                    font_asset_or_minus1: -1,
+                    style_value: __WW_Text_Glyph_Style.Regular,
+                    size_mul: 1,
+                    color: color,
+                    alpha: alpha,
+                    underline: __WW_Text_Glyph_Underline.None,
+                    strike: __WW_Text_Glyph_Strike.None,
+                    back_color: color,
+                    back_alpha: 0
+                }];
+
+                __layout__ = __build_layout__(_text_value, _default_spans);
 
                 __content_width__ = __layout__.get_content_width();
                 __content_height__ = __layout__.get_content_height();
@@ -1218,13 +1203,13 @@ function WWTextRendererBase() : WWCore() constructor {
             };
 			
 			#region jsDoc
-			/// @func   __build_layout__(_str, _metric_runs, _visual_runs)
+			/// @func   __build_layout__(_str, _spans)
 			/// @param  {String} _str
-			/// @param  {Array|Undefined} _metric_runs
-			/// @param  {Array|Undefined} _visual_runs
+			/// @param  {Array|Undefined} _spans
+			
 			/// @returns {Struct.WWTextLayout}
 			#endregion
-			static __build_layout__ = function(_str, _metric_runs=undefined, _visual_runs=undefined) {
+			static __build_layout__ = function(_str, _spans=undefined) {
 
 			    var _layout = new WWTextLayout();
 
@@ -1252,8 +1237,10 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			    static __empty_arr = [];
 
-			    _metric_runs ??= __empty_arr;
-			    _visual_runs ??= __empty_arr;
+			    _spans ??= __empty_arr;
+
+					var _metric_runs = _spans;
+					var _visual_runs = _spans;
 
 			    var _metric_run_count = array_length(_metric_runs);
 			    var _metric_run_index = 0;
@@ -1411,7 +1398,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			        var _char_val = string_char_at(_str, _logical_index + 1);
 
 			        // Newline: include as glyph slot, end the line INCLUDING the newline
-			        if (_char_val == "\n") {
+			        if (_char_val == "\n" || _char_val == "\r") {
 
 			            var _fallback_height_scaled = _active_font_height * _metric_size_mul;
 			            if (_fallback_height_scaled > _line_height) { _line_height = _fallback_height_scaled; }
@@ -1711,7 +1698,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    _metric_font_override,
 			                    _metric_style_value,
 			                    _metric_size_mul,
-			                    _visual_underline
+			                    _visual_underline,
+			                    _visual_back_color,
+			                    _visual_back_alpha,
+			                    _visual_strike
 			                );
 
 			                _metric_remaining -= 1;
@@ -1761,7 +1751,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			                _metric_font_override,
 			                _metric_style_value,
 			                _metric_size_mul,
-			                _visual_underline
+			                _visual_underline,
+			                _visual_back_color,
+			                _visual_back_alpha,
+			                _visual_strike
 			            );
 
 			            _cursor_x += (_base_wid * _metric_size_mul);
@@ -1983,10 +1976,104 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			    return true;
 			};
+			
+			#region Text State Helpers
 
+			    #region jsDoc
+			    /// @func   __text_state_make_default__()
+			    /// @desc   Creates a complete default text state from the renderer's current settings.
+			    /// @returns {Struct}
+			    #endregion
+			    static __text_state_make_default__ = function() {
+			        return {
+			            font_asset_or_minus1: -1,
+			            style_value: __WW_Text_Glyph_Style.Regular,
+			            size_mul: 1,
+			            color: color,
+			            alpha: alpha,
+			            underline: __WW_Text_Glyph_Underline.None,
+			            strike: __WW_Text_Glyph_Strike.None,
+			            back_color: undefined,
+			            back_alpha: undefined
+			        };
+			    };
+
+			    #region jsDoc
+			    /// @func   __text_state_clone__()
+			    /// @desc   Clones a complete text state struct (all expected keys must exist).
+			    /// @param  {Struct} _state
+			    /// @returns {Struct}
+			    #endregion
+			    static __text_state_clone__ = function(_state) {
+			        return {
+			            font_asset_or_minus1: _state.font_asset_or_minus1,
+			            style_value: _state.style_value,
+			            size_mul: _state.size_mul,
+			            color: _state.color,
+			            alpha: _state.alpha,
+			            underline: _state.underline,
+			            strike: _state.strike,
+			            back_color: _state.back_color,
+			            back_alpha: _state.back_alpha
+			        };
+			    };
+
+			    #region jsDoc
+			    /// @func   __text_state_apply_patch__()
+			    /// @desc   Applies a partial patch struct to an existing complete text state.
+			    ///         Only keys present in _patch are applied.
+			    /// @param  {Struct} _state
+			    /// @param  {Struct} _patch
+			    #endregion
+			    static __text_state_apply_patch__ = function(_state, _patch) {
+
+			        var _value = undefined;
+
+			        _value = _patch[$ "font_asset_or_minus1"];
+			        if (!is_undefined(_value)) _state.font_asset_or_minus1 = _value;
+
+			        _value = _patch[$ "style_value"];
+			        if (!is_undefined(_value)) _state.style_value = _value;
+
+			        _value = _patch[$ "size_mul"];
+			        if (!is_undefined(_value)) _state.size_mul = _value;
+
+			        _value = _patch[$ "color"];
+			        if (!is_undefined(_value)) _state.color = _value;
+
+			        _value = _patch[$ "alpha"];
+			        if (!is_undefined(_value)) _state.alpha = _value;
+
+			        _value = _patch[$ "underline"];
+			        if (!is_undefined(_value)) _state.underline = _value;
+
+			        _value = _patch[$ "strike"];
+			        if (!is_undefined(_value)) _state.strike = _value;
+
+			        _value = _patch[$ "back_color"];
+			        if (!is_undefined(_value)) _state.back_color = _value;
+
+			        _value = _patch[$ "back_alpha"];
+			        if (!is_undefined(_value)) _state.back_alpha = _value;
+			    };
+
+			    #region jsDoc
+			    /// @func   __text_state_clone_patch__()
+			    /// @desc   Returns a clone of _state with _patch applied.
+			    /// @param  {Struct} _state
+			    /// @param  {Struct} _patch
+			    /// @returns {Struct}
+			    #endregion
+			    static __text_state_clone_patch__ = function(_state, _patch) {
+
+			        var _result = __text_state_clone__(_state);
+			        __text_state_apply_patch__(_result, _patch);
+			        return _result;
+			    };
+
+			#endregion
 
         #endregion
-
         
         #region VB emit styled glyph
 
@@ -2174,7 +2261,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _spr_h = sprite_get_height(_spr);
                 if (_spr_h <= 0) { _spr_h = 1; }
 
-                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0, undefined, 0);
+                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, -1, undefined, 0);
                 var _vb_ul = _res.batch.buffer;
 
                 var _y1s = floor(_y0 + _spr_h);
@@ -2256,7 +2343,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 _span_state.active = false;
             };
 
-
+		#endregion
 
         #region Background flush span
 
@@ -2289,7 +2376,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _y0 = floor(_span_state.y0);
                 var _y1 = floor(_span_state.y1);
 
-                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, 0, undefined, 0);
+                var _res = __vb_get_batch_for_material__(_tex, _spr_uvs, -1, undefined, 0);
                 var _vb_bg = _res.batch.buffer;
 
                 vertex_position(_vb_bg, _x0, _y0);
@@ -2498,8 +2585,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
         #endregion
 
-        #endregion
-
         #region VB build and draw (unified)
 
             static __ensure_vb__ = function() {
@@ -2581,7 +2666,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
                     var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
 
-                    if (_char == "\n" || _char == "\r" || _char == "\t") {
+                    if (_char == "\n" || _char == "\r") {
                         __bg_flush_span__(_bg_span_state);
                         __st_flush_span__(_st_span_state);
                         __ul_flush_span__(_ul_span_state);
@@ -2885,10 +2970,84 @@ function WWTextRendererBase() : WWCore() constructor {
                     draw_set_font(_old_font);
                 }
             };
+			
+            static __draw_selection_highlight__ = function() {
 
-            static __draw_text_vb__ = function(_origin_x, _origin_y) {
+                if (is_undefined(__textbox_parent__)) {
+                    return;
+                }
+
+                var _cursor = __textbox_parent__.cursor;
+                if (is_undefined(_cursor)) {
+                    return;
+                }
+
+                if (!_cursor.get_highlight_active()) {
+                    return;
+                }
+
+                var _start_index = _cursor.get_highlight_start_index();
+                var _end_index = _cursor.get_highlight_end_index();
+
+                if (_start_index == _end_index) {
+                    return;
+                }
+
+                __ensure_layout__();
+
+                var _sel_start = min(_start_index, _end_index);
+                var _sel_end = max(_start_index, _end_index);
+
+                var _start_line = get_line_from_index(_sel_start);
+                var _end_line = get_line_from_index(_sel_end);
+
+                var _pre_color = draw_get_color();
+                var _pre_alpha = draw_get_alpha();
+
+                draw_set_color(_cursor.highlight_color);
+                draw_set_alpha(1);
+
+                var _line_index = _start_line;
+                repeat ((_end_line - _start_line) + 1) {
+
+                    var _line_y = get_line_y_offset(_line_index);
+                    var _line_h = get_line_height(_line_index) - 1;
+                    if (_line_h < 1) { _line_h = 1; }
+
+                    var _line_w = get_line_width(_line_index);
+                    if (_line_w < 0) { _line_w = 0; }
+
+                    var _range_start = 0;
+                    var _range_end = _line_w;
+
+                    if (_line_index == _start_line) {
+                        _range_start = get_x_from_index(_sel_start);
+                    }
+
+                    if (_line_index == _end_line) {
+                        _range_end = get_x_from_index(_sel_end);
+                    }
+
+                    var _draw_w = _range_end - _range_start;
+                    if (_draw_w < 0) { _draw_w = 0; }
+
+                    if (_draw_w > 0) {
+                        draw_sprite_stretched_ext(spr_ww_pixel, 0, x + _range_start, y + _line_y, _draw_w, _line_h, draw_get_color(), 1);
+                    }
+
+                    _line_index += 1;
+                }
+
+                draw_set_alpha(_pre_alpha);
+                draw_set_color(_pre_color);
+            };
+			
+            static __draw_text_vb__ = function(_origin_x, _origin_y, _layer_min, _layer_max) {
 
                 __ensure_vb__();
+
+                if (_layer_min == undefined) { _layer_min = -1000000; }
+                if (_layer_max == undefined) { _layer_max =  1000000; }
 
                 var _old_mat = matrix_get(matrix_world);
                 matrix_set(matrix_world, matrix_build(_origin_x, _origin_y, 0, 0, 0, 0, 1, 1, 1));
@@ -2904,7 +3063,13 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _batch = __draw_batches__[_batch_index];
 
                     if (!is_undefined(_batch) && !is_undefined(_batch.material)) {
-                        _batch.material.draw(_origin_x, _origin_y);
+
+                        var _batch_layer = _batch.layer;
+                        if (_batch_layer == undefined) { _batch_layer = 0; }
+
+                        if (_batch_layer >= _layer_min && _batch_layer <= _layer_max) {
+                            _batch.material.draw(_origin_x, _origin_y);
+                        }
                     }
 
                     _batch_index += 1;
@@ -2915,8 +3080,7 @@ function WWTextRendererBase() : WWCore() constructor {
             };
 
         #endregion
-
-
+		
         #region Cleanup
 
             static __cleanup__ = function() {
@@ -2927,7 +3091,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     __vb_format__ = undefined;
                 }
             };
-
+			
             static __vb_free__ = function() {
                 var _batch_index = 0;
                 var _batch_count = array_length(__draw_batches__);
@@ -2955,4 +3119,5 @@ function WWTextRendererBase() : WWCore() constructor {
         #endregion
 
     #endregion
+	
 }

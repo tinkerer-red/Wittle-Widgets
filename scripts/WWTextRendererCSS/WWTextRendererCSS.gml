@@ -126,8 +126,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
         // Parsed output
         static __css_plain_text__ = "";
-        static __css_metric_runs__ = [];
-        static __css_visual_runs__ = [];
+        static __css_spans__ = [];
         static __css_align_runs__ = [];
 
         // Stylesheet map: class name -> style delta struct
@@ -173,17 +172,12 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
             };
         };
 
-        static __css_state_equals_metric__ = function(_state_a, _state_b) {
+        static __css_state_equals_span__ = function(_state_a, _state_b) {
             return (
                 _state_a.font_asset_or_minus1 == _state_b.font_asset_or_minus1
                 && _state_a.style_value == _state_b.style_value
                 && _state_a.size_mul == _state_b.size_mul
-            );
-        };
-
-        static __css_state_equals_visual__ = function(_state_a, _state_b) {
-            return (
-                _state_a.color_value == _state_b.color_value
+                && _state_a.color_value == _state_b.color_value
                 && _state_a.alpha_value == _state_b.alpha_value
                 && _state_a.underline_value == _state_b.underline_value
                 && _state_a.back_color_value == _state_b.back_color_value
@@ -210,27 +204,30 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
             });
         };
 
-        static __css_span_state_to_metric_run__ = function(_span_len, _state) {
-            return {
+        static __css_span_state_to_span_run__ = function(_span_len, _state) {
+            var _final_color = _state.color_value;
+            if (is_undefined(_final_color)) { _final_color = color; }
+            var _final_alpha = _state.alpha_value;
+            if (is_undefined(_final_alpha)) { _final_alpha = alpha; }
+            var _final_size = _state.size_mul;
+            if (is_undefined(_final_size) || _final_size <= 0) { _final_size = 1; }
+            var _final_underline = _state.underline_value;
+            if (is_undefined(_final_underline)) { _final_underline = __WW_Text_Glyph_Underline.None; }
+            var _final_strike = _state.strike_value;
+            if (is_undefined(_final_strike)) { _final_strike = __WW_Text_Glyph_Strike.None; }
+            var _run = {
                 index_count: _span_len,
                 font_asset_or_minus1: _state.font_asset_or_minus1,
                 style_value: _state.style_value,
-                size_mul: _state.size_mul
+                size_mul: _final_size,
+                color: _final_color,
+                alpha: _final_alpha,
+                underline: _final_underline
             };
+            _run[$ "back_color"] = _state.back_color_value; _run[$ "back_alpha"] = _state.back_alpha_value;
+            _run[$ "strike"] = _final_strike;
+            return _run;
         };
-
-        static __css_span_state_to_visual_run__ = function(_span_len, _state) {
-            return {
-                index_count: _span_len,
-                color: _state.color_value,
-                alpha: _state.alpha_value,
-                underline: _state.underline_value,
-                back_color: _state.back_color_value,
-                back_alpha: _state.back_alpha_value,
-                strike: _state.strike_value
-            };
-        };
-
         static __css_span_state_to_align_run__ = function(_span_len, _state) {
             return {
                 index_count: _span_len,
@@ -898,8 +895,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
         static __css_parse__ = function(_src_text) {
 
             __css_plain_text__ = "";
-            __css_metric_runs__ = [];
-            __css_visual_runs__ = [];
+            __css_spans__ = [];
             __css_align_runs__ = [];
 
             var _src_len = string_length(_src_text);
@@ -974,7 +970,6 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                     continue;
                 }
 
-               
                 if (_name == "style" && !_tag.is_close) {
 
                     // Consume <style> ... </style> without emitting it.
@@ -1078,16 +1073,13 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
             }
 
             // Initialize run builders
-            var _metric_runs = [];
-            var _visual_runs = [];
+            var _span_runs = [];
             var _align_out = [];
 
-            var _curr_metric_state = _spans[0].state;
-            var _curr_visual_state = _spans[0].state;
+            var _curr_span_state = _spans[0].state;
             var _curr_align_state = _spans[0].state;
 
-            var _metric_count = 0;
-            var _visual_count = 0;
+            var _span_count_accum = 0;
             var _align_count = 0;
 
             var _i = 0;
@@ -1095,27 +1087,19 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
                 var _span = _spans[_i];
                 var _span_len = _span.end_index - _span.start_index;
+
                 var _span_state = _span.state;
 
-                // Metric merge
-                if (_i == 0 || __css_state_equals_metric__(_curr_metric_state, _span_state)) {
-                    _metric_count += _span_len;
+                // Span merge (single definitive stream)
+                if (_i == 0 || __css_state_equals_span__(_curr_span_state, _span_state)) {
+                    _span_count_accum += _span_len;
                 } else {
-                    array_push(_metric_runs, __css_span_state_to_metric_run__(_metric_count, _curr_metric_state));
-                    _curr_metric_state = _span_state;
-                    _metric_count = _span_len;
+                    array_push(_span_runs, __css_span_state_to_span_run__(_span_count_accum, _curr_span_state));
+                    _curr_span_state = _span_state;
+                    _span_count_accum = _span_len;
                 }
 
-                // Visual merge
-                if (_i == 0 || __css_state_equals_visual__(_curr_visual_state, _span_state)) {
-                    _visual_count += _span_len;
-                } else {
-                    array_push(_visual_runs, __css_span_state_to_visual_run__(_visual_count, _curr_visual_state));
-                    _curr_visual_state = _span_state;
-                    _visual_count = _span_len;
-                }
-
-                // Align merge (index_count stream, like metric/visual)
+                // Align merge (separate stream - post-pass)
                 if (_i == 0 || __css_state_equals_align__(_curr_align_state, _span_state)) {
                     _align_count += _span_len;
                 } else {
@@ -1127,16 +1111,17 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 _i += 1;
             }
 
-            // Flush final merged runs
-            array_push(_align_out, __css_span_state_to_align_run__(_align_count, _curr_align_state));
+            // Flush tails
+            if (_span_count_accum > 0) {
+                array_push(_span_runs, __css_span_state_to_span_run__(_span_count_accum, _curr_span_state));
+            }
 
-            // Flush final merged runs
-            array_push(_metric_runs, __css_span_state_to_metric_run__(_metric_count, _curr_metric_state));
-            array_push(_visual_runs, __css_span_state_to_visual_run__(_visual_count, _curr_visual_state));
+            if (_align_count > 0) {
+                array_push(_align_out, __css_span_state_to_align_run__(_align_count, _curr_align_state));
+            }
 
             __css_plain_text__ = _plain;
-            __css_metric_runs__ = _metric_runs;
-            __css_visual_runs__ = _visual_runs;
+            __css_spans__ = _span_runs;
             __css_align_runs__ = _align_out;
         };
 
@@ -1226,7 +1211,20 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
                 __display_text__ = _source_text;
 
-                __layout__ = __build_layout__(_source_text, undefined, undefined);
+                var _default_spans = [{
+                    index_count: string_length(_source_text),
+                    font_asset_or_minus1: -1,
+                    style_value: __WW_Text_Glyph_Style.Regular,
+                    size_mul: 1,
+                    color: color,
+                    alpha: alpha,
+                    underline: __WW_Text_Glyph_Underline.None,
+                    back_color: undefined,
+                    back_alpha: undefined,
+                    strike: __WW_Text_Glyph_Strike.None
+                }];
+
+                __layout__ = __build_layout__(_source_text, _default_spans);
                 __content_width__ = __layout__.get_content_width();
                 __content_height__ = __layout__.get_content_height();
 
@@ -1243,7 +1241,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 
             __display_text__ = __css_plain_text__;
 
-            __layout__ = __build_layout__(__css_plain_text__, __css_metric_runs__, __css_visual_runs__);
+            __layout__ = __build_layout__(__css_plain_text__, __css_spans__);
 
             // Alignment is still a post-pass because it depends on final line breaks.
             var _align_width = __layout__.get_content_width();

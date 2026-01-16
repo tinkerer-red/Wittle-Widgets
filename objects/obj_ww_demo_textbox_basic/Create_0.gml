@@ -6,8 +6,7 @@ title = "Basic Demo";
 subtitle = "Left is basic. Right is specalized renderer.";
 
 #region text
-text = @'
-Base and advanced text demo.
+text = @'Base and advanced text demo.
 
 This textbox shows raw editable text.
 The preview mirrors input exactly.
@@ -37,8 +36,7 @@ should only appear when enabled
 in the advanced renderer.
 
 This demo combines the base and advanced
-features into a single focused example.
-';
+features into a single focused example.';
 #endregion
 
 left_init = function(_textbox_instance) {

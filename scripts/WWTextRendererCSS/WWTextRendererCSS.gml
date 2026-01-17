@@ -142,10 +142,6 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
 			return _copy;
 		};
 
-		static __css_state_equals_align__ = function(_state_a, _state_b) {
-			return (_state_a.align_value == _state_b.align_value);
-		};
-
 		// ---------------------------------
 		// Span helpers
 		// ---------------------------------
@@ -244,9 +240,9 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 alpha: undefined,
 
                 has_back_color: false,
-                back_color: undefined,
+                back_color: 0,
                 has_back_alpha: false,
-                back_alpha: undefined,
+                back_alpha: 0,
 
                 has_font: false,
                 font_asset: font,
@@ -284,7 +280,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
             if (_delta.has_back_color) _state.back_color = _delta.back_color;
             if (_delta.has_back_alpha) _state.back_alpha = _delta.back_alpha;
 
-            if (_delta.has_font) _state.font_asset = _delta.font;
+            if (_delta.has_font) _state.font_asset = _delta.font_asset;
             if (_delta.has_style) _state.style = _delta.style;
             if (_delta.has_size_mul) _state.size_mul = _delta.size_mul;
             if (_delta.has_underline) _state.underline = _delta.underline;
@@ -537,14 +533,19 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                     _delta.has_alpha = true;
                     _delta.alpha = __css_parse_opacity__(_val);
                 }
-                else if (_prop == "background" || _prop == "background-color") {
-                    var _bcol = __css_parse_color__(_val);
-                    if (!is_undefined(_bcol)) {
-                        _delta.has_back_color = true;
-                        _delta.back_color = _bcol;
-                        // If user provides rgba() alpha, they likely intend opacity too, but we do not parse alpha from rgba here.
-                    }
-                }
+				else if (_prop == "background" || _prop == "background-color") {
+				    var _bcol = __css_parse_color__(_val);
+				    if (!is_undefined(_bcol)) {
+				        _delta.has_back_color = true;
+				        _delta.back_color = _bcol;
+
+				        // Enable background by default when a color is provided.
+				        if (!_delta.has_back_alpha) {
+				            _delta.has_back_alpha = true;
+				            _delta.back_alpha = 1;
+				        }
+				    }
+				}
                 else if (_prop == "font-size") {
                     _delta.has_size_mul = true;
                     _delta.size_mul = __css_parse_font_size_mul__(_val);
@@ -1025,7 +1026,7 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                 }
 
                 // Align merge (separate stream - post-pass)
-                if (_i == 0 || __css_state_equals_align__(_curr_align_state, _span_state)) {
+                if (_i == 0 || __text_state_equals_align__(_curr_align_state, _span_state)) {
                     _align_count += _span_len;
                 } else {
                     array_push(_align_out, __text_align_run_from_state__(_align_count, _curr_align_state));
@@ -1144,8 +1145,8 @@ function WWTextRendererCSS() : WWTextRendererBase() constructor {
                     color: color,
                     alpha: alpha,
                     underline: __WW_Text_Glyph_Underline.None,
-                    back_color: undefined,
-                    back_alpha: undefined,
+                    back_color: 0,
+                    back_alpha: 0,
                     strike: __WW_Text_Glyph_Strike.None
                 }];
 

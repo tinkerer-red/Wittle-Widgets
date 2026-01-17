@@ -2116,44 +2116,72 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			    var _x0 = floor(_pos_x + _xoff);
 			    var _y0 = floor(_pos_y + _yoff);
-			    var _x1 = floor(_x0 + _w);
-			    var _y1 = floor(_y0 + _h);
+
+				var _w_int = floor(_w);
+				var _h_int = floor(_h);
+				
+				var _x1 = _x0 + _w_int;
+				var _y1 = _y0 + _h_int;
 
 			    var _italic = ((_style == __WW_Text_Glyph_Style.Italic) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
+				var _bold = ((_style == __WW_Text_Glyph_Style.Bold) || (_style == __WW_Text_Glyph_Style.Bold_Italic));
 
-			    var _slant_top = 0;
-			    var _slant_bottom = 0;
+				var _slant_top = 0;
+				var _slant_bottom = 0;
 
-			    if (_italic) {
-			        _slant_top = ceil(2 * _size_mul);
-			        _slant_bottom = floor(-1 * _size_mul);
-			    }
+				if (_italic) {
+				    _slant_top = floor(2 * _size_mul);
+				    _slant_bottom = floor(-1 * _size_mul);
+				}
 
-			    vertex_position(_vb_buffer, _x0 + _slant_top, _y0);
-			    vertex_texcoord(_vb_buffer, _u0, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
+				var _pass_count = 1;
+				if (_bold) {
+				    _pass_count = 2;
+				}
 
-			    vertex_position(_vb_buffer, _x1 + _slant_top, _y0);
-			    vertex_texcoord(_vb_buffer, _u1, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
+				var _pass_index = 0;
+				repeat (_pass_count) {
 
-			    vertex_position(_vb_buffer, _x1 + _slant_bottom, _y1);
-			    vertex_texcoord(_vb_buffer, _u1, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
+				    var _x_offset = 0;
+				    if (_pass_index == 1) {
+				        _x_offset = max(1, ceil(_size_mul));
+				    }
+					
+					
+					var _x0_top = _x0 + _slant_top + _x_offset;
+			        var _x1_top = _x1 + _slant_top + _x_offset;
+			        var _x1_bot = _x1 + _slant_bottom + _x_offset;
+			        var _x0_bot = _x0 + _slant_bottom + _x_offset;
+					
+					vertex_position(_vb_buffer, _x0_top, _y0);
+					vertex_texcoord(_vb_buffer, _u0, _v0);
+					vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, _x0 + _slant_top, _y0);
-			    vertex_texcoord(_vb_buffer, _u0, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
+					vertex_position(_vb_buffer, _x1_top, _y0);
+					vertex_texcoord(_vb_buffer, _u1, _v0);
+					vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, _x1 + _slant_bottom, _y1);
-			    vertex_texcoord(_vb_buffer, _u1, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
+					vertex_position(_vb_buffer, _x1_bot, _y1);
+					vertex_texcoord(_vb_buffer, _u1, _v1);
+					vertex_colour(_vb_buffer, _col, _alp);
 
-			    vertex_position(_vb_buffer, _x0 + _slant_bottom, _y1);
-			    vertex_texcoord(_vb_buffer, _u0, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
+					vertex_position(_vb_buffer, _x0_top, _y0);
+					vertex_texcoord(_vb_buffer, _u0, _v0);
+					vertex_colour(_vb_buffer, _col, _alp);
 
-			    return true;
+					vertex_position(_vb_buffer, _x1_bot, _y1);
+					vertex_texcoord(_vb_buffer, _u1, _v1);
+					vertex_colour(_vb_buffer, _col, _alp);
+
+					vertex_position(_vb_buffer, _x0_bot, _y1);
+					vertex_texcoord(_vb_buffer, _u0, _v1);
+					vertex_colour(_vb_buffer, _col, _alp);
+
+				    _pass_index += 1;
+				}
+
+				return true;
+
 			};
 
         #endregion
@@ -2601,7 +2629,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
 			            draw_set_font(_old_font);
 			        }
-			        _timers[4] += get_timer()-___time;
 			        return;
 			    }
 
@@ -2612,7 +2639,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
 			            draw_set_font(_old_font);
 			        }
-			        _timers[4] += get_timer()-___time;
 			        return;
 			    }
 
@@ -2675,7 +2701,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			    };
 
 			    // Font resolution cache per-char (avoid repeated fallback scanning)
-			    var _font_data_by_char = {};
+			    var _font_data_by_font = {};
 
 			    // Batch reuse (avoid calling __vb_get_batch_for_material__ when unchanged)
 			    var _last_tex = -1;
@@ -2683,12 +2709,20 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _last_shader = undefined;
 			    var _last_spread = 0;
 			    var _last_batch_buffer = -1;
-
+				
+				var __timer = array_create(11,  0)
+				
+				
+				//minor performance increase to use a local var instead of a instance var for every single glyph emit, this added up for 30+ line text boxes, others would probably just use a macro.
+				var _emit_glyph = __vb_emit_glyph_styled_to_buffer__;
+				
+				
 			    var _glyph_index = 0;
 			    repeat (_glyph_count) {
-
+					
 			        var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
-
+					
+					var _t = get_timer();
 			        var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
 			        if (_char == "\n" || _char == "\r") {
 			            __bg_flush_span__(_bg_span_state);
@@ -2705,7 +2739,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _glyph_index += 1;
 			            continue;
 			        }
-
+					__timer[0] += get_timer()-_t;
+					
+					var _t = get_timer();
 			        var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
 			        var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
 			        var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
@@ -2727,13 +2763,17 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			        var _final_back_col = _span.back_color;
 			        var _final_back_alp = _span.back_alpha;
-
+					__timer[1] += get_timer()-_t;
+					
+					var _t = get_timer();
 			        if (!_use_formatting) {
 			            _final_style = __WW_Text_Glyph_Style.Regular;
 			            _final_size = 1;
 			        }
+					__timer[2] += get_timer()-_t;
 					
 			        // Optional whitespace markers
+					var _t = get_timer();
 			        if (_use_whitespace) {
 
 			            if (_char == " ") {
@@ -2749,7 +2789,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    _mark_x = _pos_x + ((_cell_w - _ws_space_width) * 0.5);
 			                }
 
-			                __vb_emit_glyph_styled_to_buffer__(
+			                _emit_glyph(
 			                    _ws_batch_buffer,
 			                    _default_font_data,
 			                    _ws_space_marker,
@@ -2771,7 +2811,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			                __st_flush_span__(_st_span_state);
 			                __ul_flush_span__(_ul_span_state);
 
-			                __vb_emit_glyph_styled_to_buffer__(
+			                _emit_glyph(
 			                    _ws_batch_buffer,
 			                    _default_font_data,
 			                    _ws_tab_marker,
@@ -2787,8 +2827,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			                continue;
 			            }
 			        }
-
+					__timer[3] += get_timer()-_t;
+					
 			        // Background accumulation (alpha 0 means none)
+					var _t = get_timer();
 			        if (_final_back_alp > 0) {
 
 			            var _bg_x0 = _pos_x;
@@ -2808,7 +2850,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			                _bg_span_state.col = _final_back_col;
 			                _bg_span_state.alp = _final_back_alp;
 
-			            } else {
+			            }
+						else {
 
 			                var _same_col_bg = (_bg_span_state.col == _final_back_col);
 			                var _same_alp_bg = (_bg_span_state.alp == _final_back_alp);
@@ -2836,34 +2879,45 @@ function WWTextRendererBase() : WWCore() constructor {
 			                }
 			            }
 
-			        } else {
-
+			        } 
+					else {
 			            __bg_flush_span__(_bg_span_state);
 			        }
+					__timer[4] += get_timer()-_t;
+					
+					// Resolve font data (cached by font then char)
+					var _t = get_timer();
+					var _font_cache = _font_data_by_font[$ _final_font];
+					if (is_undefined(_font_cache)) {
+					    _font_cache = {};
+					    _font_data_by_font[$ _final_font] = _font_cache;
+					}
 
-			        // Resolve font data (cached by char)
-			        var _font_data = _font_data_by_char[$ _char];
+					var _font_data = _font_cache[$ _char];
 
-			        if (is_undefined(_font_data)) {
+					if (is_undefined(_font_data)) {
 
-			            _font_data = __glyph_resolve_font_data__(_final_font, _char, _default_font_data);
+					    _font_data = __glyph_resolve_font_data__(_final_font, _char, _default_font_data);
 
-			            if (is_undefined(_font_data)) {
-			                _font_data_by_char[$ _char] = 0;
-			            } else {
-			                _font_data_by_char[$ _char] = _font_data;
-			            }
-			        }
+					    if (is_undefined(_font_data)) {
+					        _font_cache[$ _char] = 0;
+					        _font_data = 0;
+					    } else {
+					        _font_cache[$ _char] = _font_data;
+					    }
+					}
 
-			        if (_font_data == 0) {
-			            __bg_flush_span__(_bg_span_state);
-			            __st_flush_span__(_st_span_state);
-			            __ul_flush_span__(_ul_span_state);
-			            _glyph_index += 1;
-			            continue;
-			        }
-
+					if (_font_data == 0) {
+					    __bg_flush_span__(_bg_span_state);
+					    __st_flush_span__(_st_span_state);
+					    __ul_flush_span__(_ul_span_state);
+					    _glyph_index += 1;
+					    continue;
+					}
+					__timer[5] += get_timer()-_t;
+					
 			        // Batch reuse: only call when material changes
+					var _t = get_timer();
 			        var _need_batch = true;
 
 			        if (_font_data.tex == _last_tex &&
@@ -2872,7 +2926,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _font_data.sdf_spread == _last_spread) {
 			            _need_batch = false;
 			        }
-
+					__timer[6] += get_timer()-_t;
+					
+					var _t = get_timer();
 			        if (_need_batch) {
 
 			            var _glyph_batch = __vb_get_batch_for_material__(
@@ -2889,8 +2945,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _last_spread = _font_data.sdf_spread;
 			            _last_batch_buffer = _glyph_batch.batch.buffer;
 			        }
-
-			        __vb_emit_glyph_styled_to_buffer__(
+					__timer[7] += get_timer()-_t;
+					
+					var _t = get_timer();
+			        _emit_glyph(
 			            _last_batch_buffer,
 			            _font_data,
 			            _char,
@@ -2901,8 +2959,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _final_size,
 			            _final_style
 			        );
-
+					__timer[8] += get_timer()-_t;
+					
 			        // Underline
+					var _t = get_timer();
 			        if (_final_under != __WW_Text_Glyph_Underline.None) {
 
 			            var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
@@ -2917,7 +2977,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			                _ul_span_state.col = _final_color;
 			                _ul_span_state.alp = _final_alpha;
 
-			            } else {
+			            }
+						else {
 
 			                var _same_type = (_ul_span_state.under == _final_under);
 			                var _same_col = (_ul_span_state.col == _final_color);
@@ -2946,8 +3007,10 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            __ul_flush_span__(_ul_span_state);
 			        }
-
+					__timer[9] += get_timer()-_t;
+					
 			        // Strike
+					var _t = get_timer();
 			        if (_final_strike != __WW_Text_Glyph_Strike.None) {
 
 			            var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
@@ -2987,14 +3050,29 @@ function WWTextRendererBase() : WWCore() constructor {
 			                }
 			            }
 
-			        } else {
-
+			        }
+					else {
 			            __st_flush_span__(_st_span_state);
 			        }
-
+					__timer[10] += get_timer()-_t;
+					
 			        _glyph_index += 1;
 			    }
-
+				
+				__timer[0] /= 1000;
+				__timer[1] /= 1000;
+				__timer[2] /= 1000;
+				__timer[3] /= 1000;
+				__timer[4] /= 1000;
+				__timer[5] /= 1000;
+				__timer[6] /= 1000;
+				__timer[7] /= 1000;
+				__timer[8] /= 1000;
+				__timer[9] /= 1000;
+				__timer[10] /= 1000;
+				
+				pprint(__timer)
+				
 			    __bg_flush_span__(_bg_span_state);
 			    __st_flush_span__(_st_span_state);
 			    __ul_flush_span__(_ul_span_state);

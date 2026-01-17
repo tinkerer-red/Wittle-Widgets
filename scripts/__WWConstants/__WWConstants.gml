@@ -108,4 +108,12 @@ enum __WW_Layout_Glyph {
 
 	__Size__
 }
+
+enum __WW_Text_Glyph_Strike {
+	None,
+	Line,
+	Squiggle,
+	Warning,
+	Error
+}
 #endregion

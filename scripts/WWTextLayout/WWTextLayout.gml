@@ -670,10 +670,3 @@ function WWTextLayout() constructor {
 }
 
 
-enum __WW_Text_Glyph_Strike {
-	None,
-	Line,
-	Squiggle,
-	Warning,
-	Error
-}

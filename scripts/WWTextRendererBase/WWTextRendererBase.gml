@@ -1852,76 +1852,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
         #endregion
 
-        #region VB glyph emitter (basic)
-
-            static __vb_emit_glyph_basic_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp) {
-
-			    if (_char == "" || is_undefined(_font_data)) {
-			        return false;
-			    }
-
-			    var _glyph_info = _font_data.info.glyphs[$ _char];
-			    if (is_undefined(_glyph_info)) {
-			        return false;
-			    }
-
-			    var _gx = _glyph_info.x;
-			    var _gy = _glyph_info.y;
-			    var _gw = _glyph_info.w;
-			    var _gh = _glyph_info.h;
-
-			    if (_gx < 0 || _gy < 0 || _gw <= 0 || _gh <= 0) {
-			        return false;
-			    }
-
-			    var _uv_w = _font_data.texel_w;
-				var _uv_h = _font_data.texel_h;
-
-			    var _u0 = _gx * _uv_w;
-			    var _v0 = _gy * _uv_h;
-			    var _u1 = (_gx + _gw) * _uv_w;
-			    var _v1 = (_gy + _gh) * _uv_h;
-
-			    var _padding = 0;
-			    if (!is_undefined(_font_data.info) && _font_data.info.sdfEnabled) {
-			        _padding = _font_data.info.sdfSpread;
-			    }
-
-			    var _xoff = _glyph_info.offset - _padding;
-			    var _yoff = _glyph_info.yoffset - _padding;
-
-			    var _x0 = _pos_x + _xoff;
-			    var _y0 = _pos_y + _yoff;
-			    var _x1 = _x0 + _gw;
-			    var _y1 = _y0 + _gh;
-
-			    vertex_position(_vb_buffer, _x0, _y0);
-			    vertex_texcoord(_vb_buffer, _u0, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    vertex_position(_vb_buffer, _x1, _y0);
-			    vertex_texcoord(_vb_buffer, _u1, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    vertex_position(_vb_buffer, _x1, _y1);
-			    vertex_texcoord(_vb_buffer, _u1, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    vertex_position(_vb_buffer, _x0, _y0);
-			    vertex_texcoord(_vb_buffer, _u0, _v0);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    vertex_position(_vb_buffer, _x1, _y1);
-			    vertex_texcoord(_vb_buffer, _u1, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    vertex_position(_vb_buffer, _x0, _y1);
-			    vertex_texcoord(_vb_buffer, _u0, _v1);
-			    vertex_colour(_vb_buffer, _col, _alp);
-
-			    return true;
-			};
-			
 			#region Text State Helpers
 
 				#region jsDoc
@@ -2081,8 +2011,6 @@ function WWTextRendererBase() : WWCore() constructor {
 				};
 				
 			#endregion
-			
-        #endregion
         
         #region VB emit styled glyph
 
@@ -2778,10 +2706,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            if (_char == " ") {
 
-			                __bg_flush_span__(_bg_span_state);
-			                __st_flush_span__(_st_span_state);
-			                __ul_flush_span__(_ul_span_state);
-
 			                var _cell_w = _wid * _final_size;
 
 			                var _mark_x = _pos_x;
@@ -2806,10 +2730,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			            }
 
 			            if (_char == "\t") {
-
-			                __bg_flush_span__(_bg_span_state);
-			                __st_flush_span__(_st_span_state);
-			                __ul_flush_span__(_ul_span_state);
 
 			                _emit_glyph(
 			                    _ws_batch_buffer,

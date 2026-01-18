@@ -2638,9 +2638,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _last_spread = 0;
 			    var _last_batch_buffer = -1;
 				
-				var __timer = array_create(11,  0)
-				
-				
 				//minor performance increase to use a local var instead of a instance var for every single glyph emit, this added up for 30+ line text boxes, others would probably just use a macro.
 				var _emit_glyph = __vb_emit_glyph_styled_to_buffer__;
 				
@@ -2650,8 +2647,7 @@ function WWTextRendererBase() : WWCore() constructor {
 					
 			        var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
 					
-					var _t = get_timer();
-			        var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
+					var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
 			        if (_char == "\n" || _char == "\r") {
 			            __bg_flush_span__(_bg_span_state);
 			            __st_flush_span__(_st_span_state);
@@ -2667,10 +2663,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _glyph_index += 1;
 			            continue;
 			        }
-					__timer[0] += get_timer()-_t;
 					
-					var _t = get_timer();
-			        var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
+					var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
 			        var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
 			        var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
 			        var _hei = _glyphs[_base + __WW_Layout_Glyph.Height];
@@ -2691,18 +2685,14 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			        var _final_back_col = _span.back_color;
 			        var _final_back_alp = _span.back_alpha;
-					__timer[1] += get_timer()-_t;
 					
-					var _t = get_timer();
-			        if (!_use_formatting) {
+					if (!_use_formatting) {
 			            _final_style = __WW_Text_Glyph_Style.Regular;
 			            _final_size = 1;
 			        }
-					__timer[2] += get_timer()-_t;
 					
 			        // Optional whitespace markers
-					var _t = get_timer();
-			        if (_use_whitespace) {
+					if (_use_whitespace) {
 
 			            if (_char == " ") {
 
@@ -2747,11 +2737,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			                continue;
 			            }
 			        }
-					__timer[3] += get_timer()-_t;
 					
 			        // Background accumulation (alpha 0 means none)
-					var _t = get_timer();
-			        if (_final_back_alp > 0) {
+					if (_final_back_alp > 0) {
 
 			            var _bg_x0 = _pos_x;
 			            var _bg_x1 = _pos_x + (_wid * _final_size);
@@ -2803,10 +2791,8 @@ function WWTextRendererBase() : WWCore() constructor {
 					else {
 			            __bg_flush_span__(_bg_span_state);
 			        }
-					__timer[4] += get_timer()-_t;
 					
 					// Resolve font data (cached by font then char)
-					var _t = get_timer();
 					var _font_cache = _font_data_by_font[$ _final_font];
 					if (is_undefined(_font_cache)) {
 					    _font_cache = {};
@@ -2834,11 +2820,9 @@ function WWTextRendererBase() : WWCore() constructor {
 					    _glyph_index += 1;
 					    continue;
 					}
-					__timer[5] += get_timer()-_t;
 					
 			        // Batch reuse: only call when material changes
-					var _t = get_timer();
-			        var _need_batch = true;
+					var _need_batch = true;
 
 			        if (_font_data.tex == _last_tex &&
 			            _font_data.uvs == _last_uvs &&
@@ -2846,10 +2830,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _font_data.sdf_spread == _last_spread) {
 			            _need_batch = false;
 			        }
-					__timer[6] += get_timer()-_t;
 					
-					var _t = get_timer();
-			        if (_need_batch) {
+					if (_need_batch) {
 
 			            var _glyph_batch = __vb_get_batch_for_material__(
 			                _font_data.tex,
@@ -2865,10 +2847,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _last_spread = _font_data.sdf_spread;
 			            _last_batch_buffer = _glyph_batch.batch.buffer;
 			        }
-					__timer[7] += get_timer()-_t;
 					
-					var _t = get_timer();
-			        _emit_glyph(
+					_emit_glyph(
 			            _last_batch_buffer,
 			            _font_data,
 			            _char,
@@ -2879,11 +2859,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _final_size,
 			            _final_style
 			        );
-					__timer[8] += get_timer()-_t;
 					
 			        // Underline
-					var _t = get_timer();
-			        if (_final_under != __WW_Text_Glyph_Underline.None) {
+					if (_final_under != __WW_Text_Glyph_Underline.None) {
 
 			            var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
 
@@ -2927,11 +2905,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            __ul_flush_span__(_ul_span_state);
 			        }
-					__timer[9] += get_timer()-_t;
 					
 			        // Strike
-					var _t = get_timer();
-			        if (_final_strike != __WW_Text_Glyph_Strike.None) {
+					if (_final_strike != __WW_Text_Glyph_Strike.None) {
 
 			            var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
 
@@ -2974,24 +2950,9 @@ function WWTextRendererBase() : WWCore() constructor {
 					else {
 			            __st_flush_span__(_st_span_state);
 			        }
-					__timer[10] += get_timer()-_t;
 					
 			        _glyph_index += 1;
 			    }
-				
-				__timer[0] /= 1000;
-				__timer[1] /= 1000;
-				__timer[2] /= 1000;
-				__timer[3] /= 1000;
-				__timer[4] /= 1000;
-				__timer[5] /= 1000;
-				__timer[6] /= 1000;
-				__timer[7] /= 1000;
-				__timer[8] /= 1000;
-				__timer[9] /= 1000;
-				__timer[10] /= 1000;
-				
-				pprint(__timer)
 				
 			    __bg_flush_span__(_bg_span_state);
 			    __st_flush_span__(_st_span_state);

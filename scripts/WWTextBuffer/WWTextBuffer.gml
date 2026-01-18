@@ -133,6 +133,53 @@ function WWTextBuffer() : WWCore() constructor {
 					return string_copy(get_text(), _gm_start, _count);
 				};
 			
+
+				#region jsDoc
+				/// @func	get_byte_index_from_index()
+				/// @desc	Convert a 0-based character index to a 0-based UTF-8 byte index.
+				/// 		This is used by the textbox editing code to call insert/erase which operate on byte indices.
+				/// @param	{Real} _index
+				/// @returns {Real}
+				#endregion
+				static get_byte_index_from_index = function(_index) {
+					__ensure_byte_offsets__();
+					var _char_count = __length__;
+					if (_index <= 0) { return 0; }
+					if (_index >= _char_count) { return __byte_total__; }
+					return __byte_offsets__[_index];
+				};
+
+				#region jsDoc
+				/// @func	get_index_from_byte_index()
+				/// @desc	Convert a 0-based UTF-8 byte index to a 0-based character index.
+				/// @param	{Real} _byte_index
+				/// @returns {Real}
+				#endregion
+				static get_index_from_byte_index = function(_byte_index) {
+					__ensure_byte_offsets__();
+					if (_byte_index <= 0) { return 0; }
+					if (_byte_index >= __byte_total__) { return __length__; }
+
+					var _low = 0;
+					var _high = __length__;
+					while (_low <= _high) {
+						var _mid = (_low + _high) div 2;
+						var _mid_off = __byte_offsets__[_mid];
+						if (_mid_off == _byte_index) {
+							return _mid;
+						}
+						if (_mid_off < _byte_index) {
+							_low = _mid + 1;
+						}
+						else {
+							_high = _mid - 1;
+						}
+					}
+
+					if (_high < 0) { return 0; }
+					return _high;
+				};
+
 				#region jsDoc
 				/// @func	get_allowed_char()
 				/// @desc	Gets the allowed character struct.
@@ -141,7 +188,6 @@ function WWTextBuffer() : WWCore() constructor {
 				static get_allowed_char = function() {
 					return __allowed_char_map__;
 				};
-			
 			#endregion
 			
 			#region jsDoc
@@ -237,6 +283,7 @@ function WWTextBuffer() : WWCore() constructor {
 				buffer_write(__buffer__, buffer_u8, 0);
 	
 				__is_dirty__ = true;
+				__byte_offsets_dirty__ = true;
 				return self;
 			};
 			
@@ -290,6 +337,7 @@ function WWTextBuffer() : WWCore() constructor {
 				buffer_write(__buffer__, buffer_u8, 0);
 				
 				__is_dirty__ = true;
+				__byte_offsets_dirty__ = true;
 				return self;
 			};
 			
@@ -318,6 +366,11 @@ function WWTextBuffer() : WWCore() constructor {
 			
 			// Denote if __content__ needs to be updated on next call to `.get_text()`
 			__is_dirty__ = true;
+				
+				// Byte offset mapping: char index -> UTF-8 byte index
+				__byte_offsets__ = [];
+				__byte_total__ = 0;
+				__byte_offsets_dirty__ = true;
 			
 			__textbox_parent__ = undefined;
 			
@@ -325,9 +378,10 @@ function WWTextBuffer() : WWCore() constructor {
 		
 		#region Functions
 			
-			static __mark_dirty__ = function() {
-				__is_dirty__ = true;
-			}
+				static __mark_dirty__ = function() {
+					__is_dirty__ = true;
+					__byte_offsets_dirty__ = true;
+				};
 			
 			static __set_text__ = function(_text) {
 				if (!buffer_exists(__buffer__)) {
@@ -341,7 +395,26 @@ function WWTextBuffer() : WWCore() constructor {
 				
 				__content__ = _text;
 				__length__  = string_length(_text);
+					__byte_offsets_dirty__ = true;
 			};
+
+				static __ensure_byte_offsets__ = function() {
+					if (!__byte_offsets_dirty__) { return; }
+					var _text_value = get_text();
+					var _char_count = __length__;
+					__byte_offsets__ = array_create(_char_count + 1, 0);
+					var _byte_cursor = 0;
+					var _char_index1 = 1;
+					repeat (_char_count) {
+						__byte_offsets__[_char_index1 - 1] = _byte_cursor;
+						var _char_value = string_char_at(_text_value, _char_index1);
+						_byte_cursor += string_byte_length(_char_value);
+						_char_index1 += 1;
+					}
+					__byte_offsets__[_char_count] = _byte_cursor;
+					__byte_total__ = _byte_cursor;
+					__byte_offsets_dirty__ = false;
+				};
 			
 			static __filter_allowed__ = function(_text) {
 				if (is_undefined(__allowed_char_map__)) {

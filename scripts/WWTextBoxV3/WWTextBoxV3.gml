@@ -840,8 +840,8 @@ function WWTextBoxV3() : WWCore() constructor {
 
 				var _prev = _index - 1;
 
-				var _buf_start = renderer.get_buffer_index_from_index(_prev);
-				var _buf_end = renderer.get_buffer_index_from_index(_index);
+				var _buf_start = buffer.get_byte_index_from_index(_prev);
+				var _buf_end = buffer.get_byte_index_from_index(_index);
 
 				buffer.erase(_buf_start, _buf_end);
 
@@ -870,8 +870,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				// If at end of text, nothing to delete
 				if (_index >= renderer.get_glyph_count()) return;
 				
-				var _buf_start = renderer.get_buffer_index_from_index(_index);
-				var _buf_end   = renderer.get_buffer_index_from_index(_next);
+				var _buf_start = buffer.get_byte_index_from_index(_index);
+				var _buf_end   = buffer.get_byte_index_from_index(_next);
 				
 				buffer.erase(_buf_start, _buf_end);
 				__force_rebuild__();
@@ -898,8 +898,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _bounds = __compute_word_boundaries__(_pointed_index, false);
 				var _start = _bounds.index_start;
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_index);
-				var _buffer_end = renderer.get_buffer_index_from_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_index);
+				var _buffer_end = buffer.get_byte_index_from_index(_end);
 
 				buffer.erase(_buffer_start, _buffer_end);
 
@@ -926,8 +926,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _bounds = __compute_word_boundaries__(_pointed_index, false);
 				var _end = _bounds.index_end;
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_index);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_index);
+				var _buffer_end   = buffer.get_byte_index_from_index(_end);
 				
 				buffer.erase(_buffer_start, _buffer_end);
 				__force_rebuild__();
@@ -965,8 +965,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _line = renderer.get_line_from_index(_end)
 				var _start = renderer.get_line_index_start(_line);
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_start);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_start);
+				var _buffer_end   = buffer.get_byte_index_from_index(_end);
 				buffer.erase(_buffer_start, _buffer_end);
 				cursor.set_index(_start);
 				__force_rebuild__();
@@ -998,8 +998,8 @@ function WWTextBoxV3() : WWCore() constructor {
 					_end -= 1;
 				}
 				
-				var _buffer_start = renderer.get_buffer_index_from_index(_start);
-				var _buffer_end   = renderer.get_buffer_index_from_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_start);
+				var _buffer_end   = buffer.get_byte_index_from_index(_end);
 				buffer.erase(_buffer_start, _buffer_end);
 				cursor.set_index(_start);
 				cursor.set_highlight_active(false);
@@ -1022,8 +1022,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			hotkeys.register([vk_control, ord("C")], function() {
 				var _start = cursor.get_highlight_start_index();
 				var _end   = cursor.get_highlight_end_index();
-				var _buffer_start = renderer.get_glyph_buffer_index(_start);
-				var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_start);
+				var _buffer_end   = buffer.get_byte_index_from_index(_end);
 				var _string = buffer.get_substring(_buffer_start, _buffer_end);
 				__clipboard_set_text__(_string);
 			});
@@ -1049,8 +1049,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				}
 				
 				// Cut
-				var _buffer_start = renderer.get_glyph_buffer_index(_start);
-				var _buffer_end   = renderer.get_glyph_buffer_index(_end);
+				var _buffer_start = buffer.get_byte_index_from_index(_start);
+				var _buffer_end   = buffer.get_byte_index_from_index(_end);
 				var _string = buffer.get_substring(_buffer_start, _buffer_end);
 				__clipboard_set_text__(_string);
 				buffer.erase(_buffer_start, _buffer_end);
@@ -1898,7 +1898,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					__delete_selection_if_any__(false, false);
 
 					var _index = cursor.get_index();
-					var _buffer_index = renderer.get_glyph_buffer_index(_index);
+					var _buffer_index = buffer.get_byte_index_from_index(_index);
 
 					// insert the text
 					buffer.insert(_buffer_index, _new_str);
@@ -1907,7 +1907,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					__force_rebuild__();
 
 					// move cursor to final position (do not mutate latest record cursor)
-					var _new_index = renderer.get_index_from_buffer_index(_buffer_index + _str_byte_len);
+					var _new_index = buffer.get_index_from_byte_index(_buffer_index + _str_byte_len);
 					__cursor_set_index_synced__(_new_index, false, false);
 
 					// snapshot AFTER everything is settled
@@ -2172,8 +2172,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				var _min_index = min(_start_index, _end_index);
 				var _max_index = max(_start_index, _end_index);
 
-				var _buffer_start = renderer.get_buffer_index_from_index(_min_index);
-				var _buffer_end = renderer.get_buffer_index_from_index(_max_index);
+				var _buffer_start = buffer.get_byte_index_from_index(_min_index);
+				var _buffer_end = buffer.get_byte_index_from_index(_max_index);
 
 				buffer.erase(_buffer_start, _buffer_end);
 

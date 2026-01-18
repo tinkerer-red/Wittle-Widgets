@@ -780,9 +780,19 @@ function WWTextRendererBase() : WWCore() constructor {
 	            /// @returns {Real}
 	            #endregion
 	            static get_buffer_index_from_index = function(_index) {
-	                __ensure_layout__();
-	                return __layout__.get_glyph_buffer_index(_index);
-	            };
+                __ensure_layout__();
+
+                if (_index <= 0) { return 0; }
+
+                var _offset_count = array_length(__byte_offsets__);
+                if (_offset_count <= 0) { return 0; }
+
+                if (_index >= _offset_count) {
+                    return __byte_total__;
+                }
+
+                return __byte_offsets__[_index];
+            };
 
 	            #region jsDoc
 	            /// @func   get_index_from_buffer_index()
@@ -790,120 +800,41 @@ function WWTextRendererBase() : WWCore() constructor {
 	            /// @returns {Real}
 	            #endregion
 	            static get_index_from_buffer_index = function(_buffer_index) {
-	                __ensure_layout__();
+                __ensure_layout__();
 
-	                if (_buffer_index <= 0) { return 0; }
+                if (_buffer_index <= 0) { return 0; }
 
-	                var _glyph_count = __layout__.get_glyph_count();
-	                if (_glyph_count <= 0) { return 0; }
+                var _offset_count = array_length(__byte_offsets__);
+                if (_offset_count <= 0) { return 0; }
 
-	                var _last_glyph_index = _glyph_count - 1;
-	                var _last_glyph_buffer_start = __layout__.get_glyph_buffer_index(_last_glyph_index);
+                if (_buffer_index >= __byte_total__) {
+                    return _offset_count;
+                }
 
-	                if (_buffer_index == _last_glyph_buffer_start) {
-	                    return __layout__.get_glyph_index(_last_glyph_index);
-	                }
+                var _low = 0;
+                var _high = _offset_count - 1;
 
-	                var _last_glyph_buffer_end = _last_glyph_buffer_start + __layout__.get_glyph_buffer_size(_last_glyph_index);
+                while (_low <= _high) {
 
-	                if (_buffer_index >= _last_glyph_buffer_end) {
-	                    return __layout__.get_glyph_index(_last_glyph_index) + 1;
-	                }
+                    var _mid = (_low + _high) div 2;
+                    var _mid_off = __byte_offsets__[_mid];
 
-	                var _line_count = __layout__.get_line_count();
-	                if (_line_count <= 0) {
-	                    return 0;
-	                }
+                    if (_mid_off == _buffer_index) {
+                        return _mid;
+                    }
 
-	                var _target_line_index = 0;
-	                var _found_line = false;
+                    if (_mid_off < _buffer_index) {
+                        _low = _mid + 1;
+                    }
+                    else {
+                        _high = _mid - 1;
+                    }
+                }
 
-	                var _line_index = 0;
-	                repeat (_line_count) {
-
-	                    var _glyph_start = __layout__.get_line_index_start(_line_index);
-	                    var _glyph_end = __layout__.get_line_index_end(_line_index);
-	                    var _glyph_count_line = _glyph_end - _glyph_start;
-
-	                    if (_glyph_count_line > 0) {
-
-	                        var _first_buf_start = __layout__.get_glyph_buffer_index(_glyph_start);
-	                        var _last_glyph_in_line = _glyph_end - 1;
-	                        var _last_buf_start = __layout__.get_glyph_buffer_index(_last_glyph_in_line);
-	                        var _last_buf_size = __layout__.get_glyph_buffer_size(_last_glyph_in_line);
-	                        var _line_buf_end = _last_buf_start + _last_buf_size;
-
-	                        if (_buffer_index < _first_buf_start) {
-	                            _target_line_index = _line_index;
-	                            _found_line = true;
-	                            break;
-	                        }
-
-	                        if (_buffer_index >= _first_buf_start && _buffer_index < _line_buf_end) {
-	                            _target_line_index = _line_index;
-	                            _found_line = true;
-	                            break;
-	                        }
-
-	                        _target_line_index = _line_index;
-	                    }
-
-	                    _line_index++;
-	                }
-
-	                if (!_found_line) {
-	                    var _last_line_index = _line_count - 1;
-	                    var _last_glyph_start2 = __layout__.get_line_index_start(_last_line_index);
-	                    var _last_glyph_end2 = __layout__.get_line_index_end(_last_line_index);
-
-	                    if (_last_glyph_end2 > _last_glyph_start2) {
-	                        var _last_glyph2 = _last_glyph_end2 - 1;
-	                        return __layout__.get_glyph_index(_last_glyph2) + 1;
-	                    }
-
-	                    return 0;
-	                }
-
-	                var _line_start_index = __layout__.get_line_index_start(_target_line_index);
-
-	                var _glyph_start_line = __layout__.get_line_index_start(_target_line_index);
-	                var _glyph_end_line = __layout__.get_line_index_end(_target_line_index);
-	                var _glyph_count_line2 = _glyph_end_line - _glyph_start_line;
-
-	                if (_glyph_count_line2 <= 0) {
-	                    return _line_start_index;
-	                }
-
-	                var _first_buf_start_line = __layout__.get_glyph_buffer_index(_glyph_start_line);
-	                if (_buffer_index <= _first_buf_start_line) {
-	                    return _line_start_index;
-	                }
-
-	                var _closest_index = _line_start_index;
-
-	                var _glyph_index2 = _glyph_start_line;
-	                repeat (_glyph_count_line2) {
-
-	                    var _buf_start = __layout__.get_glyph_buffer_index(_glyph_index2);
-	                    var _buf_size = __layout__.get_glyph_buffer_size(_glyph_index2);
-	                    var _buf_end = _buf_start + _buf_size;
-
-	                    var _logical_index = __layout__.get_glyph_index(_glyph_index2);
-
-	                    if (_buffer_index >= _buf_start && _buffer_index < _buf_end) {
-	                        return _logical_index;
-	                    }
-
-	                    if (_buffer_index < _buf_start) {
-	                        return _logical_index;
-	                    }
-
-	                    _closest_index = _logical_index + 1;
-	                    _glyph_index2++;
-	                }
-
-	                return _closest_index;
-	            };
+                // _high is now the last offset < buffer_index
+                if (_high < 0) { return 0; }
+                return _high;
+            };
 
             #endregion
 
@@ -933,6 +864,10 @@ function WWTextRendererBase() : WWCore() constructor {
             // Tab metrics cached per rebuild
             __space_width__ = 0;
             __tab_width__ = 0;
+
+            // Byte offset mapping: glyph index -> UTF-8 byte index
+            __byte_offsets__ = [];
+            __byte_total__ = 0;
 			
 			__textbox_parent__ = undefined;
 			__layout__ = __build_layout__("", []);
@@ -1164,13 +1099,20 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _layout = new WWTextLayout();
 				_layout.set_spans(_spans);
 
+				// Byte-offset table for mapping glyph indices -> buffer byte indices
+				var _byte_offsets = [];
+				var _byte_cursor = 0;
+
+
 			    if (_str == "") {
 
 			        if (!is_undefined(__textbox_parent__)) {
 			            _layout.apply_line_alignment(__textbox_parent__.width);
 			        }
 
-			        return _layout;
+			        __byte_offsets__ = [];
+					__byte_total__ = 0;
+					return _layout;
 			    }
 
 			    var _text_length = string_length(_str);
@@ -1627,7 +1569,13 @@ function WWTextRendererBase() : WWCore() constructor {
 			                if (_active_font_height <= 0) { _active_font_height = 1; }
 			            }
 
+			            
 			            var _char_emit = string_char_at(_str, _emit_index + 1);
+
+			            // Record byte mapping for this glyph index
+			            var _byte_size = string_byte_length(_char_emit);
+			            if (_byte_size < 0) { _byte_size = 0; }
+			            array_push(_byte_offsets, _byte_cursor);
 
 			            // Newline placeholders: emit glyph slot, but line height must advance
 			            if (_char_emit == "\n" || _char_emit == "\r") {
@@ -1635,19 +1583,21 @@ function WWTextRendererBase() : WWCore() constructor {
 			                var _fallback_scaled = _active_font_height * _metric_size_mul;
 			                if (_fallback_scaled > _max_height) { _max_height = _fallback_scaled; }
 
-							var _span_index_nl = _visual_run_index;
+			                var _span_index_nl = _visual_run_index;
 
-							_layout.add_glyph(
-							    _char_emit,
-							    _emit_index,
-							    _emit_index,
-							    1,
-							    _cursor_x,
-							    _current_y,
-							    0,
-							    0,
-							    _span_index_nl
-							);
+			                _layout.add_glyph(
+			                    _char_emit,
+			                    _emit_index,
+			                    _byte_cursor,
+			                    _byte_size,
+			                    _cursor_x,
+			                    _current_y,
+			                    0,
+			                    _active_font_height,
+			                    _span_index_nl
+			                );
+
+			                _byte_cursor += _byte_size;
 
 			                _metric_remaining -= 1;
 			                _visual_remaining -= 1;
@@ -1664,16 +1614,15 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    if (tab_use_stops) {
 			                        _base_wid = __tab_advance__(_cursor_x);
 			                    }
-								else {
+			                    else {
 			                        _base_wid = _active_tab_width;
 			                    }
-
 			                }
-							else {
+			                else {
 			                    _base_wid = _active_tab_width;
 			                }
 			            }
-						else {
+			            else {
 			                _base_wid = string_width(_char_emit);
 			            }
 
@@ -1682,20 +1631,21 @@ function WWTextRendererBase() : WWCore() constructor {
 			            var _scaled_hei = _base_hei * _metric_size_mul;
 			            if (_scaled_hei > _max_height) { _max_height = _scaled_hei; }
 
-						var _span_index = _visual_run_index;
+			            var _span_index = _visual_run_index;
 
-						_layout.add_glyph(
-						    _char_emit,
-						    _emit_index,
-						    _emit_index,
-						    1,
-						    _cursor_x,
-						    _current_y,
-						    _base_wid,
-						    _base_hei,
-						    _span_index
-						);
+			            _layout.add_glyph(
+			                _char_emit,
+			                _emit_index,
+			                _byte_cursor,
+			                _byte_size,
+			                _cursor_x,
+			                _current_y,
+			                _base_wid,
+			                _base_hei,
+			                _span_index
+			            );
 
+			            _byte_cursor += _byte_size;
 
 			            _cursor_x += (_base_wid * _metric_size_mul);
 
@@ -1703,6 +1653,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _visual_remaining -= 1;
 
 			            _emit_index += 1;
+
+
 			        }
 
 			        // Line text for storage: exclude trailing newline if present
@@ -1746,7 +1698,9 @@ function WWTextRendererBase() : WWCore() constructor {
 			        draw_set_font(_old_font);
 			    }
 
-			    return _layout;
+			    __byte_offsets__ = _byte_offsets;
+				__byte_total__ = _byte_cursor;
+				return _layout;
 			};
 			
         #endregion

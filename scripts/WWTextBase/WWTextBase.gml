@@ -259,7 +259,7 @@ function WWTextBase() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_gui_loc()
 				/// @desc    Sets the cursor position based on the provided GUI x/y coordinates. The function
-				///          converts the GUI coordinates to the text box’s local coordinate space (accounting for scrolling)
+				///          converts the GUI coordinates to the text box's local coordinate space (accounting for scrolling)
 				///          and finds the best matching character position on the appropriate line.
 				/// @self    GUICompTextbox
 				/// @param   {Real} _gui_x : The x position in GUI space.
@@ -721,7 +721,7 @@ function WWTextBase() : WWCore() constructor {
         
         #region Variables
 			
-			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
+			__is_focusable__ = true; // Mark this component as focusable (set to false if a component should never receive focus)
 			
 			text = {
 				buffer  : buffer_create(16384, buffer_grow, 1), // The buffer which contains the text
@@ -1377,7 +1377,7 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __break_lines__()
-				/// @desc    Handles word wrapping for text lines based on the textbox’s width. This
+				/// @desc    Handles word wrapping for text lines based on the textbox's width. This
 				///          function splits lines at appropriate word boundaries when the text exceeds
 				///          the available drawing width, and optionally adjusts the cursor position
 				///          after a forced line break.
@@ -1385,7 +1385,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @param   {Real} _start_line_index       : The index of the line from which to start processing.
 				/// @param   {Real} _number_of_lines           : The number of lines to process for wrapping.
 				/// @param   {Real} _char_limit          : (Optional) The target character offset at which to force a break.
-				/// @param   {Real} _cursor_line_offset   : (Optional) An offset applied to the cursor’s line position after a forced break.
+				/// @param   {Real} _cursor_line_offset   : (Optional) An offset applied to the cursor's line position after a forced break.
 				/// @returns {Undefeined}
 				#endregion
 				static __break_lines__ = function(_start_line_index, _number_of_lines, _char_limit = 0, _cursor_line_offset = 0) {
@@ -1491,7 +1491,7 @@ function WWTextBase() : WWCore() constructor {
 				            var _current_str_length = __string_length(_current_str);
             
 				            if (_current_str_length >= _char_limit) {
-				                // Set the cursor’s line position, applying the offset.
+				                // Set the cursor's line position, applying the offset.
 				                set_cursor_y_pos(_start_line_index + _cursor_line_offset);
                 
 				                // If the offset is nonzero, position the cursor at the start of the line.

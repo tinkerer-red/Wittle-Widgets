@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"WWScrollBar",
+  "%Name":"WWScrollbar",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"WWScrollBar",
+  "name":"WWScrollbar",
   "parent":{
-    "name":"Finished Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
+    "name":"Scrollbars",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Scrollbars.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

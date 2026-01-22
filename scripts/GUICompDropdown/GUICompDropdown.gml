@@ -226,8 +226,8 @@ function GUICompDropdown() : GUICompController() constructor {
 				static set_text_alignment = function(_h=fa_left, _v=fa_top) {
 					__button__.set_text_alignment(_h, _v);
 					
-					text.halign = _h;
-					text.valign = _v;
+					text.__halign__ = _h;
+					text.__valign__ = _v;
 		
 					return self;
 				};
@@ -329,7 +329,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_element_enabled = function(_index, _is_enabled) {
-					elements[_index].is_enabled = _is_enabled;
+					elements[_index].__is_enabled__ = _is_enabled;
 					
 					return self;
 				}
@@ -604,8 +604,8 @@ function GUICompDropdown() : GUICompController() constructor {
 			#endregion
 			static update_component_positions = function() {
 				static __update = function(_comp) {
-					var _xx = __get_controller_archor_x__(_comp.halign);
-					var _yy = __get_controller_archor_y__(_comp.valign);
+					var _xx = __get_controller_archor_x__(_comp.__halign__);
+					var _yy = __get_controller_archor_y__(_comp.__valign__);
 					
 					_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__;
 					_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__;
@@ -756,8 +756,8 @@ function GUICompDropdown() : GUICompController() constructor {
 			static __element__ = function(_string) : WWButtonText()  constructor {
 				debug_name = "GUICompDropdown__element__"
 				
-				halign = fa_left;
-				valign = fa_top;
+				__halign__ = fa_left;
+				__valign__ = fa_top;
 				
 				set_sprite(other.sprite_middle);
 				image_index = 0;

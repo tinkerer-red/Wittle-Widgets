@@ -1,18 +1,27 @@
 #region jsDoc
-/// @func    WWButton()
-/// @desc    Creates a button component
-/// @return {Struct.WWButton}
+/// @func    WWButtonSprite()
+/// @desc    Convenience alias / preset constructor for sprite-based buttons
+/// @returns {Struct.WWButtonSprite}
 #endregion
-function WWButton() : WWSprite() constructor {
-	debug_name = "WWButton";
+function WWButtonSprite() : WWSprite() constructor {
+	debug_name = "WWButtonSprite";
 	
-	#region Public
+		#region Public
 		
 		#region Builder Functions
+			#region jsDoc
+			/// @func    set_callback()
+			/// @desc    Sets the callback invoked when the button is released.
+			/// @self    WWButtonSprite
+			/// @param   {Function} _callback : Function called on release.
+			/// @returns {Struct.WWButtonSprite}
+			#endregion
 			static set_callback = function(_callback) {
-				on_released(_callback);
+				__callback__ = _callback;
+				on_released(__callback__);
 				return self;
-			}
+			};
+
 		#endregion
 		
 		#region Events
@@ -37,13 +46,21 @@ function WWButton() : WWSprite() constructor {
 		
 		#region Variables
 			
-			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
-			
 			set_sprite(sButton); // init the sprite variables
 			
 		#endregion
 		
 		#region Functions
+			
+			#region jsDoc
+			/// @func    get_callback()
+			/// @desc    Returns the callback currently used for the release event.
+			/// @self    WWButtonSprite
+			/// @returns {Function} callback_or_undefined
+			#endregion
+			static get_callback = function() {
+				return __callback__;
+			};
 			
 			#region GML Events
 				
@@ -58,6 +75,9 @@ function WWButton() : WWSprite() constructor {
 		
 		#region Variables
 			
+			__is_focusable__ = true; // Mark this component as focusable (set to false if a component should never receive focus)
+			__callback__ = undefined;
+			
 		#endregion
 		
 		#region Functions
@@ -70,14 +90,4 @@ function WWButton() : WWSprite() constructor {
 		#endregion
 	
 	#endregion
-	
-}
-
-#region jsDoc
-/// @func    WWButtonSprite()
-/// @desc    Creates a button component
-/// @return {Struct.WWButtonSprite}
-#endregion
-function WWButtonSprite() : WWButton() constructor {
-	debug_name = "WWButtonSprite";
 }

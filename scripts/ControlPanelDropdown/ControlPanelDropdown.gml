@@ -85,8 +85,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 		
 		#region Variables
 			
-			halign = fa_left
-			valign = fa_top;
+			__halign__ = fa_left
+			__valign__ = fa_top;
 			callback = _func;
 			is_open = false;
 			
@@ -176,7 +176,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				//adjust the visuals so all components are simillar
 				add_event_listener(self.events.post_step, function(_data) {
 					
-					var _image_index = (is_enabled) ? max(__dropdown__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
+					var _image_index = (__is_enabled__) ? max(__dropdown__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
 					
 					__button__.image_index   = _image_index;
 					__dropdown__.image_index = _image_index;

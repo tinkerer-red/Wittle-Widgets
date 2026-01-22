@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWSlider",
   "parent":{
-    "name":"Finished Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
+    "name":"Sliders",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Sliders.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

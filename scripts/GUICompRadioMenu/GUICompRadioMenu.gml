@@ -1,7 +1,7 @@
 #region jsDoc
 /// @func    GUICompRadioMenu()
 /// @desc    A menu that manages a group of radio buttons, ensuring only one is selected.
-/// @return  {Struct.GUICompRadioMenu}
+/// @returns  {Struct.GUICompRadioMenu}
 #endregion
 function GUICompRadioMenu() : WWCore() constructor {
     debug_name = "GUICompRadioMenu";
@@ -93,7 +93,7 @@ function GUICompRadioMenu() : WWCore() constructor {
 #region jsDoc
 /// @func    GUICompRadioOption()
 /// @desc    A menu that manages a group of radio buttons, ensuring only one is selected.
-/// @return  {Struct.GUICompRadioOption}
+/// @returns  {Struct.GUICompRadioOption}
 #endregion
 function GUICompRadioOption() : WWCore() constructor {
 	debug_name = "GUICompRadioOption";

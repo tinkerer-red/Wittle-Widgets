@@ -71,8 +71,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 		
 		#region Variables
 			
-			halign = fa_left
-			valign = fa_top;
+			__halign__ = fa_left
+			__valign__ = fa_top;
 			callback = _func;
 			
 		#endregion
@@ -98,8 +98,8 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 				.set_text_alignment(fa_left, fa_top)
 				.set_text_offsets(0, 0, 1)
 			
-			__button__.halign = fa_left;
-			__button__.valign = fa_top;
+			__button__.__halign__ = fa_left;
+			__button__.__valign__ = fa_top;
 			
 			var _info = sprite_get_nineslice(__button__.sprite_index);
 			
@@ -151,7 +151,7 @@ function ControlPanelButton(_label="<Missing Label>", _func) : GUICompController
 				
 				//adjust the visuals so all components are simillar
 				add_event_listener(events.pre_step, function(_data) {
-					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
+					var _image_index = (__is_enabled__) ? __button__.image_index : GUI_IMAGE_DISABLED;
 					
 					__button__.image_index   = _image_index;
 					

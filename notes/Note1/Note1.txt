@@ -1,4 +1,4 @@
-Below is an organized list that prioritizes the most essential (core) components first. After that, I’ve listed additional components that are typically implemented as children of other objects or are relatively straightforward to add on later.
+Below is an organized list that prioritizes the most essential (core) components first. After that, I've listed additional components that are typically implemented as children of other objects or are relatively straightforward to add on later.
 
 ---
 

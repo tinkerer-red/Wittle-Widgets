@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"__demo_inspector",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"__demo_inspector",
+  "parent":{
+    "name":"_internal",
+    "path":"folders/Demo/_internal.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

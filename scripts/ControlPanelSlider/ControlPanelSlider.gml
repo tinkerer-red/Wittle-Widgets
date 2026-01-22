@@ -114,8 +114,8 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 		
 		#region Variables
 			
-			halign = fa_left
-			valign = fa_top;
+			__halign__ = fa_left
+			__valign__ = fa_top;
 			callback = _func;
 			is_open = false;
 			
@@ -257,7 +257,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				//adjust the visuals so all components are simillar
 				add_event_listener(self.events.post_step, function(_data) {
 					
-					var _image_index = (is_enabled) ? __button__.image_index : GUI_IMAGE_DISABLED;
+					var _image_index = (__is_enabled__) ? __button__.image_index : GUI_IMAGE_DISABLED;
 					_image_index = max(_image_index, __textbox__.__is_focused__)
 					
 					__button__.image_index   = _image_index;

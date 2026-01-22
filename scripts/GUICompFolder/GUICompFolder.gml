@@ -4,7 +4,7 @@
 /// @self    GUICompFolder
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.GUICompFolder}
+/// @returns {Struct.GUICompFolder}
 #endregion
 function GUICompFolder() : GUICompController() constructor {
 	debug_name = "GUICompFolder";
@@ -68,8 +68,8 @@ function GUICompFolder() : GUICompController() constructor {
 			
 			is_open = true;
 			header_shown = true;
-			halign = fa_left;
-			valign = fa_top;
+			__halign__ = fa_left;
+			__valign__ = fa_top;
 			
 		#endregion
 		
@@ -128,8 +128,8 @@ function GUICompFolder() : GUICompController() constructor {
 				var _i=0; repeat(__children_count__) {
 					_comp = __children__[_i];
 					
-					_xx = __get_controller_archor_x__(_comp.halign);
-					_yy = __get_controller_archor_y__(_comp.valign);
+					_xx = __get_controller_archor_x__(_comp.__halign__);
+					_yy = __get_controller_archor_y__(_comp.__valign__);
 					
 					_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__;
 					_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__;

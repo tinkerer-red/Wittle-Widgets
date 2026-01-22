@@ -82,8 +82,8 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 		
 		#region Variables
 			
-			halign = fa_left
-			valign = fa_top;
+			__halign__ = fa_left
+			__valign__ = fa_top;
 			callback = _func;
 			
 		#endregion
@@ -168,7 +168,7 @@ function ControlPanelCheckbox(_label="<Missing Label>", _func) : GUICompControll
 				//adjust the visuals so all components are simillar
 				add_event_listener(self.events.post_step, function(_data) {
 					
-					var _image_index = (is_enabled) ? max(__checkbox__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
+					var _image_index = (__is_enabled__) ? max(__checkbox__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
 					
 					__button__.image_index   = _image_index;
 					__checkbox__.image_index = _image_index;

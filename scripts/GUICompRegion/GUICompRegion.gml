@@ -401,8 +401,8 @@ function GUICompRegion() : GUICompController() constructor {
 					var _i=0; repeat(__children_count__) {
 						_comp = __children__[_i];
 						
-						_xx = __get_controller_archor_x__(_comp.halign);
-						_yy = __get_controller_archor_y__(_comp.valign);
+						_xx = __get_controller_archor_x__(_comp.__halign__);
+						_yy = __get_controller_archor_y__(_comp.__valign__);
 						
 						_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__ + scroll.x_off;
 						_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__ + scroll.y_off;
@@ -437,11 +437,11 @@ function GUICompRegion() : GUICompController() constructor {
 				//create the children sliders
 				
 				//init both before we start building as they are codependant
-				__scroll_vert__ = new WWScrollBar()
+				__scroll_vert__ = new WWScrollBarHorz()
 					.set_offset(0,0)
 					.set_alignment(fa_right, fa_top)
 					.set_vertical(true)
-				__scroll_horz__ = new WWScrollBar()
+				__scroll_horz__ = new WWScrollBarHorz()
 					.set_offset(0,0)
 					.set_alignment(fa_left, fa_bottom)
 					.set_button_sprites(s9ScrollbarHorzButtonLeft, s9ScrollbarHorzButtonRight)

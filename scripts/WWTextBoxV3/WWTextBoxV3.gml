@@ -32,7 +32,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_size()
 			/// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.  
-			///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
+			///          This updates the region and marks the size as user–preferred so that future internal updates won't override it.
 			/// @self    WWCore
 			/// @param   {Real} left : The left side of the bounding box
 			/// @param   {Real} top : The top side of the bounding box
@@ -545,7 +545,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			    _new_renderer.__set_textbox__(self);
 				_new_renderer.set_offset(0, 0);
 			    _new_renderer.set_size(width, height);
-			    _new_renderer.set_active(is_active);
+			    _new_renderer.set_active(__is_active__);
 			    
 				// Add as child so it receives WW events/draw
 				remove(_old_renderer);
@@ -1185,7 +1185,7 @@ function WWTextBoxV3() : WWCore() constructor {
 		
 		#region Variables
 			
-			is_focusable = true;
+			__is_focusable__ = true;
 			is_read_only = false;
 			enter_submits_text = false;
 			tab_exits_text = false;
@@ -2094,7 +2094,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __history_update_latest_cursor__()
-				/// @desc    Updates the most recent snapshot’s cursor field.
+				/// @desc    Updates the most recent snapshot's cursor field.
 				/// @returns {Undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {

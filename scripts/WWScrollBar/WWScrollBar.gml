@@ -1,61 +1,23 @@
 #region jsDoc
-/// @func    WWScrollbarHorz()
-/// @desc    Creates a horizontal scrollbar using a slider with a thumb.
-/// @returns {Struct.WWScrollbarHorz}
-#endregion
-function WWScrollbarHorz() : WWScrollbarBase() constructor {
-    debug_name = "WWScrollbarHorz";
-
-    // Overrides
-    __get_mouse_pos__      = function() { return device_mouse_x_to_gui(0); };
-    __get_available_size__ = function() { return width - thumb.width; };
-    __get_thumb_pos__      = function() { return x + (width - thumb.width) * normalized_value; };
-    __get_thumb_size__     = function() { return thumb.width; };
-    __get_scroll_origin__  = function() { return x; };
-    __set_thumb_offset__   = function(_pos) { thumb.set_offset(_pos, 0); };
-	__set_thumb_size__ = function(_size) { thumb.set_size(_size, height); };
-}
-#region jsDoc
-/// @func    WWScrollbarVert()
-/// @desc    Creates a vertical scrollbar using a slider with a thumb.
-/// @returns {Struct.WWScrollbarVert}
-#endregion
-function WWScrollbarVert() : WWScrollbarBase() constructor {
-    debug_name = "WWScrollbarVert";
-
-    // Overrides
-    __get_mouse_pos__ = function() { return device_mouse_y_to_gui(0); };
-    __get_available_size__ = function() { return height - thumb.height; };
-    __get_thumb_pos__ = function() { return y + (height - thumb.height) * normalized_value; };
-    __get_thumb_size__ = function() { return thumb.height; };
-    __get_scroll_origin__ = function() { return y; };
-    __set_thumb_offset__ = function(_pos) { thumb.set_offset(0, _pos); };
-	__set_thumb_size__ = function(_size) { thumb.set_size(width, _size); };
-}
-
-#region jsDoc
-/// @func    WWScrollbarBase()
+/// @func    WWScrollbar()
 /// @desc    Base class for horizontal and vertical scrollbars.
-/// @returns {Struct.WWScrollbarBase}
+/// @returns {Struct.WWScrollbar}
 #endregion
-function WWScrollbarBase() : WWSliderBase() constructor {
-    debug_name = "WWScrollbarBase";
+function WWScrollbar() : WWSliderBase() constructor {
+    debug_name = "WWScrollbar";
 	
     #region Public
 
         #region Builder Functions
 
             #region jsDoc
-            /// @func    set_size()
-            /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
-            ///          This updates the region and marks the size as user-preferred so that future internal updates won’t override it.
-            /// @self    WWScrollbarBase
-            /// @param   {Real} left : The left side of the bounding box.
-            /// @param   {Real} top : The top side of the bounding box.
-            /// @param   {Real} right : The right side of the bounding box.
-            /// @param   {Real} bottom : The bottom side of the bounding box.
-            /// @returns {Struct.WWScrollbarBase}
-            #endregion
+			/// @func    set_size()
+			/// @desc    Sets the scrollbar size. Also updates the thumb size unless the thumb was user-sized.
+			/// @self    WWScrollbar
+			/// @param   {Real} _width : Width of the scrollbar.
+			/// @param   {Real} _height : Height of the scrollbar.
+			/// @returns {Struct.WWScrollbar}
+			#endregion
             static set_size = function(_width, _height) {
                 __size_set__ = true;
                 __set_size__(_width, _height);
@@ -68,13 +30,12 @@ function WWScrollbarBase() : WWSliderBase() constructor {
                 return self;
             }
 			#region jsDoc
-            /// @func    set_canvas_size()
-            /// @desc    Sets the total size of the scrollable canvas.
-            ///          This determines how large the thumb should be relative to the visible region, usually for scroll bar support.
-            /// @self    WWScrollbarBase
-            /// @param   {Real} size : The size of the scrollable content.
-            /// @returns {Struct.WWScrollbarBase}
-            #endregion
+			/// @func    set_canvas_size()
+			/// @desc    Sets the total scrollable content size used to compute scroll range and thumb size.
+			/// @self    WWScrollbar
+			/// @param   {Real} _size : Total content size.
+			/// @returns {Struct.WWScrollbar}
+			#endregion
             static set_canvas_size = function(_size) {
                 canvas_size = _size;
                 max_scroll = max(0, canvas_size - coverage_size);
@@ -83,13 +44,12 @@ function WWScrollbarBase() : WWSliderBase() constructor {
                 return self;
             }
             #region jsDoc
-            /// @func    set_coverage_size()
-            /// @desc    Sets the visible portion of the scrollable area.
-            ///          This affects how much movement occurs when clicking the scrollbar background.
-            /// @self    WWScrollbarBase
-            /// @param   {Real} size : The size of the viewport.
-            /// @returns {Struct.WWScrollbarBase}
-            #endregion
+			/// @func    set_coverage_size()
+			/// @desc    Sets the visible coverage size used to compute scroll range, paging, and thumb size.
+			/// @self    WWScrollbar
+			/// @param   {Real} _size : Visible size (viewport size).
+			/// @returns {Struct.WWScrollbar}
+			#endregion
             static set_coverage_size = function(_size) {
                 coverage_size = _size;
                 max_scroll = clamp(canvas_size - coverage_size, 0, canvas_size);
@@ -98,12 +58,12 @@ function WWScrollbarBase() : WWSliderBase() constructor {
                 return self;
             }
             #region jsDoc
-            /// @func    set_smooth_scrolling()
-            /// @desc    Enables or disables smooth scrolling.
-            /// @self    WWScrollbarBase
-            /// @param   {Bool} smooth : If true, scrolling will be animated instead of instant.
-            /// @returns {Struct.WWScrollbarBase}
-            #endregion
+			/// @func    set_smooth_scrolling()
+			/// @desc    Enables or disables smooth scrolling (value changes ease toward a target).
+			/// @self    WWScrollbar
+			/// @param   {Bool} _smooth : True to animate scroll changes.
+			/// @returns {Struct.WWScrollbar}
+			#endregion
             static set_smooth_scrolling = function(_smooth=false) {
                 smooth_scrolling = _smooth;
                 return self;
@@ -178,6 +138,33 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 		#region Functions
 			
 			#region jsDoc
+			/// @func    get_canvas_size()
+			/// @desc    Returns the total scrollable content size.
+			/// @self    WWScrollbar
+			/// @returns {Real} canvas_size
+			#endregion
+			static get_canvas_size = function() {
+				return canvas_size;
+			};
+			#region jsDoc
+			/// @func    get_coverage_size()
+			/// @desc    Returns the visible coverage size.
+			/// @self    WWScrollbar
+			/// @returns {Real} coverage_size
+			#endregion
+			static get_coverage_size = function() {
+				return coverage_size;
+			};
+			#region jsDoc
+			/// @func    get_smooth_scrolling()
+			/// @desc    Returns whether smooth scrolling is enabled.
+			/// @self    WWScrollbar
+			/// @returns {Bool} is_enabled
+			#endregion
+			static get_smooth_scrolling = function() {
+				return smooth_scrolling;
+			};
+			#region jsDoc
 			/// @func    increment_scroll()
 			/// @desc    Increments the scroll bar's value by a ratio of the coverage size, usually the view.
 			/// @self    GUICompScrollBar
@@ -199,9 +186,9 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 			}
 			#region jsDoc
 			/// @func    decrement_scroll()
-			/// @desc    Decrements the scroll bar's value by a ratio of the coverage size, usually the view.
-			/// @self    GUICompScrollBar
-			/// @param   {Real} amount_of_view : The total amount of the view which should be moved, be default this is 0.06 which is a general standard but if you wish to include a faster scroll rate you can increase this value.
+			/// @desc    Moves the scroll backward by a fraction of the coverage size (page step).
+			/// @self    WWScrollbar
+			/// @param   {Real} _amount_of_view : Fraction of coverage size to move (default ~0.0666).
 			/// @returns {Undefined}
 			#endregion
 			static decrement_scroll = function(_amount_of_view = 0.0666) {
@@ -224,7 +211,12 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 
         #region Functions
 			
-			// Dynamically adjust the scrollbar thumb size based on content size
+			#region jsDoc
+			/// @func    __adjust_thumb_size__()
+			/// @desc    Recomputes the thumb size from canvas/coverage ratio and available track size.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
             static __adjust_thumb_size__ = function() {
                 var _ratio = coverage_size / canvas_size;
                 var _thumb_size = __get_available_size__() * _ratio;
@@ -235,20 +227,59 @@ function WWScrollbarBase() : WWSliderBase() constructor {
 			
 			#region Overwrites
 			
-            /// @desc Returns the position of the mouse in the relevant axis.
-            static __get_mouse_pos__ = function() { return 0; }; // Overridden in subclass
-			/// @desc Returns the available space the thumb can move within.
-            static __get_available_size__ = function() { return 0; }; // Overridden in subclass
-            /// @desc Returns the current position of the thumb.
-            static __get_thumb_pos__ = function() { return 0; }; // Overridden in subclass
-            /// @desc Returns the size of the thumb.
-            static __get_thumb_size__ = function() { return 0; }; // Overridden in subclass
-            /// @desc Returns the scroll region’s origin (left for horizontal, top for vertical).
-            static __get_scroll_origin__ = function() { return 0; }; // Overridden in subclass
-            /// @desc Updates the thumb's position.
-            static __set_thumb_offset__ = function(_pos) {}; // Overridden in subclass
-			/// @desc Updates the thumb size appropriately based on the scroll direction.
-			static __set_thumb_size__ = function(_size) {}; // Overridden in subclass
+			#region jsDoc
+			/// @func    __get_mouse_pos__()
+			/// @desc    Returns the mouse position projected onto the scrollbar's primary axis.
+			/// @returns {Real} mouse_position
+			///@ignore
+			#endregion
+			static __get_mouse_pos__ = function() { return 0; };
+			#region jsDoc
+			/// @func    __get_available_size__()
+			/// @desc    Returns the total distance the thumb is allowed to travel along the track.
+			/// @returns {Real} available_size
+			///@ignore
+			#endregion
+			static __get_available_size__ = function() { return 0; };
+			#region jsDoc
+			/// @func    __get_thumb_pos__()
+			/// @desc    Returns the current position of the thumb along the scroll axis.
+			/// @returns {Real} thumb_position
+			///@ignore
+			#endregion
+			static __get_thumb_pos__ = function() { return 0; };
+			#region jsDoc
+			/// @func    __get_thumb_size__()
+			/// @desc    Returns the current size of the thumb along the scroll axis.
+			/// @returns {Real} thumb_size
+			///@ignore
+			#endregion
+			static __get_thumb_size__ = function() { return 0; };
+			#region jsDoc
+			/// @func    __get_scroll_origin__()
+			/// @desc    Returns the origin of the scroll region along the primary axis
+			///          (left for horizontal, top for vertical).
+			/// @returns {Real} scroll_origin
+			///@ignore
+			#endregion
+			static __get_scroll_origin__ = function() { return 0; };
+			#region jsDoc
+			/// @func    __set_thumb_offset__()
+			/// @desc    Sets the thumb position along the scroll axis.
+			/// @param   {Real} _pos : New thumb position.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __set_thumb_offset__ = function(_pos) {};
+			#region jsDoc
+			/// @func    __set_thumb_size__()
+			/// @desc    Sets the thumb size along the scroll axis.
+			/// @param   {Real} _size : New thumb size.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __set_thumb_size__ = function(_size) {};
+
 			
 			#endregion
 			

@@ -1,29 +1,25 @@
 #region jsDoc
 /// @func    WWSprite()
-/// @desc    The bar used inside of sliders
+/// @desc    Basic sprite-drawing component that sizes/offsets itself from the sprite unless overridden.
 /// @returns {Struct.WWSprite}
 #endregion
 function WWSprite() : WWCore() constructor {
-	debug_name = "WWSliderThumb";
+	debug_name = "WWSprite";
 	
 	#region Public
 		
 		#region Builder Functions
 			#region jsDoc
 			/// @func    set_sprite()
-			/// @desc    Sets the sprite for the button. Also, if the user hasn’t explicitly set a size,
-            ///          the size is initialized internally based on the sprite’s dimensions.
-			/// @self    WWButtonSprite
+			/// @desc    Sets the sprite for the button. Also, if the user hasn't explicitly set a size,
+            ///          the size is initialized internally based on the sprite's dimensions.
+			/// @self    WWSprite
 			/// @param   {Asset.GMSprite} sprite : The sprite the component will use.
-			/// @returns {Struct.WWButtonSprite}
+			/// @returns {Struct.WWSprite}
 			#endregion
 			static set_sprite = function(_sprite) {
-				/// NOTE: These are the default structure of GUI button sprites
-				/// image_index[0] = idle; no interaction;
-				/// image_index[1] = mouse over; the mouse is over it;
-				/// image_index[2] = mouse down; actively being pressed;
-				/// image_index[3] = disabled; not allowed to interact with;
 				
+				///super equivalent
 				static __set_sprite = WWCore.set_sprite;
 				__set_sprite(_sprite);
 				
@@ -48,7 +44,7 @@ function WWSprite() : WWCore() constructor {
 				if (self.image_xscale == 0) return;
 				if (self.image_yscale == 0) return;
 				
-				var _image_index = (is_enabled) ? image_index : GUI_IMAGE_DISABLED;
+				var _image_index = (__is_enabled__) ? image_index : GUI_IMAGE_DISABLED;
 				
 				//draw the nineslice
 				if (self.image_alpha == 1)

@@ -1,11 +1,11 @@
 #region jsDoc
-/// @func    WWViewport()
+/// @func    WWView()
 /// @desc    A viewport component that acts as a container for a scrollable canvas.
 ///          This prevents interaction with elements outside the visible region.
-/// @returns {Struct.WWViewport}
+/// @returns {Struct.WWView}
 #endregion
-function WWViewport() : WWCore() constructor {
-	debug_name = "WWViewport";
+function WWView() : WWCore() constructor {
+	debug_name = "WWView";
 	
 	#region Public
 		
@@ -13,10 +13,10 @@ function WWViewport() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func    set_canvas()
-			/// @desc    Assigns a canvas to the viewport, defining the scrollable content.
-			/// @self    WWViewport
-			/// @param   {Struct} _canvas : The canvas object to be displayed inside the viewport.
-			/// @returns {Struct.WWViewport}
+			/// @desc    Assigns the scrollable canvas component displayed inside the viewport.
+			/// @self    WWView
+			/// @param   {Struct.WWCore} _canvas : Canvas component to mount into the viewport.
+			/// @returns {Struct.WWView}
 			#endregion
 			static set_canvas = function(_canvas) {
 				if (canvas) {
@@ -45,7 +45,7 @@ function WWViewport() : WWCore() constructor {
 			#region jsDoc
 			/// @func    on_pre_draw()
 			/// @desc    Applies the scissor clipping region before drawing.
-			/// @self    WWViewport
+			/// @self    WWView
 			/// @returns {Undefined}
 			#endregion
 			on_pre_draw(function() {
@@ -55,7 +55,7 @@ function WWViewport() : WWCore() constructor {
 			#region jsDoc
 			/// @func    on_post_draw()
 			/// @desc    Restores the previous scissor clipping region after drawing.
-			/// @self    WWViewport
+			/// @self    WWView
 			/// @returns {Undefined}
 			#endregion
 			on_post_draw(function() {
@@ -73,9 +73,18 @@ function WWViewport() : WWCore() constructor {
 		#region Functions
 			
 			#region jsDoc
+			/// @func    get_canvas()
+			/// @desc    Returns the currently assigned canvas component.
+			/// @self    WWView
+			/// @returns {Struct.WWCore} canvas_component_or_undefined
+			#endregion
+			static get_canvas = function() {
+				return canvas;
+			};
+			#region jsDoc
 			/// @func    mouse_on_comp()
-			/// @desc    Checks to see if the mouse is currently on the component. Used for optimization when hundreds of components are available.
-			/// @self    WWCore
+			/// @desc    Returns true if the mouse is inside this viewport's bounds.
+			/// @self    WWView
 			/// @returns {Bool}
 			#endregion
 			static mouse_on_comp = function() {
@@ -106,10 +115,9 @@ function WWViewport() : WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    mouse_on_group()
-			/// @desc    This function is internally used to help assist early outing collision checks.
-			/// @self    WWController
+			/// @desc    Returns true if the mouse is inside this viewport's group bounds.
+			/// @self    WWView
 			/// @returns {Bool}
-			/// @ignore
 			#endregion
 			static mouse_on_group = function() {
 				//check if parent even has a mouse over it
@@ -152,10 +160,8 @@ function WWViewport() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    __update_group_region__()
-			/// @desc    This function is internally used to help assist updating the bounding box of controllers. This bounding box is used for many things but primarily used for collision check optimizations.
-			/// @self    WWController
-			/// @param   {Real} index : The index of the component to remove.
-			/// @returns {Struct.WWController}
+			/// @desc    Updates this viewport's cached group bounds used for collision early-outs.
+			/// @returns {Undefined}
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {

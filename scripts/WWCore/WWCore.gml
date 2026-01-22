@@ -14,7 +14,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    set_position()
 			/// @desc    Publicly sets the position of the component, recording the user's preferred position.
-			///          The component’s x and y coordinates are updated relative to the parent controller and its anchor.
+			///          The component's x and y coordinates are updated relative to the parent controller and its anchor.
 			/// @self    WWCore
 			/// @param   {Real} x : The x of the component.
 			/// @param   {Real} y : The y of the component.
@@ -65,8 +65,8 @@ function WWCore() constructor {
 			#endregion
 			static set_alignment = function(_halign=fa_left, _valign=fa_top) {
 				
-				halign = _halign;
-				valign = _valign;
+				__halign__ = _halign;
+				__valign__ = _valign;
 				
 				return self;
 			}
@@ -149,7 +149,7 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_background_color = function(_col) {
-				background_color_set = true;
+				__background_color_set__ = true;
 				background_color = _col;
 				return self;
 			}
@@ -158,6 +158,22 @@ function WWCore() constructor {
 			
 			
 			#region jsDoc
+			/// @func    set_focusable()
+			/// @desc    Sets whether this component can be focused/hovered/interacted with.
+			/// @self    WWCore
+			/// @param   {Bool} _is_focusable : True to allow interaction.
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_focusable = function(_is_focusable) {
+				__is_focusable__ = _is_focusable;
+				if (!__is_focusable__) {
+					set_focus(false);
+					set_hover(false);
+					set_interact(false);
+				}
+				return self;
+			};
+			#region jsDoc
 			/// @func    set_enabled()
 			/// @desc    Enable or Disable the Component, This usually effects how some components are handled in terms of greying out a component.
 			/// @self    WWCore
@@ -165,9 +181,9 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_enabled = function(_is_enabled) {
-				if (is_enabled == _is_enabled) return self;
+				if (__is_enabled__ == _is_enabled) return self;
 				
-				is_enabled = _is_enabled;
+				__is_enabled__ = _is_enabled;
 				
 				// Propagate the state change to children components.
 				if (!__is_empty__) {
@@ -178,7 +194,7 @@ function WWCore() constructor {
 					_i+=1;}//end repeat loop
 				}
 				
-				if (is_enabled) {
+				if (__is_enabled__) {
 					trigger_event(self.events.enabled);
 				}
 				else {
@@ -195,11 +211,11 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_active = function(_is_active) {
-				if (is_active == _is_active) return self;
+				if (__is_active__ == _is_active) return self;
 				
-				is_active = _is_active;
+				__is_active__ = _is_active;
 				
-				if (is_active) {
+				if (__is_active__) {
 					trigger_event(self.events.activated);
 				}
 				else {
@@ -216,10 +232,15 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_debug = function(_debug_enabled) {
-				debug_enabled = _debug_enabled;
+				__debug_enabled__ = _debug_enabled;
 				return self;
 			}
-			
+			#region jsDoc
+			/// @func   set_focus(_is_focused)
+			/// @desc   Sets focus state for this component.
+			/// @param  {Bool} _is_focused
+			/// @returns {Struct.WWCore} self
+			#endregion
 			static set_focus = function(_focus) {
 			    if (_focus && !__is_focused__) {
 					__is_focused__ = true;
@@ -232,6 +253,12 @@ function WWCore() constructor {
 				}
 			    return self;
 			}
+			#region jsDoc
+			/// @func   set_hover(_is_hovered)
+			/// @desc   Sets hover state for this component.
+			/// @param  {Bool} _is_hovered
+			/// @returns {Struct.WWCore} self
+			#endregion
 			static set_hover = function(_hover) {
 			    if (_hover && !__is_hovered__) {
 					__is_hovered__ = true;
@@ -244,6 +271,12 @@ function WWCore() constructor {
 				}
 			    return self;
 			}
+			#region jsDoc
+			/// @func   set_interact(_is_interacting)
+			/// @desc   Sets interaction state for this component.
+			/// @param  {Bool} _is_interacting
+			/// @returns {Struct.WWCore} self
+			#endregion
 			static set_interact = function(_interact) {
 			    if (_interact && !__is_interacting__) {
 					__is_interacting__ = true;
@@ -435,7 +468,7 @@ function WWCore() constructor {
             
             /// @func    navigate_focus()
             /// @desc    Attempts to shift focus in the given _dir ('next', 'prev', 'up', 'down', etc.)
-            ///          This simple algorithm checks the parent’s children list and, if needed, escalates upward.
+            ///          This simple algorithm checks the parent's children list and, if needed, escalates upward.
             /// @param   {String} _dir : The navigation _dir.
             /// @returns {Struct.WWCore} The component that received focus, or self if none found.
             static navigate_focus = function(_dir) {
@@ -452,7 +485,7 @@ function WWCore() constructor {
                 if (_dir == "next" || _dir == "right" || _dir == "down") {
                     var i = currentIndex + 1;
                     while (i < array_length(siblings)) {
-                        if (siblings[i].is_focusable && siblings[i].is_enabled) {
+                        if (siblings[i].__is_focusable__ && siblings[i].__is_enabled__) {
                             target = siblings[i];
                             break;
                         }
@@ -462,7 +495,7 @@ function WWCore() constructor {
                 else if (_dir == "prev" || _dir == "left" || _dir == "up") {
                     var i = currentIndex - 1;
                     while (i >= 0) {
-                        if (siblings[i].is_focusable && siblings[i].is_enabled) {
+                        if (siblings[i].__is_focusable__ && siblings[i].__is_enabled__) {
                             target = siblings[i];
                             break;
                         }
@@ -520,17 +553,6 @@ function WWCore() constructor {
 		
 		#region Variables
 			
-			is_focusable = false; // Mark this component as focusable (set to false if a component should never receive focus)
-			
-			is_enabled = true; //if the component is in a enabled/disabled state, typically if you want to grey out a button
-			is_active  = true; //is the component's code is being executed
-			
-			debug_enabled = false;
-			
-			halign = fa_left;
-			valign = fa_top;
-			
-			background_color_set = false;
 			background_color = c_black;
 			
 			//each component will have it's own events these will always be listed in this region
@@ -584,13 +606,12 @@ function WWCore() constructor {
 			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
 			/// @param   {Struct} data : The data supplied from the struct, dependant on the component.
 			/// @returns {Undefined}
-			/// @ignore
 			#endregion
 			static trigger_event = function(_event_id, _data=undefined) {
 			    static __depth = 0;
 			    static __queue = [];
 				
-			    if (debug_enabled) {
+			    if (__debug_enabled__) {
 			        log("Trigger: " + self.event_name(_event_id), __depth);
 			    }
 				
@@ -724,11 +745,10 @@ function WWCore() constructor {
 				return struct_exists_from_hash(self.__event_listeners__, _event_id)
 			}
 			#region jsDoc
-			/// @func    event_exists()
-			/// @desc    Fetches the event's name from the hash in events, if the event doesnt exist in the object returns undefined
-			/// @self    WWCore
-			/// @param   {Real} event_id : One of the component's event IDs as a hash.
-			/// @returns {String|Undefined}
+			/// @func   event_name(_event_id)
+			/// @desc   Converts an event id into a readable event name string.
+			/// @param  {Real} _event_id
+			/// @returns {String} event_name_string
 			#endregion
 			static event_name = function(_event_id) {
 				var _names = struct_get_names(events);
@@ -745,19 +765,17 @@ function WWCore() constructor {
 			
 			#endregion
 			
-			#region Overlay Functions
-			
-			static add_overlay = function(_id, _component, _depth) {
-				
-			}
-			static remove_overlay = function(_id) {
-				
-			}
-			
-			#endregion
-			
 			#region Getter Functions
 			
+			#region jsDoc
+			/// @func    get_focusable()
+			/// @desc    Returns whether this component can be focused/hovered/interacted with.
+			/// @self    WWCore
+			/// @returns {Bool} is_focusable
+			#endregion
+			static get_focusable = function() {
+				return __is_focusable__;
+			};
 			#region jsDoc
 			/// @func    get_functions()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's functions. Useful for learning what available public functions you have access to.
@@ -833,7 +851,118 @@ function WWCore() constructor {
 			static get_children = function() {
 				return __children__
 			}
-			
+			#region jsDoc
+			/// @func   get_position()
+			/// @desc   Returns the current position of this component.
+			/// @returns {Struct} position_struct_with_x_y
+			#endregion
+			static get_position = function() {
+				return { x: x, y: y };
+			};
+			#region jsDoc
+			/// @func   get_size()
+			/// @desc   Returns the current size of this component.
+			/// @returns {Struct} size_struct_with_width_height
+			#endregion
+			static get_size = function() {
+				return { width: width, height: height };
+			};
+			#region jsDoc
+			/// @func   get_offset()
+			/// @desc   Returns the current draw offset for this component.
+			/// @returns {Struct} offset_struct_with_x_y
+			#endregion
+			static get_offset = function() {
+				return { x: offset_x, y: offset_y };
+			};
+			#region jsDoc
+			/// @func   get_alignment()
+			/// @desc   Returns the current horizontal and vertical alignment.
+			/// @returns {Struct} alignment_struct_with_halign_valign
+			#endregion
+			static get_alignment = function() {
+				return { halign: halign, valign: valign };
+			};
+			#region jsDoc
+			/// @func   get_width()
+			/// @desc   Returns the current width of this component.
+			/// @returns {Real} width_value
+			#endregion
+			static get_width = function() {
+				return width;
+			};
+			#region jsDoc
+			/// @func   get_height()
+			/// @desc   Returns the current height of this component.
+			/// @returns {Real} height_value
+			#endregion
+			static get_height = function() {
+				return height;
+			};
+			#region jsDoc
+			/// @func   get_sprite()
+			/// @desc   Returns the current sprite assigned to this component.
+			/// @returns {Asset.GMSprite} sprite_asset
+			#endregion
+			static get_sprite = function() {
+				return sprite;
+			};
+			#region jsDoc
+			/// @func   get_sprite_angle()
+			/// @desc   Returns the current sprite rotation angle.
+			/// @returns {Real} angle_degrees
+			#endregion
+			static get_sprite_angle = function() {
+				return sprite_angle;
+			};
+			#region jsDoc
+			/// @func   get_sprite_color()
+			/// @desc   Returns the current sprite color multiplier.
+			/// @returns {Real} color_value
+			#endregion
+			static get_sprite_color = function() {
+				return sprite_color;
+			};
+			#region jsDoc
+			/// @func   get_sprite_alpha()
+			/// @desc   Returns the current sprite alpha multiplier.
+			/// @returns {Real} alpha_value
+			#endregion
+			static get_sprite_alpha = function() {
+				return sprite_alpha;
+			};
+			#region jsDoc
+			/// @func   get_background_color()
+			/// @desc   Returns the current background color and whether it is set.
+			/// @returns {Real} background_color
+			#endregion
+			static get_background_color = function() {
+				return background_color;
+			};
+			#region jsDoc
+			/// @func   get_enabled()
+			/// @desc   Returns whether this component is enabled.
+			/// @returns {Bool} is_enabled
+			#endregion
+			static get_enabled = function() {
+				return is_enabled;
+			};
+			#region jsDoc
+			/// @func   get_active()
+			/// @desc   Returns whether this component is active.
+			/// @returns {Bool} is_active
+			#endregion
+			static get_active = function() {
+				return is_active;
+			};
+			#region jsDoc
+			/// @func   get_debug()
+			/// @desc   Returns whether debug drawing is enabled for this component.
+			/// @returns {Bool} is_debug_enabled
+			#endregion
+			static get_debug = function() {
+				return debug_enabled;
+			};
 			#endregion
 			
 			#region Input Functions
@@ -868,7 +997,6 @@ function WWCore() constructor {
 			/// @desc    This function is internally used to help assist early outing collision checks.
 			/// @self    WWCore
 			/// @returns {Bool}
-			/// @ignore
 			#endregion
 			static mouse_on_group = function() {
 				//check if parent even has a mouse over it
@@ -929,8 +1057,14 @@ function WWCore() constructor {
 				__update_group_region__();
 				
 			}
+			#region jsDoc
+			/// @func   add_inline(_inline_component)
+			/// @desc   Adds a component as an inline child of this component.
+			/// @param  {Struct.WWCore} _inline_component
+			/// @returns {Struct.WWCore} self
+			#endregion
 			static add_inline = function(componentsArray, horizontalSpacing=0, verticalSpacing=0, scaleInline=true) {
-			    var lines = [];
+				var lines = [];
 			    var currentLine = [];
 			    for (var i = 0; i < array_length(componentsArray); i++) {
 			        var comp = componentsArray[i];
@@ -1081,8 +1215,8 @@ function WWCore() constructor {
 					var _i=0; repeat(__children_count__) {
 						var _comp = __children__[_i];
 						
-						var _xx = __get_controller_archor_x__(_comp.halign);
-						var _yy = __get_controller_archor_y__(_comp.valign);
+						var _xx = __get_controller_archor_x__(_comp.__halign__);
+						var _yy = __get_controller_archor_y__(_comp.__valign__);
 						
 						_comp.x = self.x + _xx + _comp.x_offset;
 						_comp.y = self.y + _yy + _comp.y_offset;
@@ -1123,7 +1257,7 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static step = function(_input=undefined) {
-				if (!is_active) return;
+				if (!__is_active__) return;
 				
 				_input ??= {
 					consumed : false,
@@ -1150,7 +1284,7 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static draw = function(_input=undefined, _debug=false) {
-				if (!is_active) return;
+				if (!__is_active__) return;
 				
 				_input ??= {
 					consumed : false,
@@ -1158,8 +1292,10 @@ function WWCore() constructor {
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group();
 				
-				//if is_focusable
-				if (background_color_set) {
+				
+				
+				//if __is_focusable__
+				if (__background_color_set__) {
 					draw_sprite_stretched_ext(
 						spr_ww_pixel,
 						0,
@@ -1172,7 +1308,7 @@ function WWCore() constructor {
 					);
 				}
 				
-				//if is_focusable
+				//if __is_focusable__
 				trigger_event(self.events.pre_draw, _input);
 				
 				//run the children
@@ -1182,7 +1318,7 @@ function WWCore() constructor {
 					_comp.draw(_input, _debug);
 				_i+=1;}//end repeat loop
 				
-				if (_debug || debug_enabled) {
+				if (_debug || __debug_enabled__) {
 					draw_set_alpha(0.2)
 					#region Comp Region
 					draw_set_color(c_red)
@@ -1266,6 +1402,16 @@ function WWCore() constructor {
 			__comp_id__ = __GLOBAL_ID__++; // used to make sure we dont re add the same component to a controller
 			__previous_scissor__ = undefined;
 			
+			__is_focusable__ = false; // Mark this component as focusable (set to false if a component should never receive focus)
+			
+			__is_enabled__ = true; //if the component is in a enabled/disabled state, typically if you want to grey out a button
+			__is_active__  = true; //is the component's code is being executed
+			
+			__debug_enabled__ = false;
+			
+			__halign__ = fa_left;
+			__valign__ = fa_top;
+			
 			#region Event Variables
 			__event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
 			__event_listener_uid__ = 0; // a unique identifier for event listeners
@@ -1296,6 +1442,7 @@ function WWCore() constructor {
 			__position_set__ = false;
 			__offset_set__   = false;
 			__size_set__     = false;
+			__background_color_set__ = false;
 			#endregion
 			
 		#endregion
@@ -1303,7 +1450,7 @@ function WWCore() constructor {
 		#region Functions
 			#region Input Priv Functions
 			on_post_step(function(){
-				if (!is_enabled) {
+				if (!__is_enabled__) {
 					return;
 				}
 				
@@ -1328,7 +1475,7 @@ function WWCore() constructor {
 				if (__is_interacting__) trigger_event(self.events.interact);
 			})
 			on_mouse_over(function(){
-				if (!is_enabled) {
+				if (!__is_enabled__) {
 					return;
 				}
 				
@@ -1339,7 +1486,7 @@ function WWCore() constructor {
 				set_hover(false);
 			})
 			on_hover(function(){
-				if (!is_enabled || !is_focusable) {
+				if (!__is_enabled__ || !__is_focusable__) {
 					return;
 				}
 				
@@ -1378,7 +1525,7 @@ function WWCore() constructor {
 				__last_click_was_double__ = false;
 			})
 			on_interact_enter(function(){
-				if (!is_enabled || !is_focusable) {
+				if (!__is_enabled__ || !__is_focusable__) {
 					return;
 				}
 				
@@ -1538,6 +1685,13 @@ function WWCore() constructor {
 		
 				return _i;
 			}
+			#region jsDoc
+			/// @func    __adopt_children_events__()
+			/// @desc    Adopts all child component events into this component, wiring their events
+			///          to re-dispatch through this component.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
 			static __adopt_children_events__ = function() {
 				for (var _i=0; _i<array_length(__children__); _i++) {
 					var _child = __children__[_i];
@@ -1545,6 +1699,14 @@ function WWCore() constructor {
 				}
 				
 			}
+			#region jsDoc
+			/// @func    __adopt_child_events__()
+			/// @desc    Wires a child component's events so they bubble through this component,
+			///          and dynamically exposes on_<event>() helper functions for chaining.
+			/// @param   {Struct.WWCore} _comp : Child component whose events are adopted.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
 			static __adopt_child_events__ = function(_comp) {
 				var _self = self;
 				var _events = _comp.get_events();
@@ -1599,7 +1761,6 @@ function WWCore() constructor {
 				
 				gpu_set_scissor(_new_x, _new_y, _new_w, _new_h);
 			};
-
 			#region jsDoc
 			/// @func    __restore_clipping_region__()
 			/// @desc    Restores the previous GPU scissor region after drawing.
@@ -1649,7 +1810,6 @@ function WWCore() constructor {
 				
 				return self;
 			}
-			
 			#region jsDoc
 			/// @func    __set_size__()
 			/// @desc    Sets the user-preferred size (width/height) and updates regions; note: some components will have a minimum size override.
@@ -1692,7 +1852,7 @@ function WWCore() constructor {
 				
 				update_component_positions();
 				
-				// If this component is a child, trigger an update on the parent’s group size.
+				// If this component is a child, trigger an update on the parent's group size.
 			    if (__is_child__) {
 			        __parent__.__update_group_region__();
 			    }
@@ -1729,6 +1889,48 @@ function WWCore() constructor {
 				
 			    return self;
 			};
+			#region jsDoc
+			/// @func    __get_controller_archor_x__()
+			/// @desc    Get's the anchor's desired location from the controller region.
+			/// @self    WWCore
+			/// @param   {Constant.HAlign} halign : Horizontal alignment.
+			/// @returns {Real}
+			#endregion
+			static __get_controller_archor_x__ = function(_halign=fa_center) {
+				switch (_halign) {
+					default:
+					case fa_left:{
+						 return 0;
+					}
+					case fa_center:{
+						 return floor(width/2 + 0.5);
+					}
+					case fa_right:{
+						 return width;
+					}
+				}
+			}
+			#region jsDoc
+			/// @func    __get_controller_archor_y__()
+			/// @desc    Get's the anchor's desired location from the controller region.
+			/// @self    WWCore
+			/// @param   {Constant.VAlign} valign : Vertical alignment.
+			/// @returns {Real}
+			#endregion
+			static __get_controller_archor_y__= function(_valign=fa_middle) {
+				switch (_valign) {
+					default:
+					case fa_top:{
+						 return 0;
+					}
+					case fa_middle:{
+						 return floor(height/2 + 0.5);
+					}
+					case fa_bottom:{
+						 return height;
+					}
+				}
+			}
 
 			#endregion
 		#endregion
@@ -1737,6 +1939,7 @@ function WWCore() constructor {
 	
 }
 
-
-
-
+//before anything else initialize core to prevent a GM bug
+//	https://github.com/YoYoGames/GameMaker-Bugs/issues/13747
+//	https://github.com/YoYoGames/GameMaker-Bugs/issues/13663
+var _last_resort = new WWCore();

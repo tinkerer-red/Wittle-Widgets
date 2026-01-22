@@ -4,9 +4,9 @@
 /// @self    WWLabelScrolling
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.WWLabelScrolling}
+/// @returns {Struct.WWLabelScrolling}
 #endregion
-function WWLabelScrolling() : WWScrollingCanvas() constructor {
+function WWLabelScrolling() : WWViewScrollAuto() constructor {
 	debug_name = "WWLabelScrolling"
 	
 	#region Public

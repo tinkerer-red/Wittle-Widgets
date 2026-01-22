@@ -25,6 +25,11 @@
 #macro WW_Scribble_Jr_Exists     __WWConstants.Scribble_Jr_Exists
 #macro WW_Emobble_Exists         __WWConstants.Emobble_Exists
 
+#macro GUI_IMAGE_ENABLED 0
+#macro GUI_IMAGE_HOVER 1
+#macro GUI_IMAGE_PRESSED 2
+#macro GUI_IMAGE_DISABLED 3
+
 function __WWConstants(){
 	static Scribble_Deluxe_Exists = false;
 	try {

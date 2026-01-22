@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWButtonTextScribble",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWButtonTextScribble",
+  "parent":{
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

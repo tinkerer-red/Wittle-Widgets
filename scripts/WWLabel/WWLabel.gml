@@ -1,8 +1,8 @@
-/*
+
 #region jsDoc
 /// @func    WWLabel()
 /// @desc    A basic text rendering component with support for alignment, colors, and multi-line text.
-/// @return  {Struct.WWLabel}
+/// @returns  {Struct.WWLabel}
 #endregion
 function WWLabel() : WWCore() constructor {
     debug_name = "WWLabel";
@@ -106,7 +106,7 @@ function WWLabel() : WWCore() constructor {
 #region jsDoc
 /// @func    WWLabelScribble()
 /// @desc    A basic text rendering component with support for alignment, colors, and multi-line text.
-/// @return  {Struct.WWLabelScribble}
+/// @returns  {Struct.WWLabelScribble}
 #endregion
 function WWLabelScribble() : WWCore() constructor {
     debug_name = "WWLabelScribble";
@@ -180,14 +180,14 @@ function WWLabelScribble() : WWCore() constructor {
 	#endregion
 }
 
-
+/*
 #region jsDoc
 /// @func    WWLabelRenderer()
 /// @desc    Lightweight, size-dynamic label built on top of WWTextRendererBase.
 ///          Internally it is the same renderer pipeline, but:
 ///          - exposes only basic configuration
 ///          - automatically updates its own size when rendered content changes
-/// @return  {Struct.WWLabelRenderer}
+/// @returns  {Struct.WWLabelRenderer}
 #endregion
 function WWLabel() : WWTextRendererBase() constructor {
 
@@ -196,7 +196,9 @@ function WWLabel() : WWTextRendererBase() constructor {
     #region Public
 
         #region Builder
-
+			
+			static set_color = set_text_color;
+			
             #region jsDoc
             /// @func   set_text()
             /// @desc   Sets caption text. Label auto-sizes to content.
@@ -257,7 +259,8 @@ function WWLabel() : WWTextRendererBase() constructor {
                 __label_update_size__();
                 return self;
             };
-
+			
+			
         #endregion
 
         #region Events

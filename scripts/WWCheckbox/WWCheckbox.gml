@@ -1,11 +1,9 @@
 #region jsDoc
 /// @func    WWCheckbox()
-/// @desc    Creates a Checkbox Component
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
+/// @desc    Sprite checkbox that toggles between checked and unchecked states.
 /// @returns {Struct.WWCheckbox}
 #endregion
-function WWCheckbox() : WWButton() constructor {
+function WWCheckbox() : WWButtonSprite() constructor {
 	debug_name = "WWCheckbox";
 	
 	#region Public
@@ -14,10 +12,10 @@ function WWCheckbox() : WWButton() constructor {
 			
 			#region jsDoc
 			/// @func    set_checkbox_sprites()
-			/// @desc    Sets the sprites which will be used for the checkbox's checked and unchecked states
+			/// @desc    Sets the sprites used for the checked and unchecked states.
 			/// @self    WWCheckbox
-			/// @param   {Asset.GMSprite} checked_sprite : The sprite used to draw the check box when checked
-			/// @param   {Asset.GMSprite} unchecked_sprite : The sprite used to draw the check box when unchecked
+			/// @param   {Asset.GMSprite} checked_sprite : Sprite used when checked.
+			/// @param   {Asset.GMSprite} unchecked_sprite : Sprite used when unchecked.
 			/// @returns {Struct.WWCheckbox}
 			#endregion
 			static set_checkbox_sprites = function(_checked_sprite=s9CheckBoxChecked, _unchecked_sprite=s9CheckBoxUnchecked) {
@@ -35,11 +33,12 @@ function WWCheckbox() : WWButton() constructor {
 				
 				return self;
 			}
+			
 			#region jsDoc
 			/// @func    set_value()
-			/// @desc    Sets the checkbox to checked or unchecked
+			/// @desc    Sets whether the checkbox is checked.
 			/// @self    WWCheckbox
-			/// @param   {Bool} is_checked : If the checkbox should be changed to checked.
+			/// @param   {Bool} is_checked : True to check, false to uncheck.
 			/// @returns {Struct.WWCheckbox}
 			#endregion
 			static set_value = function(_is_checked) {
@@ -50,14 +49,34 @@ function WWCheckbox() : WWButton() constructor {
 				
 				return self;
 			}
+			
+			#region jsDoc
+			/// @func    set_checked()
+			/// @desc    Sets whether the checkbox is checked.
+			/// @self    WWCheckbox
+			/// @param   {Bool} is_checked : True to check, false to uncheck.
+			/// @returns {Struct.WWCheckbox}
+			#endregion
 			static set_checked = set_value;
+			
+			#region jsDoc
+			/// @func    set_callback()
+			/// @desc    Sets the callback invoked when the checkbox is released (after toggle).
+			/// @self    WWCheckbox
+			/// @param   {Function} _callback : Function called with (is_checked).
+			/// @returns {Struct.WWCheckbox}
+			#endregion
 			static set_callback = function(_callback) {
+				__callback__ = _callback;
+
 				var _self = self;
-				on_released(method({this: _self, callback: _callback}, function(){
+				on_released(method({this: _self, callback: _callback}, function() {
 					callback(this.is_checked);
 				}));
+
 				return self;
-			}
+			};
+
 		#endregion
 		
 		#region Events
@@ -95,6 +114,35 @@ function WWCheckbox() : WWButton() constructor {
 				return is_checked;
 			}
 			
+			#region jsDoc
+			/// @func    get_checkbox_sprites()
+			/// @desc    Returns the sprites used for the checked and unchecked states.
+			/// @self    WWCheckbox
+			/// @returns {Struct} sprites_struct_with_checked_unchecked
+			#endregion
+			static get_checkbox_sprites = function() {
+				return {
+					checked: sprite_checked,
+					unchecked: sprite_unchecked,
+				};
+			};
+
+			#region jsDoc
+			/// @func    get_callback()
+			/// @desc    Returns the current release callback.
+			/// @self    WWCheckbox
+			/// @returns {Function} callback_or_undefined
+			#endregion
+			static get_callback = function() {
+				return __callback__;
+			};
+			
+			#region jsDoc
+			/// @func    toggle()
+			/// @desc    Toggles the checkbox between checked and unchecked.
+			/// @self    WWCheckbox
+			/// @returns {Struct.WWCheckbox}
+			#endregion
 			static toggle = function() {
 				return set_value(!is_checked);
 			};
@@ -106,6 +154,8 @@ function WWCheckbox() : WWButton() constructor {
 	#region Private
 		
 		#region Variables
+			
+			__callback__ = undefined;
 			
 		#endregion
 		

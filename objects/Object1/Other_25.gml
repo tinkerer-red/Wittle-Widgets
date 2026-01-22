@@ -1,4 +1,4 @@
-Dbuild_ui_discord = function(){
+build_ui_discord = function(){
 	// 🌟 Root GUI (Discord Window)
 	root = new WWCore()
 	    .set_offset(0, 0)
@@ -1002,26 +1002,26 @@ End of demo.
 			_left_setup_fn,
 			_right_setup_fn
 		) {
-			var _root = root_ref;
+			var root = root_ref;
 
 			var _card_back = new WWCore()
 			    .set_offset(_panel_x - card_pad, _panel_y - card_pad)
 			    .set_size(card_width, card_height)
 			    .set_background_color(card_bg);
-			_root.add(_card_back);
+			root.add(_card_back);
 
 			var _card_hdr_back = new WWCore()
 			    .set_offset(_panel_x - card_pad, _panel_y - card_pad)
 			    .set_size(card_width, header_height)
 			    .set_background_color(card_hdr);
-			_root.add(_card_hdr_back);
+			root.add(_card_hdr_back);
 
 			var _caption_label = new WWLabel()
 			    .set_offset(_panel_x - card_pad + 10, _panel_y - card_pad + 5)
 			    .set_size(card_width - 20, header_height)
 			    .set_text(_title_text)
 			    .set_text_color(caption_color);
-			_root.add(_caption_label);
+			root.add(_caption_label);
 
 			var _left_x = _panel_x - card_pad + text_xoff;
 			var _left_y = _panel_y - card_pad + text_yoff;
@@ -1049,7 +1049,7 @@ End of demo.
 			    .set_cursor_color(c_white)
 			    .set_wrap_enabled(true);
 			
-			//_textbox_right.is_focusable = false;
+			//_textbox_right.__is_focusable__ = false;
 			
 			if (is_callable(_left_setup_fn)) {
 				_left_setup_fn(_textbox_left);
@@ -1063,8 +1063,8 @@ End of demo.
 				right_ref.set_text(left_ref.get_text());
 			}));
 			
-			_root.add(_textbox_left);
-			_root.add(_textbox_right);
+			root.add(_textbox_left);
+			root.add(_textbox_right);
 
 			var _checkbox_size = 18;
 
@@ -1084,8 +1084,8 @@ End of demo.
 			    	textbox_ref.set_active(_is_checked);
 			    }));
 
-			_root.add(_checkbox_left);
-			_root.add(_checkbox_right);
+			root.add(_checkbox_left);
+			root.add(_checkbox_right);
 			
 			return {
 				text_left: _textbox_left,
@@ -1228,3 +1228,245 @@ End of demo.
 
 	#endregion
 };
+
+build_ui_folder_demo = function() {
+	ww_demo_folder_item_callback = function() {
+		var _button = self;
+
+		if (!variable_struct_exists(_button, "__demo_folder_context__")) { exit; }
+		if (!variable_struct_exists(_button, "__demo_folder_label__")) { exit; }
+
+		var _context = _button.__demo_folder_context__;
+		var _label_text = _button.__demo_folder_label__;
+
+		if (is_struct(_context) && variable_struct_exists(_context, "title_label")) {
+			_context.title_label.set_text("Selected: " + _label_text);
+		}
+	};
+	ww_demo_folder_make_item_button = function(_context, _label_text, _width_value, _height_value, _color_text, _color_panel) {
+		var _button = new WWButtonText()
+			.set_size(_width_value, _height_value)
+			.set_text(_label_text)
+			.set_text_color(_color_text)
+			.set_background_color(_color_panel)
+			.set_text_font(fnt_ww_consolas_msdf);
+
+		// No closures: store context + label on the instance.
+		_button.__demo_folder_context__ = _context;
+		_button.__demo_folder_label__ = _label_text;
+
+		// Shared callback reads from self.
+		_button.set_callback(ww_demo_folder_item_callback);
+
+		return _button;
+	};
+
+	// ============================================================
+	// ROOT
+	// ============================================================
+	root = new WWCore()
+		.set_offset(0, 0)
+		.set_size(1280, 720)
+		.set_background_color(c_black)
+		.set_enabled(true);
+
+	// ============================================================
+	// THEME
+	// ============================================================
+	var _color_page = make_color_rgb(16, 16, 18);
+	var _color_panel = make_color_rgb(32, 32, 36);
+	var _color_panel_alt = make_color_rgb(40, 40, 46);
+	var _color_header = make_color_rgb(26, 26, 30);
+	var _color_text = make_color_rgb(230, 230, 235);
+	var _color_text_dim = make_color_rgb(170, 170, 180);
+
+	// Page backdrop
+	var _page_backdrop = new WWCore()
+		.set_offset(10, 10)
+		.set_size(1260, 700)
+		.set_background_color(_color_page);
+	root.add(_page_backdrop);
+
+	// ============================================================
+	// LEFT NAV PANEL (FOLDER TREE)
+	// ============================================================
+	var _nav_panel = new WWCore()
+		.set_offset(20, 20)
+		.set_size(360, 680)
+		.set_background_color(_color_panel);
+	root.add(_nav_panel);
+
+	var _nav_header = new WWCore()
+		.set_offset(20, 20)
+		.set_size(360, 44)
+		.set_background_color(_color_header);
+	root.add(_nav_header);
+
+	var _nav_title = new WWLabel()
+		.set_offset(34, 32)
+		.set_size(332, 24)
+		.set_text("Navigation")
+		.set_text_color(_color_text);
+	root.add(_nav_title);
+
+	// This is the container that holds the folder tree
+	var _tree_container = new WWFolder()
+		.set_offset(20, 64)
+		.set_size(0, 0)
+		.set_background_color(_color_panel_alt);
+	_nav_panel.add(_tree_container);
+
+	// ============================================================
+	// RIGHT CONTENT PANEL
+	// ============================================================
+	var _content_panel = new WWCore()
+		.set_offset(400, 20)
+		.set_size(860, 680)
+		.set_background_color(_color_panel);
+	root.add(_content_panel);
+
+	var _content_header = new WWCore()
+		.set_offset(400, 20)
+		.set_size(860, 44)
+		.set_background_color(_color_header);
+	root.add(_content_header);
+
+	var _content_title = new WWLabel()
+		.set_offset(414, 32)
+		.set_size(832, 24)
+		.set_text("Selected: (none)")
+		.set_text_color(_color_text);
+	root.add(_content_title);
+
+	var _content_hint = new WWLabel()
+		.set_offset(414, 62)
+		.set_size(832, 18)
+		.set_text("Click items in the folder tree to update the selection.")
+		.set_text_color(_color_text_dim);
+	root.add(_content_hint);
+
+	// A simple "log" panel area (just a visual block for now)
+	var _log_panel = new WWCore()
+		.set_offset(414, 92)
+		.set_size(832, 590)
+		.set_background_color(_color_panel_alt);
+	root.add(_log_panel);
+
+	var _log_header = new WWLabel()
+		.set_offset(426, 104)
+		.set_size(800, 18)
+		.set_text("Content area placeholder")
+		.set_text_color(_color_text_dim);
+	root.add(_log_header);
+
+	// ============================================================
+	// CONTEXT (NO CAPTURED LOCALS)
+	// ============================================================
+	var _selection_context = {
+		title_label: _content_title
+	};
+
+	// ============================================================
+	// BUILD TREE USING WWFolder
+	// ============================================================
+	var _folder_basic = new WWFolder()
+		.set_offset(10, 10)
+				.set_size(340, 0)
+		.set_text("Basic")
+		.set_children_offsets(18, 4)
+		.set_open(true);
+
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Bullets", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Collapsing Headers", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Combo", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Color and Picker Widgets", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Data Types", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Disable Blocks", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Drag and Drop", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Drag and Slider Flags", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Fonts", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Images", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "List Boxes", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Multi-component Widgets", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Plotting", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Progress Bars", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Querying Item Status", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Querying Window Status", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Selectables", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Selection State and Multi-Select", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Tabs", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Text", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Text Filter", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Text Input", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Tooltips", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Tree Nodes", 320, 26, _color_text, _color_panel));
+	_folder_basic.add(ww_demo_folder_make_item_button(_selection_context, "Vertical Sliders", 320, 26, _color_text, _color_panel));
+
+	// ------------------------------------------------------------
+	// Folder: Layout and Scrolling
+	// ------------------------------------------------------------
+	var _folder_layout = new WWFolder()
+		.set_offset(10, 10)
+		.set_size(340, 0)
+		.set_text("Layout and Scrolling")
+		.set_children_offsets(18, 4)
+		.set_open(false);
+
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Child windows", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Widgets Width", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Basic Horizontal Layout", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Groups", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Text Baseline Alignment", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Scrolling", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Text Clipping", 320, 26, _color_text, _color_panel));
+	_folder_layout.add(ww_demo_folder_make_item_button(_selection_context, "Overlap Mode", 320, 26, _color_text, _color_panel));
+
+	// ------------------------------------------------------------
+	// Folder: Popups and Modal Windows
+	// ------------------------------------------------------------
+	var _folder_popups = new WWFolder()
+		.set_offset(10, 10)
+		.set_size(340, 0)
+		.set_text("Popups and Modal Windows")
+		.set_children_offsets(18, 4)
+		.set_open(false);
+
+	_folder_popups.add(ww_demo_folder_make_item_button(_selection_context, "Popups", 320, 26, _color_text, _color_panel));
+	_folder_popups.add(ww_demo_folder_make_item_button(_selection_context, "Context Menus", 320, 26, _color_text, _color_panel));
+	_folder_popups.add(ww_demo_folder_make_item_button(_selection_context, "Modals", 320, 26, _color_text, _color_panel));
+	_folder_popups.add(ww_demo_folder_make_item_button(_selection_context, "Menus inside a regular window", 320, 26, _color_text, _color_panel));
+
+	// ============================================================
+	// STACK ROOT FOLDERS (EXPLICIT, NO STACK CONTROLLER)
+	// ============================================================
+	_tree_container.add(_folder_basic);
+	_tree_container.add(_folder_layout);
+	_tree_container.add(_folder_popups);
+
+	var _stack_y = 10;
+	var _stack_gap = 8;
+
+	_folder_basic.set_offset(10, _stack_y);
+	_folder_basic.update_component_positions();
+	_folder_basic.__update_group_region__();
+	_stack_y += _folder_basic.__group__.height + _stack_gap;
+
+	_folder_layout.set_offset(10, _stack_y);
+	_folder_layout.update_component_positions();
+	_folder_layout.__update_group_region__();
+	_stack_y += _folder_layout.__group__.height + _stack_gap;
+
+	_folder_popups.set_offset(10, _stack_y);
+	_folder_popups.update_component_positions();
+	_folder_popups.__update_group_region__();
+	_stack_y += _folder_popups.__group__.height + _stack_gap;
+
+	// ============================================================
+	// FINALIZE
+	// ============================================================
+	root.update_component_positions();
+	root.__update_group_region__();
+};
+
+
+

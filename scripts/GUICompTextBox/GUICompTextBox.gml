@@ -3,7 +3,7 @@
 /// @desc    Creates a text input component
 /// @param   {Real} x : The x position of the component on screen.
 /// @param   {Real} y : The y position of the component on screen.
-/// @return {Struct.GUICompTextbox}
+/// @returns {Struct.GUICompTextbox}
 #endregion
 function GUICompTextbox() : GUICompRegion() constructor {
 	debug_name = "GUICompTextbox";
@@ -225,7 +225,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 			
 			draw_set_font(fnt_ww_default_small)
 			
-			is_focusable = true; // Mark this component as focusable (set to false if a component should never receive focus)
+			__is_focusable__ = true; // Mark this component as focusable (set to false if a component should never receive focus)
 			
 			owner = other;
 			
@@ -1463,7 +1463,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 						
 							if (__is_on_focus__)
 							&& (draw.display_cursor > 0)
-							&& (is_enabled) {
+							&& (__is_enabled__) {
 								var _cursor_xoff = (__using_cached_drawing__) ? -x : 0
 								var _cursor_yoff = (__using_cached_drawing__) ? -y : 0
 								var _y_offset = -(_center_y+_center_y);

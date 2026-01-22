@@ -4,7 +4,7 @@
 /// @self    GUICompControllerStacked
 /// @param   {Real} x : The x possition of the component on screen.
 /// @param   {Real} y : The y possition of the component on screen.
-/// @return {Struct.GUICompControllerStacked}
+/// @returns {Struct.GUICompControllerStacked}
 #endregion
 function GUICompControllerStacked() : GUICompController() constructor {
 	debug_name = "GUICompControllerStacked";
@@ -44,8 +44,8 @@ function GUICompControllerStacked() : GUICompController() constructor {
 		
 		#region Variables
 			
-			halign = fa_left;
-			valign = fa_top;
+			__halign__ = fa_left;
+			__valign__ = fa_top;
 			
 		#endregion
 		

@@ -13,7 +13,7 @@ function WWWindow() : WWCore() constructor {
             #region jsDoc
             /// @func    set_size()
             /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
-            ///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
+            ///          This updates the region and marks the size as user–preferred so that future internal updates won't override it.
             /// @self    WWCore
             /// @param   {Real} width : The new width.
             /// @param   {Real} height : The new height.

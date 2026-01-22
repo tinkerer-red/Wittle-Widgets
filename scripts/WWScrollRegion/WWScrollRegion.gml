@@ -1,136 +1,306 @@
 #region jsDoc
 /// @func    WWScrollRegion()
-/// @desc    A scrollable region that contains a larger canvas of content.
+/// @desc    Scrollable view wrapper that owns a scroll view and its two scrollbars.
 /// @returns {Struct.WWScrollRegion}
 #endregion
 function WWScrollRegion() : WWCore() constructor {
-    debug_name = "WWScrollRegion";
-	
+	debug_name = "WWScrollRegion";
+
 	#region Public
-		
+
 		#region Builder Functions
-			
+
+			#region jsDoc
+			/// @func    set_scrollbar_thickness()
+			/// @desc    Sets the thickness (pixels) of both scrollbars.
+			/// @self    WWScrollRegion
+			/// @param   {Real} _thickness : Scrollbar thickness in pixels.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_scrollbar_thickness = function(_thickness) {
+				scrollbar_thickness = _thickness;
+				__layout_children__();
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_wheel_step()
+			/// @desc    Sets the number of pixels scrolled per mouse wheel unit.
+			/// @self    WWScrollRegion
+			/// @param   {Real} _pixels_per_wheel : Pixels per wheel unit.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_wheel_step = function(_pixels_per_wheel) {
+				wheel_step = _pixels_per_wheel;
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_viewport_size()
+			/// @desc    Sets the visible viewport size (excludes scrollbars).
+			/// @self    WWScrollRegion
+			/// @param   {Real} _width : Viewport width.
+			/// @param   {Real} _height : Viewport height.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_viewport_size = function(_width, _height) {
+				viewport_width = _width;
+				viewport_height = _height;
+
+				__layout_children__();
+				__sync_scrollbars__();
+
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_canvas()
+			/// @desc    Assigns the canvas component that will be scrolled inside the view.
+			/// @self    WWScrollRegion
+			/// @param   {Struct.WWCore} _canvas : Canvas component to scroll.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_canvas = function(_canvas) {
+				view.set_canvas(_canvas);
+				__sync_scrollbars__();
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_content_size()
+			/// @desc    Sets the content size used for clamping scroll offsets.
+			/// @self    WWScrollRegion
+			/// @param   {Real} _width : Content width.
+			/// @param   {Real} _height : Content height.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_content_size = function(_width, _height) {
+				view.set_content_size(_width, _height);
+				__sync_scrollbars__();
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_scroll_offset()
+			/// @desc    Sets the scroll offset in pixels (clamped).
+			/// @self    WWScrollRegion
+			/// @param   {Real} _xoff : Horizontal scroll offset.
+			/// @param   {Real} _yoff : Vertical scroll offset.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_scroll_offset = function(_xoff=0, _yoff=0) {
+				view.set_scroll_offset(_xoff, _yoff);
+				__sync_scrollbars__();
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    scroll_by()
+			/// @desc    Adds a delta to the current scroll offset (clamped).
+			/// @self    WWScrollRegion
+			/// @param   {Real} _dx : Horizontal delta.
+			/// @param   {Real} _dy : Vertical delta.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static scroll_by = function(_dx=0, _dy=0) {
+				view.scroll_by(_dx, _dy);
+				__sync_scrollbars__();
+				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_size()
+			/// @desc    Sets the total region size (includes scrollbars).
+			/// @self    WWScrollRegion
+			/// @param   {Real} _width : Total width.
+			/// @param   {Real} _height : Total height.
+			/// @returns {Struct.WWScrollRegion}
+			#endregion
+			static set_size = function(_width, _height) {
+				
+				//super equivalent
+				static _core_set_size = WWCore.set_size;
+				_core_set_size(_width, _height);
+
+				viewport_width = max(0, width - scrollbar_thickness);
+				viewport_height = max(0, height - scrollbar_thickness);
+
+				__layout_children__();
+				__sync_scrollbars__();
+
+				return self;
+			};
+
 		#endregion
-		
-		#region Events
-			
+
+		#region Components
+
+			#region jsDoc
+			/// @func    get_view()
+			/// @desc    Returns the internal scroll view component.
+			/// @self    WWScrollRegion
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static get_view = function() {
+				return view;
+			};
+
+			#region jsDoc
+			/// @func    get_scrollbar_horz()
+			/// @desc    Returns the horizontal scrollbar component.
+			/// @self    WWScrollRegion
+			/// @returns {Struct.WWScrollBarHorz}
+			#endregion
+			static get_scrollbar_horz = function() {
+				return scrollbar_horz;
+			};
+
+			#region jsDoc
+			/// @func    get_scrollbar_vert()
+			/// @desc    Returns the vertical scrollbar component.
+			/// @self    WWScrollRegion
+			/// @returns {Struct.WWScrollBarVert}
+			#endregion
+			static get_scrollbar_vert = function() {
+				return scrollbar_vert;
+			};
+
 		#endregion
-		
+
 		#region Variables
-			
+
 			viewport_width = 100;
-		    viewport_height = 100;
-		    canvas_width = 100;
-		    canvas_height = 100;
-		    scroll_x = 0;
-		    scroll_y = 0;
-			
+			viewport_height = 100;
+
+			scrollbar_thickness = 16;
+			wheel_step = 10;
+
 		#endregion
-	
-		#region Functions
-			
-		#endregion
-		
+
 	#endregion
-	
+
 	#region Private
-		
+
 		#region Variables
-			
+
+			view = undefined;
+			scrollbar_horz = undefined;
+			scrollbar_vert = undefined;
+
 		#endregion
-		
+
 		#region Functions
-			
+
+			#region jsDoc
+			/// @func    __layout_children__()
+			/// @desc    Updates child sizes and positions based on viewport size and scrollbar thickness.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __layout_children__ = function() {
+				view
+					.set_position(0, 0)
+					.set_size(viewport_width, viewport_height);
+
+				scrollbar_horz
+					.set_position(0, viewport_height)
+					.set_size(viewport_width, scrollbar_thickness);
+
+				scrollbar_vert
+					.set_position(viewport_width, 0)
+					.set_size(scrollbar_thickness, viewport_height);
+
+				static _core_set_size = WWCore.set_size;
+				_core_set_size(viewport_width + scrollbar_thickness, viewport_height + scrollbar_thickness);
+			};
+
+			#region jsDoc
+			/// @func    __sync_scrollbars__()
+			/// @desc    Synchronizes scrollbar ranges and values from the view state.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __sync_scrollbars__ = function() {
+				var _content = view.get_content_size();
+				var _offset = view.get_scroll_offset();
+
+				scrollbar_horz.set_canvas_size(_content.width);
+				scrollbar_horz.set_coverage_size(viewport_width);
+				scrollbar_horz.set_value(_offset.x);
+
+				scrollbar_vert.set_canvas_size(_content.height);
+				scrollbar_vert.set_coverage_size(viewport_height);
+				scrollbar_vert.set_value(_offset.y);
+			};
+
+			#region jsDoc
+			/// @func    __on_scrollbar_horz__()
+			/// @desc    Applies the horizontal scrollbar value to the view.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __on_scrollbar_horz__ = function() {
+				set_scroll_offset(scrollbar_horz.get_value(), view.get_scroll_offset().y);
+			};
+
+			#region jsDoc
+			/// @func    __on_scrollbar_vert__()
+			/// @desc    Applies the vertical scrollbar value to the view.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __on_scrollbar_vert__ = function() {
+				set_scroll_offset(view.get_scroll_offset().x, scrollbar_vert.get_value());
+			};
+
+			#region jsDoc
+			/// @func    __on_wheel__()
+			/// @desc    Handles mouse wheel scrolling when the mouse is over the view.
+			/// @param   {Struct} _input : Input state containing scroll_y.
+			/// @returns {Undefined}
+			///@ignore
+			#endregion
+			static __on_wheel__ = function(_input) {
+				if (!view.mouse_on_comp()) { return; }
+
+				var _delta = -_input.scroll_y * wheel_step;
+				scroll_by(0, _delta);
+			};
+
 		#endregion
-		
+
 	#endregion
-	
-    #region Components
-    
-    viewport = new WWCore()
-        .set_size(viewport_width, viewport_height)
-        .set_clipping(true); // Ensures content outside the viewport is hidden.
-		
-		//ad sub-child canvas
-		canvas = new WWCore()
-	        .set_size(canvas_width, canvas_height);
-		
-	    viewport.add(canvas);
-		
-	
-    scrollbar_horz = new WWScrollbarHorz()
-        .set_size(viewport_width, 16)
-        .set_canvas_size(canvas_width)
-        .set_coverage_size(viewport_width)
-        .set_callback(function() {
-            set_scroll_x(scrollbar_horz.get_value());
-        });
-    
-    scrollbar_vert = new WWScrollbarVert()
-        .set_size(16, viewport_height)
-        .set_canvas_size(canvas_height)
-        .set_coverage_size(viewport_height)
-        .set_callback(function() {
-            set_scroll_y(scrollbar_vert.get_value());
-        });
 
-    add([viewport, scrollbar_horz, scrollbar_vert]);
-	
-	
-	
-	
-    #endregion
+	#region Components
 
-    #region 📌 Scrolling Logic
+		view = new WWViewScrollRegion();
 
-    /// @desc Updates the horizontal scroll position.
-    static set_scroll_x = function(_x) {
-        scroll_x = clamp(_x, 0, max(0, canvas_width - viewport_width));
-        canvas.set_offset(-scroll_x, -scroll_y);
-    };
+		scrollbar_horz = new WWScrollBarHorz();
+		scrollbar_vert = new WWScrollBarVert();
 
-    /// @desc Updates the vertical scroll position.
-    static set_scroll_y = function(_y) {
-        scroll_y = clamp(_y, 0, max(0, canvas_height - viewport_height));
-        canvas.set_offset(-scroll_x, -scroll_y);
-    };
+		view.set_scrollbars(scrollbar_horz, scrollbar_vert);
 
-    /// @desc Adjusts scrollbars when content size changes.
-    static update_scrollbars = function() {
-        scrollbar_horz.set_canvas_size(canvas_width);
-        scrollbar_horz.set_coverage_size(viewport_width);
-        
-        scrollbar_vert.set_canvas_size(canvas_height);
-        scrollbar_vert.set_coverage_size(viewport_height);
-    };
+		add([view, scrollbar_horz, scrollbar_vert]);
 
-    /// @desc Sets the size of the viewport.
-    static set_viewport_size = function(_width, _height) {
-        viewport_width = _width;
-        viewport_height = _height;
-        viewport.set_size(viewport_width, viewport_height);
-        update_scrollbars();
-        return self;
-    };
+		__layout_children__();
+		__sync_scrollbars__();
 
-    /// @desc Sets the size of the canvas (content area).
-    static set_canvas_size = function(_width, _height) {
-        canvas_width = _width;
-        canvas_height = _height;
-        canvas.set_size(canvas_width, canvas_height);
-        update_scrollbars();
-        return self;
-    };
+	#endregion
 
-    #endregion
+	#region Events
 
-    #region 📌 Mouse Wheel Scrolling
+		on_scroll(method({this: self}, function(_input) {
+			with (this) __on_wheel__(_input);
+		}));
 
-    on_scroll(function(_input) {
-        var _scroll_delta = -_input.scroll_y * 10;
-        set_scroll_y(scroll_y + _scroll_delta);
-        scrollbar_vert.set_value(scroll_y);
-    });
+		scrollbar_horz.set_callback(method({this: self}, function() {
+			with (this) __on_scrollbar_horz__();
+		}));
 
-    #endregion
+		scrollbar_vert.set_callback(method({this: self}, function() {
+			with (this) __on_scrollbar_vert__();
+		}));
+
+	#endregion
+
 }

@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextBase",
   "parent":{
-    "name":"Finished Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

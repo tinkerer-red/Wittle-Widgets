@@ -40,12 +40,10 @@ features into a single focused example.';
 #endregion
 
 left_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBase);
 	_textbox_instance.set_wrap_enabled(false);
 };
 
 right_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBase);
 	_textbox_instance.set_wrap_enabled(true);
 				
 	// Font is a textbox concern, keep it here

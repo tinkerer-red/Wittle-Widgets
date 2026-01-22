@@ -1,8 +1,8 @@
-///@ignore
 #region jsDoc
 /// @func    WWTemplate()
 /// @desc    This is a template for building a new component from scratch, this should never be called by the user
 /// @returns {Struct.WWTemplate}
+///@ignore
 #endregion
 function WWTemplate() : WWCore() constructor {
 	debug_name = "WWTemplate";

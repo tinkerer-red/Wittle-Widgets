@@ -6,6 +6,8 @@
 /// @returns {Struct.WWSlider}
 #endregion
 function WWSlider() : WWSliderHorz() constructor {}
+
+//Sliders
 #region jsDoc
 /// @func    WWSliderHorz()
 /// @desc    Creates a slider.
@@ -73,6 +75,7 @@ function WWSliderVert() : WWSliderBase() constructor {
     });
 }
 
+//Thumbs
 #region jsDoc
 /// @func    WWSliderHorzThumb()
 /// @desc    Creates a horizontal slider with a draggable thumb.
@@ -169,10 +172,10 @@ function WWSliderBase() : WWButton() constructor {
 		/// @func    set_size()
 		/// @desc    Set the reletive region for the bar sub component. Reletive to the x,y of the component.
 		/// @self    WWCore
-		/// @param   {real} left : The left side of the bounding box
-		/// @param   {real} top : The top side of the bounding box
-		/// @param   {real} right : The right side of the bounding box
-		/// @param   {real} bottom : The bottom side of the bounding box
+		/// @param   {Real} left : The left side of the bounding box
+		/// @param   {Real} top : The top side of the bounding box
+		/// @param   {Real} right : The right side of the bounding box
+		/// @param   {Real} bottom : The bottom side of the bounding box
 		/// @returns {Struct.WWCore}
 		#endregion
 		static set_size = function(_width, _height) {
@@ -284,10 +287,10 @@ function WWSliderBase() : WWButton() constructor {
 		/// @func    set_bar_size()
 		/// @desc    Set the reletive region for the bar sub component. Reletive to the x,y of the component.
 		/// @self    WWCore
-		/// @param   {real} left : The left side of the bounding box
-		/// @param   {real} top : The top side of the bounding box
-		/// @param   {real} right : The right side of the bounding box
-		/// @param   {real} bottom : The bottom side of the bounding box
+		/// @param   {Real} left : The left side of the bounding box
+		/// @param   {Real} top : The top side of the bounding box
+		/// @param   {Real} right : The right side of the bounding box
+		/// @param   {Real} bottom : The bottom side of the bounding box
 		/// @returns {Struct.WWCore}
 		#endregion
 		static set_bar_size = function(_left, _top, _right, _bottom) {
@@ -298,10 +301,10 @@ function WWSliderBase() : WWButton() constructor {
 		/// @func    set_background_size()
 		/// @desc    Set the reletive region for the background. Reletive to the x,y of the component.
 		/// @self    WWCore
-		/// @param   {real} left : The left side of the bounding box
-		/// @param   {real} top : The top side of the bounding box
-		/// @param   {real} right : The right side of the bounding box
-		/// @param   {real} bottom : The bottom side of the bounding box
+		/// @param   {Real} left : The left side of the bounding box
+		/// @param   {Real} top : The top side of the bounding box
+		/// @param   {Real} right : The right side of the bounding box
+		/// @param   {Real} bottom : The bottom side of the bounding box
 		/// @returns {Struct.WWCore}
 		#endregion
 		static set_background_size = function(_left, _top, _right, _bottom) {

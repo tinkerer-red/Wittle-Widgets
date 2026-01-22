@@ -57,8 +57,6 @@ function WWTextLayout() constructor {
 	/// @desc    Adds a glyph record to the layout. This glyph may represent a full Unicode cluster.
 	/// @param   {String} _char          : Representative character or cluster.
 	/// @param   {Real}   _index         : Logical text index (cluster index).
-	/// @param   {Real}   _buffer_index  : Offset in the underlying buffer.
-	/// @param   {Real}   _buffer_size   : Number of buffer units consumed by this glyph.
 	/// @param   {Real}   _x             : X position in layout space.
 	/// @param   {Real}   _y             : Y position in layout space.
 	/// @param   {Real}   _width         : Glyph width.
@@ -69,23 +67,21 @@ function WWTextLayout() constructor {
 	static add_glyph = function(
 	    _char,
 	    _index,
-	    _buffer_index,
-	    _buffer_size,
 	    _x,
 	    _y,
 	    _width,
 	    _height,
 	    _span_index
 	) {
-	    var _data = layout_data;
+	    if (argument_count > 7) throw "HERE!"
+		
+		var _data = layout_data;
 	    var _glyphs = _data.glyphs;
 
 	    array_push(
 	        _glyphs,
 	        _char,
 	        _index,
-	        _buffer_index,
-	        _buffer_size,
 	        _x,
 	        _y,
 	        _width,
@@ -404,8 +400,6 @@ function WWTextLayout() constructor {
 			var _line = {
 				text         : _glyphs[_index + __WW_Layout_Glyph.Char],
 				index        : _glyphs[_index + __WW_Layout_Glyph.Index],
-				buffer_index : _glyphs[_index + __WW_Layout_Glyph.Buffer_Index],
-				buffer_size  : _glyphs[_index + __WW_Layout_Glyph.Buffer_Size],
 				x            : _glyphs[_index + __WW_Layout_Glyph.X],
 				y            : _glyphs[_index + __WW_Layout_Glyph.Y],
 				width        : _glyphs[_index + __WW_Layout_Glyph.Width],
@@ -450,54 +444,6 @@ function WWTextLayout() constructor {
 		
 			var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
 			return _data.glyphs[_index + __WW_Layout_Glyph.Index]
-		};
-
-		#region jsDoc
-		/// @func    get_glyph_buffer_index(_glyph_index)
-		/// @desc    Returns the buffer offset where this glyph begins.
-		/// @param   {Real} _glyph_index
-		/// @returns {Real}
-		#endregion
-		static get_glyph_buffer_index = function(_glyph_index)
-		{
-			var _data = layout_data;
-		
-			if (_data.glyphs_count == 0) {
-				return 0;
-			}
-		
-			if (_glyph_index < 0) {
-				_glyph_index = 0;
-			}
-		
-			if (_glyph_index >= _data.glyphs_count) {
-				_glyph_index = _data.glyphs_count-1;
-				var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
-				var _buffer_index = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Index]
-				var _buffer_size = _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Size]
-				return _buffer_index + _buffer_size;
-			}
-		
-			var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
-			return _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Index]
-		};
-
-		#region jsDoc
-		/// @func    get_glyph_buffer_size(_glyph_index)
-		/// @desc    Returns how many buffer units this glyph consumes.
-		/// @param   {Real} _glyph_index
-		/// @returns {Real}
-		#endregion
-		static get_glyph_buffer_size = function(_glyph_index)
-		{
-			var _data = layout_data;
-		
-			if (_glyph_index < 0 || _glyph_index >= _data.glyphs_count) {
-				return 0;
-			}
-		
-			var _index = _glyph_index * __WW_Layout_Glyph.__Size__;
-			return _data.glyphs[_index + __WW_Layout_Glyph.Buffer_Size]
 		};
 
 		#region jsDoc
@@ -575,34 +521,7 @@ function WWTextLayout() constructor {
 	#endregion
 	
 	#region High-level helpers (cursor / hit-testing)
-	
-		#region jsDoc
-		/// @func    get_glyph_for_buffer_index(_buffer_index)
-		/// @desc    Returns the glyph slot whose buffer span covers _buffer_index.
-		/// @param   {Real} _buffer_index
-		/// @returns {Real}
-		#endregion
-		static get_glyph_for_buffer_index = function(_buffer_index) {
-			var _glyphs = layout_data.glyphs;
-			var _count = layout_data.glyphs_count;
 		
-			var _i = 0;
-			repeat (_count) {
-			
-				var _start = _glyphs[_i + __WW_Layout_Glyph.Buffer_Index];
-				var _end = _start + _glyphs[_i + __WW_Layout_Glyph.Buffer_Size] - 1;
-			
-				if (_buffer_index >= _start)
-				&& (_buffer_index <= _end) {
-					return _i div __WW_Layout_Glyph.__Size__;
-				}
-			
-				_i += __WW_Layout_Glyph.__Size__;
-			
-			}
-			return -1;
-		};
-	
 		#region jsDoc
 		/// @func    apply_line_alignment()
 		/// @desc    Mutates glyph X positions in-place based on each line's alignment.

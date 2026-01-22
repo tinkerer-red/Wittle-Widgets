@@ -19,10 +19,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @func    set_size()
 				/// @desc    Set the reletive region for all click selections. Reletive to the x,y of the component.
 				/// @self    GUICompCore
-				/// @param   {real} left : The left side of the bounding box
-				/// @param   {real} top : The top side of the bounding box
-				/// @param   {real} right : The right side of the bounding box
-				/// @param   {real} bottom : The bottom side of the bounding box
+				/// @param   {Real} left : The left side of the bounding box
+				/// @param   {Real} top : The top side of the bounding box
+				/// @param   {Real} right : The right side of the bounding box
+				/// @param   {Real} bottom : The bottom side of the bounding box
 				/// @returns {Struct.GUICompCore}
 				#endregion
 				static set_size = function(_left, _top, _right, _bottom) {
@@ -337,10 +337,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @func    set_dropdown_size()
 				/// @desc    Sets the size of the drop down region.
 				/// @self    GUICompDropdown
-				/// @param   {real} left : The left side of the bounding box
-				/// @param   {real} top : The top side of the bounding box
-				/// @param   {real} right : The right side of the bounding box
-				/// @param   {real} bottom : The bottom side of the bounding box
+				/// @param   {Real} left : The left side of the bounding box
+				/// @param   {Real} top : The top side of the bounding box
+				/// @param   {Real} right : The right side of the bounding box
+				/// @param   {Real} bottom : The bottom side of the bounding box
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_dropdown_size = function(_left, _top, _right, _bottom) {
@@ -352,8 +352,8 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @func    set_dropdown_anchor()
 				/// @desc    Sets the location the drop down will appear reletive to the header button
 				/// @self    GUICompDropdown
-				/// @param   {real} xoff : The left side of the bounding box
-				/// @param   {real} yoff : The top side of the bounding box
+				/// @param   {Real} xoff : The left side of the bounding box
+				/// @param   {Real} yoff : The top side of the bounding box
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_dropdown_anchor = function(_xoff, _yoff) {
@@ -365,7 +365,7 @@ function GUICompDropdown() : GUICompController() constructor {
 				/// @func    set_dropdown_height()
 				/// @desc    Sets the height of the dropdown region.
 				/// @self    GUICompDropdown
-				/// @param   {real} height : The height of the dropdown.
+				/// @param   {Real} height : The height of the dropdown.
 				/// @returns {Struct.GUICompDropdown}
 				#endregion
 				static set_dropdown_height = function(_height) {

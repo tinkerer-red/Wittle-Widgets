@@ -1027,7 +1027,7 @@ function WWTextBase() : WWCore() constructor {
 			/// @desc    Draws the static parts (highlight selection and text) to a cached surface.
 			///          This function is called whenever the text or formatting changes, so that the
 			///          expensive drawing of text is only performed once.
-			/// @returns {undefined}
+			/// @returns {Undefined}
 			#endregion
 			static draw_to_surface = function() {
 			    // Create or reuse a surface sized to the text box.
@@ -1056,7 +1056,7 @@ function WWTextBase() : WWCore() constructor {
 			///          to compute the rectangular areas for each affected line.
 			/// @param   {Real} _x : The x-offset (typically 0 when drawing to surface).
 			/// @param   {Real} _y : The y-offset.
-			/// @returns {undefined}
+			/// @returns {Undefined}
 			#endregion
 			static __draw_highlight_selection__ = function(_x, _y) {
 			    // Only draw a highlight if a selection is active.
@@ -1117,7 +1117,7 @@ function WWTextBase() : WWCore() constructor {
 			///          the function uses the current GPU scissor region to determine which lines are visible.
 			/// @param   {Real} _x : The x-offset for drawing.
 			/// @param   {Real} _y : The y-offset for drawing.
-			/// @returns {undefined}
+			/// @returns {Undefined}
 			#endregion
 			static __draw_text__ = function(_x, _y) {
 			    // Set the font and color.
@@ -1152,7 +1152,7 @@ function WWTextBase() : WWCore() constructor {
 			///          directly (not cached) because it updates frequently.
 			/// @param   {Real} _x : The x-offset of the component.
 			/// @param   {Real} _y : The y-offset of the component.
-			/// @returns {undefined}
+			/// @returns {Undefined}
 			#endregion
 			static __draw_cursor__ = function(_x, _y) {
 			    // Only draw the cursor if the component is focused.
@@ -1569,7 +1569,7 @@ function WWTextBase() : WWCore() constructor {
 				///          equals the anchor, selection is cleared; otherwise, selection remains active.
 				/// @self    WWTextInputSingle
 				/// @param   {Bool} _select : Whether selection mode is enabled.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __check_minput__ = function(_select) {
 					// If selection mode is enabled and no anchor is set, establish the anchor.
@@ -1606,7 +1606,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @param   {Real} _change : The amount to move the cursor.
 				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
 				/// @param   {Bool} _vertical : Whether the movement is vertical (if false, horizontal).
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
 					static __struct = { x: undefined, y: undefined, width: undefined };
@@ -2071,7 +2071,7 @@ function WWTextBase() : WWCore() constructor {
 			    /// @desc    Inserts a new string at the cursor position, respecting allowed characters.
 			    /// @self    WWTextInputSingle
 			    /// @param   {String} _str : The string to insert.
-			    /// @returns {undefined}
+			    /// @returns {Undefined}
 			    #endregion
 				static __insert_string_at_cursor__ = function(_str) {
 				    // sanitize input
@@ -2154,7 +2154,7 @@ function WWTextBase() : WWCore() constructor {
 				///		  at the beginning of the selection.
 				/// @self	WWTextInputSingle
 				/// @param   {Bool} _is_del_key : True if the delete key is pressed (forward delete), false if backspace.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __textbox_delete_string__ = function(_is_del_key) {
 					// Store current cursor position.
@@ -2269,7 +2269,7 @@ function WWTextBase() : WWCore() constructor {
 				///              - If it is a space or tab, it selects all adjacent spaces and tabs.
 				///              - Otherwise, it selects all contiguous word breaker characters.
 				/// @self    WWTextBase
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __highlight_word_at_cursor__ = function() {
 				    var _loc = __compute_word_boundaries__(cursor_y_pos, cursor_x_pos);
@@ -2294,7 +2294,7 @@ function WWTextBase() : WWCore() constructor {
 				///          the highlight is set to __word_anchor_end__; if to the right, it is set to __word_anchor_start__.
 				///          When on a different line, the highlight is anchored to the original word line.
 				/// @self    WWTextBase
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __update_word_selection_drag__ = function() {
 				    // Get current mouse coordinates.
@@ -2410,7 +2410,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _line   : The active line index.
 				/// @param   {Real} _cursor : The cursor position in the active line.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_add__ = function(_line, _cursor) {
 				    var nextRecordIndex = __historic_records_loc__ + 1;
@@ -2445,7 +2445,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _line   : The active line index.
 				/// @param   {Real} _cursor : The cursor position in the active line.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_rec__ = function(_line, _cursor) {
 				    var currentRecord = __historic_records__[__historic_records_loc__];
@@ -2459,7 +2459,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @desc    Moves the history cursor by _change steps and restores that snapshot (for undo/redo).
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _change : The number of steps to move in the history (negative for undo, positive for redo).
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_set__ = function(_change) {
 				    var targetIndex = __historic_records_loc__ + _change;
@@ -2694,7 +2694,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             /// @func    __emit_change__()
             /// @desc    Mark render dirty, push history snapshot, and fire change event.
             /// @param   {Bool} _push_history
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __emit_change__ = function(_push_history=true) {
                 __refresh_surf__ = true;
@@ -2727,7 +2727,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             /// @func    __delete_selection_or_char__()
             /// @desc    Wrapper around base deletion that also emits change.
             /// @param   {Bool} _forward
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
 			static __delete_selection_or_char__ = function(_forward) {
 			    __textbox_delete_string__(_forward);
@@ -2738,7 +2738,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __delete_word_left__()
             /// @desc    Delete the previous word (selection-aware).
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __delete_word_left__ = function() {
                 if (highlight_selected) {
@@ -2757,7 +2757,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __delete_word_right__()
             /// @desc    Delete the next word (selection-aware).
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __delete_word_right__ = function() {
                 if (highlight_selected) {
@@ -2776,7 +2776,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __delete_to_line_start__()
             /// @desc    Delete from cursor to beginning of line.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __delete_to_line_start__ = function() {
                 if (cursor_x_pos <= 0) return;
@@ -2789,7 +2789,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __delete_to_line_end__()
             /// @desc    Delete from cursor to end of line.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __delete_to_line_end__ = function() {
                 var line_text = __lines__[cursor_y_pos];
@@ -2807,7 +2807,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             /// @func    __insert_text__()
             /// @desc    Insert text with max-length enforcement and change event.
             /// @param   {String} _text
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __insert_text__ = function(_text) {
                 if (!is_string(_text) || _text == "") return;
@@ -2838,7 +2838,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __insert_newline__()
             /// @desc    Insert newline, optionally inheriting indentation, and emit change.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __insert_newline__ = function() {
                 // compute indentation from beginning of current line
@@ -2868,7 +2868,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __indent_selection_or_cursor__()
             /// @desc    Tab behavior: if selection spans multiple lines, indent each line; otherwise insert indent_string.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __indent_selection_or_cursor__ = function() {
                 if (!highlight_selected) {
@@ -2925,7 +2925,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __unindent_selection_or_cursor__()
             /// @desc    Shift+Tab behavior: remove one indent_string or single leading tab/spaces from lines in selection.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __unindent_selection_or_cursor__ = function() {
                 var start_y, end_y, start_x, end_x;
@@ -2991,7 +2991,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
             #region jsDoc
             /// @func    __cut_selection__()
             /// @desc    Copy selection and delete.
-            /// @returns {undefined}
+            /// @returns {Undefined}
             #endregion
             static __cut_selection__ = function() {
                 if (!highlight_selected) return;
@@ -3163,7 +3163,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			    /// @func    __textbox_max_length__()
 			    /// @desc    Enforces the maximum character limit for the text input component.
 			    /// @self    WWTextInputSingle
-			    /// @returns {undefined}
+			    /// @returns {Undefined}
 			    #endregion
 			    static __textbox_max_length__ = function() {
 			        if (max_char_length == infinity) return;
@@ -3204,7 +3204,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			    /// @func    __textbox_break_line__()
 			    /// @desc    Inserts a new line at the cursor position.
 			    /// @self    WWTextInputSingle
-			    /// @returns {undefined}
+			    /// @returns {Undefined}
 			    #endregion
 			    static __textbox_break_line__ = function() {
 			        var _current_line = cursor_y_pos;

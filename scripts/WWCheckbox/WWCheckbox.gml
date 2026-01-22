@@ -103,7 +103,7 @@ function WWCheckbox() : WWButton() constructor {
 	
 	#endregion
 	
-	#region Private Library
+	#region Private
 		
 		#region Variables
 			

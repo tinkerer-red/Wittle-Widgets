@@ -98,8 +98,6 @@ enum __WW_Text_Alignment {
 enum __WW_Layout_Glyph {
 	Char,
 	Index,
-	Buffer_Index,
-	Buffer_Size,
 	X,
 	Y,
 	Width,

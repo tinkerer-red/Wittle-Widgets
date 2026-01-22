@@ -1,3 +1,4 @@
+/*
 #region jsDoc
 /// @func    WWLabel()
 /// @desc    A basic text rendering component with support for alignment, colors, and multi-line text.
@@ -100,6 +101,7 @@ function WWLabel() : WWCore() constructor {
 	
 	#endregion
 }
+//*/
 
 #region jsDoc
 /// @func    WWLabelScribble()
@@ -179,3 +181,109 @@ function WWLabelScribble() : WWCore() constructor {
 }
 
 
+#region jsDoc
+/// @func    WWLabelRenderer()
+/// @desc    Lightweight, size-dynamic label built on top of WWTextRendererBase.
+///          Internally it is the same renderer pipeline, but:
+///          - exposes only basic configuration
+///          - automatically updates its own size when rendered content changes
+/// @return  {Struct.WWLabelRenderer}
+#endregion
+function WWLabel() : WWTextRendererBase() constructor {
+
+    debug_name = "WWLabelRenderer";
+
+    #region Public
+
+        #region Builder
+
+            #region jsDoc
+            /// @func   set_text()
+            /// @desc   Sets caption text. Label auto-sizes to content.
+            /// @param  {String} _text
+            /// @returns {Struct.WWLabelRenderer}
+            #endregion
+            static set_text = function(_text) {
+                set_caption(_text);
+                __label_update_size__();
+                return self;
+            };
+
+            #region jsDoc
+            /// @func   set_text_font()
+            /// @desc   Sets font. Label auto-sizes to content.
+            /// @param  {Asset.GMFont} _font
+            /// @returns {Struct.WWLabelRenderer}
+            #endregion
+            static set_text_font = function(_font) {
+                set_font(_font);
+                __label_update_size__();
+                return self;
+            };
+			
+            #region jsDoc
+            /// @func   set_text_alpha()
+            /// @desc   Sets alpha. Does not affect size.
+            /// @param  {Real} _alpha
+            /// @returns {Struct.WWLabelRenderer}
+            #endregion
+            static set_text_alpha = function(_alpha) {
+                set_alpha(_alpha);
+                return self;
+            };
+
+            #region jsDoc
+            /// @func   set_renderer()
+            /// @desc   Swap the active renderer implementation (processor/render style),
+            ///         then auto-size to content. This assumes your base has a setter for it.
+            /// @param  {Any} _renderer_id_or_kind
+            /// @returns {Struct.WWLabelRenderer}
+            #endregion
+            static set_text_processor = function(_proc_or_name) {
+				if (is_string(_proc_or_name)) {
+					var _name = string_lower(_proc_or_name);
+					switch (_name) {
+					    case "bbcode":   set_text_processor(_proc_or_name); break;
+					    case "md":
+						case "markdown": set_text_processor(_proc_or_name); break;
+					    case "css":      set_text_processor(_proc_or_name); break;
+					    default: clear_text_processor(); break;
+					}
+				}
+				else {
+					set_text_processor(_proc_or_name);
+				}
+
+                __label_update_size__();
+                return self;
+            };
+
+        #endregion
+
+        #region Events
+
+            on_change(function() {
+                __label_update_size__();
+            });
+
+        #endregion
+
+    #endregion
+
+    #region Private
+
+        #region Functions
+
+            static __label_update_size__ = function() {
+				__ensure_layout__();
+
+                var _width = get_content_width();
+                var _height = get_content_height();
+
+                __set_size__(_width, _height);
+            };
+
+        #endregion
+
+    #endregion
+}

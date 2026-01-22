@@ -50,10 +50,10 @@ function WWScrollbarBase() : WWSliderBase() constructor {
             /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
             ///          This updates the region and marks the size as user-preferred so that future internal updates won’t override it.
             /// @self    WWScrollbarBase
-            /// @param   {real} left : The left side of the bounding box.
-            /// @param   {real} top : The top side of the bounding box.
-            /// @param   {real} right : The right side of the bounding box.
-            /// @param   {real} bottom : The bottom side of the bounding box.
+            /// @param   {Real} left : The left side of the bounding box.
+            /// @param   {Real} top : The top side of the bounding box.
+            /// @param   {Real} right : The right side of the bounding box.
+            /// @param   {Real} bottom : The bottom side of the bounding box.
             /// @returns {Struct.WWScrollbarBase}
             #endregion
             static set_size = function(_width, _height) {

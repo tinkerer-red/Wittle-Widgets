@@ -1,8 +1,6 @@
 #region jsDoc
 /// @func    WWCore()
 /// @desc    This is the root most component, only use this if you need a very basic component for drawing purposes or if you're creating a new component.
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
 /// @returns {Struct.WWCore}
 #endregion
 function WWCore() constructor {
@@ -33,13 +31,10 @@ function WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    set_size()
-			/// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.  
-			///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
+			/// @desc    Sets the user-preferred size (width/height) and updates regions; note: some components will have a minimum size override.
 			/// @self    WWCore
-			/// @param   {real} left : The left side of the bounding box
-			/// @param   {real} top : The top side of the bounding box
-			/// @param   {real} right : The right side of the bounding box
-			/// @param   {real} bottom : The bottom side of the bounding box
+			/// @param   {Real} width : The width of the component
+			/// @param   {Real} height : The height of the component
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -196,7 +191,7 @@ function WWCore() constructor {
 			/// @func    set_active()
 			/// @desc    Activate of Deactivate the Component from executing any of it's code. This will also prevent all subcomponets code from running.
 			/// @self    WWCore
-			/// @param   {Bool} is_enabled : If the component should be enabled or not.
+			/// @param   {Bool} is_active : Whether this component (and subtree) executes update logic.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_active = function(_is_active) {
@@ -588,7 +583,7 @@ function WWCore() constructor {
 			/// @self    WWCore
 			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
 			/// @param   {Struct} data : The data supplied from the struct, dependant on the component.
-			/// @returns {undefined}
+			/// @returns {Undefined}
 			/// @ignore
 			#endregion
 			static trigger_event = function(_event_id, _data=undefined) {
@@ -680,7 +675,7 @@ function WWCore() constructor {
 			/// @func    remove_event_listener()
 			/// @desc    Remove an event listener to the component
 			/// @self    WWCore
-			/// @param   {real} uid : The Unique ID of a previously added event function returned by add_event_listener.
+			/// @param   {Real} uid : The Unique ID of a previously added event function returned by add_event_listener.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static remove_event_listener = function(_uid) {
@@ -722,13 +717,19 @@ function WWCore() constructor {
 			/// @func    event_exists()
 			/// @desc    Lightweight check to see if an event exists.
 			/// @self    WWCore
-			/// @param   {String} event_id : One of the component's event IDs, see get_events for more info
-			/// @returns {undefined}
-			/// @ignore
+			/// @param   {Real} event_id : The hash of the event_id, example: `self.event.change`
+			/// @returns {Bool}
 			#endregion
 			static event_exists = function(_event_id) {
 				return struct_exists_from_hash(self.__event_listeners__, _event_id)
 			}
+			#region jsDoc
+			/// @func    event_exists()
+			/// @desc    Fetches the event's name from the hash in events, if the event doesnt exist in the object returns undefined
+			/// @self    WWCore
+			/// @param   {Real} event_id : One of the component's event IDs as a hash.
+			/// @returns {String|Undefined}
+			#endregion
 			static event_name = function(_event_id) {
 				var _names = struct_get_names(events);
 				var _len = array_length(_names)
@@ -738,6 +739,8 @@ function WWCore() constructor {
 						return _name;
 					}
 				_i++}
+				
+				return undefined;
 			}
 			
 			#endregion
@@ -798,7 +801,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    get_children_count()
 			/// @desc    Returns the number of children this component directly controls. This will not include children of children.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @returns {Real}
 			#endregion
 			static get_children_count = function() {
@@ -807,7 +810,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    get_sub_children_count()
 			/// @desc    Returns the number of all children. This will include all children of children.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @returns {Real}
 			#endregion
 			static get_sub_children_count = function() {
@@ -824,8 +827,8 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    get_children()
 			/// @desc    Returns an array of the children
-			/// @self    WWController
-			/// @returns {Array<Struct>}
+			/// @self    WWCore
+			/// @returns {Array<Struct.WWCore>}
 			#endregion
 			static get_children = function() {
 				return __children__
@@ -863,7 +866,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    mouse_on_group()
 			/// @desc    This function is internally used to help assist early outing collision checks.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @returns {Bool}
 			/// @ignore
 			#endregion
@@ -903,7 +906,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    add()
 			/// @desc    Add a Component to the controller.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Struct.WWCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
 			#endregion
@@ -1004,7 +1007,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    insert()
 			/// @desc    Inserts a Component into the controller's children array.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Real} index : The index (possition) you wish to insert the component into the children array
 			/// @param   {Struct.WWCore|Array} comp : The component you wish to add to the controller.
 			/// @returns {Undefined}
@@ -1025,7 +1028,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    remove()
 			/// @desc    Remove a Child Component from the children array.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Real} comp : The component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
@@ -1037,7 +1040,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    remove_index()
 			/// @desc    Remove a Child Component from the children array by it's index.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Real} index : The index of the component you wish to remove from the controller's children array.
 			/// @returns {Undefined}
 			#endregion
@@ -1053,8 +1056,8 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    find()
 			/// @desc    Find the index of the given component. Will return -1 if the component was not found.
-			/// @self    WWController
-			/// @param   {Struct.WWController} component : The component you wish to find the index of.
+			/// @self    WWCore
+			/// @param   {Struct.WWCore} component : The component you wish to find the index of.
 			/// @returns {Real}
 			#endregion
 			static find = function(_comp) {
@@ -1069,8 +1072,8 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    update_component_positions()
 			/// @desc    Updates the locations of all sub components of the top most controller
-			/// @self    WWHandler
-			/// @returns {Real}
+			/// @self    WWCore
+			/// @returns {Undefined}
 			#endregion
 			static update_component_positions = function() {
 				if (!__is_empty__) {
@@ -1094,7 +1097,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    clear_children()
 			/// @desc    Clears all children from the children array, deleting their structs and running their cleanup events. Use this when you are deleting components.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @returns {Undefined}
 			#endregion
 			static clear_children = function() {
@@ -1403,7 +1406,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    __validate_component_additions__()
 			/// @desc    Validates that we are not adding existing components to our controller, or that a supplied array of components does not contain duplicates.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Array<Struct>} arr : The array of structs to validate
 			/// @returns {Undefined}
 			/// @ignore
@@ -1441,7 +1444,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    __include_children__()
 			/// @desc    Includes the children by either pushing them into the list or inserting them into the list. Any index under 0 will push the component.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Array<Struct>} arr_of_comp : The array of components you wish to include into the children.
 			/// @param   {Real} index : The index the array will be inserted into. Note: a value of -1 will push the array to the end.
 			/// @ignore
@@ -1480,9 +1483,9 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    __update_group_region__()
 			/// @desc    This function is internally used to help assist updating the bounding box of controllers. This bounding box is used for many things but primarily used for collision check optimizations.
-			/// @self    WWController
+			/// @self    WWCore
 			/// @param   {Real} index : The index of the component to remove.
-			/// @returns {Struct.WWController}
+			/// @returns {Struct.WWCore}
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
@@ -1520,7 +1523,7 @@ function WWCore() constructor {
 			/// @func    __find_index_in_parent__()
 			/// @desc    Find the child's index inside it's parent. Typically used for updating the Achor point
 			/// @self    WWCore
-			/// @returns {real}
+			/// @returns {Real}
 			/// @ignore
 			#endregion
 			static __find_index_in_parent__ = function() {
@@ -1576,8 +1579,9 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    __apply_clipping_region__()
 			/// @desc    Sets the GPU scissor region to limit rendering to the viewport bounds.
-			/// @self    WWViewport
+			/// @self    WWCore
 			/// @returns {Undefined}
+			/// @ignore
 			#endregion
 			static __apply_clipping_region__ = function() {
 				previous_scissor = gpu_get_scissor();
@@ -1599,8 +1603,9 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func    __restore_clipping_region__()
 			/// @desc    Restores the previous GPU scissor region after drawing.
-			/// @self    WWViewport
+			/// @self    WWCore
 			/// @returns {Undefined}
+			/// @ignore
 			#endregion
 			static __restore_clipping_region__ = function() {
 				gpu_set_scissor(previous_scissor);
@@ -1614,6 +1619,7 @@ function WWCore() constructor {
 			/// @self    WWCore
 			/// @param   {Asset.GMSprite} sprite : The sprite to apply to the component, and to get the values from.
 			/// @returns {Struct.WWCore}
+			/// @ignore
 			#endregion
 			static __set_sprite__ = function(_sprite) {
 				/// NOTE: These are the default structure of GUI button sprites
@@ -1646,15 +1652,12 @@ function WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    __set_size__()
-			/// @desc    Internally updates the component's region without marking the size as user–preferred.  
-			///          This function is used by internal layout routines so that they can adjust the component's dimensions  
-			///          without overwriting an explicit user setting.
+			/// @desc    Sets the user-preferred size (width/height) and updates regions; note: some components will have a minimum size override.
 			/// @self    WWCore
-			/// @param   {real} left : The left side of the bounding box
-			/// @param   {real} top : The top side of the bounding box
-			/// @param   {real} right : The right side of the bounding box
-			/// @param   {real} bottom : The bottom side of the bounding box
+			/// @param   {Real} width : The width of the component
+			/// @param   {Real} height : The height of the component
 			/// @returns {Struct.WWCore}
+			/// @ignore
 			#endregion
 			static __set_size__ = function(_width, _height) {
 				width  = _width ;
@@ -1677,6 +1680,7 @@ function WWCore() constructor {
 			/// @param   {Real} x : The x of the component.
 			/// @param   {Real} y : The y of the component.
 			/// @returns {Struct.WWCore}
+			/// @ignore
 			#endregion
 			static __set_position__ = function(_x, _y) {
 				if (_x == self.x && _y == self.y) return self; // Avoid redundant updates
@@ -1703,6 +1707,7 @@ function WWCore() constructor {
 			/// @param   {Real} x : The x offset.
 			/// @param   {Real} y : The y offset.
 			/// @returns {Struct.WWCore}
+			/// @ignore
 			#endregion
 			static __set_offset__ = function(_x, _y) {
 			    if (_x == self.x_offset && _y == self.y_offset) return self; // Avoid redundant updates

@@ -15,8 +15,8 @@ function WWScrollbarButtons() : WWCore() constructor {
             /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
             ///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
             /// @self    WWCore
-            /// @param   {real} width : The new width.
-            /// @param   {real} height : The new height.
+            /// @param   {Real} width : The new width.
+            /// @param   {Real} height : The new height.
             /// @returns {Struct.WWCore}
             #endregion
             static set_size = function(_width, _height) {

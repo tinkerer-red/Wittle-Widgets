@@ -67,13 +67,12 @@ End of CSS demo.</span>';
 #endregion
 
 left_init = function(_textbox_instance) {
-    _textbox_instance.set_renderer(WWTextRendererBase);
     _textbox_instance.set_text_font(fnt_ww_consolas_msdf);
     _textbox_instance.set_wrap_enabled(true);
 };
 
 right_init = function(_textbox_instance) {
-    _textbox_instance.set_renderer(WWTextRendererCSS);
+    _textbox_instance.set_text_processor(WWTextProcessorCSS);
     _textbox_instance.set_text_font(fnt_ww_consolas_msdf);
     _textbox_instance.set_wrap_enabled(true);
 };

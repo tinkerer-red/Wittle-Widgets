@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWButtonText",
   "parent":{
-    "name":"Finished Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
+    "name":"Buttons",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Buttons.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

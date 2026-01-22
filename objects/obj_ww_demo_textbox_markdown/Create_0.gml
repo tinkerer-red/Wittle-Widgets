@@ -56,12 +56,11 @@ enabled: true
 #endregion
 
 left_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBase);
 	_textbox_instance.set_wrap_enabled(false);
 };
 
 right_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererMarkdown);
+	_textbox_instance.set_text_processor(WWTextProcessorMarkdown);
 	_textbox_instance.set_wrap_enabled(true);
 	_textbox_instance.set_text_font(fnt_ww_default_small_msdf);
 };

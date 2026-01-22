@@ -34,16 +34,17 @@ Paragraph test:[p]New paragraph starts here
 
 [left]Left aligned text[/left]
 [center]Centered text[/center]
-[right]Right aligned text[/right]';
+[right]Right aligned text[/right]
+
+[left]Left[/left][center]Center[/center][right]Right[/right]';
 #endregion
 
 left_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBase);
 	_textbox_instance.set_wrap_enabled(false);
 };
 
 right_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBBCode);
+	_textbox_instance.set_text_processor(WWTextProcessorBBCode);
 	_textbox_instance.set_wrap_enabled(true);
 };
 

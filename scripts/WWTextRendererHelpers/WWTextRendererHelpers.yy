@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"WWTextRendererBBCode",
+  "%Name":"WWTextRendererHelpers",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"WWTextRendererBBCode",
+  "name":"WWTextRendererHelpers",
   "parent":{
     "name":"Renderers",
     "path":"folders/TextBoxV3/Renderers.yy",

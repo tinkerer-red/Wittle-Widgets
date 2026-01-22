@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextProcessorMarkdown",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextProcessorMarkdown",
+  "parent":{
+    "name":"Renderers",
+    "path":"folders/TextBoxV3/Renderers.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

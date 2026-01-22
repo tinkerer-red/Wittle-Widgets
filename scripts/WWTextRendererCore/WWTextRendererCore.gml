@@ -166,12 +166,12 @@ function WWTextRendererCore() : WWCore() constructor {
         #region Events
 
             events.text_change = variable_get_hash("text_change");
-            static on_text_change = function(_func) {
+            static on_change = function(_func) {
                 add_event_listener(events.text_change, _func);
                 return self;
             };
 
-            on_text_change(function(_input) {
+            on_change(function(_input) {
                 __mark_dirty__();
             });
 

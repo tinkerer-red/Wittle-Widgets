@@ -29,6 +29,24 @@ function WWTextBoxV3() : WWCore() constructor {
 		
 		#region Builder Functions
 			
+			#region jsDoc
+			/// @func    set_size()
+			/// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.  
+			///          This updates the region and marks the size as user–preferred so that future internal updates won’t override it.
+			/// @self    WWCore
+			/// @param   {Real} left : The left side of the bounding box
+			/// @param   {Real} top : The top side of the bounding box
+			/// @param   {Real} right : The right side of the bounding box
+			/// @param   {Real} bottom : The bottom side of the bounding box
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_size = function(_width, _height) {
+				renderer.set_size(_width, _height);
+				__size_set__ = true;
+				__set_size__(_width, _height);
+				return self;
+			}
+			
 			#region Text
 				
 				#region jsDoc
@@ -340,6 +358,26 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			
 			#region Syntax Highlight
+				
+				#region jsDoc
+                /// @func   set_text_processor()
+                /// @desc   Sets an optional text processor callback. The processor receives
+                ///         a raw input string and may return a processed output string and
+                ///         span array for layout/rendering.
+                ///
+                ///         Expected return values:
+                ///         - { text: String, spans: Array }
+                ///         - [String, Array]
+                ///         - String (text only, spans will be defaulted)
+                ///
+                ///         Returning undefined disables processing for this build.
+                /// @param  {Function} _processor_fn
+                /// @returns {Struct.WWTextRendererBase}
+                #endregion
+                static set_text_processor = function(_processor_fn) {
+					renderer.set_text_processor(_processor_fn);
+					return self;
+				}
 				
 				#region jsDoc
 				/// @func   set_format_range()
@@ -1204,7 +1242,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real}
 				#endregion
 				static get_content_width = function() {
-					return renderer.get_width();
+					return renderer.get_content_width();
 				}
 				#region jsDoc
 				/// @func    get_content_height()
@@ -1213,7 +1251,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @returns {Real}
 				#endregion
 				static get_content_height = function() {
-					return renderer.get_height();
+					return renderer.get_content_height();
 				}
 				
 			#endregion
@@ -1560,7 +1598,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				///          equals the anchor, selection is cleared; otherwise, selection remains active.
 				/// @self    WWTextInputSingle
 				/// @param   {Bool} _select : Whether selection mode is enabled.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __check_minput__ = function(_select) {
 					// Get mouse coordinates in GUI space.
@@ -1578,7 +1616,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param   {Real} _change : The amount to move the cursor.
 				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
 				/// @param   {Bool} _vertical : Whether the movement is vertical (if false, horizontal).
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
 					static __word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
@@ -1653,7 +1691,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @self    WWTextInputSingle
 				/// @param   {Real} _vector : The direction to move the cursor.
 				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_paged_offset__ = function(_vector, _shift) {
 					if (_vector == 0) return;
@@ -1883,7 +1921,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @desc    Inserts a new string at the cursor position, respecting allowed characters.
 				/// @self    WWTextInputSingle
 				/// @param   {String} _str : The string to insert.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __insert_string_at_cursor__ = function(_str) {
 
@@ -1928,7 +1966,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				///          original anchor word to the current word span, including intermediate
 				///          whitespace.
 				/// @self    WWTextBase
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __update_word_selection_drag__ = function() {
 					// Get current mouse coordinates in GUI space.
@@ -2023,7 +2061,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    __history_add_record__()
 				/// @desc    Captures a new snapshot and pushes it to the undo history.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __history_add_record__ = function() {
 
@@ -2057,7 +2095,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    __history_update_latest_cursor__()
 				/// @desc    Updates the most recent snapshot’s cursor field.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {
 					var _record = __historic_records__[__historic_records_loc__];
@@ -2072,7 +2110,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @desc    Moves through undo/redo history by a signed offset
 				///          and restores the corresponding snapshot.
 				/// @param   {Real} _change : Negative=undo, Positive=redo.
-				/// @returns {undefined}
+				/// @returns {Undefined}
 				#endregion
 				static __history_jump__ = function(_change) {
 

@@ -991,7 +991,7 @@ End of demo.
 		#region jsDoc
 		/// @func   _panel_make_pair(_panel_x, _panel_y, _title_text, _left_text, _left_setup_fn, _right_setup_fn)
 		/// @desc   Builds one panel containing two textboxes (left + right) and two checkboxes.
-		///         Left drives right via on_text_change.
+		///         Left drives right via on_change.
 		///         Renderers are assigned explicitly via set_renderer().
 		#endregion
 		var _panel_make_pair = method(_panel_ctx, function(
@@ -1135,7 +1135,7 @@ End of demo.
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBBCode);
+				_textbox_instance.set_renderer(WWTextProcessorBBCode);
 				_textbox_instance.set_wrap_enabled(true);
 			}
 		);
@@ -1151,7 +1151,7 @@ End of demo.
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererMarkdown);
+				_textbox_instance.set_renderer(WWTextProcessorMarkdown);
 				_textbox_instance.set_wrap_enabled(true);
 				_textbox_instance.set_text_font(fnt_ww_default_small_msdf);
 			}
@@ -1169,7 +1169,7 @@ End of demo.
 				_textbox_instance.set_text_font(fnt_ww_consolas_msdf);
 			},
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererCSS);
+				_textbox_instance.set_renderer(WWTextProcessorCSS);
 				_textbox_instance.set_wrap_enabled(true);
 				_textbox_instance.set_text_font(fnt_ww_consolas_msdf);
 			}

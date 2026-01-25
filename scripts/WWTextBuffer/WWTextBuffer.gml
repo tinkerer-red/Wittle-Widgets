@@ -400,19 +400,78 @@ function WWTextBuffer() : WWCore() constructor {
 
 			static __ensure_byte_offsets__ = function() {
 				if (!__byte_offsets_dirty__) { return; }
-				var _text_value = get_text();
-				var _char_count = __length__;
-				__byte_offsets__ = array_create(_char_count + 1, 0);
-				var _byte_cursor = 0;
-				var _char_index1 = 1;
-				repeat (_char_count) {
-					__byte_offsets__[_char_index1 - 1] = _byte_cursor;
-					var _char_value = string_char_at(_text_value, _char_index1);
-					_byte_cursor += string_byte_length(_char_value);
-					_char_index1 += 1;
+
+				if (!buffer_exists(__buffer__)) {
+					__byte_offsets__ = [0];
+					__byte_total__ = 0;
+					__length__ = 0;
+					__byte_offsets_dirty__ = false;
+					return;
 				}
-				__byte_offsets__[_char_count] = _byte_cursor;
-				__byte_total__ = _byte_cursor;
+
+				// Build char-index -> byte-index mapping by scanning the UTF-8 bytes in the backing buffer.
+				// This avoids per-character string slicing (string_char_at), which becomes O(n^2) for large strings.
+				var _buf = __buffer__;
+				var _buf_size = buffer_get_size(_buf);
+				var _pos = 0;
+				var _char_count = 0;
+
+				// Pass 1: count characters + find total used bytes (stop at first 0 byte).
+				while (_pos < _buf_size) {
+					var _b0 = buffer_peek(_buf, _pos, buffer_u8);
+					if (_b0 == 0) { break; }
+
+					var _step = 1;
+					if (_b0 < 128) {
+						_step = 1;
+					} else if ((_b0 & 224) == 192) {
+						_step = 2;
+					} else if ((_b0 & 240) == 224) {
+						_step = 3;
+					} else if ((_b0 & 248) == 240) {
+						_step = 4;
+					} else {
+						_step = 1;
+					}
+
+					_pos += _step;
+					_char_count += 1;
+				}
+
+				var _byte_total = _pos;
+				__byte_total__ = _byte_total;
+				__length__ = _char_count;
+
+				// Allocate/reuse array.
+				var _need_len = _char_count + 1;
+				if (is_undefined(__byte_offsets__) || array_length(__byte_offsets__) != _need_len) {
+					__byte_offsets__ = array_create(_need_len, 0);
+				}
+
+				// Pass 2: fill offsets.
+				_pos = 0;
+				var _i = 0;
+				repeat (_char_count) {
+					__byte_offsets__[_i] = _pos;
+					var _b = buffer_peek(_buf, _pos, buffer_u8);
+
+					var _step2 = 1;
+					if (_b < 128) {
+						_step2 = 1;
+					} else if ((_b & 224) == 192) {
+						_step2 = 2;
+					} else if ((_b & 240) == 224) {
+						_step2 = 3;
+					} else if ((_b & 248) == 240) {
+						_step2 = 4;
+					} else {
+						_step2 = 1;
+					}
+
+					_pos += _step2;
+					_i += 1;
+				}
+				__byte_offsets__[_char_count] = _byte_total;
 				__byte_offsets_dirty__ = false;
 			};
 			

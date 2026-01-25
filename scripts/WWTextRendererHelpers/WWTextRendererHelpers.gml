@@ -7,6 +7,43 @@
 
 #region State
 
+// Patch bitmask (compiled lazily into patch structs)
+#macro __WW_TP_PATCH_COLOR      (1 << 0)
+#macro __WW_TP_PATCH_ALPHA      (1 << 1)
+#macro __WW_TP_PATCH_FONT       (1 << 2)
+#macro __WW_TP_PATCH_STYLE      (1 << 3)
+#macro __WW_TP_PATCH_SIZE_MUL   (1 << 4)
+#macro __WW_TP_PATCH_UNDERLINE  (1 << 5)
+#macro __WW_TP_PATCH_STRIKE     (1 << 6)
+#macro __WW_TP_PATCH_BACK_COLOR (1 << 7)
+#macro __WW_TP_PATCH_BACK_ALPHA (1 << 8)
+#macro __WW_TP_PATCH_ALIGN      (1 << 9)
+
+/// @func    __ww_textproc_patch_compile__()
+/// @desc    Adds a cached bitmask onto a patch struct, so hot loops can avoid variable_struct_exists.
+///          The mask is stored under key "__ww_tp_mask".
+/// @param   {Struct} _patch
+/// @returns {Struct} patch
+function __ww_textproc_patch_compile__(_patch) {
+	if (is_undefined(_patch)) { return _patch; }
+	if (variable_struct_exists(_patch, "__ww_tp_mask")) { return _patch; }
+	
+	var _m = 0;
+	if (variable_struct_exists(_patch, "color"))      { _m |= __WW_TP_PATCH_COLOR; }
+	if (variable_struct_exists(_patch, "alpha"))      { _m |= __WW_TP_PATCH_ALPHA; }
+	if (variable_struct_exists(_patch, "font_asset")) { _m |= __WW_TP_PATCH_FONT; }
+	if (variable_struct_exists(_patch, "style"))      { _m |= __WW_TP_PATCH_STYLE; }
+	if (variable_struct_exists(_patch, "size_mul"))   { _m |= __WW_TP_PATCH_SIZE_MUL; }
+	if (variable_struct_exists(_patch, "underline"))  { _m |= __WW_TP_PATCH_UNDERLINE; }
+	if (variable_struct_exists(_patch, "strike"))     { _m |= __WW_TP_PATCH_STRIKE; }
+	if (variable_struct_exists(_patch, "back_color")) { _m |= __WW_TP_PATCH_BACK_COLOR; }
+	if (variable_struct_exists(_patch, "back_alpha")) { _m |= __WW_TP_PATCH_BACK_ALPHA; }
+	if (variable_struct_exists(_patch, "align_value")) { _m |= __WW_TP_PATCH_ALIGN; }
+
+	_patch.__ww_tp_mask = _m;
+	return _patch;
+}
+
 /// @func    __ww_textproc_state_clone__()
 /// @param   {Struct} _state
 /// @returns {Struct} cloned_state
@@ -37,22 +74,21 @@ function __ww_textproc_state_clone__(_state) {
 /// @param   {Struct} _state
 /// @param   {Struct} _patch
 function __ww_textproc_state_apply_patch__(_state, _patch) {
-
 	if (is_undefined(_patch)) { return; }
+	_patch = __ww_textproc_patch_compile__(_patch);
+	var _m = _patch.__ww_tp_mask;
+	if (_m == 0) { return; }
 
-	if (variable_struct_exists(_patch, "color")) { _state.color = _patch.color; }
-	if (variable_struct_exists(_patch, "alpha")) { _state.alpha = _patch.alpha; }
-
-	if (variable_struct_exists(_patch, "font_asset")) { _state.font_asset = _patch.font_asset; }
-	if (variable_struct_exists(_patch, "style")) { _state.style = _patch.style; }
-	if (variable_struct_exists(_patch, "size_mul")) { _state.size_mul = _patch.size_mul; }
-
-	if (variable_struct_exists(_patch, "underline")) { _state.underline = _patch.underline; }
-	if (variable_struct_exists(_patch, "strike")) { _state.strike = _patch.strike; }
-
-	if (variable_struct_exists(_patch, "back_color")) { _state.back_color = _patch.back_color; }
-	if (variable_struct_exists(_patch, "back_alpha")) { _state.back_alpha = _patch.back_alpha; }
-	if (variable_struct_exists(_patch, "align_value")) { _state.align_value = _patch.align_value; }
+	if (_m & __WW_TP_PATCH_COLOR)      { _state.color      = _patch.color; }
+	if (_m & __WW_TP_PATCH_ALPHA)      { _state.alpha      = _patch.alpha; }
+	if (_m & __WW_TP_PATCH_FONT)       { _state.font_asset = _patch.font_asset; }
+	if (_m & __WW_TP_PATCH_STYLE)      { _state.style      = _patch.style; }
+	if (_m & __WW_TP_PATCH_SIZE_MUL)   { _state.size_mul   = _patch.size_mul; }
+	if (_m & __WW_TP_PATCH_UNDERLINE)  { _state.underline  = _patch.underline; }
+	if (_m & __WW_TP_PATCH_STRIKE)     { _state.strike     = _patch.strike; }
+	if (_m & __WW_TP_PATCH_BACK_COLOR) { _state.back_color = _patch.back_color; }
+	if (_m & __WW_TP_PATCH_BACK_ALPHA) { _state.back_alpha = _patch.back_alpha; }
+	if (_m & __WW_TP_PATCH_ALIGN)      { _state.align_value = _patch.align_value; }
 }
 
 #endregion
@@ -117,6 +153,7 @@ function __ww_textproc_ctx_begin__(_default_state) {
 		out_len: 0,
 
 		spans: [],
+		align_runs: [],
 		state: __ww_textproc_state_clone__(_default_state),
 		span_start: 0
 	};
@@ -149,29 +186,40 @@ function __ww_textproc_ctx_flush_span__(_ctx, _end_index) {
 /// @param   {Struct} _ctx
 /// @param   {Struct} _patch
 function __ww_textproc_ctx_apply_patch__(_ctx, _patch) {
-
 	if (is_undefined(_patch)) { return; }
+	_patch = __ww_textproc_patch_compile__(_patch);
+	var _m = _patch.__ww_tp_mask;
+	if (_m == 0) { return; }
 
+	var _state = _ctx.state;
 	var _needs_flush = false;
 
-	if (variable_struct_exists(_patch, "color") && _ctx.state.color != _patch.color) { _needs_flush = true; }
-	if (variable_struct_exists(_patch, "alpha") && _ctx.state.alpha != _patch.alpha) { _needs_flush = true; }
-
-	if (variable_struct_exists(_patch, "font_asset") && _ctx.state.font_asset != _patch.font_asset) { _needs_flush = true; }
-	if (variable_struct_exists(_patch, "style") && _ctx.state.style != _patch.style) { _needs_flush = true; }
-	if (variable_struct_exists(_patch, "size_mul") && _ctx.state.size_mul != _patch.size_mul) { _needs_flush = true; }
-
-	if (variable_struct_exists(_patch, "underline") && _ctx.state.underline != _patch.underline) { _needs_flush = true; }
-	if (variable_struct_exists(_patch, "strike") && _ctx.state.strike != _patch.strike) { _needs_flush = true; }
-
-	if (variable_struct_exists(_patch, "back_color") && _ctx.state.back_color != _patch.back_color) { _needs_flush = true; }
-	if (variable_struct_exists(_patch, "back_alpha") && _ctx.state.back_alpha != _patch.back_alpha) { _needs_flush = true; }
+	if (_m & __WW_TP_PATCH_COLOR)      { if (_state.color      != _patch.color)      { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_ALPHA)      { if (_state.alpha      != _patch.alpha)      { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_FONT)       { if (_state.font_asset != _patch.font_asset) { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_STYLE)      { if (_state.style      != _patch.style)      { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_SIZE_MUL)   { if (_state.size_mul   != _patch.size_mul)   { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_UNDERLINE)  { if (_state.underline  != _patch.underline)  { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_STRIKE)     { if (_state.strike     != _patch.strike)     { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_BACK_COLOR) { if (_state.back_color != _patch.back_color) { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_BACK_ALPHA) { if (_state.back_alpha != _patch.back_alpha) { _needs_flush = true; } }
+	if (_m & __WW_TP_PATCH_ALIGN)      { if (_state.align_value != _patch.align_value) { _needs_flush = true; } }
 
 	if (_needs_flush) {
 		__ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
 	}
 
-	__ww_textproc_state_apply_patch__(_ctx.state, _patch);
+	// Apply patch values (no extra variable_struct_exists checks).
+	if (_m & __WW_TP_PATCH_COLOR)      { _state.color      = _patch.color; }
+	if (_m & __WW_TP_PATCH_ALPHA)      { _state.alpha      = _patch.alpha; }
+	if (_m & __WW_TP_PATCH_FONT)       { _state.font_asset = _patch.font_asset; }
+	if (_m & __WW_TP_PATCH_STYLE)      { _state.style      = _patch.style; }
+	if (_m & __WW_TP_PATCH_SIZE_MUL)   { _state.size_mul   = _patch.size_mul; }
+	if (_m & __WW_TP_PATCH_UNDERLINE)  { _state.underline  = _patch.underline; }
+	if (_m & __WW_TP_PATCH_STRIKE)     { _state.strike     = _patch.strike; }
+	if (_m & __WW_TP_PATCH_BACK_COLOR) { _state.back_color = _patch.back_color; }
+	if (_m & __WW_TP_PATCH_BACK_ALPHA) { _state.back_alpha = _patch.back_alpha; }
+	if (_m & __WW_TP_PATCH_ALIGN)      { _state.align_value = _patch.align_value; }
 }
 
 /// @func    __ww_textproc_ctx_finish__()

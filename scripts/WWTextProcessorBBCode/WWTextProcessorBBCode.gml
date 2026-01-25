@@ -6,6 +6,30 @@
 /// @param   {Struct} _default_state
 /// @returns {Struct} { text, spans, align_runs }
 #endregion
+
+function __ww_bbcode_find_u8__(_buff, _start, _endd, _target_u8) {
+
+    var _pos = _start;
+    while (_pos < _endd) {
+        if (buffer_peek(_buff, _pos, buffer_u8) == _target_u8) {
+            return _pos;
+        }
+        _pos += 1;
+    }
+
+    return -1;
+}
+
+function __ww_bbcode_init_input_buff__(_text) {
+    static __bbcode_in_buff = buffer_create(0, buffer_grow, 1);
+
+    buffer_seek(__bbcode_in_buff, buffer_seek_start, 0);
+    buffer_write(__bbcode_in_buff, buffer_text, _text);
+    var _byte_len = buffer_tell(__bbcode_in_buff);
+    buffer_write(__bbcode_in_buff, buffer_u64, 0);
+
+    return [ __bbcode_in_buff, _byte_len ];
+}
 function WWTextProcessorBBCode(_raw_text, _default_state) {
 
     var _ctx = __ww_textproc_ctx_begin__(_default_state);
@@ -30,7 +54,9 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
         return _res_empty;
     }
 
-    var _length = string_length(_raw_text);
+    var _in_pair = __ww_bbcode_init_input_buff__(_raw_text);
+    var _in_buff = _in_pair[0];
+    var _in_len = _in_pair[1];
 
     // Stack entries: { tag_name, prev_state }
     var _state_stack = [];
@@ -41,50 +67,45 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
     // NOTE: updates _align_start to _ctx.out_len
     // (implemented as repeated code blocks where needed)
 
-    var _index = 1;
-    while (_index <= _length) {
+    var _pos = 0;
+    while (_pos < _in_len) {
 
-        var _character = string_char_at(_raw_text, _index);
+        // Emit plain text up to next '[' in a single chunk.
+        var _open_pos = __ww_bbcode_find_u8__(_in_buff, _pos, _in_len, 91); // '['
+        if (_open_pos < 0) {
+            __ww_textproc_ctx_append_text__(_ctx, regex__buffer_read_text_range(_in_buff, _pos, _in_len));
+            break;
+        }
 
-        if (_character != "[") {
-            __ww_textproc_ctx_append_text__(_ctx, _character);
-            _index += 1;
+        if (_open_pos > _pos) {
+            __ww_textproc_ctx_append_text__(_ctx, regex__buffer_read_text_range(_in_buff, _pos, _open_pos));
+            _pos = _open_pos;
+        }
+
+        // Scan for closing bracket ']'
+        var _close_pos = __ww_bbcode_find_u8__(_in_buff, _pos + 1, _in_len, 93); // ']'
+
+        // No close bracket -> literal '['
+        if (_close_pos < 0) {
+            __ww_textproc_ctx_append_text__(_ctx, regex__buffer_read_text_range(_in_buff, _pos, _pos + 1));
+            _pos += 1;
             continue;
         }
 
-        // Scan for closing bracket
-        var _close_index = 0;
-        var _scan_index = _index + 1;
-
-        while (_scan_index <= _length) {
-            if (string_char_at(_raw_text, _scan_index) == "]") {
-                _close_index = _scan_index;
-                break;
-            }
-            _scan_index += 1;
-        }
-
-        // No close bracket -> literal
-        if (_close_index == 0) {
-            __ww_textproc_ctx_append_text__(_ctx, _character);
-            _index += 1;
-            continue;
-        }
-
-        var _tag_raw = string_copy(_raw_text, _index + 1, (_close_index - _index) - 1);
+        var _tag_raw = regex__buffer_read_text_range(_in_buff, _pos + 1, _close_pos);
         var _tag_trim = string_trim(_tag_raw);
         var _tag = string_lower(_tag_trim);
 
         // Self-closing emitters
         if (_tag == "br" || _tag == "br/") {
             __ww_textproc_ctx_append_text__(_ctx, "\n");
-            _index = _close_index + 1;
+            _pos = _close_pos + 1;
             continue;
         }
 
         if (_tag == "p" || _tag == "p/") {
             __ww_textproc_ctx_append_text__(_ctx, "\n\n");
-            _index = _close_index + 1;
+            _pos = _close_pos + 1;
             continue;
         }
 
@@ -146,14 +167,14 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                     _ctx.span_start = _ctx.out_len;
 
-                    _index = _close_index + 1;
+                    _pos = _close_pos + 1;
                     continue;
                 }
             }
 
             // Unknown close -> literal
             __ww_textproc_ctx_append_text__(_ctx, "[" + _tag_raw + "]");
-            _index = _close_index + 1;
+            _pos = _close_pos + 1;
             continue;
         }
 
@@ -174,7 +195,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                 _ctx.span_start = _ctx.out_len;
 
-                _index = _close_index + 1;
+                _pos = _close_pos + 1;
                 continue;
             }
 
@@ -188,7 +209,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                 _ctx.span_start = _ctx.out_len;
 
-                _index = _close_index + 1;
+                _pos = _close_pos + 1;
                 continue;
             }
 
@@ -204,7 +225,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                 _ctx.span_start = _ctx.out_len;
 
-                _index = _close_index + 1;
+                _pos = _close_pos + 1;
                 continue;
             }
 
@@ -219,7 +240,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                 _ctx.span_start = _ctx.out_len;
 
-                _index = _close_index + 1;
+                _pos = _close_pos + 1;
                 continue;
             }
 
@@ -236,7 +257,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
                 _ctx.span_start = _ctx.out_len;
 
-                _index = _close_index + 1;
+                _pos = _close_pos + 1;
                 continue;
             }
         }
@@ -294,14 +315,16 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
             _ctx.span_start = _ctx.out_len;
 
-            _index = _close_index + 1;
+            _pos = _close_pos + 1;
             continue;
         }
 
         // Unknown tag -> literal, preserve full token and do not affect stack.
         __ww_textproc_ctx_append_text__(_ctx, "[" + _tag_raw + "]");
-        _index = _close_index + 1;
+        _pos = _close_pos + 1;
     }
+
+    buffer_resize(_in_buff, 0);
 
     // Auto-close remaining tags: restore states, tracking alignment changes.
     var _remaining = array_length(_state_stack);

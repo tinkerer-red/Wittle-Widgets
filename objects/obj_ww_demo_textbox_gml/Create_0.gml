@@ -27,7 +27,10 @@ left_init = function(_textbox_instance) {
 };
 
 right_init = function(_textbox_instance) {
-    //_textbox_instance.set_text_processor(WWTextRendererGML);
+	var _xml = file_read_all_text("GMLv2.3.xml");
+	processor = ww_textproc_build_from_npp_udl_xml(_xml);
+	
+    _textbox_instance.set_text_processor(processor);
     _textbox_instance.set_text_font(fnt_ww_consolas_msdf);
     _textbox_instance.set_wrap_enabled(false);
 };

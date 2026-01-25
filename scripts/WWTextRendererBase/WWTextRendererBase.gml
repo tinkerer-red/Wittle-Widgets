@@ -438,6 +438,39 @@ function WWTextRendererBase() : WWCore() constructor {
             // Formatting / diagnostics (optional)
             formatting_enabled = true;
 
+            // VB emission culling (performance)
+            // If a GPU scissor is active, only emit glyph geometry for that visible region (plus margin).
+            // VB will be rebuilt only when the scissor window moves outside the previously emitted region.
+            vb_cull_emits_to_scissor = true;
+            vb_scissor_margin = 1;
+
+            // Progressive VB emission ("green threads")
+            // Builds the visible scissor region first, then expands the emitted region outward over
+            // subsequent frames to avoid emitting all glyphs at once.
+            vb_progressive_emit_enabled = true;
+            vb_progressive_emit_expand_px = 256;
+            vb_progressive_chunk_height_px = 512;
+            vb_progressive_chunk_width_px = 1024;
+            vb_progressive_chunk_lines = 32;
+
+            // Keep only chunks near the visible region (prevents batch count from exploding)
+            vb_progressive_cache_chunk_radius = 2;
+
+            // If glyph count is small, skip culling/chunking and build everything.
+            vb_small_text_full_build_glyphs = 2048;
+
+            // Debug overlay for VB culling
+            vb_debug_show_cull = false;
+            vb_debug_cull_color_cached = c_lime;
+            vb_debug_cull_color_desired = c_aqua;
+            vb_debug_cull_color_scissor = c_red;
+
+            // Debug overlay: chunk grid boundaries
+            vb_debug_show_chunks = true;
+
+            // Debug overlay: progressive/chunk status HUD
+            vb_debug_show_progressive = false;
+
             // Whitespace visualization
             whitespace_visible = false;
             whitespace_marker_space = ".";
@@ -468,6 +501,7 @@ function WWTextRendererBase() : WWCore() constructor {
             // Tabs
             tab_size_spaces = 4;
             tab_use_stops = true;
+
 			
         #endregion
 
@@ -508,32 +542,34 @@ function WWTextRendererBase() : WWCore() constructor {
                 #endregion
                 static get_x_from_index = function(_index) {
                     __ensure_layout__();
-
+					
                     var _lines = __layout_lines__;
                     var _glyphs = __layout_glyphs__;
-
+					
+					if (array_length(_glyphs) == 0) return 0;
+					
                     var _line_index = get_line_from_index(_index);
                     var _line_base = _line_index * __WW_Layout_Line.__Size__;
-
+					
                     var _start_index = _lines[_line_base + __WW_Layout_Line.Start_Index];
                     var _end_index = _lines[_line_base + __WW_Layout_Line.End_Index];
                     var _line_width_val = _lines[_line_base + __WW_Layout_Line.Width];
-
+					
                     var _line_len = _end_index - _start_index;
                     if (_line_len <= 0) {
                         return 0;
                     }
-
+					
                     if (_index <= _start_index) {
                         return 0;
                     }
                     if (_index >= _end_index) {
                         return _line_width_val;
                     }
-
+					
                     var _target_index = _index;
                     var _sum_width = 0;
-
+					
                     // Glyph indices are emitted in logical order, so we can walk by index.
                     var _walk_index = _start_index;
                     repeat (_target_index - _start_index) {
@@ -541,10 +577,10 @@ function WWTextRendererBase() : WWCore() constructor {
                         _sum_width += _glyphs[_glyph_base + __WW_Layout_Glyph.Width];
                         _walk_index += 1;
                     }
-
+					
                     return _sum_width;
                 };
-
+				
                 #region jsDoc
                 /// @func   get_y_from_index()
                 /// @param  {Real} _index
@@ -555,8 +591,11 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     var _line_index = get_line_from_index(_index);
                     var _lines = __layout_lines__;
+					
+					if (array_length(_lines) == 0) return 0;
+					
                     var _base = _line_index * __WW_Layout_Line.__Size__;
-
+					
                     return _lines[_base + __WW_Layout_Line.Y_Offset];
                 };
 
@@ -962,6 +1001,35 @@ function WWTextRendererBase() : WWCore() constructor {
             __vb_is_dirty__ = true;
             __vb_format__ = undefined;
 
+            // Optional emit culling region (local coords, relative to draw origin)
+            __vb_emit_clip__ = undefined;
+            __vb_last_emit_clip__ = undefined;
+            __vb_desired_emit_clip__ = undefined;
+
+            __vb_progressive_active__ = false;
+            __vb_progressive_last_step_ms__ = -1;
+
+            // VB render mode: 0=full, 1=scissor-clip, 2=progressive-chunks
+            __vb_render_mode__ = 0;
+
+            // Chunk-based progressive build state
+            __vb_built_this_frame__ = false;
+            __vb_needs_full_rebuild__ = true;
+            __vb_force_full_build__ = false;
+            __vb_open_buffers__ = [];
+            __vb_pending_chunks__ = [];
+            __vb_chunk_built__ = [];
+            __vb_chunk_count__ = 0;
+            __vb_visible_chunk_min__ = 0;
+            __vb_visible_chunk_max__ = -1;
+            __vb_keep_chunk_min__ = 0;
+            __vb_keep_chunk_max__ = -1;
+            __vb_current_chunk_id__ = -1;
+            __vb_current_chunk_bounds__ = undefined;
+
+            __vb_dbg_last_total_glyphs__ = 0;
+            __vb_dbg_last_emitted_glyphs__ = 0;
+
             // Unified draw batches
             __draw_batches__ = [];
 
@@ -993,11 +1061,59 @@ function WWTextRendererBase() : WWCore() constructor {
 
             static __mark_vb_dirty__ = function() {
                 __vb_is_dirty__ = true;
+                __vb_needs_full_rebuild__ = true;
+                __vb_force_full_build__ = false;
+                __vb_pending_chunks__ = [];
+                __vb_chunk_built__ = [];
+                __vb_chunk_count__ = 0;
+                __vb_visible_chunk_min__ = 0;
+                __vb_visible_chunk_max__ = -1;
+                __vb_keep_chunk_min__ = 0;
+                __vb_keep_chunk_max__ = -1;
             };
 
         #endregion
 
         #region VB batch helpers
+
+            static __vb_queue_chunk_unique__ = function(_chunk_id) {
+                if (is_undefined(_chunk_id) || _chunk_id < 0) {
+                    return;
+                }
+
+                // Avoid duplicates in the pending queue
+                var _i = 0;
+                var _n = array_length(__vb_pending_chunks__);
+                repeat (_n) {
+                    if (__vb_pending_chunks__[_i] == _chunk_id) {
+                        return;
+                    }
+                    _i += 1;
+                }
+
+                array_push(__vb_pending_chunks__, _chunk_id);
+            };
+
+            static __vb_delete_batches_for_chunk__ = function(_chunk_id) {
+                if (is_undefined(_chunk_id) || _chunk_id < 0) {
+                    return;
+                }
+
+                var _b = array_length(__draw_batches__) - 1;
+                while (_b >= 0) {
+                    var _batch = __draw_batches__[_b];
+                    if (!is_undefined(_batch) && _batch.chunk_id == _chunk_id) {
+                        if (!is_undefined(_batch.material) && is_callable(_batch.material.destroy)) {
+                            _batch.material.destroy();
+                        }
+                        if (!is_undefined(_batch.buffer)) {
+                            vertex_delete_buffer(_batch.buffer);
+                        }
+                        array_delete(__draw_batches__, _b, 1);
+                    }
+                    _b -= 1;
+                }
+            };
 
 			#region jsDoc
 			/// @func   __vb_get_batch_for_material__()
@@ -1007,20 +1123,28 @@ function WWTextRendererBase() : WWCore() constructor {
 			/// @param  {Real} _spread
 			/// @returns {Struct} batch
 			#endregion
-			static __vb_get_batch_for_material__ = function(_tex, _layer, _shader, _spread) {
+            static __vb_get_batch_for_material__ = function(_tex, _layer, _shader, _spread, _chunk_id) {
+
+                // Normalize keys so comparisons are stable (avoid undefined equality edge-cases)
+                var _shader_key = _shader;
+                if (is_undefined(_shader_key) || _shader_key == -1) { _shader_key = -1; }
+
+                var _spread_key = _spread;
+                if (is_undefined(_spread_key)) { _spread_key = 0; }
 
 			    var _batch_count = array_length(__draw_batches__);
 			    var _batch_index = 0;
 
-			    repeat (_batch_count) {
+                repeat (_batch_count) {
 			        var _batch = __draw_batches__[_batch_index];
 
-			        if (_batch.layer == _layer) {
+                    if (_batch.layer == _layer && _batch.chunk_id == _chunk_id) {
 
 			            var _material = _batch.material;
 
 			            if (!is_undefined(_material)) {
-			                if (_material.tex == _tex && _material.shader == _shader && _material.spread == _spread) {
+                            // Spread is numeric; shader can be undefined in some paths, so compare normalized key.
+                            if (_material.tex == _tex && _material.shader == _shader_key && _material.spread == _spread_key) {
 			                    return _batch;
 			                }
 			            }
@@ -1033,34 +1157,37 @@ function WWTextRendererBase() : WWCore() constructor {
 			    var _closure = {
 			        vb: _vertex_buffer,
 			        tex: _tex,
-			        shader: _shader,
-			        spread: _spread
+                    shader: _shader_key,
+                    spread: _spread_key
 			    };
 
-			    var _draw_fn = method(_closure, function(_x, _y) {
-			        if (!is_undefined(shader)) {
-			            shader_set(shader);
-			            vertex_submit(vb, pr_trianglelist, tex);
-			            shader_reset();
-			        } else {
-			            vertex_submit(vb, pr_trianglelist, tex);
-			        }
-			    });
+                var _draw_fn = method(_closure, function(_x, _y) {
+                    if (shader != -1) {
+                        shader_set(shader);
+                        vertex_submit(vb, pr_trianglelist, tex);
+                        shader_reset();
+                    } else {
+                        vertex_submit(vb, pr_trianglelist, tex);
+                    }
+                });
 
 			    var _new_material = new WWMaterial(_draw_fn);
 			    _new_material.tex = _tex;
-			    _new_material.shader = _shader;
-			    _new_material.spread = _spread;
+                _new_material.shader = _shader_key;
+                _new_material.spread = _spread_key;
 
 			    var _new_batch = {
 			        material: _new_material,
 			        buffer: _vertex_buffer,
 			        format: __vb_format__,
-			        layer: _layer
+                    layer: _layer,
+                    chunk_id: _chunk_id,
+                    bounds: __vb_current_chunk_bounds__
 			    };
 
 			    array_push(__draw_batches__, _new_batch);
 			    vertex_begin(_new_batch.buffer, _new_batch.format);
+                array_push(__vb_open_buffers__, _new_batch.buffer);
 
 			    return _new_batch;
 			};
@@ -1623,6 +1750,7 @@ function WWTextRendererBase() : WWCore() constructor {
             static __build_layout__ = function(_str, _spans=undefined) {
 
                 static __empty_arr = [];
+				static __layout_in_buff = buffer_create(0, buffer_grow, 1);
 
                 _spans ??= __empty_arr;
 
@@ -1632,6 +1760,14 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     return;
                 }
+
+                // Buffer input for fast scanning (UTF-8) + sentinel
+                var _byte_len = string_byte_length(_str);
+                buffer_resize(__layout_in_buff, _byte_len + 8);
+                buffer_seek(__layout_in_buff, buffer_seek_start, 0);
+                buffer_write(__layout_in_buff, buffer_text, _str);
+                buffer_write(__layout_in_buff, buffer_u64, 0);
+                buffer_seek(__layout_in_buff, buffer_seek_start, 0);
 
                 var _text_length = string_length(_str);
 
@@ -1747,7 +1883,11 @@ function WWTextRendererBase() : WWCore() constructor {
 				var _height_since_break = 0;
 
 				var _logical_index = 0;
-				while (_logical_index < _text_length) {
+                var _byte_pos = 0;
+                var _line_start_byte = 0;
+                var _last_break_byte_end = -1;
+
+                while (_byte_pos < _byte_len) {
 
 				    // Advance metric run if needed
 				    while (_metric_remaining <= 0 && _metric_run_index < _metric_run_count - 1) {
@@ -1806,22 +1946,61 @@ function WWTextRendererBase() : WWCore() constructor {
 				        }
 				    }
 
-				    var _char_val = string_char_at(_str, _logical_index + 1);
 
-				    // Explicit newlines break lines, include newline glyph in segment.
-				    if (_char_val == "\n" || _char_val == "\r") {
+                    // Read one UTF-8 codepoint from buffer (forward-only)
+                    var _char_byte_start = _byte_pos;
+                    var _b0 = buffer_read(__layout_in_buff, buffer_u8);
+                    _byte_pos += 1;
+
+                    var _cp = _b0;
+                    if ((_b0 & $80) != 0) {
+                        // 2-byte: 110xxxxx 10xxxxxx
+                        if ((_b0 & $E0) == $C0) {
+                            var _b1 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            _cp = ((_b0 & $1F) << 6) | (_b1 & $3F);
+                        }
+                        // 3-byte: 1110xxxx 10xxxxxx 10xxxxxx
+                        else if ((_b0 & $F0) == $E0) {
+                            var _b2 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            var _b3 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            _cp = ((_b0 & $0F) << 12) | ((_b2 & $3F) << 6) | (_b3 & $3F);
+                        }
+                        // 4-byte: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+                        else if ((_b0 & $F8) == $F0) {
+                            var _b4 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            var _b5 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            var _b6 = (_byte_pos < _byte_len) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                            _byte_pos += 1;
+                            _cp = ((_b0 & $07) << 18) | ((_b4 & $3F) << 12) | ((_b5 & $3F) << 6) | (_b6 & $3F);
+                        }
+                    }
+
+                    var _char_byte_end = _byte_pos;
+
+                    // Explicit newlines break lines, include newline glyph in segment.
+                    if (_cp == 10 || _cp == 13) {
 
 				        array_push(_line_segments, {
 				            start_index: _line_start_index,
 				            end_index: _logical_index + 1,
+                            start_byte: _line_start_byte,
+                            end_byte: _char_byte_end,
+                            text_end_byte: _char_byte_start,
 				            force_wrapped: false
 				        });
 
 				        _line_start_index = _logical_index + 1;
+                        _line_start_byte = _char_byte_end;
 				        _line_width = 0;
 				        _line_height = 0;
 
 				        _last_break_pos = -1;
+                        _last_break_byte_end = -1;
 				        _width_since_break = 0;
 				        _height_since_break = 0;
 
@@ -1831,10 +2010,10 @@ function WWTextRendererBase() : WWCore() constructor {
 				        continue;
 				    }
 
-				    // Measure advance in "layout units" (scaled width)
-				    var _advance = 0;
+                    // Measure advance in "layout units" (scaled width)
+                    var _advance = 0;
 
-				    if (_char_val == "\t") {
+                    if (_cp == 9) {
 
 				        if (tab_use_stops) {
 				            var _next_stop = ceil((_line_width + 0.001) / _active_tab_width) * _active_tab_width;
@@ -1843,13 +2022,13 @@ function WWTextRendererBase() : WWCore() constructor {
 				            _advance = _active_tab_width;
 				        }
 
-				    } else if (_char_val == " ") {
+                    } else if (_cp == 32) {
 
 				        _advance = _active_space_width * _metric_size_mul;
 
 				    } else {
-
-				        _advance = string_width(_char_val) * _metric_size_mul;
+                        var _char_val = chr(_cp);
+                        _advance = string_width(_char_val) * _metric_size_mul;
 				    }
 
 				    var _char_height = _active_font_height * _metric_size_mul;
@@ -1857,20 +2036,24 @@ function WWTextRendererBase() : WWCore() constructor {
 				        _line_height = _char_height;
 				    }
 
-				    // If we overflow and can wrap, split.
-				    if (_wrap_enabled && (_line_width + _advance) > _width_limit && _line_start_index < _logical_index) {
+                    // If we overflow and can wrap, split.
+                    if (_wrap_enabled && (_line_width + _advance) > _width_limit && _line_start_index < _logical_index) {
 
-				        if (_last_break_pos >= _line_start_index) {
+                        if (_last_break_pos >= _line_start_index) {
 
 				            // Split at last break (includes the break char in previous segment)
 				            array_push(_line_segments, {
 				                start_index: _line_start_index,
 				                end_index: _last_break_pos + 1,
+                                start_byte: _line_start_byte,
+                                end_byte: _last_break_byte_end,
+                                text_end_byte: _last_break_byte_end,
 				                force_wrapped: true
 				            });
 
 				            // New line begins after break char.
 				            _line_start_index = _last_break_pos + 1;
+                            _line_start_byte = _last_break_byte_end;
 
 				            // Current char becomes the first char on the new line.
 				            _line_width = _width_since_break + _advance;
@@ -1883,6 +2066,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
 				            // No valid break recorded within this new line yet.
 				            _last_break_pos = -1;
+                            _last_break_byte_end = -1;
 
 				            // Since-break now means since the *new* last break, which doesn't exist yet,
 				            // so it should equal current line width/height so far.
@@ -1900,28 +2084,34 @@ function WWTextRendererBase() : WWCore() constructor {
 				            array_push(_line_segments, {
 				                start_index: _line_start_index,
 				                end_index: _logical_index,
+                                start_byte: _line_start_byte,
+                                end_byte: _char_byte_start,
+                                text_end_byte: _char_byte_start,
 				                force_wrapped: true
 				            });
 
 				            _line_start_index = _logical_index;
+                            _line_start_byte = _char_byte_start;
 				            _line_width = 0;
 				            _line_height = 0;
 
 				            _last_break_pos = -1;
+                            _last_break_byte_end = -1;
 				            _width_since_break = 0;
 				            _height_since_break = 0;
 
-				            continue;
+                            // Now fall through and commit this char to the new line.
 				        }
 				    }
 
 				    // Commit the char to the current line
 				    _line_width += _advance;
 
-				    // Break opportunities: record last break pos and reset remainder accumulators
-				    if (_char_val == " " || _char_val == "\t") {
+                    // Break opportunities: record last break pos and reset remainder accumulators
+                    if (_cp == 32 || _cp == 9) {
 
 				        _last_break_pos = _logical_index;
+                        _last_break_byte_end = _char_byte_end;
 
 				        // Remainder begins AFTER this break char
 				        _width_since_break = 0;
@@ -1943,10 +2133,13 @@ function WWTextRendererBase() : WWCore() constructor {
 				}
 
 				// Last segment
-				if (_line_start_index <= _text_length) {
+                if (_line_start_index <= _logical_index) {
 				    array_push(_line_segments, {
 				        start_index: _line_start_index,
-				        end_index: _text_length,
+                        end_index: _logical_index,
+                        start_byte: _line_start_byte,
+                        end_byte: _byte_len,
+                        text_end_byte: _byte_len,
 				        force_wrapped: false
 				    });
 				}
@@ -2005,13 +2198,19 @@ function WWTextRendererBase() : WWCore() constructor {
                     var _seg = _line_segments[_segment_index];
                     var _seg_start = _seg.start_index;
                     var _seg_end = _seg.end_index;
+					var _seg_start_byte = _seg.start_byte;
+					var _seg_end_byte = _seg.end_byte;
+					var _seg_text_end_byte = _seg.text_end_byte;
 
                     var _cursor_x = 0;
                     var _max_height = 0;
 
                     // Emit each logical char in this segment
                     var _emit_pos = _seg_start;
-                    while (_emit_pos < _seg_end) {
+					buffer_seek(__layout_in_buff, buffer_seek_start, _seg_start_byte);
+					var _emit_byte_pos = _seg_start_byte;
+
+                    while (_emit_pos < _seg_end && _emit_byte_pos < _seg_end_byte) {
 
                         while (_metric_remaining <= 0 && _metric_run_index < _metric_run_count - 1) {
                             _metric_run_index += 1;
@@ -2053,17 +2252,46 @@ function WWTextRendererBase() : WWCore() constructor {
                             }
                         }
 
-                        var _char_emit = string_char_at(_str, _emit_pos + 1);
+                        // Decode next UTF-8 codepoint for emission
+                        var _b0e = buffer_read(__layout_in_buff, buffer_u8);
+                        _emit_byte_pos += 1;
+
+                        var _cpe = _b0e;
+                        if ((_b0e & $80) != 0) {
+                            if ((_b0e & $E0) == $C0) {
+                                var _b1e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                _cpe = ((_b0e & $1F) << 6) | (_b1e & $3F);
+                            }
+                            else if ((_b0e & $F0) == $E0) {
+                                var _b2e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                var _b3e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                _cpe = ((_b0e & $0F) << 12) | ((_b2e & $3F) << 6) | (_b3e & $3F);
+                            }
+                            else if ((_b0e & $F8) == $F0) {
+                                var _b4e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                var _b5e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                var _b6e = (_emit_byte_pos < _seg_end_byte) ? buffer_read(__layout_in_buff, buffer_u8) : 0;
+                                _emit_byte_pos += 1;
+                                _cpe = ((_b0e & $07) << 18) | ((_b4e & $3F) << 12) | ((_b5e & $3F) << 6) | (_b6e & $3F);
+                            }
+                        }
+
+                        var _char_emit = chr(_cpe);
 
                         var _base_wid = 0;
-                        if (_char_emit == "\t") {
+						if (_cpe == 9) {
                             if (tab_use_stops) {
                                 var _next_stop2 = ceil((_cursor_x + 0.001) / _active_tab_width) * _active_tab_width;
                                 _base_wid = _next_stop2 - _cursor_x;
                             } else {
                                 _base_wid = _active_tab_width;
                             }
-                        } else if (_char_emit == " ") {
+						} else if (_cpe == 32) {
                             _base_wid = _active_space_width;
                         } else {
                             _base_wid = string_width(_char_emit);
@@ -2097,20 +2325,11 @@ function WWTextRendererBase() : WWCore() constructor {
                         _emit_pos += 1;
                     }
 
-                    // Line text for storage: exclude trailing newline if present
-                    var _text_end = _seg_end;
-
-                    if (_text_end > _seg_start) {
-                        var _tail_char = string_char_at(_str, _text_end);
-                        if (_tail_char == "\n" || _tail_char == "\r") {
-                            _text_end -= 1;
-                        }
-                    }
-
-                    var _line_text = "";
-                    if (_text_end > _seg_start) {
-                        _line_text = string_copy(_str, _seg_start + 1, _text_end - _seg_start);
-                    }
+					// Line text for storage: use byte range and exclude trailing newline if present
+					var _line_text = "";
+					if (_seg_text_end_byte > _seg_start_byte) {
+						_line_text = regex__buffer_read_text_range(__layout_in_buff, _seg_start_byte, _seg_text_end_byte);
+					}
 
                     var _extra_sep = (line_sep > 0) ? line_sep : 0;
                     var _line_height_val = _max_height + _extra_sep;
@@ -2134,6 +2353,8 @@ function WWTextRendererBase() : WWCore() constructor {
                 if (font_exists(_old_font) && _old_font != draw_get_font()) {
                     draw_set_font(_old_font);
                 }
+
+				buffer_resize(__layout_in_buff, 0);
             };
 			
         #endregion
@@ -2452,6 +2673,34 @@ function WWTextRendererBase() : WWCore() constructor {
 				    _slant_bottom = floor(-1 * _size_mul);
 				}
 
+                // Fast emission culling: if we have a cached clip rect, skip emitting quads outside it.
+                // NOTE: This uses local glyph coordinates; the clip is also stored in local coords.
+                var _clip = __vb_emit_clip__;
+                if (vb_cull_emits_to_scissor && !is_undefined(_clip)) {
+                    var _min_slant = min(_slant_top, _slant_bottom);
+                    var _max_slant = max(_slant_top, _slant_bottom);
+
+                    // Bold does a second pass with a small +X offset.
+                    var _bold_off = 0;
+                    if (_bold) {
+                        _bold_off = max(1, ceil(_size_mul));
+                    }
+
+                    var _cx0 = _x0 + _min_slant;
+                    var _cx1 = _x1 + _max_slant + _bold_off;
+                    var _cy0 = _y0;
+                    var _cy1 = _y1;
+
+                    var _clip_x0 = variable_struct_get(_clip, "x0");
+                    var _clip_y0 = variable_struct_get(_clip, "y0");
+                    var _clip_x1 = variable_struct_get(_clip, "x1");
+                    var _clip_y1 = variable_struct_get(_clip, "y1");
+
+                    if (_cx1 < _clip_x0 || _cx0 > _clip_x1 || _cy1 < _clip_y0 || _cy0 > _clip_y1) {
+                        return false;
+                    }
+                }
+
 				var _pass_count = 1;
 				if (_bold) {
 				    _pass_count = 2;
@@ -2497,6 +2746,8 @@ function WWTextRendererBase() : WWCore() constructor {
 
 				    _pass_index += 1;
 				}
+
+                return true;
 			};
 
         #endregion
@@ -2555,7 +2806,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     var _y1 = floor(_y0 + _thick);
 
-                    var _batch = __vb_get_batch_for_material__(_tex, 0, undefined, 0);
+                    var _batch = __vb_get_batch_for_material__(_tex, 0, undefined, 0, __vb_current_chunk_id__);
                     var _vb_plain = _batch.buffer;
 
                     vertex_position(_vb_plain, _x0, _y0);
@@ -2593,7 +2844,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _spr_h = sprite_get_height(_spr);
                 if (_spr_h <= 0) { _spr_h = 1; }
 
-                var _batch = __vb_get_batch_for_material__(_tex, -1, undefined, 0);
+                var _batch = __vb_get_batch_for_material__(_tex, -1, undefined, 0, __vb_current_chunk_id__);
                 var _vb_ul = _batch.buffer;
 
                 var _y1s = floor(_y0 + _spr_h);
@@ -2694,7 +2945,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     _span_state.active = false;
                     return;
                 }
-
+				
                 var _tex = sprite_get_texture(background_sprite, 0);
                 var _spr_uvs = sprite_get_uvs(background_sprite, 0);
 
@@ -2708,7 +2959,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _y0 = floor(_span_state.y0);
                 var _y1 = floor(_span_state.y1);
 
-                var _batch = __vb_get_batch_for_material__(_tex, -1, undefined, 0);
+                var _batch = __vb_get_batch_for_material__(_tex, -1, undefined, 0, __vb_current_chunk_id__);
                 var _vb_bg = _batch.buffer;
 
                 vertex_position(_vb_bg, _x0, _y0);
@@ -2794,7 +3045,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     var _y1 = floor(_y0 + _thick);
 
-                    var _batch = __vb_get_batch_for_material__(_tex, 2, undefined, 0);
+                    var _batch = __vb_get_batch_for_material__(_tex, 2, undefined, 0, __vb_current_chunk_id__);
                     var _vb_plain = _batch.buffer;
 
                     vertex_position(_vb_plain, _x0, _y0);
@@ -2832,7 +3083,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _spr_h = sprite_get_height(_spr);
                 if (_spr_h <= 0) { _spr_h = 1; }
 
-                var _batch = __vb_get_batch_for_material__(_tex, 2, undefined, 0);
+                var _batch = __vb_get_batch_for_material__(_tex, 2, undefined, 0, __vb_current_chunk_id__);
                 var _vb_st = _batch.buffer;
 
                 var _y1s = floor(_y0 + _spr_h);
@@ -2920,13 +3171,292 @@ function WWTextRendererBase() : WWCore() constructor {
                     return;
                 }
 
+                // Only build once per frame; __draw_text_vb__ is called twice (pre/post).
+                if (__vb_built_this_frame__) {
+                    return;
+                }
+
                 __ensure_layout__();
                 __vb_ensure_format__();
 
-                __vb_free__();
+                // Full rebuild: layout/content changed or clip mode toggled.
+                if (__vb_needs_full_rebuild__) {
+                    __vb_free__();
+                    __vb_needs_full_rebuild__ = false;
+                }
+
                 __build_vb__();
 
-                __vb_is_dirty__ = false;
+                // If we still have queued chunks, stay dirty so next frame builds another.
+                if (vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
+                    __vb_is_dirty__ = (array_length(__vb_pending_chunks__) > 0);
+                } else {
+                    __vb_is_dirty__ = false;
+                }
+
+                __vb_built_this_frame__ = true;
+            };
+
+            static __vb_update_emit_clip_for_draw__ = function(_origin_x, _origin_y) {
+
+                // Small-text fast path: always build full VB.
+                __ensure_layout__();
+                var _glyph_count_total = __layout_glyphs_count__;
+                var _small_thresh = vb_small_text_full_build_glyphs;
+                if (is_undefined(_small_thresh) || _small_thresh < 0) { _small_thresh = 2048; }
+
+                var _target_mode = 0;
+
+                // Decide target mode.
+                if (_glyph_count_total > _small_thresh && vb_cull_emits_to_scissor) {
+
+                    var _sc = gpu_get_scissor();
+                    var _sc_w = is_undefined(_sc) ? undefined : variable_struct_get(_sc, "w");
+                    var _sc_h = is_undefined(_sc) ? undefined : variable_struct_get(_sc, "h");
+
+                    if (!is_undefined(_sc) && !is_undefined(_sc_w) && !is_undefined(_sc_h) && _sc_w > 0 && _sc_h > 0) {
+                        _target_mode = (vb_progressive_emit_enabled == true) ? 2 : 1;
+                    } else {
+                        _target_mode = 0;
+                    }
+                }
+
+                // Handle mode switch (do a full rebuild once).
+                if (_target_mode != __vb_render_mode__) {
+                    __vb_render_mode__ = _target_mode;
+                    __vb_needs_full_rebuild__ = true;
+                    __vb_is_dirty__ = true;
+                    __vb_force_full_build__ = (_target_mode == 0);
+
+                    __vb_pending_chunks__ = [];
+                    __vb_chunk_built__ = [];
+                    __vb_chunk_count__ = 0;
+                    __vb_visible_chunk_min__ = 0;
+                    __vb_visible_chunk_max__ = -1;
+                    __vb_keep_chunk_min__ = 0;
+                    __vb_keep_chunk_max__ = -1;
+                    __vb_progressive_active__ = false;
+                    __vb_last_emit_clip__ = undefined;
+                }
+
+                if (_target_mode == 0) {
+                    __vb_emit_clip__ = undefined;
+                    __vb_desired_emit_clip__ = undefined;
+                    __vb_progressive_active__ = false;
+                    return;
+                }
+
+                // At this point we know scissor is valid.
+                var _sc = gpu_get_scissor();
+                var _sc_w = variable_struct_get(_sc, "w");
+                var _sc_h = variable_struct_get(_sc, "h");
+
+                var _m = vb_scissor_margin;
+                if (is_undefined(_m) || _m < 0) { _m = 0; }
+
+                // Quantize to integer pixels to avoid clip jitter causing rebuild thrash
+                var _ox = floor(_origin_x);
+                var _oy = floor(_origin_y);
+
+                // Convert scissor (draw-space) -> renderer-local-space by subtracting draw origin.
+                var _sc_x = floor(variable_struct_get(_sc, "x"));
+                var _sc_y = floor(variable_struct_get(_sc, "y"));
+
+                var _x0 = floor((_sc_x - _ox) - _m);
+                var _y0 = floor((_sc_y - _oy) - _m);
+                var _x1 = ceil((_sc_x + _sc_w - _ox) + _m);
+                var _y1 = ceil((_sc_y + _sc_h - _oy) + _m);
+
+                var _desired = { x0: _x0, y0: _y0, x1: _x1, y1: _y1 };
+                __vb_desired_emit_clip__ = _desired;
+
+                // Progressive chunk build scheduling (pixel-based).
+                if (__vb_render_mode__ == 2) {
+
+                    var _chunk_h = vb_progressive_chunk_height_px;
+                    if (is_undefined(_chunk_h) || _chunk_h <= 0) { _chunk_h = 256; }
+
+                    // Full bounds in local coords
+                    var _full_y0 = -_m;
+                    var _full_y1 = __layout_content_height__ + _m;
+
+                    var _full_h = max(1, _full_y1 - _full_y0);
+                    __vb_chunk_count__ = ceil(_full_h / _chunk_h);
+                    if (__vb_chunk_count__ < 1) { __vb_chunk_count__ = 1; }
+
+                    if (array_length(__vb_chunk_built__) != __vb_chunk_count__) {
+                        __vb_chunk_built__ = array_create(__vb_chunk_count__, false);
+                        __vb_pending_chunks__ = [];
+                    }
+
+                    // Expand visible min by 1 chunk to account for lines that start in the previous
+                    // chunk but extend downward into the visible region.
+                    var _vis_chunk_min = floor((_y0 - _full_y0) / _chunk_h) - 1;
+                    var _vis_chunk_max = floor((_y1 - _full_y0) / _chunk_h);
+                    _vis_chunk_min = clamp(_vis_chunk_min, 0, __vb_chunk_count__ - 1);
+                    _vis_chunk_max = clamp(_vis_chunk_max, 0, __vb_chunk_count__ - 1);
+
+                    __vb_visible_chunk_min__ = _vis_chunk_min;
+                    __vb_visible_chunk_max__ = _vis_chunk_max;
+
+                    // Keep only a bounded window of chunks near the view.
+                    var _radius = vb_progressive_cache_chunk_radius;
+                    if (is_undefined(_radius) || _radius < 0) { _radius = 6; }
+
+                    var _keep_min = max(0, _vis_chunk_min - _radius);
+                    var _keep_max = min(__vb_chunk_count__ - 1, _vis_chunk_max + _radius);
+                    __vb_keep_chunk_min__ = _keep_min;
+                    __vb_keep_chunk_max__ = _keep_max;
+
+                    // Evict batches outside keep window (prevents batch breaks from exploding over time).
+                    var _b = array_length(__draw_batches__) - 1;
+                    while (_b >= 0) {
+                        var _batch = __draw_batches__[_b];
+                        if (!is_undefined(_batch)) {
+                            var _cid = _batch.chunk_id;
+                            if (!is_undefined(_cid) && _cid != -1) {
+                                if (_cid < _keep_min || _cid > _keep_max) {
+                                    if (!is_undefined(_batch.material) && is_callable(_batch.material.destroy)) {
+                                        _batch.material.destroy();
+                                    }
+                                    if (!is_undefined(_batch.buffer)) {
+                                        vertex_delete_buffer(_batch.buffer);
+                                    }
+                                    array_delete(__draw_batches__, _b, 1);
+                                }
+                            }
+                        }
+                        _b -= 1;
+                    }
+
+                    // Mark evicted chunks as not built (and clear pending that falls outside window).
+                    if (array_length(__vb_chunk_built__) == __vb_chunk_count__) {
+                        var _i = 0;
+                        repeat (__vb_chunk_count__) {
+                            if (_i < _keep_min || _i > _keep_max) {
+                                __vb_chunk_built__[_i] = false;
+                            }
+                            _i += 1;
+                        }
+                    }
+
+                    var _p = array_length(__vb_pending_chunks__) - 1;
+                    while (_p >= 0) {
+                        var _pcid = __vb_pending_chunks__[_p];
+                        if (_pcid < _keep_min || _pcid > _keep_max) {
+                            array_delete(__vb_pending_chunks__, _p, 1);
+                        }
+                        _p -= 1;
+                    }
+
+                    // Queue visible chunks (so visible area appears ASAP).
+                    var _c = _vis_chunk_min;
+                    while (_c <= _vis_chunk_max) {
+                        if (!__vb_chunk_built__[_c]) {
+                            __vb_queue_chunk_unique__(_c);
+                        }
+                        _c += 1;
+                    }
+
+                    __vb_progressive_active__ = true;
+
+                    if (array_length(__vb_pending_chunks__) > 0) {
+                        __vb_is_dirty__ = true;
+                    }
+
+                    // In chunk mode we don't do per-glyph scissor tests.
+                    __vb_emit_clip__ = undefined;
+                    __vb_last_emit_clip__ = undefined;
+                    return;
+                }
+
+                // Non-progressive cull path (legacy): keep current behavior.
+                __vb_progressive_active__ = false;
+
+                var _last = __vb_last_emit_clip__;
+                if (is_undefined(_last)) {
+                    __vb_last_emit_clip__ = _desired;
+                    __vb_emit_clip__ = _desired;
+                    __vb_is_dirty__ = true;
+                    return;
+                }
+
+                // If the new desired clip doesn't fit inside the previously emitted region, rebuild.
+                var _lx0 = variable_struct_get(_last, "x0");
+                var _ly0 = variable_struct_get(_last, "y0");
+                var _lx1 = variable_struct_get(_last, "x1");
+                var _ly1 = variable_struct_get(_last, "y1");
+
+                if (_x0 < _lx0 || _y0 < _ly0 || _x1 > _lx1 || _y1 > _ly1) {
+                    __vb_last_emit_clip__ = _desired;
+                    __vb_emit_clip__ = _desired;
+                    __vb_is_dirty__ = true;
+                } else {
+                    // Keep the larger cached region to avoid rebuild thrashing.
+                    __vb_emit_clip__ = _last;
+                }
+            };
+
+            static __vb_progressive_emit_step__ = function() {
+
+                if (!vb_progressive_emit_enabled || !vb_cull_emits_to_scissor) {
+                    __vb_progressive_active__ = false;
+                    return;
+                }
+
+                if (!__vb_progressive_active__) {
+                    return;
+                }
+
+                // Avoid doing this twice per frame (pre_draw + post_draw)
+                var _now_ms = current_time;
+                if (_now_ms == __vb_progressive_last_step_ms__) {
+                    return;
+                }
+                __vb_progressive_last_step_ms__ = _now_ms;
+
+                // If a build is already queued, wait until next frame.
+                if (__vb_is_dirty__) {
+                    return;
+                }
+
+                if (__vb_chunk_count__ <= 0 || array_length(__vb_chunk_built__) != __vb_chunk_count__) {
+                    __vb_progressive_active__ = false;
+                    return;
+                }
+
+                var _minc = __vb_visible_chunk_min__;
+                var _maxc = __vb_visible_chunk_max__;
+                if (_minc < 0) { _minc = 0; }
+                if (_maxc < _minc) { _maxc = _minc; }
+                if (_maxc >= __vb_chunk_count__) { _maxc = __vb_chunk_count__ - 1; }
+
+                // Expand outward from visible chunk range.
+                var _left = _minc - 1;
+                var _right = _maxc + 1;
+
+                var _keep_min = __vb_keep_chunk_min__;
+                var _keep_max = __vb_keep_chunk_max__;
+                if (_keep_max < _keep_min) {
+                    _keep_min = 0;
+                    _keep_max = __vb_chunk_count__ - 1;
+                }
+
+                var _picked = -1;
+                while (_left >= _keep_min || _right <= _keep_max) {
+                    if (_left >= _keep_min && !__vb_chunk_built__[_left]) { _picked = _left; break; }
+                    if (_right <= _keep_max && !__vb_chunk_built__[_right]) { _picked = _right; break; }
+                    _left -= 1;
+                    _right += 1;
+                }
+
+                if (_picked < 0) {
+                    __vb_progressive_active__ = false;
+                    return;
+                }
+
+                __vb_queue_chunk_unique__(_picked);
+                __vb_is_dirty__ = true;
             };
 
 			static __build_vb__ = function() {
@@ -2936,8 +3466,8 @@ function WWTextRendererBase() : WWCore() constructor {
 			        draw_set_font(font);
 			    }
 
-			    var _glyphs = __layout_glyphs__;
-			    var _glyph_count = __layout_glyphs_count__;
+                var _glyphs = __layout_glyphs__;
+                var _glyph_count = __layout_glyphs_count__;
 
 			    if (_glyph_count <= 0) {
 			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
@@ -2946,7 +3476,172 @@ function WWTextRendererBase() : WWCore() constructor {
 			        return;
 			    }
 
-			    var _spans = __layout_spans__;
+                var _spans = __layout_spans__;
+
+                // Decide between full build vs single-chunk build.
+                var _chunk_mode = false;
+                var _chunk_id = -1;
+                var _glyph_start = 0;
+                var _glyph_end = _glyph_count;
+
+                if (__vb_force_full_build__) {
+                    _chunk_mode = false;
+                    __vb_force_full_build__ = false;
+                } else if (vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
+                    if (array_length(__vb_pending_chunks__) > 0) {
+                        _chunk_mode = true;
+                    }
+                }
+
+                // IMPORTANT: In progressive-chunk render mode, never fall back to a full build when
+                // there is no queued chunk. Doing so causes the whole document to be drawn in addition
+                // to already-built chunks (bold/double-draw).
+                if (__vb_render_mode__ == 2 && !_chunk_mode) {
+                    return;
+                }
+
+                if (_chunk_mode) {
+                    _chunk_id = __vb_pending_chunks__[0];
+                    array_delete(__vb_pending_chunks__, 0, 1);
+
+                    // If this chunk is being rebuilt, delete prior batches for this chunk id.
+                    __vb_delete_batches_for_chunk__(_chunk_id);
+
+                    __ensure_layout__();
+                    var _line_count = __layout_lines_count__;
+                    if (_line_count > 0) {
+                        var _lines = __layout_lines__;
+                        var _lsz = __WW_Layout_Line.__Size__;
+
+                        var _m = vb_scissor_margin;
+                        if (is_undefined(_m) || _m < 0) { _m = 0; }
+
+                        var _chunk_h = vb_progressive_chunk_height_px;
+                        if (is_undefined(_chunk_h) || _chunk_h <= 0) { _chunk_h = 256; }
+
+                        var _full_y0 = -_m;
+                        var _full_y1 = __layout_content_height__ + _m;
+
+                        var _cy0 = _full_y0 + (_chunk_id * _chunk_h);
+                        var _cy1 = min(_full_y0 + ((_chunk_id + 1) * _chunk_h), _full_y1);
+
+                        // Non-overlapping chunk assignment: include lines whose TOP (y_offset) is inside
+                        // [chunk_y0, chunk_y1). This prevents the same glyphs appearing in multiple chunks.
+                        var _y0v = _cy0;
+                        var _y1v = _cy1;
+
+                        // min_line = first line with y_offset >= chunk_y0
+                        var _lo = 0;
+                        var _hi = _line_count - 1;
+                        while (_lo < _hi) {
+                            var _mid = (_lo + _hi) div 2;
+                            var _b = _mid * _lsz;
+                            var _yy = _lines[_b + __WW_Layout_Line.Y_Offset];
+                            if (_yy < _y0v) {
+                                _lo = _mid + 1;
+                            } else {
+                                _hi = _mid;
+                            }
+                        }
+                        var _min_line = _lo;
+
+                        // max_line = last line with y_offset < chunk_y1
+                        _lo = 0;
+                        _hi = _line_count - 1;
+                        while (_lo < _hi) {
+                            var _mid2 = (_lo + _hi + 1) div 2;
+                            var _b2 = _mid2 * _lsz;
+                            var _yy2 = _lines[_b2 + __WW_Layout_Line.Y_Offset];
+                            if (_yy2 >= _y1v) {
+                                _hi = _mid2 - 1;
+                            } else {
+                                _lo = _mid2;
+                            }
+                        }
+                        var _max_line = _lo;
+
+                        _min_line = clamp(_min_line, 0, _line_count - 1);
+                        _max_line = clamp(_max_line, 0, _line_count - 1);
+
+                        // If this chunk contains no line tops, build nothing.
+                        var _b_min = _min_line * _lsz;
+                        var _y_min = _lines[_b_min + __WW_Layout_Line.Y_Offset];
+                        if (_y_min < _y0v || _y_min >= _y1v) {
+                            _glyph_start = 0;
+                            _glyph_end = 0;
+                        } else {
+                            var _b0 = _min_line * _lsz;
+                            var _b1 = _max_line * _lsz;
+                            _glyph_start = _lines[_b0 + __WW_Layout_Line.Start_Index];
+                            _glyph_end = _lines[_b1 + __WW_Layout_Line.End_Index];
+                        }
+
+                        __vb_current_chunk_bounds__ = { x0: 0, y0: _cy0, x1: __layout_content_width__, y1: _cy1 };
+                    } else {
+                        _chunk_mode = false;
+                        _chunk_id = -1;
+                    }
+                }
+
+                // Scissor-clip build: restrict to visible line range (cuts Y collision checks).
+                if (!_chunk_mode && __vb_render_mode__ == 1 && !is_undefined(__vb_emit_clip__)) {
+                    __ensure_layout__();
+                    var _line_count2 = __layout_lines_count__;
+                    if (_line_count2 > 0) {
+                        var _lines2 = __layout_lines__;
+                        var _lsz2 = __WW_Layout_Line.__Size__;
+
+                        var _clip = __vb_emit_clip__;
+                        var _y0c = variable_struct_get(_clip, "y0");
+                        var _y1c = variable_struct_get(_clip, "y1");
+
+                        var _lo2 = 0;
+                        var _hi2 = _line_count2 - 1;
+                        while (_lo2 < _hi2) {
+                            var _mid3 = (_lo2 + _hi2) div 2;
+                            var _b3 = _mid3 * _lsz2;
+                            var _yy3 = _lines2[_b3 + __WW_Layout_Line.Y_Offset];
+                            var _hh3 = _lines2[_b3 + __WW_Layout_Line.Height];
+                            if (_yy3 + _hh3 < _y0c) {
+                                _lo2 = _mid3 + 1;
+                            } else {
+                                _hi2 = _mid3;
+                            }
+                        }
+                        var _min_line2 = _lo2;
+
+                        _lo2 = 0;
+                        _hi2 = _line_count2 - 1;
+                        while (_lo2 < _hi2) {
+                            var _mid4 = (_lo2 + _hi2 + 1) div 2;
+                            var _b4 = _mid4 * _lsz2;
+                            var _yy4 = _lines2[_b4 + __WW_Layout_Line.Y_Offset];
+                            if (_yy4 > _y1c) {
+                                _hi2 = _mid4 - 1;
+                            } else {
+                                _lo2 = _mid4;
+                            }
+                        }
+                        var _max_line2 = _lo2;
+
+                        _min_line2 = clamp(_min_line2, 0, _line_count2 - 1);
+                        _max_line2 = clamp(_max_line2, 0, _line_count2 - 1);
+
+                        var _bb0 = _min_line2 * _lsz2;
+                        var _bb1 = _max_line2 * _lsz2;
+                        _glyph_start = _lines2[_bb0 + __WW_Layout_Line.Start_Index];
+                        _glyph_end = _lines2[_bb1 + __WW_Layout_Line.End_Index];
+                    }
+                }
+
+                __vb_current_chunk_id__ = _chunk_id;
+                __vb_open_buffers__ = [];
+
+                var _saved_emit_clip = __vb_emit_clip__;
+                if (_chunk_mode) {
+                    // Chunk selection already culls, avoid per-glyph clip checks.
+                    __vb_emit_clip__ = undefined;
+                }
 
 			    var _default_font_data = __font_get_render_data__(font);
 			    if (is_undefined(_default_font_data)) {
@@ -2969,11 +3664,17 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			    var _ws_batch_buffer = -1;
 			    if (_use_whitespace) {
-			        var _ws_batch = __vb_get_batch_for_material__(
+                    var _ws_shader = _default_font_data.sdf_shader;
+                    if (is_undefined(_ws_shader) || _ws_shader == -1) { _ws_shader = -1; }
+                    var _ws_spread = _default_font_data.sdf_spread;
+                    if (is_undefined(_ws_spread)) { _ws_spread = 0; }
+
+                    var _ws_batch = __vb_get_batch_for_material__(
 			            _default_font_data.tex,
 			            1,
-			            _default_font_data.sdf_shader,
-			            _default_font_data.sdf_spread
+                        _ws_shader,
+                        _ws_spread,
+                        __vb_current_chunk_id__
 			        );
 			        _ws_batch_buffer = _ws_batch.buffer;
 			    }
@@ -3012,22 +3713,25 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			    var _font_data_by_font = {};
 
-			    var _last_tex = -1;
-			    var _last_shader = undefined;
-			    var _last_spread = 0;
-			    var _last_batch_buffer = -1;
+                // Debug counters reflect the last build segment.
+                __vb_dbg_last_total_glyphs__ = max(0, _glyph_end - _glyph_start);
+                __vb_dbg_last_emitted_glyphs__ = 0;
 
-			    var __timer = array_create(11, 0);
+                var _last_tex = -1;
+                var _last_shader = -1;
+                var _last_spread = 0;
+			    var _last_batch_buffer = -1;
 
 			    var _emit_glyph = __vb_emit_glyph_styled_to_buffer__;
 
-			    var _glyph_index = 0;
-			    repeat (_glyph_count) {
+                var _build_count = max(0, _glyph_end - _glyph_start);
+                var _glyph_index = _glyph_start;
+                repeat (_build_count) {
 
 			        var _base = _glyph_index * __WW_Layout_Glyph.__Size__;
 
-			        var _t = get_timer();
 			        var _char = _glyphs[_base + __WW_Layout_Glyph.Char];
+
 			        if (_char == "\n" || _char == "\r") {
 			            __bg_flush_span__(_bg_span_state);
 			            __st_flush_span__(_st_span_state);
@@ -3043,9 +3747,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _glyph_index += 1;
 			            continue;
 			        }
-			        __timer[0] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        var _pos_x = _glyphs[_base + __WW_Layout_Glyph.X];
 			        var _pos_y = _glyphs[_base + __WW_Layout_Glyph.Y];
 			        var _wid = _glyphs[_base + __WW_Layout_Glyph.Width];
@@ -3085,11 +3786,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _final_back_col = _span.back_color;
 			            _final_back_alp = _span.back_alpha;
 			        }
-
-			        __timer[1] += get_timer() - _t;
-
-
-			        var _t = get_timer();
 			        if (_use_whitespace) {
 
 			            if (_char == " ") {
@@ -3101,7 +3797,7 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    _mark_x = _pos_x + ((_cell_w - _ws_space_width) * 0.5);
 			                }
 
-			                _emit_glyph(
+                            var _did_emit_ws = _emit_glyph(
 			                    _ws_batch_buffer,
 			                    _default_font_data,
 			                    _ws_space_marker,
@@ -3111,7 +3807,11 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    whitespace_alpha,
 			                    1,
 			                    __WW_Text_Glyph_Style.Regular
-			                );
+                            );
+
+                            if (_did_emit_ws) {
+                                __vb_dbg_last_emitted_glyphs__ += 1;
+                            }
 
 			                _glyph_index += 1;
 			                continue;
@@ -3119,7 +3819,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            if (_char == "\t") {
 
-			                _emit_glyph(
+                            var _did_emit_ws2 = _emit_glyph(
 			                    _ws_batch_buffer,
 			                    _default_font_data,
 			                    _ws_tab_marker,
@@ -3129,15 +3829,16 @@ function WWTextRendererBase() : WWCore() constructor {
 			                    whitespace_alpha,
 			                    1,
 			                    __WW_Text_Glyph_Style.Regular
-			                );
+                            );
+
+                            if (_did_emit_ws2) {
+                                __vb_dbg_last_emitted_glyphs__ += 1;
+                            }
 
 			                _glyph_index += 1;
 			                continue;
 			            }
 			        }
-			        __timer[3] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        if (_final_back_alp > 0) {
 
 			            var _bg_x0 = _pos_x;
@@ -3188,9 +3889,6 @@ function WWTextRendererBase() : WWCore() constructor {
 			        } else {
 			            __bg_flush_span__(_bg_span_state);
 			        }
-			        __timer[4] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        var _font_cache = _font_data_by_font[$ _final_font];
 			        if (is_undefined(_font_cache)) {
 			            _font_cache = {};
@@ -3218,37 +3916,34 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _glyph_index += 1;
 			            continue;
 			        }
-			        __timer[5] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        var _need_batch = true;
 
+                    var _shader_key = _font_data.sdf_shader;
+                    if (is_undefined(_shader_key) || _shader_key == -1) { _shader_key = -1; }
+                    var _spread_key = _font_data.sdf_spread;
+                    if (is_undefined(_spread_key)) { _spread_key = 0; }
+
 			        if (_font_data.tex == _last_tex &&
-			            _font_data.sdf_shader == _last_shader &&
-			            _font_data.sdf_spread == _last_spread) {
+                        _shader_key == _last_shader &&
+                        _spread_key == _last_spread) {
 			            _need_batch = false;
 			        }
-			        __timer[6] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        if (_need_batch) {
 
-			            var _glyph_batch = __vb_get_batch_for_material__(
+                        var _glyph_batch = __vb_get_batch_for_material__(
 			                _font_data.tex,
 			                1,
-			                _font_data.sdf_shader,
-			                _font_data.sdf_spread
+                            _shader_key,
+                            _spread_key,
+                            __vb_current_chunk_id__
 			            );
 
 			            _last_tex = _font_data.tex;
-			            _last_shader = _font_data.sdf_shader;
-			            _last_spread = _font_data.sdf_spread;
+                        _last_shader = _shader_key;
+                        _last_spread = _spread_key;
 			            _last_batch_buffer = _glyph_batch.buffer;
 			        }
-			        __timer[7] += get_timer() - _t;
-
-			        var _t = get_timer();
-			        _emit_glyph(
+                    var _did_emit = _emit_glyph(
 			            _last_batch_buffer,
 			            _font_data,
 			            _char,
@@ -3259,9 +3954,10 @@ function WWTextRendererBase() : WWCore() constructor {
 			            _final_size,
 			            _final_style
 			        );
-			        __timer[8] += get_timer() - _t;
 
-			        var _t = get_timer();
+                    if (_did_emit) {
+                        __vb_dbg_last_emitted_glyphs__ += 1;
+                    }
 			        if (_final_under != __WW_Text_Glyph_Underline.None) {
 
 			            var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
@@ -3305,9 +4001,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
 			            __ul_flush_span__(_ul_span_state);
 			        }
-			        __timer[9] += get_timer() - _t;
-
-			        var _t = get_timer();
 			        if (_final_strike != __WW_Text_Glyph_Strike.None) {
 
 			            var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
@@ -3350,35 +4043,31 @@ function WWTextRendererBase() : WWCore() constructor {
 			        } else {
 			            __st_flush_span__(_st_span_state);
 			        }
-			        __timer[10] += get_timer() - _t;
 
 			        _glyph_index += 1;
 			    }
-
-			    __timer[0] /= 1000;
-			    __timer[1] /= 1000;
-			    __timer[2] /= 1000;
-			    __timer[3] /= 1000;
-			    __timer[4] /= 1000;
-			    __timer[5] /= 1000;
-			    __timer[6] /= 1000;
-			    __timer[7] /= 1000;
-			    __timer[8] /= 1000;
-			    __timer[9] /= 1000;
-			    __timer[10] /= 1000;
-
-			    pprint(__timer);
 
 			    __bg_flush_span__(_bg_span_state);
 			    __st_flush_span__(_st_span_state);
 			    __ul_flush_span__(_ul_span_state);
 
-			    var _batch_count = array_length(__draw_batches__);
-			    var _batch_index = 0;
-			    repeat (_batch_count) {
-			        vertex_end(__draw_batches__[_batch_index].buffer);
-			        _batch_index += 1;
-			    }
+
+                // End only the buffers created in this build.
+                var _buf_count = array_length(__vb_open_buffers__);
+                var _bi = 0;
+                repeat (_buf_count) {
+                    vertex_end(__vb_open_buffers__[_bi]);
+                    _bi += 1;
+                }
+                __vb_open_buffers__ = [];
+
+                if (_chunk_mode && _chunk_id >= 0 && _chunk_id < __vb_chunk_count__) {
+                    __vb_chunk_built__[_chunk_id] = true;
+                }
+
+                __vb_emit_clip__ = _saved_emit_clip;
+                __vb_current_chunk_id__ = -1;
+                __vb_current_chunk_bounds__ = undefined;
 
 			    if (font_exists(_old_font) && _old_font != draw_get_font()) {
 			        draw_set_font(_old_font);
@@ -3458,6 +4147,12 @@ function WWTextRendererBase() : WWCore() constructor {
 			
             static __draw_text_vb__ = function(_origin_x, _origin_y, _layer_min, _layer_max) {
 
+                if (_layer_min < 0) {
+                    // Reset per-frame gate on the pre_draw call.
+                    __vb_built_this_frame__ = false;
+                }
+
+                __vb_update_emit_clip_for_draw__(_origin_x, _origin_y);
                 __ensure_vb__();
 
                 if (_layer_min == undefined) { _layer_min = -1000000; }
@@ -3487,6 +4182,191 @@ function WWTextRendererBase() : WWCore() constructor {
                     }
 
                     _batch_index += 1;
+                }
+
+                if (vb_debug_show_cull) {
+                    var _pre_col = draw_get_color();
+                    var _pre_alp = draw_get_alpha();
+
+                    // Draw raw scissor rect in local coords (red)
+                    var _sc = gpu_get_scissor();
+                    if (!is_undefined(_sc)) {
+                        var _sx = variable_struct_get(_sc, "x") - _origin_x;
+                        var _sy = variable_struct_get(_sc, "y") - _origin_y;
+                        var _sw = variable_struct_get(_sc, "w");
+                        var _sh = variable_struct_get(_sc, "h");
+                        if (!is_undefined(_sw) && !is_undefined(_sh) && _sw > 0 && _sh > 0) {
+                            draw_set_color(vb_debug_cull_color_scissor);
+                            draw_set_alpha(0.9);
+                            draw_rectangle(_sx, _sy, _sx + _sw, _sy + _sh, true);
+                        }
+                    }
+
+                    // Desired (aqua) vs cached/emitted (lime)
+                    var _desired = __vb_desired_emit_clip__;
+                    if (!is_undefined(_desired)) {
+                        var _dx0 = variable_struct_get(_desired, "x0");
+                        var _dy0 = variable_struct_get(_desired, "y0");
+                        var _dx1 = variable_struct_get(_desired, "x1");
+                        var _dy1 = variable_struct_get(_desired, "y1");
+                        draw_set_color(vb_debug_cull_color_desired);
+                        draw_set_alpha(0.7);
+                        draw_rectangle(_dx0, _dy0, _dx1, _dy1, true);
+                    }
+
+                    var _cached = __vb_last_emit_clip__;
+                    if (!is_undefined(_cached)) {
+                        var _cx0 = variable_struct_get(_cached, "x0");
+                        var _cy0 = variable_struct_get(_cached, "y0");
+                        var _cx1 = variable_struct_get(_cached, "x1");
+                        var _cy1 = variable_struct_get(_cached, "y1");
+                        draw_set_color(vb_debug_cull_color_cached);
+                        draw_set_alpha(0.7);
+                        draw_rectangle(_cx0, _cy0, _cx1, _cy1, true);
+                    }
+
+                    // Chunk boundaries (grid) in local coords, aligned with the same matrix as glyphs.
+                    if (vb_debug_show_chunks) {
+
+                        var _chunk_x = vb_progressive_chunk_width_px;
+                        if (is_undefined(_chunk_x) || _chunk_x <= 0) { _chunk_x = 512; }
+
+                        var _chunk_y = vb_progressive_chunk_height_px;
+                        if (is_undefined(_chunk_y) || _chunk_y <= 0) { _chunk_y = 256; }
+
+                        if (_chunk_x > 0 && _chunk_y > 0) {
+
+                            // Prefer cached bounds (what's actually emitted), fallback to desired.
+                            var _bx0 = 0;
+                            var _by0 = 0;
+                            var _bx1 = __layout_content_width__;
+                            var _by1 = __layout_content_height__;
+
+                            if (!is_undefined(_cached)) {
+                                _bx0 = variable_struct_get(_cached, "x0");
+                                _by0 = variable_struct_get(_cached, "y0");
+                                _bx1 = variable_struct_get(_cached, "x1");
+                                _by1 = variable_struct_get(_cached, "y1");
+                            } else if (!is_undefined(_desired)) {
+                                _bx0 = variable_struct_get(_desired, "x0");
+                                _by0 = variable_struct_get(_desired, "y0");
+                                _bx1 = variable_struct_get(_desired, "x1");
+                                _by1 = variable_struct_get(_desired, "y1");
+                            }
+
+                            // Snap to grid
+                            var _gx0 = floor(_bx0 / _chunk_x) * _chunk_x;
+                            var _gy0 = floor(_by0 / _chunk_y) * _chunk_y;
+                            var _gx1 = ceil(_bx1 / _chunk_x) * _chunk_x;
+                            var _gy1 = ceil(_by1 / _chunk_y) * _chunk_y;
+
+                            draw_set_color(c_yellow);
+                            draw_set_alpha(0.25);
+
+                            var _x = _gx0;
+                            while (_x <= _gx1) {
+                                draw_line(_x, _gy0, _x, _gy1);
+                                _x += _chunk_x;
+                            }
+
+                            var _y = _gy0;
+                            while (_y <= _gy1) {
+                                draw_line(_gx0, _y, _gx1, _y);
+                                _y += _chunk_y;
+                            }
+                        }
+                    }
+
+                    // Quick numeric proof
+                    draw_set_color(c_white);
+                    draw_set_alpha(1);
+                    var _cx = vb_progressive_chunk_width_px;
+                    if (is_undefined(_cx) || _cx <= 0) { _cx = 512; }
+                    var _cy = vb_progressive_chunk_height_px;
+                    if (is_undefined(_cy) || _cy <= 0) { _cy = 256; }
+                    draw_text(4, 4, "VB emit " + string(__vb_dbg_last_emitted_glyphs__) + "/" + string(__vb_dbg_last_total_glyphs__) + " | chunk " + string(_cx) + "x" + string(_cy));
+
+                    if (vb_debug_show_progressive) {
+
+                        var _queue_len = array_length(__vb_pending_chunks__);
+                        var _batches = array_length(__draw_batches__);
+
+                        var _chunk_h = vb_progressive_chunk_height_px;
+                        if (is_undefined(_chunk_h) || _chunk_h <= 0) { _chunk_h = 256; }
+
+                        var _m = vb_scissor_margin;
+                        if (is_undefined(_m) || _m < 0) { _m = 0; }
+
+                        var _total_chunks = __vb_chunk_count__;
+                        if (is_undefined(_total_chunks) || _total_chunks <= 0) {
+                            _total_chunks = ceil((__layout_content_height__ + (_m * 2)) / _chunk_h);
+                        }
+                        if (is_undefined(_total_chunks) || _total_chunks < 0) { _total_chunks = 0; }
+
+                        var _built_total = 0;
+                        var _built_keep = 0;
+                        var _keep_min = __vb_keep_chunk_min__;
+                        var _keep_max = __vb_keep_chunk_max__;
+                        var _keep_span = 0;
+                        if (!is_undefined(_keep_min) && !is_undefined(_keep_max) && _keep_max >= _keep_min) {
+                            _keep_span = (_keep_max - _keep_min + 1);
+                        }
+
+                        var _built_arr = __vb_chunk_built__;
+                        if (!is_undefined(_built_arr)) {
+                            var _n = array_length(_built_arr);
+                            var _i = 0;
+                            repeat (_n) {
+                                if (_built_arr[_i]) {
+                                    _built_total += 1;
+                                    if (_keep_span > 0 && _i >= _keep_min && _i <= _keep_max) {
+                                        _built_keep += 1;
+                                    }
+                                }
+                                _i += 1;
+                            }
+                        }
+
+                        var _vis_min = __vb_visible_chunk_min__;
+                        var _vis_max = __vb_visible_chunk_max__;
+
+                        var _y = 18;
+                        draw_text(4, _y,
+                            "mode " + string(__vb_render_mode__) +
+                            " | curChunk " + string(__vb_current_chunk_id__) +
+                            " | q " + string(_queue_len) +
+                            " | batches " + string(_batches)
+                        );
+                        _y += 14;
+
+                        draw_text(4, _y,
+                            "builtKeep " + string(_built_keep) + "/" + string(_keep_span) +
+                            " | built " + string(_built_total) + "/" + string(_total_chunks)
+                        );
+                        _y += 14;
+
+                        draw_text(4, _y,
+                            "keep " + string(_keep_min) + ".." + string(_keep_max) +
+                            " | vis " + string(_vis_min) + ".." + string(_vis_max) +
+                            " | dirty " + string(__vb_is_dirty__) +
+                            " | active " + string(__vb_progressive_active__)
+                        );
+                        _y += 14;
+
+                        draw_text(4, _y,
+                            "glyphsBuilt " + string(__vb_dbg_last_total_glyphs__) +
+                            " | glyphsEmitted " + string(__vb_dbg_last_emitted_glyphs__) +
+                            " | glyphsTotal " + string(__layout_glyphs_count__)
+                        );
+                    }
+
+                    draw_set_color(_pre_col);
+                    draw_set_alpha(_pre_alp);
+                }
+
+                // Run progressive expansion once per frame (avoid pre_draw doubling)
+                if (_layer_min >= 0) {
+                    __vb_progressive_emit_step__();
                 }
 
                 gpu_set_tex_filter(_old_filt);
@@ -3528,6 +4408,17 @@ function WWTextRendererBase() : WWCore() constructor {
                 }
 
                 __draw_batches__ = [];
+
+                __vb_open_buffers__ = [];
+                __vb_pending_chunks__ = [];
+                __vb_chunk_built__ = [];
+                __vb_chunk_count__ = 0;
+                __vb_visible_chunk_min__ = 0;
+                __vb_visible_chunk_max__ = -1;
+                __vb_keep_chunk_min__ = 0;
+                __vb_keep_chunk_max__ = -1;
+                __vb_current_chunk_id__ = -1;
+                __vb_current_chunk_bounds__ = undefined;
             };
 
         #endregion

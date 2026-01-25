@@ -38,6 +38,231 @@ function __ww_css_collapse_whitespace__(_text) {
     return _output;
 }
 
+// Buffer-first helpers (performance)
+function __ww_css_init_input_buff__(_text) {
+    static __css_in_buff = buffer_create(0, buffer_grow, 1);
+
+    buffer_seek(__css_in_buff, buffer_seek_start, 0);
+    buffer_write(__css_in_buff, buffer_text, _text);
+
+    // buffer_text includes a trailing NUL; exclude it from the content length
+    var _byte_len = buffer_tell(__css_in_buff) - 1;
+    buffer_write(__css_in_buff, buffer_u64, 0);
+
+    return [ __css_in_buff, _byte_len ];
+}
+
+function __ww_css_is_space_u8__(_b) {
+    return (_b == 32 || _b == 9 || _b == 10 || _b == 13);
+}
+
+function __ww_css_is_name_u8__(_b) {
+    return (
+        (_b >= 97 && _b <= 122) ||
+        (_b >= 65 && _b <= 90) ||
+        (_b >= 48 && _b <= 57) ||
+        (_b == 95) ||
+        (_b == 45)
+    );
+}
+
+function __ww_css_lower_ascii_u8__(_b) {
+    if (_b >= 65 && _b <= 90) { return _b + 32; }
+    return _b;
+}
+
+function __ww_css_find_u8__(_buff, _start, _endd, _target_u8) {
+    var _pos = _start;
+    while (_pos < _endd) {
+        if (buffer_peek(_buff, _pos, buffer_u8) == _target_u8) {
+            return _pos;
+        }
+        _pos += 1;
+    }
+    return -1;
+}
+
+function __ww_css_collapse_whitespace_u8__(_text) {
+
+    if (_text == "") { return ""; }
+
+    var _in_pair = __ww_css_init_input_buff__(_text);
+    var _in_buff = _in_pair[0];
+    var _in_len = _in_pair[1];
+
+    static __css_ws_out_buff = buffer_create(0, buffer_grow, 1);
+    buffer_seek(__css_ws_out_buff, buffer_seek_start, 0);
+
+    var _prev_space = false;
+    var _pos = 0;
+    while (_pos < _in_len) {
+        var _b = buffer_peek(_in_buff, _pos, buffer_u8);
+        if (__ww_css_is_space_u8__(_b)) {
+            if (!_prev_space) {
+                buffer_write(__css_ws_out_buff, buffer_u8, 32);
+                _prev_space = true;
+            }
+        } else {
+            buffer_write(__css_ws_out_buff, buffer_u8, _b);
+            _prev_space = false;
+        }
+        _pos += 1;
+    }
+
+    buffer_write(__css_ws_out_buff, buffer_u8, 0);
+    buffer_seek(__css_ws_out_buff, buffer_seek_start, 0);
+    return buffer_read(__css_ws_out_buff, buffer_text);
+}
+
+function __ww_css_parse_tag_buff__(_buff, _pos, _endd) {
+
+    var _tag = {
+        is_tag: false,
+        is_close: false,
+        is_self_close: false,
+        name: "",
+        class_text: "",
+        style_text: "",
+        href_text: "",
+        end_pos: _pos
+    };
+
+    if (_pos >= _endd) { return _tag; }
+    if (buffer_peek(_buff, _pos, buffer_u8) != 60) { return _tag; } // '<'
+
+    var _scan = _pos + 1;
+    if (_scan >= _endd) { return _tag; }
+
+    if (buffer_peek(_buff, _scan, buffer_u8) == 47) { // '/'
+        _tag.is_close = true;
+        _scan += 1;
+    }
+
+    var _name_start = _scan;
+    while (_scan < _endd) {
+        var _b = buffer_peek(_buff, _scan, buffer_u8);
+        if (!__ww_css_is_name_u8__(_b)) { break; }
+        _scan += 1;
+    }
+
+    if (_scan <= _name_start) { return _tag; }
+
+    _tag.name = string_lower(regex__buffer_read_text_range(_buff, _name_start, _scan));
+
+    while (_scan < _endd) {
+
+        var _c = buffer_peek(_buff, _scan, buffer_u8);
+
+        if (_c == 62) { // '>'
+            _scan += 1;
+            break;
+        }
+
+        if (_c == 47 && (_scan + 1) < _endd && buffer_peek(_buff, _scan + 1, buffer_u8) == 62) {
+            _tag.is_self_close = true;
+            _scan += 2;
+            break;
+        }
+
+        if (__ww_css_is_space_u8__(_c)) {
+            _scan += 1;
+            continue;
+        }
+
+        var _attr_start = _scan;
+        while (_scan < _endd) {
+            var _ab = buffer_peek(_buff, _scan, buffer_u8);
+            if (!__ww_css_is_name_u8__(_ab)) { break; }
+            _scan += 1;
+        }
+
+        if (_scan <= _attr_start) {
+            _scan += 1;
+            continue;
+        }
+
+        var _attr_name = string_lower(regex__buffer_read_text_range(_buff, _attr_start, _scan));
+
+        while (_scan < _endd) {
+            var _s = buffer_peek(_buff, _scan, buffer_u8);
+            if (!__ww_css_is_space_u8__(_s)) { break; }
+            _scan += 1;
+        }
+
+        if (_scan < _endd && buffer_peek(_buff, _scan, buffer_u8) == 61) { // '='
+
+            _scan += 1;
+
+            while (_scan < _endd) {
+                var _s2 = buffer_peek(_buff, _scan, buffer_u8);
+                if (!__ww_css_is_space_u8__(_s2)) { break; }
+                _scan += 1;
+            }
+
+            if (_scan >= _endd) { break; }
+
+            var _val = "";
+            var _first = buffer_peek(_buff, _scan, buffer_u8);
+
+            if (_first == 34 || _first == 39) {
+                var _quote = _first;
+                _scan += 1;
+                var _vstart = _scan;
+                while (_scan < _endd) {
+                    if (buffer_peek(_buff, _scan, buffer_u8) == _quote) { break; }
+                    _scan += 1;
+                }
+                if (_scan > _vstart) {
+                    _val = regex__buffer_read_text_range(_buff, _vstart, _scan);
+                }
+                if (_scan < _endd && buffer_peek(_buff, _scan, buffer_u8) == _quote) {
+                    _scan += 1;
+                }
+            } else {
+                var _vstart2 = _scan;
+                while (_scan < _endd) {
+                    var _vb = buffer_peek(_buff, _scan, buffer_u8);
+                    if (__ww_css_is_space_u8__(_vb) || _vb == 62 || _vb == 47) { break; }
+                    _scan += 1;
+                }
+                if (_scan > _vstart2) {
+                    _val = regex__buffer_read_text_range(_buff, _vstart2, _scan);
+                }
+            }
+
+            if (_attr_name == "class") { _tag.class_text = _val; }
+            else if (_attr_name == "style") { _tag.style_text = _val; }
+            else if (_attr_name == "href") { _tag.href_text = _val; }
+        }
+    }
+
+    _tag.is_tag = true;
+    _tag.end_pos = _scan;
+    return _tag;
+}
+
+function __ww_css_find_style_close_u8__(_buff, _start, _endd) {
+
+    // Find the '<' that starts a closing tag matching </style (ASCII, case-insensitive)
+    var _pos = _start;
+    while (_pos + 7 <= _endd) {
+        if (buffer_peek(_buff, _pos, buffer_u8) == 60 && buffer_peek(_buff, _pos + 1, buffer_u8) == 47) {
+            var _b2 = __ww_css_lower_ascii_u8__(buffer_peek(_buff, _pos + 2, buffer_u8));
+            var _b3 = __ww_css_lower_ascii_u8__(buffer_peek(_buff, _pos + 3, buffer_u8));
+            var _b4 = __ww_css_lower_ascii_u8__(buffer_peek(_buff, _pos + 4, buffer_u8));
+            var _b5 = __ww_css_lower_ascii_u8__(buffer_peek(_buff, _pos + 5, buffer_u8));
+            var _b6 = __ww_css_lower_ascii_u8__(buffer_peek(_buff, _pos + 6, buffer_u8));
+
+            if (_b2 == 115 && _b3 == 116 && _b4 == 121 && _b5 == 108 && _b6 == 101) {
+                return _pos;
+            }
+        }
+        _pos += 1;
+    }
+
+    return -1;
+}
+
 function __ww_css_parse_tag_name__(_text, _pos, _len) {
 
     var _start = _pos;
@@ -606,9 +831,9 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
     var _tab_size_spaces = 4;
 
     if (_default_state != undefined) {
-        if (variable_struct_exists(_default_state, "css_white_space")) { _white_space = _default_state.css_white_space; }
-        if (variable_struct_exists(_default_state, "css_overflow_wrap")) { _overflow_wrap = _default_state.css_overflow_wrap; }
-        if (variable_struct_exists(_default_state, "tab_size_spaces")) { _tab_size_spaces = _default_state.tab_size_spaces; }
+        if (variable_struct_exists(_default_state, "css_white_space")) { _white_space = variable_struct_get(_default_state, "css_white_space"); }
+        if (variable_struct_exists(_default_state, "css_overflow_wrap")) { _overflow_wrap = variable_struct_get(_default_state, "css_overflow_wrap"); }
+        if (variable_struct_exists(_default_state, "tab_size_spaces")) { _tab_size_spaces = variable_struct_get(_default_state, "tab_size_spaces"); }
     }
 
     // Optional stylesheet + resolver hook
@@ -616,8 +841,8 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
     var _font_resolver = undefined;
 
     if (_default_state != undefined) {
-        if (variable_struct_exists(_default_state, "css_stylesheet_text")) { _stylesheet_text = _default_state.css_stylesheet_text; }
-        if (variable_struct_exists(_default_state, "css_font_resolver")) { _font_resolver = _default_state.css_font_resolver; }
+        if (variable_struct_exists(_default_state, "css_stylesheet_text")) { _stylesheet_text = variable_struct_get(_default_state, "css_stylesheet_text"); }
+        if (variable_struct_exists(_default_state, "css_font_resolver")) { _font_resolver = variable_struct_get(_default_state, "css_font_resolver"); }
     }
 
     // Base font asset for px font-size scaling
@@ -639,11 +864,13 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
     var _source_text = _raw_text;
 
     if (_white_space == "normal" || _white_space == "nowrap") {
-        _source_text = __ww_css_collapse_whitespace__(_source_text);
+        _source_text = __ww_css_collapse_whitespace_u8__(_source_text);
     }
 
-    var _source_lower = string_lower(_source_text);
-    var _length = string_length(_source_text);
+    // Input buffer (UTF-8 bytes)
+    var _in_pair = __ww_css_init_input_buff__(_source_text);
+    var _in_buff = _in_pair[0];
+    var _in_len = _in_pair[1];
 
     // Alignment runs (output index space, like BBCode/Markdown)
     var _align_runs = [];
@@ -663,30 +890,36 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
     // Global gating (matches old: only until first emitted glyph)
     var _global_allowed = true;
 
-    var _index = 1;
+    var _pos = 0;
 
-    while (_index <= _length) {
+    while (_pos < _in_len) {
 
-        var _char = string_char_at(_source_text, _index);
-
-        if (_char != "<") {
-            __ww_textproc_ctx_append_text__(_ctx, _char);
-            _index += 1;
-            _global_allowed = false;
-            continue;
+        var _lt = __ww_css_find_u8__(_in_buff, _pos, _in_len, 60); // '<'
+        if (_lt < 0) {
+            if (_pos < _in_len) {
+                __ww_textproc_ctx_append_text__(_ctx, regex__buffer_read_text_range(_in_buff, _pos, _in_len));
+                _global_allowed = false;
+            }
+            break;
         }
 
-        var _tag = __ww_css_parse_tag__(_source_text, _index, _length);
+        if (_lt > _pos) {
+            __ww_textproc_ctx_append_text__(_ctx, regex__buffer_read_text_range(_in_buff, _pos, _lt));
+            _global_allowed = false;
+            _pos = _lt;
+        }
+
+        var _tag = __ww_css_parse_tag_buff__(_in_buff, _pos, _in_len);
 
         if (!_tag.is_tag) {
             __ww_textproc_ctx_append_text__(_ctx, "<");
-            _index += 1;
+            _pos += 1;
             _global_allowed = false;
             continue;
         }
 
         // Advance past the tag immediately
-        _index = _tag.end_pos;
+        _pos = _tag.end_pos;
 
         var _name = _tag.name;
 
@@ -700,18 +933,18 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
         // <style> ... </style> parses class rules and emits nothing
         if (_name == "style" && !_tag.is_close) {
 
-            var _close_pos = string_pos_ext("</style", _source_lower, _index);
+            var _close_pos = __ww_css_find_style_close_u8__(_in_buff, _pos, _in_len);
 
-            if (_close_pos > 0) {
+            if (_close_pos >= 0) {
 
-                var _css_block = string_copy(_source_text, _index, _close_pos - _index);
+                var _css_block = regex__buffer_read_text_range(_in_buff, _pos, _close_pos);
                 __ww_css_parse_stylesheet__(__css_class_map__, _css_block);
 
-                var _close_end = string_pos_ext(">", _source_text, _close_pos);
-                if (_close_end > 0) {
-                    _index = _close_end + 1;
+                var _close_end = __ww_css_find_u8__(_in_buff, _close_pos, _in_len, 62); // '>'
+                if (_close_end >= 0) {
+                    _pos = _close_end + 1;
                 } else {
-                    _index = _close_pos + 7;
+                    _pos = _close_pos + 7;
                 }
 
                 // Do not toggle _global_allowed
@@ -719,8 +952,8 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
             }
 
             // No close found: parse tail and stop
-            if (_index <= _length) {
-                var _tail = string_copy(_source_text, _index, (_length - _index) + 1);
+            if (_pos < _in_len) {
+                var _tail = regex__buffer_read_text_range(_in_buff, _pos, _in_len);
                 __ww_css_parse_stylesheet__(__css_class_map__, _tail);
             }
 
@@ -737,9 +970,9 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
                 var _frame = _state_stack[_top];
                 array_pop(_state_stack);
 
-                __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+                __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
                 _ctx.state = __ww_textproc_state_clone__(_frame.prev_state);
-                _ctx.span_start = _ctx.out_len;
+                _ctx.span_start = variable_struct_get(_ctx, "out_len");
 
                 if (_frame.tag_name == _name) { break; }
 
@@ -758,24 +991,24 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
 
         // Built-in tag effects
         if (_name == "b") {
-            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+            __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
             __ww_textproc_ctx_apply_patch__(_ctx, { style: __WW_Text_Glyph_Style.Bold });
-            _ctx.span_start = _ctx.out_len;
+            _ctx.span_start = variable_struct_get(_ctx, "out_len");
         }
         else if (_name == "i") {
-            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+            __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
             __ww_textproc_ctx_apply_patch__(_ctx, { style: __WW_Text_Glyph_Style.Italic });
-            _ctx.span_start = _ctx.out_len;
+            _ctx.span_start = variable_struct_get(_ctx, "out_len");
         }
         else if (_name == "u") {
-            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+            __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
             __ww_textproc_ctx_apply_patch__(_ctx, { underline: __WW_Text_Glyph_Underline.Line });
-            _ctx.span_start = _ctx.out_len;
+            _ctx.span_start = variable_struct_get(_ctx, "out_len");
         }
         else if (_name == "s") {
-            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+            __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
             __ww_textproc_ctx_apply_patch__(_ctx, { strike: __WW_Text_Glyph_Strike.Line });
-            _ctx.span_start = _ctx.out_len;
+            _ctx.span_start = variable_struct_get(_ctx, "out_len");
         }
 
         // Apply class rules (in order)
@@ -807,12 +1040,13 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
                 if (_delta.has_align) {
                     var _new_align = _delta.align_value;
                     if (_new_align != _align_value) {
-                        if (_ctx.out_len > _align_start) {
-                            array_push(_align_runs, { start_index: _align_start, end_index: _ctx.out_len, align_value: _align_value });
+                        var _ctx_out_len = variable_struct_get(_ctx, "out_len");
+                        if (_ctx_out_len > _align_start) {
+                            array_push(_align_runs, { start_index: _align_start, end_index: _ctx_out_len, align_value: _align_value });
                         }
                         _align_value = _new_align;
                         _ctx.state.align_value = _align_value;
-                        _align_start = _ctx.out_len;
+                        _align_start = variable_struct_get(_ctx, "out_len");
                     }
                 }
 
@@ -830,9 +1064,9 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
                 if (_delta.has_strike) { _patch.strike = _delta.strike; }
 
                 if (variable_struct_names_count(_patch) > 0) {
-                    __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+                    __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
                     __ww_textproc_ctx_apply_patch__(_ctx, _patch);
-                    _ctx.span_start = _ctx.out_len;
+                    _ctx.span_start = variable_struct_get(_ctx, "out_len");
                 }
             }
         }
@@ -852,12 +1086,13 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
                 var _new_align2 = _delta2.align_value;
 
                 if (_new_align2 != _align_value) {
-                    if (_ctx.out_len > _align_start) {
-                        array_push(_align_runs, { start_index: _align_start, end_index: _ctx.out_len, align_value: _align_value });
+                    var _ctx_out_len2 = variable_struct_get(_ctx, "out_len");
+                    if (_ctx_out_len2 > _align_start) {
+                        array_push(_align_runs, { start_index: _align_start, end_index: _ctx_out_len2, align_value: _align_value });
                     }
                     _align_value = _new_align2;
                     _ctx.state.align_value = _align_value;
-                    _align_start = _ctx.out_len;
+                    _align_start = variable_struct_get(_ctx, "out_len");
                 }
             }
 
@@ -874,9 +1109,9 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
             if (_delta2.has_strike) { _patch2.strike = _delta2.strike; }
 
             if (variable_struct_names_count(_patch2) > 0) {
-                __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+                __ww_textproc_ctx_flush_span__(_ctx, variable_struct_get(_ctx, "out_len"));
                 __ww_textproc_ctx_apply_patch__(_ctx, _patch2);
-                _ctx.span_start = _ctx.out_len;
+                _ctx.span_start = variable_struct_get(_ctx, "out_len");
             }
         }
 
@@ -885,8 +1120,9 @@ function WWTextProcessorCSS(_raw_text, _default_state) {
     }
 
     // EOF align flush
-    if (_ctx.out_len > _align_start) {
-        array_push(_align_runs, { start_index: _align_start, end_index: _ctx.out_len, align_value: _align_value });
+    var _ctx_out_len_eof = variable_struct_get(_ctx, "out_len");
+    if (_ctx_out_len_eof > _align_start) {
+        array_push(_align_runs, { start_index: _align_start, end_index: _ctx_out_len_eof, align_value: _align_value });
     }
 
     var _res = __ww_textproc_ctx_finish__(_ctx);

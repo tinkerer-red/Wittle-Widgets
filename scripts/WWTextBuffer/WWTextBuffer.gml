@@ -485,16 +485,17 @@ function WWTextBuffer() : WWCore() constructor {
 				static __args = {
 					buff : buffer_create(1, buffer_grow, 1),
 				}
+				static __fn = method(__args, function(_char, _index) {
+					if (__allowed_char_map__[$ _char]) {
+						buffer_write(buff, buffer_text, _char);
+					}
+				});
 				__args.__allowed_char_map__ = __allowed_char_map__;
 				
 				buffer_resize(__args.buff, string_byte_length(_text));
 				buffer_seek(__args.buff, buffer_seek_start, 0);
 				
-				string_foreach(_text, method(__args, function(_char, _index) {
-					if (__allowed_char_map__[$ _char]) {
-						buffer_write(buff, buffer_text, _char);
-					}
-				}));
+				string_foreach(_text, __fn);
 					
 				// Write a null terminator so the resulting string ends correctly.
 				buffer_write(__args.buff, buffer_u8, 0);

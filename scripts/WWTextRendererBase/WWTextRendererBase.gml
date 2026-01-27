@@ -1004,7 +1004,7 @@ function WWTextRendererBase() : WWCore() constructor {
             // Optional emit culling region (local coords, relative to draw origin)
             __vb_emit_clip__ = undefined;
             __vb_last_emit_clip__ = undefined;
-            __vb_desired_emit_clip__ = undefined;
+            __vb_desired_emit_clip__ = { x0: 0, y0: 0, x1: 0, y1: 0 };
 
             __vb_progressive_active__ = false;
             __vb_progressive_last_step_ms__ = -1;
@@ -1017,15 +1017,17 @@ function WWTextRendererBase() : WWCore() constructor {
             __vb_needs_full_rebuild__ = true;
             __vb_force_full_build__ = false;
             __vb_open_buffers__ = [];
-            __vb_pending_chunks__ = [];
+            __vb_pending_chunks__ = []; // normal-priority (LIFO)
+            __vb_pending_front__ = [];  // high-priority (LIFO)
             __vb_chunk_built__ = [];
+            __vb_chunk_queued__ = []; // 0=not queued, 1=normal, 2=front
             __vb_chunk_count__ = 0;
             __vb_visible_chunk_min__ = 0;
             __vb_visible_chunk_max__ = -1;
             __vb_keep_chunk_min__ = 0;
             __vb_keep_chunk_max__ = -1;
             __vb_current_chunk_id__ = -1;
-            __vb_current_chunk_bounds__ = undefined;
+            __vb_current_chunk_bounds__ = { x0: 0, y0: 0, x1: 0, y1: 0 };
 
             __vb_dbg_last_total_glyphs__ = 0;
             __vb_dbg_last_emitted_glyphs__ = 0;
@@ -1064,7 +1066,9 @@ function WWTextRendererBase() : WWCore() constructor {
                 __vb_needs_full_rebuild__ = true;
                 __vb_force_full_build__ = false;
                 __vb_pending_chunks__ = [];
+                __vb_pending_front__ = [];
                 __vb_chunk_built__ = [];
+                __vb_chunk_queued__ = [];
                 __vb_chunk_count__ = 0;
                 __vb_visible_chunk_min__ = 0;
                 __vb_visible_chunk_max__ = -1;
@@ -1078,6 +1082,16 @@ function WWTextRendererBase() : WWCore() constructor {
 
             static __vb_queue_chunk_unique__ = function(_chunk_id) {
                 if (is_undefined(_chunk_id) || _chunk_id < 0) {
+                    return;
+                }
+
+                // Fast-path: use queued flags instead of scanning arrays.
+                if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) {
+                    if (_chunk_id >= __vb_chunk_count__) { return; }
+                    if (__vb_chunk_built__[_chunk_id]) { return; }
+                    if (__vb_chunk_queued__[_chunk_id] != 0) { return; }
+                    __vb_chunk_queued__[_chunk_id] = 1;
+                    array_push(__vb_pending_chunks__, _chunk_id);
                     return;
                 }
 
@@ -1099,22 +1113,63 @@ function WWTextRendererBase() : WWCore() constructor {
                     return;
                 }
 
-                // Promote to the front (so visible chunks can preempt older offscreen work).
-                var _i = 0;
-                var _n = array_length(__vb_pending_chunks__);
-                repeat (_n) {
-                    if (__vb_pending_chunks__[_i] == _chunk_id) {
-                        if (_i > 0) {
-                            array_delete(__vb_pending_chunks__, _i, 1);
-                            array_insert(__vb_pending_chunks__, 0, _chunk_id);
-                        }
-                        return;
-                    }
-                    _i += 1;
+                // Fast-path: promote via queued flags (no array insert/delete).
+                if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) {
+                    if (_chunk_id >= __vb_chunk_count__) { return; }
+                    if (__vb_chunk_built__[_chunk_id]) { return; }
+                    var _q = __vb_chunk_queued__[_chunk_id];
+                    if (_q == 2) { return; }
+                    __vb_chunk_queued__[_chunk_id] = 2;
+                    array_push(__vb_pending_front__, _chunk_id);
+                    return;
                 }
 
-                // Not queued yet: insert at the front so it builds ASAP.
-                array_insert(__vb_pending_chunks__, 0, _chunk_id);
+                // Fallback (should rarely happen): just push onto the front list.
+                array_push(__vb_pending_front__, _chunk_id);
+            };
+
+            static __vb_pop_next_pending_chunk__ = function() {
+
+                if (__vb_chunk_count__ <= 0) {
+                    return -1;
+                }
+
+                var _keep_min = __vb_keep_chunk_min__;
+                var _keep_max = __vb_keep_chunk_max__;
+
+                // Prefer high-priority pending.
+                while (array_length(__vb_pending_front__) > 0) {
+                    var _cid = array_pop(__vb_pending_front__);
+                    if (is_undefined(_cid) || _cid < 0 || _cid >= __vb_chunk_count__) { continue; }
+                    if (_cid < _keep_min || _cid > _keep_max) {
+                        if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid] = 0; }
+                        continue;
+                    }
+                    if (__vb_chunk_built__[_cid]) {
+                        if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid] = 0; }
+                        continue;
+                    }
+                    if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid] = 0; }
+                    return _cid;
+                }
+
+                // Then normal pending.
+                while (array_length(__vb_pending_chunks__) > 0) {
+                    var _cid2 = array_pop(__vb_pending_chunks__);
+                    if (is_undefined(_cid2) || _cid2 < 0 || _cid2 >= __vb_chunk_count__) { continue; }
+                    if (_cid2 < _keep_min || _cid2 > _keep_max) {
+                        if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid2] = 0; }
+                        continue;
+                    }
+                    if (__vb_chunk_built__[_cid2]) {
+                        if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid2] = 0; }
+                        continue;
+                    }
+                    if (array_length(__vb_chunk_queued__) == __vb_chunk_count__) { __vb_chunk_queued__[_cid2] = 0; }
+                    return _cid2;
+                }
+
+                return -1;
             };
 
             static __vb_pick_unbuilt_visible_chunk__ = function() {
@@ -1175,7 +1230,7 @@ function WWTextRendererBase() : WWCore() constructor {
                         break;
                     }
 
-                    if (array_length(__vb_pending_chunks__) <= 0) {
+                    if (array_length(__vb_pending_front__) <= 0 && array_length(__vb_pending_chunks__) <= 0) {
                         break;
                     }
 
@@ -3285,7 +3340,7 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 // If we still have queued chunks, stay dirty so next frame builds another.
                 if (vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
-                    __vb_is_dirty__ = (array_length(__vb_pending_chunks__) > 0);
+                    __vb_is_dirty__ = (array_length(__vb_pending_front__) > 0 || array_length(__vb_pending_chunks__) > 0);
                 } else {
                     __vb_is_dirty__ = false;
                 }
@@ -3325,7 +3380,9 @@ function WWTextRendererBase() : WWCore() constructor {
                     __vb_force_full_build__ = (_target_mode == 0);
 
                     __vb_pending_chunks__ = [];
+                    __vb_pending_front__ = [];
                     __vb_chunk_built__ = [];
+                    __vb_chunk_queued__ = [];
                     __vb_chunk_count__ = 0;
                     __vb_visible_chunk_min__ = 0;
                     __vb_visible_chunk_max__ = -1;
@@ -3337,7 +3394,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 if (_target_mode == 0) {
                     __vb_emit_clip__ = undefined;
-                    __vb_desired_emit_clip__ = undefined;
                     __vb_progressive_active__ = false;
                     return;
                 }
@@ -3363,8 +3419,15 @@ function WWTextRendererBase() : WWCore() constructor {
                 var _x1 = ceil((_sc_x + _sc_w - _ox) + _m);
                 var _y1 = ceil((_sc_y + _sc_h - _oy) + _m);
 
-                var _desired = { x0: _x0, y0: _y0, x1: _x1, y1: _y1 };
-                __vb_desired_emit_clip__ = _desired;
+                var _desired = __vb_desired_emit_clip__;
+                if (is_undefined(_desired)) {
+                    _desired = { x0: 0, y0: 0, x1: 0, y1: 0 };
+                    __vb_desired_emit_clip__ = _desired;
+                }
+                variable_struct_set(_desired, "x0", _x0);
+                variable_struct_set(_desired, "y0", _y0);
+                variable_struct_set(_desired, "x1", _x1);
+                variable_struct_set(_desired, "y1", _y1);
 
                 // Progressive chunk build scheduling (pixel-based).
                 if (__vb_render_mode__ == 2) {
@@ -3382,7 +3445,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     if (array_length(__vb_chunk_built__) != __vb_chunk_count__) {
                         __vb_chunk_built__ = array_create(__vb_chunk_count__, false);
+                        __vb_chunk_queued__ = array_create(__vb_chunk_count__, 0);
                         __vb_pending_chunks__ = [];
+                        __vb_pending_front__ = [];
                     }
 
                     // Expand visible min by 1 chunk to account for lines that start in the previous
@@ -3436,28 +3501,21 @@ function WWTextRendererBase() : WWCore() constructor {
                         }
                     }
 
-                    var _p = array_length(__vb_pending_chunks__) - 1;
-                    while (_p >= 0) {
-                        var _pcid = __vb_pending_chunks__[_p];
-                        if (_pcid < _keep_min || _pcid > _keep_max) {
-                            array_delete(__vb_pending_chunks__, _p, 1);
-                        }
-                        _p -= 1;
-                    }
+                    // Don't physically delete pending entries (which shifts arrays and produces garbage).
+                    // Popper will skip out-of-window entries and clear queued flags opportunistically.
 
                     // Queue visible chunks (so visible area appears ASAP).
-                    // NOTE: insert in reverse order so the queue ends up [min..max] at the front.
-                    var _c = _vis_chunk_max;
-                    while (_c >= _vis_chunk_min) {
+                    var _c = _vis_chunk_min;
+                    while (_c <= _vis_chunk_max) {
                         if (!__vb_chunk_built__[_c]) {
                             __vb_queue_chunk_unique_front__(_c);
                         }
-                        _c -= 1;
+                        _c += 1;
                     }
 
                     __vb_progressive_active__ = true;
 
-                    if (array_length(__vb_pending_chunks__) > 0) {
+                    if (array_length(__vb_pending_front__) > 0 || array_length(__vb_pending_chunks__) > 0) {
                         __vb_is_dirty__ = true;
                     }
 
@@ -3585,7 +3643,7 @@ function WWTextRendererBase() : WWCore() constructor {
                     _chunk_mode = false;
                     __vb_force_full_build__ = false;
                 } else if (vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
-                    if (array_length(__vb_pending_chunks__) > 0) {
+                    if (array_length(__vb_pending_front__) > 0 || array_length(__vb_pending_chunks__) > 0) {
                         _chunk_mode = true;
                     }
                 }
@@ -3594,7 +3652,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 // force-build a visible chunk rather than returning a blank frame.
                 if (__vb_render_mode__ == 2 && !_chunk_mode) {
                     __vb_queue_visible_chunk_now__();
-                    _chunk_mode = (array_length(__vb_pending_chunks__) > 0);
+                    _chunk_mode = (array_length(__vb_pending_front__) > 0 || array_length(__vb_pending_chunks__) > 0);
                 }
 
                 // IMPORTANT: In progressive-chunk render mode, never fall back to a full build when
@@ -3605,8 +3663,10 @@ function WWTextRendererBase() : WWCore() constructor {
                 }
 
                 if (_chunk_mode) {
-                    _chunk_id = __vb_pending_chunks__[0];
-                    array_delete(__vb_pending_chunks__, 0, 1);
+                    _chunk_id = __vb_pop_next_pending_chunk__();
+                    if (_chunk_id < 0) {
+                        return;
+                    }
 
                     // If this chunk is being rebuilt, delete prior batches for this chunk id.
                     __vb_delete_batches_for_chunk__(_chunk_id);
@@ -3680,7 +3740,16 @@ function WWTextRendererBase() : WWCore() constructor {
                             _glyph_end = _lines[_b1 + __WW_Layout_Line.End_Index];
                         }
 
-                        __vb_current_chunk_bounds__ = { x0: 0, y0: _cy0, x1: __layout_content_width__, y1: _cy1 };
+                        var _bnd = __vb_current_chunk_bounds__;
+                        if (!is_struct(_bnd)) {
+                            _bnd = { x0: 0, y0: 0, x1: 0, y1: 0 };
+                            __vb_current_chunk_bounds__ = _bnd;
+                        }
+                        variable_struct_set(_bnd, "x0", 0);
+                        variable_struct_set(_bnd, "y0", _cy0);
+                        variable_struct_set(_bnd, "x1", __layout_content_width__);
+                        variable_struct_set(_bnd, "y1", _cy1);
+                        __vb_current_chunk_bounds__ = _bnd;
                     } else {
                         _chunk_mode = false;
                         _chunk_id = -1;
@@ -4171,7 +4240,6 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 __vb_emit_clip__ = _saved_emit_clip;
                 __vb_current_chunk_id__ = -1;
-                __vb_current_chunk_bounds__ = undefined;
 
 			    if (font_exists(_old_font) && _old_font != draw_get_font()) {
 			        draw_set_font(_old_font);
@@ -4400,7 +4468,9 @@ function WWTextRendererBase() : WWCore() constructor {
 
                     if (vb_debug_show_progressive) {
 
-                        var _queue_len = array_length(__vb_pending_chunks__);
+                        var _queue_len = 0;
+                        if (!is_undefined(__vb_pending_front__)) { _queue_len += array_length(__vb_pending_front__); }
+                        if (!is_undefined(__vb_pending_chunks__)) { _queue_len += array_length(__vb_pending_chunks__); }
                         var _batches = array_length(__draw_batches__);
 
                         var _chunk_h = vb_progressive_chunk_height_px;

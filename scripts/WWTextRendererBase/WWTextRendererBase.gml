@@ -1094,6 +1094,96 @@ function WWTextRendererBase() : WWCore() constructor {
                 array_push(__vb_pending_chunks__, _chunk_id);
             };
 
+            static __vb_queue_chunk_unique_front__ = function(_chunk_id) {
+                if (is_undefined(_chunk_id) || _chunk_id < 0) {
+                    return;
+                }
+
+                // Promote to the front (so visible chunks can preempt older offscreen work).
+                var _i = 0;
+                var _n = array_length(__vb_pending_chunks__);
+                repeat (_n) {
+                    if (__vb_pending_chunks__[_i] == _chunk_id) {
+                        if (_i > 0) {
+                            array_delete(__vb_pending_chunks__, _i, 1);
+                            array_insert(__vb_pending_chunks__, 0, _chunk_id);
+                        }
+                        return;
+                    }
+                    _i += 1;
+                }
+
+                // Not queued yet: insert at the front so it builds ASAP.
+                array_insert(__vb_pending_chunks__, 0, _chunk_id);
+            };
+
+            static __vb_pick_unbuilt_visible_chunk__ = function() {
+
+                if (__vb_chunk_count__ <= 0) {
+                    return -1;
+                }
+
+                var _vis_min = __vb_visible_chunk_min__;
+                var _vis_max = __vb_visible_chunk_max__;
+
+                if (_vis_max < _vis_min) {
+                    return clamp(_vis_min, 0, __vb_chunk_count__ - 1);
+                }
+
+                if (array_length(__vb_chunk_built__) != __vb_chunk_count__) {
+                    return clamp(_vis_min, 0, __vb_chunk_count__ - 1);
+                }
+
+                var _c = _vis_min;
+                while (_c <= _vis_max) {
+                    if (!__vb_chunk_built__[_c]) {
+                        return _c;
+                    }
+                    _c += 1;
+                }
+
+                return -1;
+            };
+
+            static __vb_queue_visible_chunk_now__ = function() {
+                var _picked = __vb_pick_unbuilt_visible_chunk__();
+                if (_picked >= 0) {
+                    __vb_queue_chunk_unique_front__(_picked);
+                }
+                return _picked;
+            };
+
+            static __vb_build_visible_chunks_now__ = function() {
+
+                if (__vb_render_mode__ != 2 || !vb_progressive_emit_enabled || !vb_cull_emits_to_scissor) {
+                    return;
+                }
+
+                var _vis_min = __vb_visible_chunk_min__;
+                var _vis_max = __vb_visible_chunk_max__;
+
+                // Safety cap to avoid pathological stalls if something goes wrong.
+                var _max_builds = (_vis_max - _vis_min) + 1;
+                if (_max_builds < 0) { _max_builds = 0; }
+                if (_max_builds > 32) { _max_builds = 32; }
+
+                var _built_count = 0;
+                while (_built_count < _max_builds) {
+
+                    var _picked = __vb_queue_visible_chunk_now__();
+                    if (_picked < 0) {
+                        break;
+                    }
+
+                    if (array_length(__vb_pending_chunks__) <= 0) {
+                        break;
+                    }
+
+                    __build_vb__();
+                    _built_count += 1;
+                }
+            };
+
             static __vb_delete_batches_for_chunk__ = function(_chunk_id) {
                 if (is_undefined(_chunk_id) || _chunk_id < 0) {
                     return;
@@ -3185,7 +3275,13 @@ function WWTextRendererBase() : WWCore() constructor {
                     __vb_needs_full_rebuild__ = false;
                 }
 
-                __build_vb__();
+                // Progressive-chunk mode: build everything visible immediately, then leave
+                // offscreen/nearby chunks to the normal per-frame progressive queue.
+                if (__vb_render_mode__ == 2 && vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
+                    __vb_build_visible_chunks_now__();
+                } else {
+                    __build_vb__();
+                }
 
                 // If we still have queued chunks, stay dirty so next frame builds another.
                 if (vb_progressive_emit_enabled && vb_cull_emits_to_scissor) {
@@ -3350,12 +3446,13 @@ function WWTextRendererBase() : WWCore() constructor {
                     }
 
                     // Queue visible chunks (so visible area appears ASAP).
-                    var _c = _vis_chunk_min;
-                    while (_c <= _vis_chunk_max) {
+                    // NOTE: insert in reverse order so the queue ends up [min..max] at the front.
+                    var _c = _vis_chunk_max;
+                    while (_c >= _vis_chunk_min) {
                         if (!__vb_chunk_built__[_c]) {
-                            __vb_queue_chunk_unique__(_c);
+                            __vb_queue_chunk_unique_front__(_c);
                         }
-                        _c += 1;
+                        _c -= 1;
                     }
 
                     __vb_progressive_active__ = true;
@@ -3491,6 +3588,13 @@ function WWTextRendererBase() : WWCore() constructor {
                     if (array_length(__vb_pending_chunks__) > 0) {
                         _chunk_mode = true;
                     }
+                }
+
+                // Safety: If we're in progressive-chunk render mode but nothing is queued yet,
+                // force-build a visible chunk rather than returning a blank frame.
+                if (__vb_render_mode__ == 2 && !_chunk_mode) {
+                    __vb_queue_visible_chunk_now__();
+                    _chunk_mode = (array_length(__vb_pending_chunks__) > 0);
                 }
 
                 // IMPORTANT: In progressive-chunk render mode, never fall back to a full build when
@@ -4154,6 +4258,14 @@ function WWTextRendererBase() : WWCore() constructor {
 
                 __vb_update_emit_clip_for_draw__(_origin_x, _origin_y);
                 __ensure_vb__();
+
+                // Safety: avoid transient blank frames if something caused the chunk queue to be
+                // empty while no batches exist yet (e.g. large view jumps + eviction ordering).
+                if (__vb_render_mode__ == 2 && __layout_glyphs_count__ > 0 && array_length(__draw_batches__) <= 0) {
+                    __vb_is_dirty__ = true;
+                    __vb_built_this_frame__ = false;
+                    __vb_build_visible_chunks_now__();
+                }
 
                 if (_layer_min == undefined) { _layer_min = -1000000; }
                 if (_layer_max == undefined) { _layer_max =  1000000; }

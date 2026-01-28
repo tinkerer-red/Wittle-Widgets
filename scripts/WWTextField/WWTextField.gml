@@ -7,18 +7,6 @@
 function WWTextField() : WWCore() constructor {
 	debug_name = "WWTextBase";
 	
-	// Data-only cursor record factory (the ONLY cursor "constructor" in this file).
-	// Cursor records contain: index, highlight_active, highlight_start_index, highlight_end_index, sticky_px.
-	static __cursor_record_create__ = function(_index) {
-		return {
-			index: _index,
-			highlight_active: false,
-			highlight_start_index: _index,
-			highlight_end_index: _index,
-			sticky_px: 0,
-		};
-	};
-	
 	#region Components
 		
 		hotkeys  = new WWHotkeyManager(); //doesnt need to be added as a child
@@ -675,7 +663,7 @@ function WWTextField() : WWCore() constructor {
 			})
 			on_interact(function(_data) {
 				// stay focused if mouse is on component
-				if (__word_selection_mode__) {
+				if (__selection_mode__ != __WW_Text_Field_Selection_Mode.Regular) {
 					__update_word_selection_drag__();
 				}
 				else {
@@ -694,9 +682,9 @@ function WWTextField() : WWCore() constructor {
 			})
 			on_released(function(_data) {
 				// stay focused if mouse is on component
-				__word_selection_mode__ = false;
-				__mouse_drag_mode__ = 0;
-				__mouse_drag_started__ = false;
+				__selection_mode__ = __WW_Text_Field_Selection_Mode.Regular;
+				__drag_mode__ = 0;
+				__drag_started__ = false;
 			})
 			on_double_click(function(_data) {
 				var _ctrl = keyboard_check(vk_control);
@@ -722,18 +710,18 @@ function WWTextField() : WWCore() constructor {
 					if (multi_cursor_enabled) {
 						__cursors_clear_to_single__(_clicked_index);
 					}
-					__word_anchor_start__ = _loc.index_start;
-					__word_anchor_end__   = _loc.index_end;
-					__word_drag_start_x__ = _mx;
-					__word_drag_start_y__ = _my;
-					__word_selection_mode__ = true;
+					__selection_anchor_start__ = _loc.index_start;
+					__selection_anchor_end__   = _loc.index_end;
+					__drag_start_x__ = _mx;
+					__drag_start_y__ = _my;
+					__selection_mode__ = __WW_Text_Field_Selection_Mode.Word;
 				}
 				else {
 					if (multi_cursor_enabled) {
 						// Ctrl+double-click modifies the most recently appended cursor.
 						__cursor_active__ = max(0, array_length(__cursors__) - 1);
 					}
-					__word_selection_mode__ = false;
+					__selection_mode__ = __WW_Text_Field_Selection_Mode.Regular;
 				}
 				
 				var _target_cursor = __cursors__[__cursor_active__];
@@ -804,18 +792,18 @@ function WWTextField() : WWCore() constructor {
 					if (multi_cursor_enabled) {
 						__cursors_clear_to_single__(_clicked_index);
 					}
-					__word_anchor_start__ = _start;
-					__word_anchor_end__   = _end;
-					__word_drag_start_x__ = _mx;
-					__word_drag_start_y__ = _my;
-					__word_selection_mode__ = true;
+					__selection_anchor_start__ = _start;
+					__selection_anchor_end__   = _end;
+					__drag_start_x__ = _mx;
+					__drag_start_y__ = _my;
+					__selection_mode__ = __WW_Text_Field_Selection_Mode.Line;
 				}
 				else {
 					if (multi_cursor_enabled) {
 						// Ctrl+triple-click modifies the most recently appended cursor.
 						__cursor_active__ = max(0, array_length(__cursors__) - 1);
 					}
-					__word_selection_mode__ = false;
+					__selection_mode__ = __WW_Text_Field_Selection_Mode.Regular;
 				}
 				
 				//if it anything except the last line avoid including the line break glyph
@@ -844,6 +832,19 @@ function WWTextField() : WWCore() constructor {
 			});
 			
 			on_focus(function(_input) {
+				// If a Shift+RMB box-select drag leaves the component, on_mouse_over will stop firing.
+				// Keep the gesture alive (and end it on release) while focused.
+				if (multi_cursor_enabled && __box_select_active__) {
+					if (mouse_check_button(mb_right)) {
+						var _mxu = device_mouse_x_to_gui(0);
+						var _myu = device_mouse_y_to_gui(0);
+						__box_select_update__(_mxu, _myu);
+					}
+					else {
+						__box_select_end__();
+					}
+				}
+
 				var _return = hotkeys.step();
 				if (_return == undefined) {
 					if (keyboard_string != "") {
@@ -854,6 +855,34 @@ function WWTextField() : WWCore() constructor {
 				else {
 					//empy the keyboard string after the hotkeys are handled to act as a "consume"
 					keyboard_string = "";
+				}
+			});
+			on_mouse_over(function(_input) {
+				// Shift+RMB box-like selection (RMB does not trigger on_pressed in this system).
+				if (!multi_cursor_enabled) return;
+				if (__box_select_active__) {
+					if (mouse_check_button(mb_right)) {
+						var _mxu = device_mouse_x_to_gui(0);
+						var _myu = device_mouse_y_to_gui(0);
+						__box_select_update__(_mxu, _myu);
+					}
+					else {
+						__box_select_end__();
+					}
+					return;
+				}
+				if (mouse_check_button_pressed(mb_right) && keyboard_check(vk_shift)) {
+					var _mxr = device_mouse_x_to_gui(0);
+					var _myr = device_mouse_y_to_gui(0);
+					var _mode = 0;
+					if (keyboard_check(vk_control)) _mode = 1;
+					else if (keyboard_check(vk_alt)) _mode = 2;
+					// Also grab focus when box-select begins.
+					if (!__is_focused__) {
+						trigger_event(events.select);
+						__is_focused__ = true;
+					}
+					__box_select_begin__(_mode, _mxr, _myr);
 				}
 			});
 			on_mouse_off(function(){
@@ -1856,18 +1885,22 @@ function WWTextField() : WWCore() constructor {
 			
 			__keyboard_type__ = kbv_type_default; //Used for on screen keyboards.
 			
-			__word_selection_mode__ = false;
-			__word_anchor_start__ = 0;
-			__word_anchor_end__ = 0;
-			__word_drag_start_x__ = 0;
-			__word_drag_start_y__ = 0;
-			__word_drag_deadzone_px__ = 3;
-			__mouse_drag_started__ = false;
-			__mouse_drag_start_x__ = 0;
-			__mouse_drag_start_y__ = 0;
-			__mouse_drag_deadzone_px__ = 3;
-			__mouse_drag_mode__ = 0; // 0 = normal, 1 = ctrl-drag (extend selection for one cursor)
-			__mouse_drag_cursor_id__ = 0;
+			__selection_mode__ = __WW_Text_Field_Selection_Mode.Regular; // regular, word, line (multi-click drag)
+			__selection_anchor_start__ = 0;
+			__selection_anchor_end__ = 0;
+			__drag_start_x__ = 0;
+			__drag_start_y__ = 0;
+			__drag_deadzone_px__ = 3;
+			__drag_started__ = false;
+			__drag_mode__ = 0; // 0 = normal, 1 = ctrl-drag (extend selection for one cursor)
+			__drag_select_cursor_index__ = 0; // cursor index used by ctrl-drag and box-select additive
+			
+			// Shift+Right Click box-like selection (not true monospaced box select; line-based approximation)
+			__box_select_active__ = false;
+			__box_select_mode__ = 0; // 0=override, 1=additive, 2=subtractive
+			// Anchor lives in __drag_start_x__/__drag_start_y__. End comes from current mouse position when polled.
+			__box_select_base_cursors__ = undefined; // subtractive uses a stable baseline for live cutting
+			__box_select_base_cursor_active__ = 0;
 			
 			cursor_last_width = undefined; //The last known x position in pixels, to ensure pressing up or down multiple times doesnt deviate the cursor off from its intended "center"
 			
@@ -2026,9 +2059,9 @@ function WWTextField() : WWCore() constructor {
 				
 					// New press: reset normal drag tracking.
 					if (!_select) {
-						__mouse_drag_started__ = false;
-						__mouse_drag_start_x__ = mx;
-						__mouse_drag_start_y__ = my;
+						__drag_started__ = false;
+						__drag_start_x__ = mx;
+						__drag_start_y__ = my;
 					}
 				
 					// Drag/update tick: route to the correct drag mode.
@@ -2038,22 +2071,22 @@ function WWTextField() : WWCore() constructor {
 							return;
 						}
 						// Ctrl-drag extends selection for ONLY the cursor created/targeted by Ctrl+click.
-						if (__mouse_drag_mode__ == 1) {
+						if (__drag_mode__ == 1) {
 							// If Ctrl is no longer held, cancel ctrl-drag and fall back to normal drag logic.
 							if (!keyboard_check(vk_control)) {
-								__mouse_drag_mode__ = 0;
+								__drag_mode__ = 0;
 							} else {
 								// Don't start extending until the mouse actually moves.
-								if (!__mouse_drag_started__) {
-									var _dzc = __mouse_drag_deadzone_px__;
-									var _dxc = mx - __mouse_drag_start_x__;
-									var _dyc = my - __mouse_drag_start_y__;
+								if (!__drag_started__) {
+									var _dzc = __drag_deadzone_px__;
+									var _dxc = mx - __drag_start_x__;
+									var _dyc = my - __drag_start_y__;
 									if ((_dxc * _dxc) + (_dyc * _dyc) < (_dzc * _dzc)) {
 										return;
 									}
-									__mouse_drag_started__ = true;
+									__drag_started__ = true;
 								}
-							var _cid = clamp(__mouse_drag_cursor_id__, 0, max(0, array_length(__cursors__) - 1));
+							var _cid = clamp(__drag_select_cursor_index__, 0, max(0, array_length(__cursors__) - 1));
 							var _new_index = renderer.get_index_from_xy(mx, my);
 							__cursor_active__ = _cid;
 							__cursor_set_index_synced_for__(_cid, _new_index, true, true);
@@ -2064,14 +2097,14 @@ function WWTextField() : WWCore() constructor {
 						}
 					
 						// Normal drag: do not begin extending selection until the mouse actually moves.
-						if (!__mouse_drag_started__) {
-							var _dz = __mouse_drag_deadzone_px__;
-							var _dx = mx - __mouse_drag_start_x__;
-							var _dy = my - __mouse_drag_start_y__;
+						if (!__drag_started__) {
+							var _dz = __drag_deadzone_px__;
+							var _dx = mx - __drag_start_x__;
+							var _dy = my - __drag_start_y__;
 							if ((_dx * _dx) + (_dy * _dy) < (_dz * _dz)) {
 								return;
 							}
-							__mouse_drag_started__ = true;
+							__drag_started__ = true;
 						}
 					}
 				
@@ -2080,8 +2113,8 @@ function WWTextField() : WWCore() constructor {
 						var _alt = keyboard_check(vk_alt);
 						// If we're in double-click word selection drag mode, modifier clicks should not extend that selection.
 						// (Ctrl/Alt are used for multi-cursor actions, not word-drag extension.)
-						if (__word_selection_mode__ && (_ctrl || _alt)) {
-							__word_selection_mode__ = false;
+						if (__selection_mode__ != __WW_Text_Field_Selection_Mode.Regular && (_ctrl || _alt)) {
+							__selection_mode__ = __WW_Text_Field_Selection_Mode.Regular;
 						}
 						if (multi_cursor_enabled) {
 							var _c0 = __cursors__[__cursor_active__];
@@ -2100,8 +2133,8 @@ function WWTextField() : WWCore() constructor {
 						if (_ctrl) {
 							__cursors_add_at_index__(_index);
 							__selection_add_record__();
-							__mouse_drag_mode__ = 1;
-							__mouse_drag_cursor_id__ = __cursor_active__;
+							__drag_mode__ = 1;
+							__drag_select_cursor_index__ = __cursor_active__;
 							__cursor_blink_reset__();
 							trigger_event(events.cursor_move);
 							return;
@@ -2117,7 +2150,7 @@ function WWTextField() : WWCore() constructor {
 								if (array_length(__cursors__) != _before_remove) {
 									__selection_add_record__();
 								}
-								__mouse_drag_mode__ = 0;
+								__drag_mode__ = 0;
 								return;
 							}
 							_alt = false;
@@ -2125,12 +2158,344 @@ function WWTextField() : WWCore() constructor {
 					}
 				
 					if (!_select) {
-						__mouse_drag_mode__ = 0;
+						__drag_mode__ = 0;
 						// Normal click collapses to a single cursor
 						__cursors_clear_to_single__(_index);
 					}
 					__cursor_set_index_synced__(_index, _select);
 				}
+				
+				#region Box-like selection (Shift+RMB)
+					
+					static __box_select_line_interval__ = function(_line, _x0, _x1) {
+						var _y_mid = y + renderer.get_line_y_offset(_line) + (renderer.get_line_height(_line) * 0.5);
+						var _i0 = renderer.get_index_from_xy(_x0, _y_mid);
+						var _i1 = renderer.get_index_from_xy(_x1, _y_mid);
+						var _ls = renderer.get_line_index_start(_line);
+						var _le = renderer.get_line_index_end(_line);
+						var _a = clamp(min(_i0, _i1), _ls, _le);
+						var _b = clamp(max(_i0, _i1), _ls, _le);
+						// Avoid selecting the literal line break when selecting to EOL on non-wrapped lines.
+						if (_a != _b) {
+							var _last_line_index = renderer.get_line_count() - 1;
+							if (!renderer.get_line_forced_wrapped(_line) && _line != _last_line_index) {
+								if (_b == _le) {
+									_b = max(_a, _b - 1);
+								}
+							}
+						}
+						return { a: _a, b: _b };
+					};
+					static __box_select_build_ranges__ = function(_x0, _y0, _x1, _y1) {
+						var _line_count = renderer.get_line_count();
+						if (_line_count <= 0) return [];
+						var _last_line = _line_count - 1;
+						var _i0 = renderer.get_index_from_xy(_x0, _y0);
+						var _i1 = renderer.get_index_from_xy(_x1, _y1);
+						var _l0 = clamp(renderer.get_line_from_index(_i0), 0, _last_line);
+						var _l1 = clamp(renderer.get_line_from_index(_i1), 0, _last_line);
+						var _la = min(_l0, _l1);
+						var _lb = max(_l0, _l1);
+						var _out = [];
+						var _line = _la;
+						while (_line <= _lb) {
+							array_push(_out, __box_select_line_interval__(_line, _x0, _x1));
+							_line += 1;
+						}
+						return _out;
+					};
+					static __box_select_build_cursors__ = function(_ranges) {
+						var _n = array_length(_ranges);
+						if (_n <= 0) return [];
+						var _out = [];
+						array_resize(_out, _n);
+						var _i = 0;
+						repeat (_n) {
+							var _r = _ranges[_i];
+							var _a = _r.a;
+							var _b = _r.b;
+							var _idx = _b;
+							var _c = __cursor_record_create__(_idx);
+							if (_a != _b) {
+								_c.highlight_active = true;
+								_c.highlight_start_index = _a;
+								_c.highlight_end_index = _b;
+							}
+							else {
+								_c.highlight_active = false;
+								_c.highlight_start_index = _idx;
+								_c.highlight_end_index = _idx;
+							}
+							_c.index = _idx;
+							_c.sticky_px = renderer.get_x_from_index(_idx);
+							_out[_i] = _c;
+							_i += 1;
+						}
+						return _out;
+					};
+					static __ranges_merge__ = function(_ranges) {
+						var _n = array_length(_ranges);
+						if (_n <= 1) return _ranges;
+						// insertion sort by a
+						var _j = 1;
+						while (_j < _n) {
+							var _key = _ranges[_j];
+							var _k = _j - 1;
+							while (_k >= 0 && _ranges[_k].a > _key.a) {
+								_ranges[_k + 1] = _ranges[_k];
+								_k -= 1;
+							}
+							_ranges[_k + 1] = _key;
+							_j += 1;
+						}
+						var _merged = [];
+						array_push(_merged, _ranges[0]);
+						var _i = 1;
+						repeat (_n - 1) {
+							var _cur = _ranges[_i];
+							var _last = _merged[array_length(_merged) - 1];
+							if (_cur.a <= _last.b) {
+								_last.b = max(_last.b, _cur.b);
+								_merged[array_length(_merged) - 1] = _last;
+							}
+							else {
+								array_push(_merged, _cur);
+							}
+							_i += 1;
+						}
+						return _merged;
+					};
+					static __cursors_merge_overlaps_all__ = function() {
+						var _n = array_length(__cursors__);
+						if (_n <= 1) return;
+						var _ranges = [];
+						array_resize(_ranges, _n);
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							var _a;
+							var _b;
+							if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
+								_a = min(_c.highlight_start_index, _c.highlight_end_index);
+								_b = max(_c.highlight_start_index, _c.highlight_end_index);
+							}
+							else {
+								_a = _c.index;
+								_b = _c.index;
+							}
+							_ranges[_i] = { a: _a, b: _b };
+							_i += 1;
+						}
+						_ranges = __ranges_merge__(_ranges);
+						var _m = array_length(_ranges);
+						var _out = [];
+						array_resize(_out, _m);
+						_i = 0;
+						repeat (_m) {
+							var _r = _ranges[_i];
+							var _a2 = _r.a;
+							var _b2 = _r.b;
+							var _idx2 = _b2;
+							var _nc = __cursor_record_create__(_idx2);
+							if (_a2 != _b2) {
+								_nc.highlight_active = true;
+								_nc.highlight_start_index = _a2;
+								_nc.highlight_end_index = _b2;
+							}
+							else {
+								_nc.highlight_active = false;
+								_nc.highlight_start_index = _idx2;
+								_nc.highlight_end_index = _idx2;
+							}
+							_nc.index = _idx2;
+							_nc.sticky_px = renderer.get_x_from_index(_idx2);
+							_out[_i] = _nc;
+							_i += 1;
+						}
+						__cursors__ = _out;
+						__cursor_active__ = max(0, array_length(__cursors__) - 1);
+					};
+					static __ranges_point_in_any__ = function(_ranges, _idx) {
+						var _n = array_length(_ranges);
+						var _i = 0;
+						repeat (_n) {
+							var _r = _ranges[_i];
+							// Treat selection ranges as half-open [a,b). For degenerate ranges (a==b), treat it as a single caret-position.
+							if (_r.a == _r.b) {
+								if (_idx == _r.a) return true;
+							}
+							else if (_idx >= _r.a && _idx < _r.b) {
+								return true;
+							}
+							_i += 1;
+						}
+						return false;
+					};
+					static __ranges_subtract__ = function(_a, _b, _subs) {
+						var _out = [];
+						if (_a >= _b) return _out;
+						var _cur = _a;
+						var _n = array_length(_subs);
+						var _i = 0;
+						repeat (_n) {
+							var _s = _subs[_i];
+							if (_s.b <= _cur) { _i += 1; continue; }
+							if (_s.a >= _b) break;
+							if (_s.a > _cur) {
+								array_push(_out, { a: _cur, b: min(_s.a, _b) });
+							}
+							_cur = max(_cur, _s.b);
+							if (_cur >= _b) break;
+							_i += 1;
+						}
+						if (_cur < _b) {
+							array_push(_out, { a: _cur, b: _b });
+						}
+						return _out;
+					};
+					static __box_select_apply_override_or_add__ = function(_mx, _my) {
+						var _ranges = __box_select_build_ranges__(__drag_start_x__, __drag_start_y__, _mx, _my);
+						var _box_cursors = __box_select_build_cursors__(_ranges);
+						if (__box_select_mode__ == 0) {
+							__cursors__ = _box_cursors;
+							__drag_select_cursor_index__ = 0;
+						}
+						else {
+							// Additive: always rebuild from the stable baseline snapshot + current box cursors.
+							// (We cannot rely on truncation using __drag_select_cursor_index__ because we sort/dedupe each frame.)
+							__cursors__ = __cursors_clone_from__(__box_select_base_cursors__);
+							var _n = array_length(_box_cursors);
+							var _i = 0;
+							repeat (_n) {
+								array_push(__cursors__, _box_cursors[_i]);
+								_i += 1;
+							}
+						}
+						if (array_length(__cursors__) <= 0) {
+							__cursors__ = [ __cursor_record_create__(0) ];
+							__cursor_active__ = 0;
+						}
+						else {
+							__cursor_active__ = max(0, array_length(__cursors__) - 1);
+						}
+						__cursors_sort_and_dedupe_by_index__();
+						__cursors_sync_sticky_x__();
+						__history_update_latest_cursor__();
+						__cursor_blink_reset__();
+						trigger_event(events.cursor_move);
+					};
+					static __box_select_apply_subtractive__ = function(_mx, _my) {
+						// Always re-apply cutting from a stable baseline so dragging doesn't accumulate rounding artifacts.
+						__cursors__ = __cursors_clone_from__(__box_select_base_cursors__);
+						__cursor_active__ = clamp(__box_select_base_cursor_active__, 0, max(0, array_length(__cursors__) - 1));
+						var _ranges = __box_select_build_ranges__(__drag_start_x__, __drag_start_y__, _mx, _my);
+						_ranges = __ranges_merge__(_ranges);
+						var _out = [];
+						var _n = array_length(__cursors__);
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							var _a;
+							var _b;
+							if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
+								_a = min(_c.highlight_start_index, _c.highlight_end_index);
+								_b = max(_c.highlight_start_index, _c.highlight_end_index);
+								var _pieces = __ranges_subtract__(_a, _b, _ranges);
+								var _p = 0;
+								repeat (array_length(_pieces)) {
+									var _seg = _pieces[_p];
+									if (_seg.a < _seg.b) {
+										var _nc = __cursor_record_create__(_seg.b);
+										_nc.highlight_active = true;
+										_nc.highlight_start_index = _seg.a;
+										_nc.highlight_end_index = _seg.b;
+										_nc.index = _seg.b;
+										_nc.sticky_px = renderer.get_x_from_index(_seg.b);
+										array_push(_out, _nc);
+									}
+									_p += 1;
+								}
+							}
+							else {
+								// Caret-only: remove the caret if it lies within the box region.
+								if (!__ranges_point_in_any__(_ranges, _c.index)) {
+									var _nc2 = __cursor_record_create__(_c.index);
+									_nc2.highlight_active = false;
+									_nc2.highlight_start_index = _c.index;
+									_nc2.highlight_end_index = _c.index;
+									_nc2.index = _c.index;
+									_nc2.sticky_px = renderer.get_x_from_index(_c.index);
+									array_push(_out, _nc2);
+								}
+							}
+							_i += 1;
+						}
+						if (array_length(_out) <= 0) {
+							// Never allow zero cursors.
+							var _idx0 = renderer.get_index_from_xy(__drag_start_x__, __drag_start_y__);
+							_out = [ __cursor_record_create__(_idx0) ];
+							_out[0].sticky_px = renderer.get_x_from_index(_idx0);
+						}
+						__cursors__ = _out;
+						__cursor_active__ = max(0, array_length(__cursors__) - 1);
+						__cursors_sort_and_dedupe_by_index__();
+						__cursors_sync_sticky_x__();
+						__history_update_latest_cursor__();
+						__cursor_blink_reset__();
+						trigger_event(events.cursor_move);
+					};
+					static __box_select_begin__ = function(_mode, _mx, _my) {
+						if (!multi_cursor_enabled) return;
+						__box_select_active__ = true;
+						__box_select_mode__ = _mode;
+						__drag_start_x__ = _mx;
+						__drag_start_y__ = _my;
+						__selection_add_record__();
+						__box_select_base_cursors__ = __cursors_clone__();
+						__box_select_base_cursor_active__ = __cursor_active__;
+						if (_mode == 0) {
+							__cursors__ = [];
+							__cursor_active__ = 0;
+							__drag_select_cursor_index__ = 0;
+						}
+						else if (_mode == 1) {
+							__drag_select_cursor_index__ = array_length(__cursors__);
+						}
+						else {
+							// subtractive maintains its own baseline
+							__drag_select_cursor_index__ = 0;
+						}
+						// Apply once immediately.
+						if (_mode == 2) {
+							__box_select_apply_subtractive__(_mx, _my);
+						}
+						else {
+							__box_select_apply_override_or_add__(_mx, _my);
+						}
+					};
+					static __box_select_update__ = function(_mx, _my) {
+						if (!__box_select_active__) return;
+						if (__box_select_mode__ == 2) {
+							__box_select_apply_subtractive__(_mx, _my);
+						}
+						else {
+							__box_select_apply_override_or_add__(_mx, _my);
+						}
+					};
+					static __box_select_end__ = function() {
+						if (!__box_select_active__) return;
+						__box_select_active__ = false;
+						// Additive: merge overlapping/touching highlights/carets globally on completion.
+						if (__box_select_mode__ == 1) {
+							__cursors_merge_overlaps_all__();
+							__cursors_sort_and_dedupe_by_index__();
+							__cursors_sync_sticky_x__();
+							__history_update_latest_cursor__();
+						}
+						__selection_add_record__();
+					};
+					
+				#endregion
 				
 				#region jsDoc
 				/// @func    __move_cursor_offset__()
@@ -2276,6 +2641,18 @@ function WWTextField() : WWCore() constructor {
 					var _new_index = renderer.get_index_from_xy(x + cursor_last_width, y + _final_y_offset);
 					__cursor_set_index_synced__(_new_index, _shift, true, false);
 				}
+				
+				// Data-only cursor record factory (the ONLY cursor "constructor" in this file).
+				// Cursor records contain: index, highlight_active, highlight_start_index, highlight_end_index, sticky_px.
+				static __cursor_record_create__ = function(_index) {
+					return {
+						index: _index,
+						highlight_active: false,
+						highlight_start_index: _index,
+						highlight_end_index: _index,
+						sticky_px: 0,
+					};
+				};
 				
 			#endregion
 			
@@ -2499,12 +2876,10 @@ function WWTextField() : WWCore() constructor {
 					trigger_event(events.change);
 					return true;
 				}
-
-
 				
 				#region jsDoc
 				/// @func    __update_word_selection_drag__
-				/// @desc    Updates the word selection during a mouse drag after a double-click.
+				/// @desc    Updates word/line selection during a mouse drag after a multi-click.
 				///          Uses the renderer to convert GUI coordinates into a buffer index,
 				///          then expands that index to full word boundaries using
 				///          __compute_word_boundaries__. The selection is extended from the
@@ -2517,29 +2892,45 @@ function WWTextField() : WWCore() constructor {
 					// Get current mouse coordinates in GUI space.
 					var _mouse_x_gui = device_mouse_x_to_gui(0);
 					var _mouse_y_gui = device_mouse_y_to_gui(0);
-					var _dz = __word_drag_deadzone_px__;
-					var _dx = _mouse_x_gui - __word_drag_start_x__;
-					var _dy = _mouse_y_gui - __word_drag_start_y__;
+					var _dz = __drag_deadzone_px__;
+					var _dx = _mouse_x_gui - __drag_start_x__;
+					var _dy = _mouse_y_gui - __drag_start_y__;
 					if ((_dx * _dx) + (_dy * _dy) < (_dz * _dz)) {
 						return;
 					}
 	
 					// Convert GUI coordinates to a global buffer index.
 					var _index = renderer.get_index_from_xy(_mouse_x_gui, _mouse_y_gui);
+
+					var _span_start;
+					var _span_end;
+					if (__selection_mode__ == __WW_Text_Field_Selection_Mode.Word) {
+						// Compute word bounds around the current index.
+						// We include whitespace so dragging between words selects continuous spans.
+						var _bounds = __compute_word_boundaries__(_index, false);
+						_span_start = _bounds.index_start;
+						_span_end   = _bounds.index_end; // exclusive
+					}
+					else if (__selection_mode__ == __WW_Text_Field_Selection_Mode.Line) {
+						var _line = renderer.get_line_from_index(_index);
+						_span_start = renderer.get_line_index_start(_line);
+						_span_end = renderer.get_line_index_end(_line);
+						// Avoid selecting the literal line break when selecting to EOL on non-wrapped lines.
+						if (!renderer.get_line_forced_wrapped(_line) && (_line + 1 < renderer.get_line_count())) {
+							_span_end = max(_span_start, _span_end - 1);
+						}
+					}
+					else {
+						return;
+					}
 	
-					// Compute word bounds around the current index.
-					// We include whitespace so dragging between words selects continuous spans.
-					var _bounds = __compute_word_boundaries__(_index, false);
-					var _word_start_index = _bounds.index_start;
-					var _word_end_index   = _bounds.index_end; // exclusive
-	
-					// Anchor data set on double-click.
-					var _selection_start_index = min(__word_anchor_start__, _word_start_index);
-					var _selection_end_index   = max(__word_anchor_end__, _word_end_index);
+					// Anchor data set on double/triple-click.
+					var _selection_start_index = min(__selection_anchor_start__, _span_start);
+					var _selection_end_index   = max(__selection_anchor_end__, _span_end);
 					
 					
 					var _cursor_index = _selection_end_index;
-					if (_index < __word_anchor_start__) {
+					if (_index < __selection_anchor_start__) {
 						_cursor_index = _selection_start_index;
 					}
 					
@@ -2590,750 +2981,752 @@ function WWTextField() : WWCore() constructor {
 					clipboard_set_text(_str);
 				}
 			
-				// -------------------------
-				// Multi-cursor clipboard helpers
-				// -------------------------
-				static __clipboard_strip_trailing_cr__ = function(_s) {
-					if (is_undefined(_s)) return "";
-					var _len = string_length(_s);
-					if (_len <= 0) return _s;
-					if (string_char_at(_s, _len) == "\r") {
-						return string_delete(_s, _len, 1);
-					}
-					return _s;
-				};
-				static __clipboard_split_lines__ = function(_s) {
-					if (is_undefined(_s)) return [""];
-					var _arr = string_split(_s, "\n");
-					var _n = array_length(_arr);
-					var _i = 0;
-					repeat (_n) {
-						_arr[_i] = __clipboard_strip_trailing_cr__(_arr[_i]);
-						_i += 1;
-					}
-					return _arr;
-				};
-				
-				// -------------------------
-				// Multi-cursor selection helpers (Sublime-style)
-				// -------------------------
-				#region jsDoc
-				/// @func    __cursors_clone_state__
-				/// @desc    Captures a snapshot of cursor + selection state for selection-undo.
-				///          Returns a 2-element array: [cursors_snapshot_array, active_cursor_index].
-				/// @returns {Array}
-				#endregion
-				static __cursors_clone_state__ = function() {
-					var _n = array_length(__cursors__);
-					var _out = [];
-					array_resize(_out, _n);
-					var _i = 0;
-					repeat (_n) {
-						var _c = __cursors__[_i];
-						_out[_i] = {
-							index: _c.index,
-							highlight_active: _c.highlight_active,
-							highlight_start_index: _c.highlight_start_index,
-							highlight_end_index: _c.highlight_end_index,
-							sticky_px: _c.sticky_px
-						};
-						_i += 1;
-					}
-					// [cursors_array, active_cursor_index]
-					return [_out, __cursor_active__];
-				};
-				#region jsDoc
-				/// @func    __selection_record_signature__
-				/// @desc    Creates a lightweight signature string for a cursor/selection snapshot.
-				///          Used to de-dupe consecutive identical history states.
-				/// @param   {Array} _st : Snapshot as returned by __cursors_clone_state__.
-				/// @returns {String}
-				#endregion
-				static __selection_record_signature__ = function(_st) {
-					if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return "";
-					var _curs = _st[0];
-					var _sig = string(_st[1]) + ":" + string(array_length(_curs));
-					var _n = array_length(_curs);
-					var _i = 0;
-					repeat (_n) {
-						var _c = _curs[_i];
-						_sig += ";" + string(_c.index) + "," + string(_c.highlight_active) + "," + string(_c.highlight_start_index) + "," + string(_c.highlight_end_index);
-						_i += 1;
-					}
-					return _sig;
-				};
-				#region jsDoc
-				/// @func    __selection_add_record_state__
-				/// @desc    Appends a snapshot to selection history, truncating any redo states and enforcing max history length.
-				/// @param   {Array} _st : Snapshot as returned by __cursors_clone_state__.
-				/// @returns {Bool} True if a new state was recorded, false if it was de-duped/ignored.
-				#endregion
-				static __selection_add_record_state__ = function(_st) {
-					if (!multi_cursor_enabled) return false;
-					var _sig = __selection_record_signature__(_st);
-					if (_sig == "") return false;
-					var _len = array_length(__selection_records__);
-					var _pos = __selection_records_loc__;
-					// Drop any redo states when recording a new snapshot.
-					if (_pos < _len - 1) {
-						array_delete(__selection_records__, _pos + 1, _len - (_pos + 1));
-						_len = array_length(__selection_records__);
-					}
-					_pos = clamp(_pos, -1, _len - 1);
-					// De-dupe against the current history state.
-					if (_len > 0 && _pos >= 0) {
-						var _e = __selection_records__[_pos];
-						if (is_struct(_e) && _e.sig == _sig) {
-							__selection_records_loc__ = _pos;
-							return false;
-						}
-					}
-					array_push(__selection_records__, { st: _st, sig: _sig });
-					_len = array_length(__selection_records__);
-					// Trim oldest.
-					if (_len > __selection_records_limit__) {
-						var _drop = _len - __selection_records_limit__;
-						array_delete(__selection_records__, 0, _drop);
-						_len = array_length(__selection_records__);
-					}
-					__selection_records_loc__ = _len - 1;
-					return true;
-				};
-				#region jsDoc
-				/// @func    __selection_records_rollback_to_multiclick_anchor__
-				/// @desc    Helper for double/triple click: removes intermediate click-created history entries and ensures
-				///          the history tail is the selection state from just before the multi-click gesture started.
-				/// @returns {Bool}
-				#endregion
-				static __selection_records_rollback_to_multiclick_anchor__ = function() {
-					if (!multi_cursor_enabled) return false;
-					if (!__selection_multiclick_anchor_valid__) return false;
-					var _window = 1_000/3;
-					if (current_time - __selection_multiclick_anchor_time__ > _window) return false;
-					// Delete any snapshots created by intermediate clicks in the sequence.
-					var _len0 = array_length(__selection_records__);
-					var _keep_len = clamp(__selection_multiclick_anchor_records_len__, 0, _len0);
-					if (_len0 > _keep_len) {
-						array_delete(__selection_records__, _keep_len, _len0 - _keep_len);
-					}
-					var _len = array_length(__selection_records__);
-					__selection_records_loc__ = clamp(__selection_multiclick_anchor_records_loc__, -1, _len - 1);
-					// Ensure the anchor itself is the current tail state.
-					return __selection_add_record_state__(__selection_multiclick_anchor__);
-				};
-				#region jsDoc
-				/// @func    __selection_add_record__
-				/// @desc    Records the current cursor/selection state into the selection history.
-				///          Uses a single history array + position cursor (undo/redo style) and de-duplicates
-				///          consecutive identical states. This is used by Ctrl+U / Ctrl+Shift+U.
-				/// @returns {Undefined}
-				#endregion
-				static __selection_add_record__ = function() {
-					if (!multi_cursor_enabled) return;
-					__selection_add_record_state__(__cursors_clone_state__());
-				};
-				#region jsDoc
-				/// @func    __selection_jump__
-				/// @desc    Moves through selection undo/redo history by a signed offset and restores that snapshot.
-				/// @param   {Real} _change : Negative=undo, Positive=redo.
-				/// @returns {Bool} True if a snapshot was restored.
-				#endregion
-				static __selection_jump__ = function(_change) {
-					if (!multi_cursor_enabled) return false;
-					if (_change == 0) return false;
-					var _len = array_length(__selection_records__);
-					// If history is empty, record the current state as the initial entry (undo-only).
-					if (_len <= 0) {
-						if (_change < 0) {
-							__selection_add_record__();
-						}
-						return false;
-					}
-					var _pos = clamp(__selection_records_loc__, 0, _len - 1);
-					var _target = _pos + _change;
-					if (_target < 0 || _target >= _len) return false;
-					var _e = __selection_records__[_target];
-					if (is_undefined(_e) || !is_struct(_e) || !variable_struct_exists(_e, "st")) return false;
-					var _st = _e.st;
-					if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return false;
-					__cursors__ = _st[0];
-					__cursor_active__ = clamp(_st[1], 0, max(0, array_length(__cursors__) - 1));
-					__cursors_sync_sticky_x__();
-					__history_update_latest_cursor__();
-					__cursor_blink_reset__();
-					__selection_records_loc__ = _target;
-					return true;
-				};
-				#region jsDoc
-				/// @func    __selection_undo_snapshot_push__
-				/// @desc    Backwards-compatible alias for __selection_add_record__.
-				/// @returns {Undefined}
-				/// @deprecated Use __selection_add_record__.
-				#endregion
-				static __selection_undo_snapshot_push__ = function() {
-					__selection_add_record__();
-				};
-				#region jsDoc
-				/// @func    __selection_undo_snapshot_pop__
-				/// @desc    Backwards-compatible alias for __selection_jump__(-1) (Ctrl+U).
-				/// @returns {Bool}
-				/// @deprecated Use __selection_jump__.
-				#endregion
-				static __selection_undo_snapshot_pop__ = function() {
-					return __selection_jump__(-1);
-				};
-				#region jsDoc
-				/// @func    __selection_undo_snapshot_redo__
-				/// @desc    Backwards-compatible alias for __selection_jump__(+1) (Ctrl+Shift+U).
-				/// @returns {Bool}
-				/// @deprecated Use __selection_jump__.
-				#endregion
-				static __selection_undo_snapshot_redo__ = function() {
-					return __selection_jump__(1);
-				};
-				#region jsDoc
-				/// @func    __selection_undo_push__
-				/// @desc    Backwards-compatible alias for __selection_add_record__.
-				/// @deprecated Use __selection_add_record__.
-				#endregion
-				static __selection_undo_push__ = function() {
-					__selection_add_record__();
-				};
-				#region jsDoc
-				/// @func    __selection_undo_pop__
-				/// @desc    Backwards-compatible alias for __selection_jump__(-1).
-				/// @returns {Bool}
-				/// @deprecated Use __selection_jump__.
-				#endregion
-				static __selection_undo_pop__ = function() {
-					return __selection_jump__(-1);
-				};
-				#region jsDoc
-				/// @func    __cursors_sort_and_dedupe_by_index__
-				/// @desc    Sorts __cursors__ by cursor index and removes duplicate carets at the same index.
-				/// @returns {Undefined}
-				#endregion
-				static __cursors_sort_and_dedupe_by_index__ = function() {
-					var _n = array_length(__cursors__);
-					if (_n <= 1) return;
-					// insertion sort by index
-					var _j = 1;
-					while (_j < _n) {
-						var _key = __cursors__[_j];
-						var _k = _j - 1;
-						while (_k >= 0 && __cursors__[_k].index > _key.index) {
-							__cursors__[_k + 1] = __cursors__[_k];
-							_k -= 1;
-						}
-						__cursors__[_k + 1] = _key;
-						_j += 1;
-					}
-					// dedupe
-					var _out = [];
-					array_push(_out, __cursors__[0]);
-					var _i = 1;
-					repeat (_n - 1) {
-						var _c = __cursors__[_i];
-						var _last = _out[array_length(_out) - 1];
-						if (_c.index != _last.index) {
-							array_push(_out, _c);
-						}
-						_i += 1;
-					}
-					__cursors__ = _out;
-					__cursor_active__ = clamp(__cursor_active__, 0, max(0, array_length(__cursors__) - 1));
-				};
-				#region jsDoc
-				/// @func    __cursors_add_cursor_vertical__
-				/// @desc    Adds new cursors one line above/below each existing cursor (Sublime-style).
-				/// @param   {Real} _dir : -1 for up, +1 for down.
-				/// @returns {Bool} True if any cursor was added.
-				#endregion
-				static __cursors_add_cursor_vertical__ = function(_dir) {
-					var _n = array_length(__cursors__);
-					if (_n <= 0) return false;
-					var _line_count = renderer.get_line_count();
-					if (_line_count <= 0) return false;
-					var _added = [];
-					var _i = 0;
-					repeat (_n) {
-						var _c = __cursors__[_i];
-						var _line = renderer.get_line_from_index(_c.index);
-						var _new_line = clamp(_line + _dir, 0, max(0, _line_count - 1));
-						if (_new_line == _line) {
-							_i += 1;
-							continue;
-						}
-						var _yoff = renderer.get_line_y_offset(_new_line);
-						var _sticky = _c.sticky_px;
-						if (is_undefined(_sticky) || _sticky == 0) {
-							_sticky = renderer.get_x_from_index(_c.index);
-							_c.sticky_px = _sticky;
-						}
-						var _new_index = renderer.get_index_from_xy(x + _sticky, y + _yoff);
-						var _nc = __cursor_record_create__(_new_index);
-						_nc.sticky_px = _sticky;
-						array_push(_added, _nc);
-						_i += 1;
-					}
-					var _m = array_length(_added);
-					if (_m <= 0) return false;
-					_i = 0;
-					repeat (_m) {
-						array_push(__cursors__, _added[_i]);
-						_i += 1;
-					}
-					__cursor_active__ = array_length(__cursors__) - 1;
-					__cursors_sort_and_dedupe_by_index__();
-					__cursors_sync_sticky_x__();
-					__history_update_latest_cursor__();
-					return true;
-				};
-				#region jsDoc
-				/// @func    __cursor_select_word_if_empty__
-				/// @desc    Ensures the active cursor has a non-empty selection; if empty, selects the word under the caret.
-				/// @returns {Bool} True if a selection exists/was created.
-				#endregion
-				static __cursor_select_word_if_empty__ = function() {
-					var _c = __cursors__[__cursor_active__];
-					if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) return true;
-					var _loc = __compute_word_boundaries__(_c.index);
-					if (is_undefined(_loc) || !is_struct(_loc)) return false;
-					if (_loc.index_start == _loc.index_end) return false;
-					_c.highlight_active = true;
-					_c.highlight_start_index = _loc.index_start;
-					_c.highlight_end_index = _loc.index_end;
-					__cursor_set_index_synced__(_loc.index_end, true);
-					return true;
-				};
-				#region jsDoc
-				/// @func    __cursors_get_merged_selection_ranges__
-				/// @desc    Returns merged (unioned) selection ranges across all cursors as [{a,b},...], sorted by a.
-				/// @returns {Array}
-				#endregion
-				static __cursors_get_merged_selection_ranges__ = function() {
-					var _ranges = [];
-					var _n = array_length(__cursors__);
-					var _i = 0;
-					repeat (_n) {
-						var _c = __cursors__[_i];
-						if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
-							var _a = min(_c.highlight_start_index, _c.highlight_end_index);
-							var _b = max(_c.highlight_start_index, _c.highlight_end_index);
-							array_push(_ranges, { a: _a, b: _b });
-						}
-						_i += 1;
-					}
-					var _rlen = array_length(_ranges);
-					if (_rlen <= 1) return _ranges;
-					// sort
-					var _j = 1;
-					while (_j < _rlen) {
-						var _key = _ranges[_j];
-						var _k = _j - 1;
-						while (_k >= 0 && _ranges[_k].a > _key.a) {
-							_ranges[_k + 1] = _ranges[_k];
-							_k -= 1;
-						}
-						_ranges[_k + 1] = _key;
-						_j += 1;
-					}
-					// merge overlaps/touching
-					var _merged = [];
-					array_push(_merged, _ranges[0]);
-					var _i2 = 1;
-					repeat (_rlen - 1) {
-						var _cur = _ranges[_i2];
-						var _last = _merged[array_length(_merged) - 1];
-						if (_cur.a <= _last.b) {
-							_last.b = max(_last.b, _cur.b);
-							_merged[array_length(_merged) - 1] = _last;
-						}
-						else {
-							array_push(_merged, _cur);
-						}
-						_i2 += 1;
-					}
-					return _merged;
-				};
-				#region jsDoc
-				/// @func    __ranges_overlap_any__
-				/// @desc    Tests whether [a,b) overlaps any range in a range list.
-				/// @param   {Array} _ranges
-				/// @param   {Real}  _a
-				/// @param   {Real}  _b
-				/// @returns {Bool}
-				#endregion
-				static __ranges_overlap_any__ = function(_ranges, _a, _b) {
-					var _n = array_length(_ranges);
-					var _i = 0;
-					repeat (_n) {
-						var _r = _ranges[_i];
-						if (_a < _r.b && _b > _r.a) return true;
-						_i += 1;
-					}
-					return false;
-				};
-				#region jsDoc
-				/// @func    __cursors_add_occurrence_selection__
-				/// @desc    Adds a new cursor with an active selection range [a,b].
-				/// @param   {Real} _a
-				/// @param   {Real} _b
-				/// @returns {Undefined}
-				#endregion
-				static __cursors_add_occurrence_selection__ = function(_a, _b) {
-					var _cid = array_length(__cursors__);
-					var _c = __cursor_record_create__(_b);
-					_c.highlight_active = true;
-					_c.highlight_start_index = _a;
-					_c.highlight_end_index = _b;
-					_c.index = _b;
-					_c.sticky_px = renderer.get_x_from_index(_b);
-					array_push(__cursors__, _c);
-					__cursor_active__ = _cid;
-				};
-				#region jsDoc
-				/// @func    __cursors_add_next_occurrence__
-				/// @desc    Adds the next occurrence of the current selection/word as a new selection cursor.
-				/// @returns {Bool}
-				#endregion
-				static __cursors_add_next_occurrence__ = function() {
-					if (!__cursor_select_word_if_empty__()) return false;
-					var _c = __cursors__[__cursor_active__];
-					var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
-					var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
-					var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
-					if (_needle == "") return false;
-					var _text = buffer.get_text();
-					var _needle_len = string_length(_needle);
-					if (_needle_len <= 0) return false;
-					var _ranges = __cursors_get_merged_selection_ranges__();
-					// Search start: after the last selected range end
-					var _search_index = _b0;
-					var _i = 0;
-					repeat (array_length(_ranges)) {
-						_search_index = max(_search_index, _ranges[_i].b);
-						_i += 1;
-					}
-					var _pos1 = string_pos_ext(_needle, _text, _search_index + 1);
-					while (_pos1 > 0) {
-						var _idx = _pos1 - 1;
-						var _a = _idx;
-						var _b = _idx + _needle_len;
-						if (!__ranges_overlap_any__(_ranges, _a, _b)) {
-							__cursors_add_occurrence_selection__(_a, _b);
-							__cursors_sort_and_dedupe_by_index__();
-							__history_update_latest_cursor__();
-							return true;
-						}
-						_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
-					}
-					// Wrap search
-					_pos1 = string_pos_ext(_needle, _text, 1);
-					while (_pos1 > 0 && _pos1 - 1 < _search_index) {
-						var _idx2 = _pos1 - 1;
-						var _a2 = _idx2;
-						var _b2 = _idx2 + _needle_len;
-						if (!__ranges_overlap_any__(_ranges, _a2, _b2)) {
-							__cursors_add_occurrence_selection__(_a2, _b2);
-							__cursors_sort_and_dedupe_by_index__();
-							__history_update_latest_cursor__();
-							return true;
-						}
-						_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
-					}
-					return false;
-				};
-				#region jsDoc
-				/// @func    __cursors_add_all_occurrences__
-				/// @desc    Adds cursors/selections for all non-overlapping occurrences of the current selection/word.
-				///         Intended for Sublime-style “select all occurrences”.
-				/// @returns {Bool}
-				#endregion
-				static __cursors_add_all_occurrences__ = function() {
-					if (!__cursor_select_word_if_empty__()) return false;
-					var _c = __cursors__[__cursor_active__];
-					var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
-					var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
-					var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
-					if (_needle == "") return false;
-					var _text = buffer.get_text();
-					var _needle_len = string_length(_needle);
-					if (_needle_len <= 0) return false;
-					var _pos1 = 1;
-					var _added = 0;
-					var _ranges = __cursors_get_merged_selection_ranges__();
-					_pos1 = string_pos_ext(_needle, _text, 1);
-					while (_pos1 > 0) {
-						var _idx = _pos1 - 1;
-						var _a = _idx;
-						var _b = _idx + _needle_len;
-						if (!__ranges_overlap_any__(_ranges, _a, _b)) {
-							__cursors_add_occurrence_selection__(_a, _b);
-							array_push(_ranges, { a: _a, b: _b });
-							_added += 1;
-							if (_added >= 1024) break;
-						}
-						_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
-					}
-					if (_added > 0) {
-						__cursors_sort_and_dedupe_by_index__();
-						__history_update_latest_cursor__();
-						return true;
-					}
-					return false;
-				};
-				#region jsDoc
-				/// @func    __cursor_rotate_next_occurrence__
-				/// @desc    For a single selection/word, moves the selection to the next occurrence (wraps).
-				///         Returns false when multi-cursor is active or no match exists.
-				/// @returns {Bool}
-				#endregion
-				static __cursor_rotate_next_occurrence__ = function() {
-					if (array_length(__cursors__) != 1) return false;
-					if (!__cursor_select_word_if_empty__()) return false;
-					var _c = __cursors__[0];
-					var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
-					var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
-					var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
-					if (_needle == "") return false;
-					var _text = buffer.get_text();
-					var _needle_len = string_length(_needle);
-					var _pos1 = string_pos_ext(_needle, _text, _b0 + 1);
-					if (_pos1 <= 0) _pos1 = string_pos_ext(_needle, _text, 1);
-					if (_pos1 <= 0) return false;
-					var _idx = _pos1 - 1;
-					var _a = _idx;
-					var _b = _idx + _needle_len;
-					_c.highlight_active = true;
-					_c.highlight_start_index = _a;
-					_c.highlight_end_index = _b;
-					__cursor_set_index_synced__(_b, true);
-					__history_update_latest_cursor__();
-					return true;
-				};
-				#region jsDoc
-				/// @func    __cursors_split_selection_into_lines__
-				/// @desc    Splits a single selection into per-line selections, producing one cursor per line.
-				///         Returns false if there is not exactly one non-empty selection.
-				/// @returns {Bool}
-				#endregion
-				static __cursors_split_selection_into_lines__ = function() {
-					if (array_length(__cursors__) != 1) return false;
-					var _c = __cursors__[0];
-					if (!_c.highlight_active || _c.highlight_start_index == _c.highlight_end_index) return false;
-					var _a = min(_c.highlight_start_index, _c.highlight_end_index);
-					var _b = max(_c.highlight_start_index, _c.highlight_end_index);
-					var _start_line = renderer.get_line_from_index(_a);
-					var _end_line = renderer.get_line_from_index(max(_a, _b - 1));
-					var _last_line_index = renderer.get_line_count() - 1;
-					var _out = [];
-					var _line = _start_line;
-					while (_line <= _end_line) {
-						var _ls = renderer.get_line_index_start(_line);
-						var _le = renderer.get_line_index_end(_line);
-						var _sa = max(_a, _ls);
-						var _sb = min(_b, _le);
-						if (!renderer.get_line_forced_wrapped(_line) && _line != _last_line_index) {
-							// avoid selecting the literal line break when selecting to EOL
-							if (_sb == _le) {
-								_sb = max(_sa, _sb - 1);
-							}
-						}
-						var _nc = __cursor_record_create__(_sb);
-						_nc.highlight_active = true;
-						_nc.highlight_start_index = _sa;
-						_nc.highlight_end_index = _sb;
-						_nc.index = _sb;
-						_nc.sticky_px = renderer.get_x_from_index(_sb);
-						array_push(_out, _nc);
-						_line += 1;
-					}
-					if (array_length(_out) <= 0) return false;
-					__cursors__ = _out;
-					__cursor_active__ = array_length(__cursors__) - 1;
-					__cursors_sort_and_dedupe_by_index__();
-					__cursors_sync_sticky_x__();
-					__history_update_latest_cursor__();
-					return true;
-				};
-				#region jsDoc
-				/// @func    __cursors_copy_selections_to_clipboard__
-				/// @desc    Copies multi-cursor selections to clipboard, merging overlapping/touching selections.
-				///         Clipboard output joins merged ranges with '\n'.
-				/// @returns {Bool} True if clipboard was set; false if fewer than 2 cursors or any selection was empty.
-				#endregion
-				static __cursors_copy_selections_to_clipboard__ = function() {
-					var _n = array_length(__cursors__);
-					if (_n <= 1) return false;
-				
-					// Require every cursor to have a non-empty selection.
-					var _ranges = [];
-					array_resize(_ranges, _n);
-					var _i = 0;
-					repeat (_n) {
-						var _c = __cursors__[_i];
-						if (!_c.highlight_active || _c.highlight_start_index == _c.highlight_end_index) {
-							return false;
-						}
-						var _a = min(_c.highlight_start_index, _c.highlight_end_index);
-						var _b = max(_c.highlight_start_index, _c.highlight_end_index);
-						_ranges[_i] = { a: _a, b: _b, cid: _i };
-						_i += 1;
-					}
-				
-					// Sort ascending by selection start (stable order in text).
-					var _j = 1;
-					while (_j < _n) {
-						var _key = _ranges[_j];
-						var _k = _j - 1;
-						while (_k >= 0 && _ranges[_k].a > _key.a) {
-							_ranges[_k + 1] = _ranges[_k];
-							_k -= 1;
-						}
-						_ranges[_k + 1] = _key;
-						_j += 1;
-					}
+				#region Multi-cursor clipboard helpers
 					
-					// Merge overlaps (and touching ranges) so overlapping selections become one logical selection.
-					var _merged = [];
-					array_push(_merged, { a: _ranges[0].a, b: _ranges[0].b });
-					_i = 1;
-					repeat (_n - 1) {
-						var _cur = _ranges[_i];
-						var _last = _merged[array_length(_merged) - 1];
-						if (_cur.a <= _last.b) {
-							_last.b = max(_last.b, _cur.b);
-							_merged[array_length(_merged) - 1] = _last;
+					static __clipboard_strip_trailing_cr__ = function(_s) {
+						if (is_undefined(_s)) return "";
+						var _len = string_length(_s);
+						if (_len <= 0) return _s;
+						if (string_char_at(_s, _len) == "\r") {
+							return string_delete(_s, _len, 1);
 						}
-						else {
-							array_push(_merged, { a: _cur.a, b: _cur.b });
+						return _s;
+					};
+					static __clipboard_split_lines__ = function(_s) {
+						if (is_undefined(_s)) return [""];
+						var _arr = string_split(_s, "\n");
+						var _n = array_length(_arr);
+						var _i = 0;
+						repeat (_n) {
+							_arr[_i] = __clipboard_strip_trailing_cr__(_arr[_i]);
+							_i += 1;
 						}
-						_i += 1;
-					}
-				
-					// Build the clipboard string as merged-ranges separated by \n.
-					var _out = "";
-					var _m = array_length(_merged);
-					_i = 0;
-					repeat (_m) {
-						var _r = _merged[_i];
-						var _bs = buffer.get_byte_index_from_index(_r.a);
-						var _be = buffer.get_byte_index_from_index(_r.b);
-						var _piece = buffer.get_substring(_bs, _be);
-						if (_i > 0) _out += "\n";
-						_out += _piece;
-						_i += 1;
-					}
-				
-					__clipboard_set_text__(_out);
-					return true;
-				};
-				#region jsDoc
-				/// @func    __insert_lines_at_cursors__
-				/// @desc    Multi-cursor paste helper. Inserts one string per cursor (mapped by cursor index order).
-				///         Returns false if cursor count != line count or if selections overlap.
-				/// @param   {Array} _lines : Array of strings, one per cursor.
-				/// @returns {Bool}
+						return _arr;
+					};
+					
 				#endregion
-				static __insert_lines_at_cursors__ = function(_lines) {
-					var _n = array_length(__cursors__);
-					if (_n <= 1) return false;
-					if (array_length(_lines) != _n) return false;
 				
-					// If selections overlap, fall back to normal paste.
-					var _sel = [];
-					var _slen = 0;
-					var _i = 0;
-					repeat (_n) {
-						var _c0 = __cursors__[_i];
-						if (_c0.highlight_active && _c0.highlight_start_index != _c0.highlight_end_index) {
-							var _a0 = min(_c0.highlight_start_index, _c0.highlight_end_index);
-							var _b0 = max(_c0.highlight_start_index, _c0.highlight_end_index);
-							array_push(_sel, { a: _a0, b: _b0 });
+				#region Multi-cursor selection helpers (Sublime-style)
+				
+					#region jsDoc
+					/// @func    __cursors_clone_state__
+					/// @desc    Captures a snapshot of cursor + selection state for selection-undo.
+					///          Returns a 2-element array: [cursors_snapshot_array, active_cursor_index].
+					/// @returns {Array}
+					#endregion
+					static __cursors_clone_state__ = function() {
+						var _n = array_length(__cursors__);
+						var _out = [];
+						array_resize(_out, _n);
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							_out[_i] = {
+								index: _c.index,
+								highlight_active: _c.highlight_active,
+								highlight_start_index: _c.highlight_start_index,
+								highlight_end_index: _c.highlight_end_index,
+								sticky_px: _c.sticky_px
+							};
+							_i += 1;
 						}
-						_i += 1;
-					}
-					_slen = array_length(_sel);
-					if (_slen > 1) {
-						// sort and check overlaps
-						var _j = 1;
-						while (_j < _slen) {
-							var _key = _sel[_j];
-							var _k = _j - 1;
-							while (_k >= 0 && _sel[_k].a > _key.a) {
-								_sel[_k + 1] = _sel[_k];
-								_k -= 1;
-							}
-							_sel[_k + 1] = _key;
-							_j += 1;
+						// [cursors_array, active_cursor_index]
+						return [_out, __cursor_active__];
+					};
+					#region jsDoc
+					/// @func    __selection_record_signature__
+					/// @desc    Creates a lightweight signature string for a cursor/selection snapshot.
+					///          Used to de-dupe consecutive identical history states.
+					/// @param   {Array} _st : Snapshot as returned by __cursors_clone_state__.
+					/// @returns {String}
+					#endregion
+					static __selection_record_signature__ = function(_st) {
+						if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return "";
+						var _curs = _st[0];
+						var _sig = string(_st[1]) + ":" + string(array_length(_curs));
+						var _n = array_length(_curs);
+						var _i = 0;
+						repeat (_n) {
+							var _c = _curs[_i];
+							_sig += ";" + string(_c.index) + "," + string(_c.highlight_active) + "," + string(_c.highlight_start_index) + "," + string(_c.highlight_end_index);
+							_i += 1;
 						}
-						_i = 1;
-						while (_i < _slen) {
-							if (_sel[_i].a < _sel[_i - 1].b) {
+						return _sig;
+					};
+					#region jsDoc
+					/// @func    __selection_add_record_state__
+					/// @desc    Appends a snapshot to selection history, truncating any redo states and enforcing max history length.
+					/// @param   {Array} _st : Snapshot as returned by __cursors_clone_state__.
+					/// @returns {Bool} True if a new state was recorded, false if it was de-duped/ignored.
+					#endregion
+					static __selection_add_record_state__ = function(_st) {
+						if (!multi_cursor_enabled) return false;
+						var _sig = __selection_record_signature__(_st);
+						if (_sig == "") return false;
+						var _len = array_length(__selection_records__);
+						var _pos = __selection_records_loc__;
+						// Drop any redo states when recording a new snapshot.
+						if (_pos < _len - 1) {
+							array_delete(__selection_records__, _pos + 1, _len - (_pos + 1));
+							_len = array_length(__selection_records__);
+						}
+						_pos = clamp(_pos, -1, _len - 1);
+						// De-dupe against the current history state.
+						if (_len > 0 && _pos >= 0) {
+							var _e = __selection_records__[_pos];
+							if (is_struct(_e) && _e.sig == _sig) {
+								__selection_records_loc__ = _pos;
 								return false;
 							}
+						}
+						array_push(__selection_records__, { st: _st, sig: _sig });
+						_len = array_length(__selection_records__);
+						// Trim oldest.
+						if (_len > __selection_records_limit__) {
+							var _drop = _len - __selection_records_limit__;
+							array_delete(__selection_records__, 0, _drop);
+							_len = array_length(__selection_records__);
+						}
+						__selection_records_loc__ = _len - 1;
+						return true;
+					};
+					#region jsDoc
+					/// @func    __selection_records_rollback_to_multiclick_anchor__
+					/// @desc    Helper for double/triple click: removes intermediate click-created history entries and ensures
+					///          the history tail is the selection state from just before the multi-click gesture started.
+					/// @returns {Bool}
+					#endregion
+					static __selection_records_rollback_to_multiclick_anchor__ = function() {
+						if (!multi_cursor_enabled) return false;
+						if (!__selection_multiclick_anchor_valid__) return false;
+						var _window = 1_000/3;
+						if (current_time - __selection_multiclick_anchor_time__ > _window) return false;
+						// Delete any snapshots created by intermediate clicks in the sequence.
+						var _len0 = array_length(__selection_records__);
+						var _keep_len = clamp(__selection_multiclick_anchor_records_len__, 0, _len0);
+						if (_len0 > _keep_len) {
+							array_delete(__selection_records__, _keep_len, _len0 - _keep_len);
+						}
+						var _len = array_length(__selection_records__);
+						__selection_records_loc__ = clamp(__selection_multiclick_anchor_records_loc__, -1, _len - 1);
+						// Ensure the anchor itself is the current tail state.
+						return __selection_add_record_state__(__selection_multiclick_anchor__);
+					};
+					#region jsDoc
+					/// @func    __selection_add_record__
+					/// @desc    Records the current cursor/selection state into the selection history.
+					///          Uses a single history array + position cursor (undo/redo style) and de-duplicates
+					///          consecutive identical states. This is used by Ctrl+U / Ctrl+Shift+U.
+					/// @returns {Undefined}
+					#endregion
+					static __selection_add_record__ = function() {
+						if (!multi_cursor_enabled) return;
+						__selection_add_record_state__(__cursors_clone_state__());
+					};
+					#region jsDoc
+					/// @func    __selection_jump__
+					/// @desc    Moves through selection undo/redo history by a signed offset and restores that snapshot.
+					/// @param   {Real} _change : Negative=undo, Positive=redo.
+					/// @returns {Bool} True if a snapshot was restored.
+					#endregion
+					static __selection_jump__ = function(_change) {
+						if (!multi_cursor_enabled) return false;
+						if (_change == 0) return false;
+						var _len = array_length(__selection_records__);
+						// If history is empty, record the current state as the initial entry (undo-only).
+						if (_len <= 0) {
+							if (_change < 0) {
+								__selection_add_record__();
+							}
+							return false;
+						}
+						var _pos = clamp(__selection_records_loc__, 0, _len - 1);
+						var _target = _pos + _change;
+						if (_target < 0 || _target >= _len) return false;
+						var _e = __selection_records__[_target];
+						if (is_undefined(_e) || !is_struct(_e) || !variable_struct_exists(_e, "st")) return false;
+						var _st = _e.st;
+						if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return false;
+						__cursors__ = _st[0];
+						__cursor_active__ = clamp(_st[1], 0, max(0, array_length(__cursors__) - 1));
+						__cursors_sync_sticky_x__();
+						__history_update_latest_cursor__();
+						__cursor_blink_reset__();
+						__selection_records_loc__ = _target;
+						return true;
+					};
+					#region jsDoc
+					/// @func    __selection_undo_snapshot_push__
+					/// @desc    Backwards-compatible alias for __selection_add_record__.
+					/// @returns {Undefined}
+					/// @deprecated Use __selection_add_record__.
+					#endregion
+					static __selection_undo_snapshot_push__ = function() {
+						__selection_add_record__();
+					};
+					#region jsDoc
+					/// @func    __selection_undo_snapshot_pop__
+					/// @desc    Backwards-compatible alias for __selection_jump__(-1) (Ctrl+U).
+					/// @returns {Bool}
+					/// @deprecated Use __selection_jump__.
+					#endregion
+					static __selection_undo_snapshot_pop__ = function() {
+						return __selection_jump__(-1);
+					};
+					#region jsDoc
+					/// @func    __selection_undo_snapshot_redo__
+					/// @desc    Backwards-compatible alias for __selection_jump__(+1) (Ctrl+Shift+U).
+					/// @returns {Bool}
+					/// @deprecated Use __selection_jump__.
+					#endregion
+					static __selection_undo_snapshot_redo__ = function() {
+						return __selection_jump__(1);
+					};
+					#region jsDoc
+					/// @func    __selection_undo_push__
+					/// @desc    Backwards-compatible alias for __selection_add_record__.
+					/// @deprecated Use __selection_add_record__.
+					#endregion
+					static __selection_undo_push__ = function() {
+						__selection_add_record__();
+					};
+					#region jsDoc
+					/// @func    __selection_undo_pop__
+					/// @desc    Backwards-compatible alias for __selection_jump__(-1).
+					/// @returns {Bool}
+					/// @deprecated Use __selection_jump__.
+					#endregion
+					static __selection_undo_pop__ = function() {
+						return __selection_jump__(-1);
+					};
+					#region jsDoc
+					/// @func    __cursors_sort_and_dedupe_by_index__
+					/// @desc    Sorts __cursors__ by cursor index and removes duplicate carets at the same index.
+					/// @returns {Undefined}
+					#endregion
+					static __cursors_sort_and_dedupe_by_index__ = function() {
+						var _n = array_length(__cursors__);
+						if (_n <= 1) return;
+						// insertion sort by index
+						var _j = 1;
+						while (_j < _n) {
+							var _key = __cursors__[_j];
+							var _k = _j - 1;
+							while (_k >= 0 && __cursors__[_k].index > _key.index) {
+								__cursors__[_k + 1] = __cursors__[_k];
+								_k -= 1;
+							}
+							__cursors__[_k + 1] = _key;
+							_j += 1;
+						}
+						// dedupe
+						var _out = [];
+						array_push(_out, __cursors__[0]);
+						var _i = 1;
+						repeat (_n - 1) {
+							var _c = __cursors__[_i];
+							var _last = _out[array_length(_out) - 1];
+							if (_c.index != _last.index) {
+								array_push(_out, _c);
+							}
 							_i += 1;
 						}
-					}
+						__cursors__ = _out;
+						__cursor_active__ = clamp(__cursor_active__, 0, max(0, array_length(__cursors__) - 1));
+					};
+					#region jsDoc
+					/// @func    __cursors_add_cursor_vertical__
+					/// @desc    Adds new cursors one line above/below each existing cursor (Sublime-style).
+					/// @param   {Real} _dir : -1 for up, +1 for down.
+					/// @returns {Bool} True if any cursor was added.
+					#endregion
+					static __cursors_add_cursor_vertical__ = function(_dir) {
+						var _n = array_length(__cursors__);
+						if (_n <= 0) return false;
+						var _line_count = renderer.get_line_count();
+						if (_line_count <= 0) return false;
+						var _added = [];
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							var _line = renderer.get_line_from_index(_c.index);
+							var _new_line = clamp(_line + _dir, 0, max(0, _line_count - 1));
+							if (_new_line == _line) {
+								_i += 1;
+								continue;
+							}
+							var _yoff = renderer.get_line_y_offset(_new_line);
+							var _sticky = _c.sticky_px;
+							if (is_undefined(_sticky) || _sticky == 0) {
+								_sticky = renderer.get_x_from_index(_c.index);
+								_c.sticky_px = _sticky;
+							}
+							var _new_index = renderer.get_index_from_xy(x + _sticky, y + _yoff);
+							var _nc = __cursor_record_create__(_new_index);
+							_nc.sticky_px = _sticky;
+							array_push(_added, _nc);
+							_i += 1;
+						}
+						var _m = array_length(_added);
+						if (_m <= 0) return false;
+						_i = 0;
+						repeat (_m) {
+							array_push(__cursors__, _added[_i]);
+							_i += 1;
+						}
+						__cursor_active__ = array_length(__cursors__) - 1;
+						__cursors_sort_and_dedupe_by_index__();
+						__cursors_sync_sticky_x__();
+						__history_update_latest_cursor__();
+						return true;
+					};
+					#region jsDoc
+					/// @func    __cursor_select_word_if_empty__
+					/// @desc    Ensures the active cursor has a non-empty selection; if empty, selects the word under the caret.
+					/// @returns {Bool} True if a selection exists/was created.
+					#endregion
+					static __cursor_select_word_if_empty__ = function() {
+						var _c = __cursors__[__cursor_active__];
+						if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) return true;
+						var _loc = __compute_word_boundaries__(_c.index);
+						if (is_undefined(_loc) || !is_struct(_loc)) return false;
+						if (_loc.index_start == _loc.index_end) return false;
+						_c.highlight_active = true;
+						_c.highlight_start_index = _loc.index_start;
+						_c.highlight_end_index = _loc.index_end;
+						__cursor_set_index_synced__(_loc.index_end, true);
+						return true;
+					};
+					#region jsDoc
+					/// @func    __cursors_get_merged_selection_ranges__
+					/// @desc    Returns merged (unioned) selection ranges across all cursors as [{a,b},...], sorted by a.
+					/// @returns {Array}
+					#endregion
+					static __cursors_get_merged_selection_ranges__ = function() {
+						var _ranges = [];
+						var _n = array_length(__cursors__);
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
+								var _a = min(_c.highlight_start_index, _c.highlight_end_index);
+								var _b = max(_c.highlight_start_index, _c.highlight_end_index);
+								array_push(_ranges, { a: _a, b: _b });
+							}
+							_i += 1;
+						}
+						var _rlen = array_length(_ranges);
+						if (_rlen <= 1) return _ranges;
+						// sort
+						var _j = 1;
+						while (_j < _rlen) {
+							var _key = _ranges[_j];
+							var _k = _j - 1;
+							while (_k >= 0 && _ranges[_k].a > _key.a) {
+								_ranges[_k + 1] = _ranges[_k];
+								_k -= 1;
+							}
+							_ranges[_k + 1] = _key;
+							_j += 1;
+						}
+						// merge overlaps/touching
+						var _merged = [];
+						array_push(_merged, _ranges[0]);
+						var _i2 = 1;
+						repeat (_rlen - 1) {
+							var _cur = _ranges[_i2];
+							var _last = _merged[array_length(_merged) - 1];
+							if (_cur.a <= _last.b) {
+								_last.b = max(_last.b, _cur.b);
+								_merged[array_length(_merged) - 1] = _last;
+							}
+							else {
+								array_push(_merged, _cur);
+							}
+							_i2 += 1;
+						}
+						return _merged;
+					};
+					#region jsDoc
+					/// @func    __ranges_overlap_any__
+					/// @desc    Tests whether [a,b) overlaps any range in a range list.
+					/// @param   {Array} _ranges
+					/// @param   {Real}  _a
+					/// @param   {Real}  _b
+					/// @returns {Bool}
+					#endregion
+					static __ranges_overlap_any__ = function(_ranges, _a, _b) {
+						var _n = array_length(_ranges);
+						var _i = 0;
+						repeat (_n) {
+							var _r = _ranges[_i];
+							if (_a < _r.b && _b > _r.a) return true;
+							_i += 1;
+						}
+						return false;
+					};
+					#region jsDoc
+					/// @func    __cursors_add_occurrence_selection__
+					/// @desc    Adds a new cursor with an active selection range [a,b].
+					/// @param   {Real} _a
+					/// @param   {Real} _b
+					/// @returns {Undefined}
+					#endregion
+					static __cursors_add_occurrence_selection__ = function(_a, _b) {
+						var _cid = array_length(__cursors__);
+						var _c = __cursor_record_create__(_b);
+						_c.highlight_active = true;
+						_c.highlight_start_index = _a;
+						_c.highlight_end_index = _b;
+						_c.index = _b;
+						_c.sticky_px = renderer.get_x_from_index(_b);
+						array_push(__cursors__, _c);
+						__cursor_active__ = _cid;
+					};
+					#region jsDoc
+					/// @func    __cursors_add_next_occurrence__
+					/// @desc    Adds the next occurrence of the current selection/word as a new selection cursor.
+					/// @returns {Bool}
+					#endregion
+					static __cursors_add_next_occurrence__ = function() {
+						if (!__cursor_select_word_if_empty__()) return false;
+						var _c = __cursors__[__cursor_active__];
+						var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
+						var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
+						var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
+						if (_needle == "") return false;
+						var _text = buffer.get_text();
+						var _needle_len = string_length(_needle);
+						if (_needle_len <= 0) return false;
+						var _ranges = __cursors_get_merged_selection_ranges__();
+						// Search start: after the last selected range end
+						var _search_index = _b0;
+						var _i = 0;
+						repeat (array_length(_ranges)) {
+							_search_index = max(_search_index, _ranges[_i].b);
+							_i += 1;
+						}
+						var _pos1 = string_pos_ext(_needle, _text, _search_index + 1);
+						while (_pos1 > 0) {
+							var _idx = _pos1 - 1;
+							var _a = _idx;
+							var _b = _idx + _needle_len;
+							if (!__ranges_overlap_any__(_ranges, _a, _b)) {
+								__cursors_add_occurrence_selection__(_a, _b);
+								__cursors_sort_and_dedupe_by_index__();
+								__history_update_latest_cursor__();
+								return true;
+							}
+							_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
+						}
+						// Wrap search
+						_pos1 = string_pos_ext(_needle, _text, 1);
+						while (_pos1 > 0 && _pos1 - 1 < _search_index) {
+							var _idx2 = _pos1 - 1;
+							var _a2 = _idx2;
+							var _b2 = _idx2 + _needle_len;
+							if (!__ranges_overlap_any__(_ranges, _a2, _b2)) {
+								__cursors_add_occurrence_selection__(_a2, _b2);
+								__cursors_sort_and_dedupe_by_index__();
+								__history_update_latest_cursor__();
+								return true;
+							}
+							_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
+						}
+						return false;
+					};
+					#region jsDoc
+					/// @func    __cursors_add_all_occurrences__
+					/// @desc    Adds cursors/selections for all non-overlapping occurrences of the current selection/word.
+					///         Intended for Sublime-style “select all occurrences”.
+					/// @returns {Bool}
+					#endregion
+					static __cursors_add_all_occurrences__ = function() {
+						if (!__cursor_select_word_if_empty__()) return false;
+						var _c = __cursors__[__cursor_active__];
+						var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
+						var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
+						var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
+						if (_needle == "") return false;
+						var _text = buffer.get_text();
+						var _needle_len = string_length(_needle);
+						if (_needle_len <= 0) return false;
+						var _pos1 = 1;
+						var _added = 0;
+						var _ranges = __cursors_get_merged_selection_ranges__();
+						_pos1 = string_pos_ext(_needle, _text, 1);
+						while (_pos1 > 0) {
+							var _idx = _pos1 - 1;
+							var _a = _idx;
+							var _b = _idx + _needle_len;
+							if (!__ranges_overlap_any__(_ranges, _a, _b)) {
+								__cursors_add_occurrence_selection__(_a, _b);
+								array_push(_ranges, { a: _a, b: _b });
+								_added += 1;
+								if (_added >= 1024) break;
+							}
+							_pos1 = string_pos_ext(_needle, _text, _pos1 + 1);
+						}
+						if (_added > 0) {
+							__cursors_sort_and_dedupe_by_index__();
+							__history_update_latest_cursor__();
+							return true;
+						}
+						return false;
+					};
+					#region jsDoc
+					/// @func    __cursor_rotate_next_occurrence__
+					/// @desc    For a single selection/word, moves the selection to the next occurrence (wraps).
+					///         Returns false when multi-cursor is active or no match exists.
+					/// @returns {Bool}
+					#endregion
+					static __cursor_rotate_next_occurrence__ = function() {
+						if (array_length(__cursors__) != 1) return false;
+						if (!__cursor_select_word_if_empty__()) return false;
+						var _c = __cursors__[0];
+						var _a0 = min(_c.highlight_start_index, _c.highlight_end_index);
+						var _b0 = max(_c.highlight_start_index, _c.highlight_end_index);
+						var _needle = buffer.get_substring(buffer.get_byte_index_from_index(_a0), buffer.get_byte_index_from_index(_b0));
+						if (_needle == "") return false;
+						var _text = buffer.get_text();
+						var _needle_len = string_length(_needle);
+						var _pos1 = string_pos_ext(_needle, _text, _b0 + 1);
+						if (_pos1 <= 0) _pos1 = string_pos_ext(_needle, _text, 1);
+						if (_pos1 <= 0) return false;
+						var _idx = _pos1 - 1;
+						var _a = _idx;
+						var _b = _idx + _needle_len;
+						_c.highlight_active = true;
+						_c.highlight_start_index = _a;
+						_c.highlight_end_index = _b;
+						__cursor_set_index_synced__(_b, true);
+						__history_update_latest_cursor__();
+						return true;
+					};
+					#region jsDoc
+					/// @func    __cursors_split_selection_into_lines__
+					/// @desc    Splits a single selection into per-line selections, producing one cursor per line.
+					///         Returns false if there is not exactly one non-empty selection.
+					/// @returns {Bool}
+					#endregion
+					static __cursors_split_selection_into_lines__ = function() {
+						if (array_length(__cursors__) != 1) return false;
+						var _c = __cursors__[0];
+						if (!_c.highlight_active || _c.highlight_start_index == _c.highlight_end_index) return false;
+						var _a = min(_c.highlight_start_index, _c.highlight_end_index);
+						var _b = max(_c.highlight_start_index, _c.highlight_end_index);
+						var _start_line = renderer.get_line_from_index(_a);
+						var _end_line = renderer.get_line_from_index(max(_a, _b - 1));
+						var _last_line_index = renderer.get_line_count() - 1;
+						var _out = [];
+						var _line = _start_line;
+						while (_line <= _end_line) {
+							var _ls = renderer.get_line_index_start(_line);
+							var _le = renderer.get_line_index_end(_line);
+							var _sa = max(_a, _ls);
+							var _sb = min(_b, _le);
+							if (!renderer.get_line_forced_wrapped(_line) && _line != _last_line_index) {
+								// avoid selecting the literal line break when selecting to EOL
+								if (_sb == _le) {
+									_sb = max(_sa, _sb - 1);
+								}
+							}
+							var _nc = __cursor_record_create__(_sb);
+							_nc.highlight_active = true;
+							_nc.highlight_start_index = _sa;
+							_nc.highlight_end_index = _sb;
+							_nc.index = _sb;
+							_nc.sticky_px = renderer.get_x_from_index(_sb);
+							array_push(_out, _nc);
+							_line += 1;
+						}
+						if (array_length(_out) <= 0) return false;
+						__cursors__ = _out;
+						__cursor_active__ = array_length(__cursors__) - 1;
+						__cursors_sort_and_dedupe_by_index__();
+						__cursors_sync_sticky_x__();
+						__history_update_latest_cursor__();
+						return true;
+					};
+					#region jsDoc
+					/// @func    __cursors_copy_selections_to_clipboard__
+					/// @desc    Copies multi-cursor selections to clipboard, merging overlapping/touching selections.
+					///         Clipboard output joins merged ranges with '\n'.
+					/// @returns {Bool} True if clipboard was set; false if fewer than 2 cursors or any selection was empty.
+					#endregion
+					static __cursors_copy_selections_to_clipboard__ = function() {
+						var _n = array_length(__cursors__);
+						if (_n <= 1) return false;
 				
-					// Map clipboard lines to cursors by cursor index order (ascending).
-					var _ids_asc = __cursors_sorted_ids_by_index__(false);
-					var _line_for_cid = [];
-					array_resize(_line_for_cid, _n);
-					_i = 0;
-					repeat (_n) {
-						var _cid = _ids_asc[_i];
-						_line_for_cid[_cid] = _lines[_i];
-						_i += 1;
-					}
-				
-					// Apply edits from right-to-left to keep indices stable.
-					var _ids_desc = __cursors_sorted_ids_by_index__(true);
-					_i = 0;
-					repeat (_n) {
-						var _cid2 = _ids_desc[_i];
-						var _c = __cursors__[_cid2];
-						var _raw = _line_for_cid[_cid2];
-						_raw = __clipboard_strip_trailing_cr__(_raw);
-						var _text = buffer.__filter_allowed__(_raw);
-					
-						// Replace selection for this cursor only.
-						if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
+						// Require every cursor to have a non-empty selection.
+						var _ranges = [];
+						array_resize(_ranges, _n);
+						var _i = 0;
+						repeat (_n) {
+							var _c = __cursors__[_i];
+							if (!_c.highlight_active || _c.highlight_start_index == _c.highlight_end_index) {
+								return false;
+							}
 							var _a = min(_c.highlight_start_index, _c.highlight_end_index);
 							var _b = max(_c.highlight_start_index, _c.highlight_end_index);
-							var _bs = buffer.get_byte_index_from_index(_a);
-							var _be = buffer.get_byte_index_from_index(_b);
-							buffer.erase(_bs, _be);
-							__cursors_shift_after_delete__(_a, _b, _b - _a);
-							_c = __cursors__[_cid2];
-							_c.index = _a;
-							_c.highlight_active = false;
-							_c.highlight_start_index = _c.index;
-							_c.highlight_end_index = _c.index;
+							_ranges[_i] = { a: _a, b: _b, cid: _i };
+							_i += 1;
 						}
-					
-						var _insert_at = clamp(_c.index, 0, renderer.get_glyph_count());
-						if (_text != "") {
-							var _len = string_length(_text);
-							var _bi = buffer.get_byte_index_from_index(_insert_at);
-							buffer.insert(_bi, _text);
-							__cursors_shift_right_of__(_insert_at, _len);
-							_c.index = _insert_at + _len;
-							_c.highlight_active = false;
-							_c.highlight_start_index = _c.index;
-							_c.highlight_end_index = _c.index;
-						}
-					
-						_i += 1;
-					}
 				
-					__force_rebuild__();
-					__cursors_sync_sticky_x__();
-					__history_add_record__();
-					trigger_event(events.change);
-					return true;
-				};
+						// Sort ascending by selection start (stable order in text).
+						var _j = 1;
+						while (_j < _n) {
+							var _key = _ranges[_j];
+							var _k = _j - 1;
+							while (_k >= 0 && _ranges[_k].a > _key.a) {
+								_ranges[_k + 1] = _ranges[_k];
+								_k -= 1;
+							}
+							_ranges[_k + 1] = _key;
+							_j += 1;
+						}
+					
+						// Merge overlaps (and touching ranges) so overlapping selections become one logical selection.
+						var _merged = [];
+						array_push(_merged, { a: _ranges[0].a, b: _ranges[0].b });
+						_i = 1;
+						repeat (_n - 1) {
+							var _cur = _ranges[_i];
+							var _last = _merged[array_length(_merged) - 1];
+							if (_cur.a <= _last.b) {
+								_last.b = max(_last.b, _cur.b);
+								_merged[array_length(_merged) - 1] = _last;
+							}
+							else {
+								array_push(_merged, { a: _cur.a, b: _cur.b });
+							}
+							_i += 1;
+						}
+				
+						// Build the clipboard string as merged-ranges separated by \n.
+						var _out = "";
+						var _m = array_length(_merged);
+						_i = 0;
+						repeat (_m) {
+							var _r = _merged[_i];
+							var _bs = buffer.get_byte_index_from_index(_r.a);
+							var _be = buffer.get_byte_index_from_index(_r.b);
+							var _piece = buffer.get_substring(_bs, _be);
+							if (_i > 0) _out += "\n";
+							_out += _piece;
+							_i += 1;
+						}
+				
+						__clipboard_set_text__(_out);
+						return true;
+					};
+					#region jsDoc
+					/// @func    __insert_lines_at_cursors__
+					/// @desc    Multi-cursor paste helper. Inserts one string per cursor (mapped by cursor index order).
+					///         Returns false if cursor count != line count or if selections overlap.
+					/// @param   {Array} _lines : Array of strings, one per cursor.
+					/// @returns {Bool}
+					#endregion
+					static __insert_lines_at_cursors__ = function(_lines) {
+						var _n = array_length(__cursors__);
+						if (_n <= 1) return false;
+						if (array_length(_lines) != _n) return false;
+				
+						// If selections overlap, fall back to normal paste.
+						var _sel = [];
+						var _slen = 0;
+						var _i = 0;
+						repeat (_n) {
+							var _c0 = __cursors__[_i];
+							if (_c0.highlight_active && _c0.highlight_start_index != _c0.highlight_end_index) {
+								var _a0 = min(_c0.highlight_start_index, _c0.highlight_end_index);
+								var _b0 = max(_c0.highlight_start_index, _c0.highlight_end_index);
+								array_push(_sel, { a: _a0, b: _b0 });
+							}
+							_i += 1;
+						}
+						_slen = array_length(_sel);
+						if (_slen > 1) {
+							// sort and check overlaps
+							var _j = 1;
+							while (_j < _slen) {
+								var _key = _sel[_j];
+								var _k = _j - 1;
+								while (_k >= 0 && _sel[_k].a > _key.a) {
+									_sel[_k + 1] = _sel[_k];
+									_k -= 1;
+								}
+								_sel[_k + 1] = _key;
+								_j += 1;
+							}
+							_i = 1;
+							while (_i < _slen) {
+								if (_sel[_i].a < _sel[_i - 1].b) {
+									return false;
+								}
+								_i += 1;
+							}
+						}
+				
+						// Map clipboard lines to cursors by cursor index order (ascending).
+						var _ids_asc = __cursors_sorted_ids_by_index__(false);
+						var _line_for_cid = [];
+						array_resize(_line_for_cid, _n);
+						_i = 0;
+						repeat (_n) {
+							var _cid = _ids_asc[_i];
+							_line_for_cid[_cid] = _lines[_i];
+							_i += 1;
+						}
+				
+						// Apply edits from right-to-left to keep indices stable.
+						var _ids_desc = __cursors_sorted_ids_by_index__(true);
+						_i = 0;
+						repeat (_n) {
+							var _cid2 = _ids_desc[_i];
+							var _c = __cursors__[_cid2];
+							var _raw = _line_for_cid[_cid2];
+							_raw = __clipboard_strip_trailing_cr__(_raw);
+							var _text = buffer.__filter_allowed__(_raw);
+					
+							// Replace selection for this cursor only.
+							if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) {
+								var _a = min(_c.highlight_start_index, _c.highlight_end_index);
+								var _b = max(_c.highlight_start_index, _c.highlight_end_index);
+								var _bs = buffer.get_byte_index_from_index(_a);
+								var _be = buffer.get_byte_index_from_index(_b);
+								buffer.erase(_bs, _be);
+								__cursors_shift_after_delete__(_a, _b, _b - _a);
+								_c = __cursors__[_cid2];
+								_c.index = _a;
+								_c.highlight_active = false;
+								_c.highlight_start_index = _c.index;
+								_c.highlight_end_index = _c.index;
+							}
+					
+							var _insert_at = clamp(_c.index, 0, renderer.get_glyph_count());
+							if (_text != "") {
+								var _len = string_length(_text);
+								var _bi = buffer.get_byte_index_from_index(_insert_at);
+								buffer.insert(_bi, _text);
+								__cursors_shift_right_of__(_insert_at, _len);
+								_c.index = _insert_at + _len;
+								_c.highlight_active = false;
+								_c.highlight_start_index = _c.index;
+								_c.highlight_end_index = _c.index;
+							}
+					
+							_i += 1;
+						}
+				
+						__force_rebuild__();
+						__cursors_sync_sticky_x__();
+						__history_add_record__();
+						trigger_event(events.change);
+						return true;
+					};
+				
+				#endregion
 				
 			#endregion
 			
@@ -3502,152 +3895,153 @@ function WWTextField() : WWCore() constructor {
 				}
 			};
 			
-			// -------------------------
-			// Multi-cursor navigation helpers
-			// -------------------------
-			static __cursors_sync_sticky_x__ = function() {
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					_c.sticky_px = renderer.get_x_from_index(_c.index);
-					_i += 1;
-				}
-				cursor_last_width = __cursors__[__cursor_active__].sticky_px;
-			};
-			static __cursor_set_index_synced_for__ = function(_cid, _new_index, _shift_select = false, _update_width = true) {
-				var _c = __cursors__[_cid];
-				var _old_index = _c.index;
-				_c.index = clamp(_new_index, 0, renderer.get_glyph_count());
-				if (_c.index != _old_index || _shift_select) {
-					__cursor_blink_reset__();
-				}
-				var _selection_is_non_zero = _c.index != _c.highlight_start_index;
-				if (_shift_select && _selection_is_non_zero) {
-					if (!_c.highlight_active) {
-						_c.highlight_start_index = _old_index;
-						_c.highlight_end_index = _c.index;
-						_c.highlight_active = true;
+			#region Multi-cursor navigation helpers
+			
+				static __cursors_sync_sticky_x__ = function() {
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						_c.sticky_px = renderer.get_x_from_index(_c.index);
+						_i += 1;
 					}
-					_c.highlight_end_index = _c.index;
-				}
-				else {
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-				}
-				if (_update_width) {
-					_c.sticky_px = renderer.get_x_from_index(_c.index);
-					if (_cid == __cursor_active__) {
-						cursor_last_width = _c.sticky_px;
+					cursor_last_width = __cursors__[__cursor_active__].sticky_px;
+				};
+				static __cursor_set_index_synced_for__ = function(_cid, _new_index, _shift_select = false, _update_width = true) {
+					var _c = __cursors__[_cid];
+					var _old_index = _c.index;
+					_c.index = clamp(_new_index, 0, renderer.get_glyph_count());
+					if (_c.index != _old_index || _shift_select) {
+						__cursor_blink_reset__();
 					}
-				}
-			};
-			static __cursors_move_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
-				static __word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
-				if (_vector == 0) return;
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					var _index = _c.index;
-					var _new_index = _index;
-					if (_vertical) {
-						var _line = renderer.get_line_from_index(_index);
-						var _line_count = renderer.get_line_count();
-						var _new_line = clamp(_line + _vector, 0, max(0, _line_count - 1));
-						var _yoff = renderer.get_line_y_offset(_new_line);
-						var _sticky = _c.sticky_px;
-						if (is_undefined(_sticky) || _sticky == 0) {
-							_sticky = renderer.get_x_from_index(_index);
-							_c.sticky_px = _sticky;
+					var _selection_is_non_zero = _c.index != _c.highlight_start_index;
+					if (_shift_select && _selection_is_non_zero) {
+						if (!_c.highlight_active) {
+							_c.highlight_start_index = _old_index;
+							_c.highlight_end_index = _c.index;
+							_c.highlight_active = true;
 						}
-						_new_index = renderer.get_index_from_xy(x + _sticky, y + _yoff);
-						// Vertical move should NOT update sticky-x.
-						__cursor_set_index_synced_for__(_i, _new_index, _shift, false);
+						_c.highlight_end_index = _c.index;
 					}
 					else {
-						if (_word_mode) {
-							var _idx2 = _index + _vector;
-							var _line2 = renderer.get_line_from_index(_idx2);
-							var _start = renderer.get_line_index_start(_line2);
-							var _end   = renderer.get_line_index_end(_line2);
-							var _v = sign(_vector);
-							var _newi = _index;
-							var _j = _index + _v;
-							var _length = (_v) ? _end - _j : _j - _start + 1;
-							repeat (_length) {
-								var _char = renderer.get_glyph_char(_j);
-								if (string_pos(_char, __word_breakers)) {
-									if (_v) {
-										_newi = _j;
-									}
-									break;
-								}
-								_newi = _j;
-								_j += _v;
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+					}
+					if (_update_width) {
+						_c.sticky_px = renderer.get_x_from_index(_c.index);
+						if (_cid == __cursor_active__) {
+							cursor_last_width = _c.sticky_px;
+						}
+					}
+				};
+				static __cursors_move_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
+					static __word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
+					if (_vector == 0) return;
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						var _index = _c.index;
+						var _new_index = _index;
+						if (_vertical) {
+							var _line = renderer.get_line_from_index(_index);
+							var _line_count = renderer.get_line_count();
+							var _new_line = clamp(_line + _vector, 0, max(0, _line_count - 1));
+							var _yoff = renderer.get_line_y_offset(_new_line);
+							var _sticky = _c.sticky_px;
+							if (is_undefined(_sticky) || _sticky == 0) {
+								_sticky = renderer.get_x_from_index(_index);
+								_c.sticky_px = _sticky;
 							}
-							_new_index = _newi;
+							_new_index = renderer.get_index_from_xy(x + _sticky, y + _yoff);
+							// Vertical move should NOT update sticky-x.
+							__cursor_set_index_synced_for__(_i, _new_index, _shift, false);
 						}
 						else {
-							_new_index = clamp(_index + _vector, 0, renderer.get_glyph_count());
-						}
-						__cursor_set_index_synced_for__(_i, _new_index, _shift, true);
-					}
-					_i += 1;
-				}
-				cursor_last_width = __cursors__[__cursor_active__].sticky_px;
-				__history_update_latest_cursor__();
-			};
-			static __cursors_move_paged_offset__ = function(_vector, _shift) {
-				if (_vector == 0) return;
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					var _cursor_index = _c.index;
-					var _current_line = renderer.get_line_from_index(_cursor_index);
-					var _line_count = renderer.get_line_count();
-					var _current_y_offset = renderer.get_line_y_offset(_current_line);
-					var _page_height = self.height * 0.75 * abs(_vector);
-					var _target_y_offset = _current_y_offset + (_page_height * _vector);
-					var _target_line = _current_line;
-					if (_vector > 0) {
-						var _line_index = _current_line + 1;
-						while (_line_index < _line_count) {
-							var _line_y_offset = renderer.get_line_y_offset(_line_index);
-							_target_line = _line_index;
-							if (_line_y_offset >= _target_y_offset) {
-								break;
+							if (_word_mode) {
+								var _idx2 = _index + _vector;
+								var _line2 = renderer.get_line_from_index(_idx2);
+								var _start = renderer.get_line_index_start(_line2);
+								var _end   = renderer.get_line_index_end(_line2);
+								var _v = sign(_vector);
+								var _newi = _index;
+								var _j = _index + _v;
+								var _length = (_v) ? _end - _j : _j - _start + 1;
+								repeat (_length) {
+									var _char = renderer.get_glyph_char(_j);
+									if (string_pos(_char, __word_breakers)) {
+										if (_v) {
+											_newi = _j;
+										}
+										break;
+									}
+									_newi = _j;
+									_j += _v;
+								}
+								_new_index = _newi;
 							}
-							_line_index++;
-						}
-					}
-					else {
-						var _line_index = _current_line - 1;
-						while (_line_index >= 0) {
-							var _line_y_offset = renderer.get_line_y_offset(_line_index);
-							_target_line = _line_index;
-							if (_line_y_offset <= _target_y_offset) {
-								break;
+							else {
+								_new_index = clamp(_index + _vector, 0, renderer.get_glyph_count());
 							}
-							_line_index--;
+							__cursor_set_index_synced_for__(_i, _new_index, _shift, true);
 						}
+						_i += 1;
 					}
-					var _final_y_offset = renderer.get_line_y_offset(_target_line);
-					var _sticky = _c.sticky_px;
-					if (is_undefined(_sticky) || _sticky == 0) {
-						_sticky = renderer.get_x_from_index(_cursor_index);
-						_c.sticky_px = _sticky;
+					cursor_last_width = __cursors__[__cursor_active__].sticky_px;
+					__history_update_latest_cursor__();
+				};
+				static __cursors_move_paged_offset__ = function(_vector, _shift) {
+					if (_vector == 0) return;
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						var _cursor_index = _c.index;
+						var _current_line = renderer.get_line_from_index(_cursor_index);
+						var _line_count = renderer.get_line_count();
+						var _current_y_offset = renderer.get_line_y_offset(_current_line);
+						var _page_height = self.height * 0.75 * abs(_vector);
+						var _target_y_offset = _current_y_offset + (_page_height * _vector);
+						var _target_line = _current_line;
+						if (_vector > 0) {
+							var _line_index = _current_line + 1;
+							while (_line_index < _line_count) {
+								var _line_y_offset = renderer.get_line_y_offset(_line_index);
+								_target_line = _line_index;
+								if (_line_y_offset >= _target_y_offset) {
+									break;
+								}
+								_line_index++;
+							}
+						}
+						else {
+							var _line_index = _current_line - 1;
+							while (_line_index >= 0) {
+								var _line_y_offset = renderer.get_line_y_offset(_line_index);
+								_target_line = _line_index;
+								if (_line_y_offset <= _target_y_offset) {
+									break;
+								}
+								_line_index--;
+							}
+						}
+						var _final_y_offset = renderer.get_line_y_offset(_target_line);
+						var _sticky = _c.sticky_px;
+						if (is_undefined(_sticky) || _sticky == 0) {
+							_sticky = renderer.get_x_from_index(_cursor_index);
+							_c.sticky_px = _sticky;
+						}
+						var _new_index = renderer.get_index_from_xy(x + _sticky, y + _final_y_offset);
+						// Page move is vertical; do NOT update sticky-x.
+						__cursor_set_index_synced_for__(_i, _new_index, _shift, false);
+						_i += 1;
 					}
-					var _new_index = renderer.get_index_from_xy(x + _sticky, y + _final_y_offset);
-					// Page move is vertical; do NOT update sticky-x.
-					__cursor_set_index_synced_for__(_i, _new_index, _shift, false);
-					_i += 1;
-				}
-				cursor_last_width = __cursors__[__cursor_active__].sticky_px;
-				__history_update_latest_cursor__();
-			};
+					cursor_last_width = __cursors__[__cursor_active__].sticky_px;
+					__history_update_latest_cursor__();
+				};
+			
+			#endregion
 			
 			#region jsDoc
 			/// @func    __delete_selection_if_any__
@@ -3740,386 +4134,393 @@ function WWTextField() : WWCore() constructor {
 				}
 				return true;
 			};
+			
+			#region Cursor helpers (textfield-owned)
+			
+				static __cursor_get_index__ = function() {
+					return __cursors__[__cursor_active__].index;
+				};
+				static __cursor_get_highlight_active__ = function() {
+					return __cursors__[__cursor_active__].highlight_active;
+				};
+				static __cursor_get_highlight_start_index__ = function() {
+					return __cursors__[__cursor_active__].highlight_start_index;
+				};
+				static __cursor_get_highlight_end_index__ = function() {
+					return __cursors__[__cursor_active__].highlight_end_index;
+				};
+				static __cursor_set_highlight_active__ = function(_active) {
+					__cursors__[__cursor_active__].highlight_active = _active;
+				};
+				static __cursor_set_highlight_start_index__ = function(_index) {
+					__cursors__[__cursor_active__].highlight_start_index = _index;
+				};
+				static __cursor_set_highlight_end_index__ = function(_index) {
+					__cursors__[__cursor_active__].highlight_end_index = _index;
+				};
+				static __cursor_set_col__ = function(_col) {
+					var _line = renderer.get_line_from_index(__cursor_get_index__());
+					var _idx = renderer.get_index_from_line_col(_line, _col);
+					__cursor_set_index_synced__(_idx, false);
+				};
+				static __cursor_set_line__ = function(_line) {
+					var _col = renderer.get_col_from_index(__cursor_get_index__());
+					var _idx = renderer.get_index_from_line_col(_line, _col);
+					__cursor_set_index_synced__(_idx, false);
+				};
+				static __cursor_set_highlight_start_line__ = function(_line) {
+					var _col = renderer.get_col_from_index(__cursor_get_highlight_start_index__());
+					__cursor_set_highlight_start_index__(renderer.get_index_from_line_col(_line, _col));
+				};
+				static __cursor_set_highlight_start_col__ = function(_col) {
+					var _line = renderer.get_line_from_index(__cursor_get_highlight_start_index__());
+					__cursor_set_highlight_start_index__(renderer.get_index_from_line_col(_line, _col));
+				};
+				static __cursor_set_highlight_end_line__ = function(_line) {
+					var _col = renderer.get_col_from_index(__cursor_get_highlight_end_index__());
+					__cursor_set_highlight_end_index__(renderer.get_index_from_line_col(_line, _col));
+				};
+				static __cursor_set_highlight_end_col__ = function(_col) {
+					var _line = renderer.get_line_from_index(__cursor_get_highlight_end_index__());
+					__cursor_set_highlight_end_index__(renderer.get_index_from_line_col(_line, _col));
+				};
 
-			// -------------------------
-			// Cursor helpers (textfield-owned)
-			// -------------------------
-			static __cursor_get_index__ = function() {
-				return __cursors__[__cursor_active__].index;
-			};
-			static __cursor_get_highlight_active__ = function() {
-				return __cursors__[__cursor_active__].highlight_active;
-			};
-			static __cursor_get_highlight_start_index__ = function() {
-				return __cursors__[__cursor_active__].highlight_start_index;
-			};
-			static __cursor_get_highlight_end_index__ = function() {
-				return __cursors__[__cursor_active__].highlight_end_index;
-			};
-			static __cursor_set_highlight_active__ = function(_active) {
-				__cursors__[__cursor_active__].highlight_active = _active;
-			};
-			static __cursor_set_highlight_start_index__ = function(_index) {
-				__cursors__[__cursor_active__].highlight_start_index = _index;
-			};
-			static __cursor_set_highlight_end_index__ = function(_index) {
-				__cursors__[__cursor_active__].highlight_end_index = _index;
-			};
-			static __cursor_set_col__ = function(_col) {
-				var _line = renderer.get_line_from_index(__cursor_get_index__());
-				var _idx = renderer.get_index_from_line_col(_line, _col);
-				__cursor_set_index_synced__(_idx, false);
-			};
-			static __cursor_set_line__ = function(_line) {
-				var _col = renderer.get_col_from_index(__cursor_get_index__());
-				var _idx = renderer.get_index_from_line_col(_line, _col);
-				__cursor_set_index_synced__(_idx, false);
-			};
-			static __cursor_set_highlight_start_line__ = function(_line) {
-				var _col = renderer.get_col_from_index(__cursor_get_highlight_start_index__());
-				__cursor_set_highlight_start_index__(renderer.get_index_from_line_col(_line, _col));
-			};
-			static __cursor_set_highlight_start_col__ = function(_col) {
-				var _line = renderer.get_line_from_index(__cursor_get_highlight_start_index__());
-				__cursor_set_highlight_start_index__(renderer.get_index_from_line_col(_line, _col));
-			};
-			static __cursor_set_highlight_end_line__ = function(_line) {
-				var _col = renderer.get_col_from_index(__cursor_get_highlight_end_index__());
-				__cursor_set_highlight_end_index__(renderer.get_index_from_line_col(_line, _col));
-			};
-			static __cursor_set_highlight_end_col__ = function(_col) {
-				var _line = renderer.get_line_from_index(__cursor_get_highlight_end_index__());
-				__cursor_set_highlight_end_index__(renderer.get_index_from_line_col(_line, _col));
-			};
-
-			static __cursors_clear_to_single__ = function(_index) {
-				_index = clamp(_index, 0, renderer.get_glyph_count());
-				__cursors__ = [ __cursor_record_create__(_index) ];
-				__cursor_active__ = 0;
-				__cursors__[0].sticky_px = renderer.get_x_from_index(_index);
-				cursor_last_width = __cursors__[0].sticky_px;
-				__history_update_latest_cursor__();
-			};
-			static __cursors_add_at_index__ = function(_index) {
-				_index = clamp(_index, 0, renderer.get_glyph_count());
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					if (__cursors__[_i].index == _index) {
-						__cursor_active__ = _i;
-						return;
+				static __cursors_clear_to_single__ = function(_index) {
+					_index = clamp(_index, 0, renderer.get_glyph_count());
+					__cursors__ = [ __cursor_record_create__(_index) ];
+					__cursor_active__ = 0;
+					__cursors__[0].sticky_px = renderer.get_x_from_index(_index);
+					cursor_last_width = __cursors__[0].sticky_px;
+					__history_update_latest_cursor__();
+				};
+				static __cursors_add_at_index__ = function(_index) {
+					_index = clamp(_index, 0, renderer.get_glyph_count());
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						if (__cursors__[_i].index == _index) {
+							__cursor_active__ = _i;
+							return;
+						}
+						_i += 1;
 					}
-					_i += 1;
-				}
-				array_push(__cursors__, __cursor_record_create__(_index));
-				__cursors__[array_length(__cursors__) - 1].sticky_px = renderer.get_x_from_index(_index);
-				__cursor_active__ = array_length(__cursors__) - 1;
-				cursor_last_width = __cursors__[__cursor_active__].sticky_px;
-				__history_update_latest_cursor__();
-			};
-			static __cursors_remove_nearest_to_xy__ = function(_mx, _my, _threshold) {
-				var _n = array_length(__cursors__);
-				if (_n <= 1) return;
-				
-				var _best = -1;
-				var _best_d2 = _threshold * _threshold;
-				
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					var _line = renderer.get_line_from_index(_c.index);
-					var _cx = renderer.x + renderer.get_x_from_index(_c.index);
-					var _cy = renderer.y + renderer.get_line_y_offset(_line);
-					var _dx = _mx - _cx;
-					var _dy = _my - _cy;
-					var _d2 = (_dx * _dx) + (_dy * _dy);
-					if (_d2 <= _best_d2) {
-						_best_d2 = _d2;
-						_best = _i;
-					}
-					_i += 1;
-				}
-				
-				if (_best >= 0) {
-					var _removed_was_active = (__cursor_active__ == _best);
-					var _removed_before_active = (_best < __cursor_active__);
-					array_delete(__cursors__, _best, 1);
-					// Preserve the same active cursor when deleting a cursor before it.
-					if (_removed_before_active) {
-						__cursor_active__ -= 1;
-					}
-					// If we removed the active cursor, choose the cursor that slid into its slot.
-					if (_removed_was_active) {
-						__cursor_active__ = clamp(_best, 0, max(0, array_length(__cursors__) - 1));
-					} else {
-						__cursor_active__ = clamp(__cursor_active__, 0, max(0, array_length(__cursors__) - 1));
-					}
+					array_push(__cursors__, __cursor_record_create__(_index));
+					__cursors__[array_length(__cursors__) - 1].sticky_px = renderer.get_x_from_index(_index);
+					__cursor_active__ = array_length(__cursors__) - 1;
 					cursor_last_width = __cursors__[__cursor_active__].sticky_px;
 					__history_update_latest_cursor__();
-				}
-			};
-			static __cursors_sorted_ids_by_index__ = function(_descending) {
-				var _n = array_length(__cursors__);
-				var _ids = [];
-				array_resize(_ids, _n);
-				var _i = 0;
-				repeat (_n) {
-					_ids[_i] = _i;
-					_i += 1;
-				}
-				// insertion sort by cursor.index
-				var _j = 1;
-				while (_j < _n) {
-					var _key = _ids[_j];
-					var _k = _j - 1;
-					while (_k >= 0) {
-						var _a = __cursors__[_ids[_k]].index;
-						var _b = __cursors__[_key].index;
-						if (_descending ? (_a < _b) : (_a > _b)) {
-							_ids[_k + 1] = _ids[_k];
-							_k -= 1;
-							continue;
+				};
+				static __cursors_remove_nearest_to_xy__ = function(_mx, _my, _threshold) {
+					var _n = array_length(__cursors__);
+					if (_n <= 1) return;
+				
+					var _best = -1;
+					var _best_d2 = _threshold * _threshold;
+				
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						var _line = renderer.get_line_from_index(_c.index);
+						var _cx = renderer.x + renderer.get_x_from_index(_c.index);
+						var _cy = renderer.y + renderer.get_line_y_offset(_line);
+						var _dx = _mx - _cx;
+						var _dy = _my - _cy;
+						var _d2 = (_dx * _dx) + (_dy * _dy);
+						if (_d2 <= _best_d2) {
+							_best_d2 = _d2;
+							_best = _i;
 						}
-						break;
+						_i += 1;
 					}
-					_ids[_k + 1] = _key;
-					_j += 1;
-				}
-				return _ids;
-			};
-			static __cursors_shift_right_of__ = function(_index_exclusive, _delta) {
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					if (_c.index > _index_exclusive) _c.index += _delta;
-					if (_c.highlight_start_index > _index_exclusive) _c.highlight_start_index += _delta;
-					if (_c.highlight_end_index > _index_exclusive) _c.highlight_end_index += _delta;
-					_i += 1;
-				}
-			};
-			static __cursors_shift_after_delete__ = function(_del_start, _del_end, _delta) {
-				var _n = array_length(__cursors__);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					// index
-					if (_c.index > _del_end) _c.index -= _delta;
-					else if (_c.index > _del_start) _c.index = _del_start;
-					// selection anchors
-					if (_c.highlight_start_index > _del_end) _c.highlight_start_index -= _delta;
-					else if (_c.highlight_start_index > _del_start) _c.highlight_start_index = _del_start;
-					if (_c.highlight_end_index > _del_end) _c.highlight_end_index -= _delta;
-					else if (_c.highlight_end_index > _del_start) _c.highlight_end_index = _del_start;
-					_i += 1;
-				}
-			};
-			static __cursors_clone__ = function() {
-				var _n = array_length(__cursors__);
-				var _out = [];
-				array_resize(_out, _n);
-				var _i = 0;
-				repeat (_n) {
-					var _c = __cursors__[_i];
-					var _nc = __cursor_record_create__(_c.index);
-					_nc.highlight_active = _c.highlight_active;
-					_nc.highlight_start_index = _c.highlight_start_index;
-					_nc.highlight_end_index = _c.highlight_end_index;
-					_nc.sticky_px = _c.sticky_px;
-					_out[_i] = _nc;
-					_i += 1;
-				}
-				return _out;
-			};
-			static __cursors_clone_from__ = function(_src) {
-				if (is_undefined(_src)) return [ __cursor_record_create__(0) ];
-				var _n = array_length(_src);
-				if (_n <= 0) return [ __cursor_record_create__(0) ];
-				var _out = [];
-				array_resize(_out, _n);
-				var _i = 0;
-				repeat (_n) {
-					var _c = _src[_i];
-					var _nc = __cursor_record_create__(_c.index);
-					_nc.highlight_active = _c.highlight_active;
-					_nc.highlight_start_index = _c.highlight_start_index;
-					_nc.highlight_end_index = _c.highlight_end_index;
-					_nc.sticky_px = _c.sticky_px;
-					_out[_i] = _nc;
-					_i += 1;
-				}
-				return _out;
-			};
-			static __delete_backspace_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _idx = _c.index;
-					if (_idx <= 0) { _i += 1; continue; }
-					var _prev = _idx - 1;
-					var _bs = buffer.get_byte_index_from_index(_prev);
-					var _be = buffer.get_byte_index_from_index(_idx);
-					buffer.erase(_bs, _be);
-					__cursors_shift_after_delete__(_prev, _idx, 1);
-					_c.index = _prev;
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-			static __delete_forward_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _glyphs = renderer.get_glyph_count();
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _idx = _c.index;
-					if (_idx >= _glyphs) { _i += 1; continue; }
-					var _next = _idx + 1;
-					var _bs = buffer.get_byte_index_from_index(_idx);
-					var _be = buffer.get_byte_index_from_index(_next);
-					buffer.erase(_bs, _be);
-					__cursors_shift_after_delete__(_idx, _next, 1);
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-			static __delete_word_left_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _idx = _c.index;
-					if (_idx <= 0) { _i += 1; continue; }
-					var _pointed_index = max(0, _idx - 1);
-					var _bounds = __compute_word_boundaries__(_pointed_index, false);
-					var _start = _bounds.index_start;
-					if (_start >= _idx) { _i += 1; continue; }
-					var _bs = buffer.get_byte_index_from_index(_start);
-					var _be = buffer.get_byte_index_from_index(_idx);
-					buffer.erase(_bs, _be);
-					var _delta = _idx - _start;
-					__cursors_shift_after_delete__(_start, _idx, _delta);
-					_c.index = _start;
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-			static __delete_word_right_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _glyphs = renderer.get_glyph_count();
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _idx = _c.index;
-					if (_idx >= _glyphs) { _i += 1; continue; }
-					var _pointed_index = min(_idx + 1, _glyphs);
-					var _bounds = __compute_word_boundaries__(_pointed_index, false);
-					var _end = _bounds.index_end;
-					if (_end <= _idx) { _i += 1; continue; }
-					var _bs = buffer.get_byte_index_from_index(_idx);
-					var _be = buffer.get_byte_index_from_index(_end);
-					buffer.erase(_bs, _be);
-					var _delta = _end - _idx;
-					__cursors_shift_after_delete__(_idx, _end, _delta);
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-			static __delete_to_line_start_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _end = _c.index;
-					var _line = renderer.get_line_from_index(_end);
-					var _start = renderer.get_line_index_start(_line);
-					if (_start >= _end) { _i += 1; continue; }
-					var _bs = buffer.get_byte_index_from_index(_start);
-					var _be = buffer.get_byte_index_from_index(_end);
-					buffer.erase(_bs, _be);
-					var _delta = _end - _start;
-					__cursors_shift_after_delete__(_start, _end, _delta);
-					_c.index = _start;
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-			static __delete_to_line_end_all_cursors__ = function() {
-				if (__delete_selection_if_any__(true, true)) return;
-				var _ids = __cursors_sorted_ids_by_index__(true);
-				var _n = array_length(_ids);
-				var _i = 0;
-				repeat (_n) {
-					var _cid = _ids[_i];
-					var _c = __cursors__[_cid];
-					var _start = _c.index;
-					var _line = renderer.get_line_from_index(_start);
-					var _end = renderer.get_line_index_end(_line);
-					if not (renderer.get_line_forced_wrapped(_line)) {
-						_end -= 1;
+				
+					if (_best >= 0) {
+						var _removed_was_active = (__cursor_active__ == _best);
+						var _removed_before_active = (_best < __cursor_active__);
+						array_delete(__cursors__, _best, 1);
+						// Preserve the same active cursor when deleting a cursor before it.
+						if (_removed_before_active) {
+							__cursor_active__ -= 1;
+						}
+						// If we removed the active cursor, choose the cursor that slid into its slot.
+						if (_removed_was_active) {
+							__cursor_active__ = clamp(_best, 0, max(0, array_length(__cursors__) - 1));
+						} else {
+							__cursor_active__ = clamp(__cursor_active__, 0, max(0, array_length(__cursors__) - 1));
+						}
+						cursor_last_width = __cursors__[__cursor_active__].sticky_px;
+						__history_update_latest_cursor__();
 					}
-					if (_end <= _start) { _i += 1; continue; }
-					var _bs = buffer.get_byte_index_from_index(_start);
-					var _be = buffer.get_byte_index_from_index(_end);
-					buffer.erase(_bs, _be);
-					var _delta = _end - _start;
-					__cursors_shift_after_delete__(_start, _end, _delta);
-					_c.highlight_active = false;
-					_c.highlight_start_index = _c.index;
-					_c.highlight_end_index = _c.index;
-					_i += 1;
-				}
-				__force_rebuild__();
-				__cursors_sync_sticky_x__();
-				__history_add_record__();
-			};
-
-
+				};
+				static __cursors_sorted_ids_by_index__ = function(_descending) {
+					var _n = array_length(__cursors__);
+					var _ids = [];
+					array_resize(_ids, _n);
+					var _i = 0;
+					repeat (_n) {
+						_ids[_i] = _i;
+						_i += 1;
+					}
+					// insertion sort by cursor.index
+					var _j = 1;
+					while (_j < _n) {
+						var _key = _ids[_j];
+						var _k = _j - 1;
+						while (_k >= 0) {
+							var _a = __cursors__[_ids[_k]].index;
+							var _b = __cursors__[_key].index;
+							if (_descending ? (_a < _b) : (_a > _b)) {
+								_ids[_k + 1] = _ids[_k];
+								_k -= 1;
+								continue;
+							}
+							break;
+						}
+						_ids[_k + 1] = _key;
+						_j += 1;
+					}
+					return _ids;
+				};
+				static __cursors_shift_right_of__ = function(_index_exclusive, _delta) {
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						if (_c.index > _index_exclusive) _c.index += _delta;
+						if (_c.highlight_start_index > _index_exclusive) _c.highlight_start_index += _delta;
+						if (_c.highlight_end_index > _index_exclusive) _c.highlight_end_index += _delta;
+						_i += 1;
+					}
+				};
+				static __cursors_shift_after_delete__ = function(_del_start, _del_end, _delta) {
+					var _n = array_length(__cursors__);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						// index
+						if (_c.index > _del_end) _c.index -= _delta;
+						else if (_c.index > _del_start) _c.index = _del_start;
+						// selection anchors
+						if (_c.highlight_start_index > _del_end) _c.highlight_start_index -= _delta;
+						else if (_c.highlight_start_index > _del_start) _c.highlight_start_index = _del_start;
+						if (_c.highlight_end_index > _del_end) _c.highlight_end_index -= _delta;
+						else if (_c.highlight_end_index > _del_start) _c.highlight_end_index = _del_start;
+						_i += 1;
+					}
+				};
+				static __cursors_clone__ = function() {
+					var _n = array_length(__cursors__);
+					var _out = [];
+					array_resize(_out, _n);
+					var _i = 0;
+					repeat (_n) {
+						var _c = __cursors__[_i];
+						var _nc = __cursor_record_create__(_c.index);
+						_nc.highlight_active = _c.highlight_active;
+						_nc.highlight_start_index = _c.highlight_start_index;
+						_nc.highlight_end_index = _c.highlight_end_index;
+						_nc.sticky_px = _c.sticky_px;
+						_out[_i] = _nc;
+						_i += 1;
+					}
+					return _out;
+				};
+				static __cursors_clone_from__ = function(_src) {
+					if (is_undefined(_src)) return [ __cursor_record_create__(0) ];
+					var _n = array_length(_src);
+					if (_n <= 0) return [ __cursor_record_create__(0) ];
+					var _out = [];
+					array_resize(_out, _n);
+					var _i = 0;
+					repeat (_n) {
+						var _c = _src[_i];
+						var _nc = __cursor_record_create__(_c.index);
+						_nc.highlight_active = _c.highlight_active;
+						_nc.highlight_start_index = _c.highlight_start_index;
+						_nc.highlight_end_index = _c.highlight_end_index;
+						_nc.sticky_px = _c.sticky_px;
+						_out[_i] = _nc;
+						_i += 1;
+					}
+					return _out;
+				};
+				static __delete_backspace_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _idx = _c.index;
+						if (_idx <= 0) { _i += 1; continue; }
+						var _prev = _idx - 1;
+						var _bs = buffer.get_byte_index_from_index(_prev);
+						var _be = buffer.get_byte_index_from_index(_idx);
+						buffer.erase(_bs, _be);
+						__cursors_shift_after_delete__(_prev, _idx, 1);
+						_c.index = _prev;
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+				static __delete_forward_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _glyphs = renderer.get_glyph_count();
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _idx = _c.index;
+						if (_idx >= _glyphs) { _i += 1; continue; }
+						var _next = _idx + 1;
+						var _bs = buffer.get_byte_index_from_index(_idx);
+						var _be = buffer.get_byte_index_from_index(_next);
+						buffer.erase(_bs, _be);
+						__cursors_shift_after_delete__(_idx, _next, 1);
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+				static __delete_word_left_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _idx = _c.index;
+						if (_idx <= 0) { _i += 1; continue; }
+						var _pointed_index = max(0, _idx - 1);
+						var _bounds = __compute_word_boundaries__(_pointed_index, false);
+						var _start = _bounds.index_start;
+						if (_start >= _idx) { _i += 1; continue; }
+						var _bs = buffer.get_byte_index_from_index(_start);
+						var _be = buffer.get_byte_index_from_index(_idx);
+						buffer.erase(_bs, _be);
+						var _delta = _idx - _start;
+						__cursors_shift_after_delete__(_start, _idx, _delta);
+						_c.index = _start;
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+				static __delete_word_right_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _glyphs = renderer.get_glyph_count();
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _idx = _c.index;
+						if (_idx >= _glyphs) { _i += 1; continue; }
+						var _pointed_index = min(_idx + 1, _glyphs);
+						var _bounds = __compute_word_boundaries__(_pointed_index, false);
+						var _end = _bounds.index_end;
+						if (_end <= _idx) { _i += 1; continue; }
+						var _bs = buffer.get_byte_index_from_index(_idx);
+						var _be = buffer.get_byte_index_from_index(_end);
+						buffer.erase(_bs, _be);
+						var _delta = _end - _idx;
+						__cursors_shift_after_delete__(_idx, _end, _delta);
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+				static __delete_to_line_start_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _end = _c.index;
+						var _line = renderer.get_line_from_index(_end);
+						var _start = renderer.get_line_index_start(_line);
+						if (_start >= _end) { _i += 1; continue; }
+						var _bs = buffer.get_byte_index_from_index(_start);
+						var _be = buffer.get_byte_index_from_index(_end);
+						buffer.erase(_bs, _be);
+						var _delta = _end - _start;
+						__cursors_shift_after_delete__(_start, _end, _delta);
+						_c.index = _start;
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+				static __delete_to_line_end_all_cursors__ = function() {
+					if (__delete_selection_if_any__(true, true)) return;
+					var _ids = __cursors_sorted_ids_by_index__(true);
+					var _n = array_length(_ids);
+					var _i = 0;
+					repeat (_n) {
+						var _cid = _ids[_i];
+						var _c = __cursors__[_cid];
+						var _start = _c.index;
+						var _line = renderer.get_line_from_index(_start);
+						var _end = renderer.get_line_index_end(_line);
+						if not (renderer.get_line_forced_wrapped(_line)) {
+							_end -= 1;
+						}
+						if (_end <= _start) { _i += 1; continue; }
+						var _bs = buffer.get_byte_index_from_index(_start);
+						var _be = buffer.get_byte_index_from_index(_end);
+						buffer.erase(_bs, _be);
+						var _delta = _end - _start;
+						__cursors_shift_after_delete__(_start, _end, _delta);
+						_c.highlight_active = false;
+						_c.highlight_start_index = _c.index;
+						_c.highlight_end_index = _c.index;
+						_i += 1;
+					}
+					__force_rebuild__();
+					__cursors_sync_sticky_x__();
+					__history_add_record__();
+				};
+			
+			#endregion
+			
 		#endregion
 		
 	#endregion
 	
+}
+
+
+enum __WW_Text_Field_Selection_Mode {
+	Regular = 0,
+	Word = 1,
+	Line = 2,
 }
 
 

@@ -162,6 +162,10 @@ demo_library_validate_all = function() {
 	// aren't forced to expose the entire renderer API as wrappers.
 	static __trb_set_names__ = undefined;
 	static __trb_get_names__ = undefined;
+	// Cache WWTextCursor set/get names; cursors are internal implementation details
+	// of textfields (and will become lighter-weight with multi-cursor refactors).
+	static __cursor_set_names__ = undefined;
+	static __cursor_get_names__ = undefined;
 	if (is_undefined(__core_set_names__) || is_undefined(__core_get_names__)) {
 		var _core = new WWCore();
 		var _core_funcs = _core.get_functions();
@@ -173,6 +177,12 @@ demo_library_validate_all = function() {
 		var _trb_funcs = _trb.get_functions();
 		__trb_set_names__ = __demo_library_filter_prefix__(_trb_funcs, "set_");
 		__trb_get_names__ = __demo_library_filter_prefix__(_trb_funcs, "get_");
+	}
+	if (is_undefined(__cursor_set_names__) || is_undefined(__cursor_get_names__)) {
+		var _cur = new WWTextCursor();
+		var _cur_funcs = _cur.get_functions();
+		__cursor_set_names__ = __demo_library_filter_prefix__(_cur_funcs, "set_");
+		__cursor_get_names__ = __demo_library_filter_prefix__(_cur_funcs, "get_");
 	}
 	
 	//before anything else initialize core to prevent a GM bug
@@ -230,6 +240,7 @@ demo_library_validate_all = function() {
 				var _n = _child_sets[_i];
 				if (array_contains(__core_set_names__, _n)) { continue; }
 				if (array_contains(__trb_set_names__, _n)) { continue; }
+				if (array_contains(__cursor_set_names__, _n)) { continue; }
 				array_push(_child_sets_filtered, _n);
 			}
 			var _child_gets_filtered = [];
@@ -238,6 +249,7 @@ demo_library_validate_all = function() {
 				var _n2 = _child_gets[_j];
 				if (array_contains(__core_get_names__, _n2)) { continue; }
 				if (array_contains(__trb_get_names__, _n2)) { continue; }
+				if (array_contains(__cursor_get_names__, _n2)) { continue; }
 				array_push(_child_gets_filtered, _n2);
 			}
 

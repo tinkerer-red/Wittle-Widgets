@@ -69,6 +69,53 @@ function WWScrollbar() : WWSliderBase() constructor {
                 return self;
             }
 			
+			#region jsDoc
+			/// @func    set_thumb()
+			/// @desc    Replaces the internal thumb component used for dragging the scrollbar.
+			///          The new thumb is added as a child and wired to the drag behavior.
+			/// @self    WWScrollbar
+			/// @param   {Struct.WWSliderThumb} _thumb : The new thumb component.
+			/// @returns {Struct.WWScrollbar}
+			#endregion
+			static set_thumb = function(_thumb) {
+				if (is_undefined(_thumb)) return self;
+				
+				if (!is_undefined(thumb)) {
+					remove(thumb);
+				}
+				
+				thumb = _thumb;
+				add(thumb);
+				
+				// Keep default sizing behavior: if the bar was sized and the thumb wasn't user-sized,
+				// match the bar thickness.
+				if (__size_set__ && !thumb.__size_set__) {
+					var _square = min(get_width(), get_height());
+					thumb.__set_size__(_square, _square);
+				}
+				
+				// Re-wire thumb interactions
+				thumb.on_pressed(function(_input) {
+					thumb_offset = __get_mouse_pos__() - __get_thumb_pos__();
+				});
+				thumb.on_interact(function(_input) {
+					var _available_size = __get_available_size__();
+					if (_available_size <= 0) return;
+					
+					var _mouse_pos = __get_mouse_pos__() - thumb_offset;
+					var _thumb_pos = _mouse_pos - __get_scroll_origin__();
+					var _norm_val = _thumb_pos / _available_size;
+					
+					_norm_val = clamp(_norm_val, 0, 1);
+					set_normalized_value(_norm_val);
+				});
+				
+				if (canvas_size > 0) {
+					__adjust_thumb_size__();
+				}
+				return self;
+			}
+			
         #endregion
 		
 		#region Variables
@@ -136,6 +183,16 @@ function WWScrollbar() : WWSliderBase() constructor {
         #endregion
 		
 		#region Functions
+			
+			#region jsDoc
+			/// @func    get_thumb()
+			/// @desc    Returns the internal thumb component (WWSliderThumb).
+			/// @self    WWScrollbar
+			/// @returns {Struct.WWSliderThumb}
+			#endregion
+			static get_thumb = function() {
+				return thumb;
+			};
 			
 			#region jsDoc
 			/// @func    get_canvas_size()

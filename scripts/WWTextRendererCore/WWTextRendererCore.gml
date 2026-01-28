@@ -1,12 +1,12 @@
 #region jsDoc
-/// @func    WWTextRendererBase()
+/// @func    WWTextRenderer()
 /// @desc    Basic text renderer component. Responsible for:
 ///          - Text source (textbox buffer or caption)
 ///          - Layout build (lines + glyphs)
 ///          - Metrics + hit testing helpers
 ///          - Basic VB baking (glyphs only, default style)
 ///          Does NOT implement markup parsing or diagnostics underlines.
-/// @returns {Struct.WWTextRendererBase}
+/// @returns {Struct.WWTextRenderer}
 #endregion
 function WWTextRendererCore() : WWCore() constructor {
     debug_name = "WWTextRendererCore";

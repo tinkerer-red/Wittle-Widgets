@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"ww_textproc_build_from_npp_udl_xml",
   "parent":{
-    "name":"UDL",
-    "path":"folders/TextBoxV3/Renderers/UDL.yy",
+    "name":"Notepad++ UDL.xml",
+    "path":"folders/TextBoxV3/Renderers/PreProcessors/Notepad++ UDL.xml.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

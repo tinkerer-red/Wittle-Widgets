@@ -722,7 +722,7 @@ build_ui_text_boxes = function(){
 		var _title_label = new WWLabel()
 		    .set_offset(24, 14)
 		    .set_size(1232, 30)
-		    .set_text("WWTextBoxV3 Demo - Renderer Pairs")
+		    .set_text("WWTextField Demo - Renderer Pairs")
 		    .set_text_color(c_white)
 		    .set_text_font(fnt_ww_default_big);
 		root.add(_title_label);
@@ -1029,7 +1029,7 @@ End of demo.
 			var _right_x = _left_x + half_width + text_gap;
 			var _right_y = _left_y;
 
-			var _textbox_left = new WWTextBoxV3()
+			var _textbox_left = new WWTextField()
 			    .set_offset(_left_x, _left_y)
 			    .set_size(half_width, content_height)
 			    .set_background_color(text_bg)
@@ -1039,7 +1039,7 @@ End of demo.
 			    .set_cursor_color(c_white)
 			    .set_wrap_enabled(true);
 
-			var _textbox_right = new WWTextBoxV3()
+			var _textbox_right = new WWTextField()
 			    .set_offset(_right_x, _right_y)
 			    .set_size(half_width, content_height)
 			    .set_background_color(text_bg)
@@ -1106,12 +1106,12 @@ End of demo.
 			"1) Base -> Advanced (whitespace, font, underline demo)",
 			_text_advanced,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
 				
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(true);
 				
 				// Font is a textbox concern, keep it here
@@ -1131,7 +1131,7 @@ End of demo.
 			"2) Base -> BBCode",
 			_text_bbcode,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
@@ -1147,7 +1147,7 @@ End of demo.
 			"3) Base -> Markdown",
 			_text_markdown,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
@@ -1164,7 +1164,7 @@ End of demo.
 			"4) Base -> CSS",
 			_text_css,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(true);
 				_textbox_instance.set_text_font(fnt_ww_consolas_msdf);
 			},
@@ -1182,7 +1182,7 @@ End of demo.
 			"5) Base -> Scribble",
 			_text_scribble,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(false);
 			},
 			function(_textbox_instance) {
@@ -1198,7 +1198,7 @@ End of demo.
 			"6) Base -> GML",
 			_text_gml,
 			function(_textbox_instance) {
-				_textbox_instance.set_renderer(WWTextRendererBase);
+				_textbox_instance.set_renderer(WWTextRenderer);
 				_textbox_instance.set_wrap_enabled(false);
 				_textbox_instance.set_text_font(fnt_ww_default_small);
 			},

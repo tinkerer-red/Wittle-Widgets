@@ -10,7 +10,7 @@ text = @''
 #endregion
 
 left_init = function(_textbox_instance) {
-	_textbox_instance.set_renderer(WWTextRendererBase);
+	_textbox_instance.set_renderer(WWTextRenderer);
 	_textbox_instance.set_wrap_enabled(false);
 };
 

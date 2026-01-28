@@ -103,16 +103,24 @@ function WWCheckbox() : WWButtonSprite() constructor {
 		#region Functions
 			
 			#region jsDoc
+			/// @func    get_value()
+			/// @desc    Returns whether the checkbox is checked. Alias of get_checked().
+			/// @self    WWCheckbox
+			/// @returns {Bool}
+			#endregion
+			static get_value = function() {
+				//the only reason this is a function is so it shows up better in feather
+				
+				return is_checked;
+			}
+			
+			#region jsDoc
 			/// @func    get_checked()
 			/// @desc    Returns if the checkbox is checked
 			/// @self    WWCheckbox
 			/// @returns {Bool}
 			#endregion
-			static get_checked = function() {
-				//the only reason this is a function is so it shows up better in feather
-				
-				return is_checked;
-			}
+			static get_checked = get_value;
 			
 			#region jsDoc
 			/// @func    get_checkbox_sprites()

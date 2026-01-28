@@ -94,9 +94,9 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 
 		#region Events
 
-			on_pre_step(method({this: self}, function(_input) {
-				with (this) __auto_step__(_input);
-			}));
+			on_pre_step(function(_input) {
+				__auto_step__(_input);
+			});
 
 		#endregion
 
@@ -112,6 +112,46 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 				set_scroll_offset(auto_orig_x_off, auto_orig_y_off);
 				auto_speed_x = auto_orig_speed_x;
 				auto_speed_y = auto_orig_speed_y;
+			};
+
+			#region jsDoc
+			/// @func    get_scroll_offsets()
+			/// @desc    Returns the current scroll offsets in pixels.
+			/// @self    WWViewScrollAuto
+			/// @returns {Struct} offset_struct_with_x_y
+			#endregion
+			static get_scroll_offsets = function() {
+				return { x: scroll_x, y: scroll_y };
+			};
+
+			#region jsDoc
+			/// @func    get_scroll_speeds()
+			/// @desc    Returns the current automatic scroll speeds in pixels per step.
+			/// @self    WWViewScrollAuto
+			/// @returns {Struct} speed_struct_with_x_y
+			#endregion
+			static get_scroll_speeds = function() {
+				return { x: auto_speed_x, y: auto_speed_y };
+			};
+
+			#region jsDoc
+			/// @func    get_scroll_looping()
+			/// @desc    Returns whether looping is enabled for each axis.
+			/// @self    WWViewScrollAuto
+			/// @returns {Struct} loop_struct_with_x_y
+			#endregion
+			static get_scroll_looping = function() {
+				return { x: auto_loop_x, y: auto_loop_y };
+			};
+
+			#region jsDoc
+			/// @func    get_scroll_pause()
+			/// @desc    Returns whether automatic scrolling is paused.
+			/// @self    WWViewScrollAuto
+			/// @returns {Bool} paused
+			#endregion
+			static get_scroll_pause = function() {
+				return auto_paused;
 			};
 
 		#endregion

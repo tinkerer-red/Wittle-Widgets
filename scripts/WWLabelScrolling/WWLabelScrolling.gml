@@ -18,7 +18,6 @@ function WWLabelScrolling() : WWViewScrollAuto() constructor {
 			/// @desc    Sets the variables for text drawing
 			/// @self    WWScrollingText
 			/// @param   {String} text : The text to write on the button
-			/// @param   {Real} text.click_yoff : How much the text should be moved when the mouse button is held down on the button
 			/// @returns {Struct.WWScrollingText}
 			#endregion
 			static set_text = function(_text="DefaultText") {
@@ -58,6 +57,7 @@ function WWLabelScrolling() : WWViewScrollAuto() constructor {
 				
 				return self;
 			}
+			static set_color = set_text_color;
 			#region jsDoc
 			/// @func    set_text_alpha()
 			/// @desc    Sets the alpha for the text.
@@ -77,6 +77,31 @@ function WWLabelScrolling() : WWViewScrollAuto() constructor {
 			
 			// Automatically set up a WWLabel canvas
 			set_canvas(new WWLabel());
+			
+		#endregion
+		
+		#region Variables
+			
+		#endregion
+		
+		#region Functions
+		
+			#region Getters
+				static get_text = function() {
+					return canvas.get_text();
+				}
+				static get_text_font = function() {
+					return canvas.get_text_font();
+				}
+				static get_text_color = function() {
+					return canvas.get_text_color();
+				}
+				static get_color = get_text_color;
+				static get_text_alpha = function() {
+					return canvas.get_text_alpha();
+				}
+			#endregion
+			
 			
 		#endregion
 		

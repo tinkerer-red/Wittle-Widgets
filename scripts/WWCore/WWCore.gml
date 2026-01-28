@@ -783,17 +783,34 @@ function WWCore() constructor {
 			/// @returns {Array<String>}
 			#endregion
 			static get_functions = function() {
-				var _statics = static_get(self)
+				static __core_static = static_get(WWCore);
 				var _arr = [];
-				var _names = variable_struct_get_names(_statics)
-				var _size = array_length(_names)
-				var _key;
-				var _i=0; repeat(_size) {
-					_key = _names[_i];
-					if (string_pos("__", _key) != 1) {
-						array_push(_arr, _key)
+				var _statics = static_get(self);
+				
+				while (true) {
+					var _names = variable_struct_get_names(_statics);
+					var _size = array_length(_names);
+					var _key;
+					
+					var _i = 0; repeat (_size) {
+						_key = _names[_i];
+						if (string_pos("__", _key) != 1) {
+							if (!array_contains(_arr, _key)) {
+								array_push(_arr, _key);
+							}
+						}
+						_i += 1;
 					}
-				_i+=1;}//end repeat loop
+					
+					// Stop once we've included WWCore's statics.
+					if (_statics == __core_static) { break; }
+					
+					// Walk to parent statics.
+					var _next = static_get(_statics);
+					if (_next == _statics) { break; } // safety
+					_statics = _next;
+				}
+				
 				return _arr;
 			}
 			#region jsDoc
@@ -803,17 +820,31 @@ function WWCore() constructor {
 			/// @returns {Array<String>}
 			#endregion
 			static get_builder_functions = function() {
-				var _statics = static_get(self)
+				static __core_static = static_get(WWCore);
 				var _arr = [];
-				var _names = variable_struct_get_names(_statics)
-				var _size = array_length(_names)
-				var _key;
-				var _i=0; repeat(_size) {
-					_key = _names[_i];
-					if (string_pos("set_", _key) = 1) {
-						array_push(_arr, _key)
+				var _statics = static_get(self);
+				
+				while (true) {
+					var _names = variable_struct_get_names(_statics);
+					var _size = array_length(_names);
+					var _key;
+					
+					var _i = 0; repeat (_size) {
+						_key = _names[_i];
+						if (string_pos("set_", _key) == 1) {
+							if (!array_contains(_arr, _key)) {
+								array_push(_arr, _key);
+							}
+						}
+						_i += 1;
 					}
-				_i+=1;}//end repeat loop
+					
+					if (_statics == __core_static) { break; }
+					var _next = static_get(_statics);
+					if (_next == _statics) { break; }
+					_statics = _next;
+				}
+				
 				return _arr;
 			}
 			#region jsDoc

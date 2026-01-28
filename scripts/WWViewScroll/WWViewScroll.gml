@@ -59,7 +59,7 @@ function WWViewScroll() : WWView() constructor {
 			static set_scroll_offset = function(_xoff=0, _yoff=0) {
 				scroll_x = _xoff;
 				scroll_y = _yoff;
-
+				
 				__clamp_scroll__();
 				__apply_scroll__();
 
@@ -98,6 +98,21 @@ function WWViewScroll() : WWView() constructor {
 				__apply_scroll__();
 
 				return self;
+			};
+
+			#region jsDoc
+			/// @func    set_scroll_max()
+			/// @desc    Convenience: sets the maximum scroll offsets by converting them into a content size.
+			///          Equivalent to set_content_size(view_width + max_x, view_height + max_y).
+			/// @self    WWViewScroll
+			/// @param   {Real} _max_x : Max horizontal scroll in pixels.
+			/// @param   {Real} _max_y : Max vertical scroll in pixels.
+			/// @returns {Struct.WWViewScroll}
+			#endregion
+			static set_scroll_max = function(_max_x=0, _max_y=0) {
+				_max_x = max(0, _max_x);
+				_max_y = max(0, _max_y);
+				return set_content_size(width + _max_x, height + _max_y);
 			};
 
 		#endregion

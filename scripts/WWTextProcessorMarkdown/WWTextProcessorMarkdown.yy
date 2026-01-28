@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWTextProcessorMarkdown",
   "parent":{
-    "name":"Renderers",
-    "path":"folders/TextBoxV3/Renderers.yy",
+    "name":"PreProcessors",
+    "path":"folders/TextBoxV3/Renderers/PreProcessors.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

@@ -144,7 +144,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#endregion
 			static set_read_only = function(_bool = false) {
 				is_read_only = _bool;
-				cursor.set_cursor_visibility(_bool);
+				cursor.set_cursor_visibility(!_bool);
 				return self;
 			}
 			
@@ -274,8 +274,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @self    GUICompTextbox
 				/// @returns {Real}
 				#endregion
-				static set_cursor_highlight_start_index = function() {
-					return cursor.set_highlight_start_index();
+				static set_cursor_highlight_start_index = function(_index) {
+					return cursor.set_highlight_start_index(_index);
 				}
 				#region jsDoc
 				/// @func    set_cursor_highlight_end_index()
@@ -283,8 +283,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @self    GUICompTextbox
 				/// @returns {Real}
 				#endregion
-				static set_cursor_highlight_end_index = function() {
-					return cursor.set_highlight_end_index();
+				static set_cursor_highlight_end_index = function(_index) {
+					return cursor.set_highlight_end_index(_index);
 				}
 				
 				//Renderer

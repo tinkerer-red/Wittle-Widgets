@@ -1,15 +1,15 @@
 #region jsDoc
-/// @func    WWTextRendererBase()
+/// @func    WWTextRenderer()
 /// @desc    Unified text renderer component. Responsible for:
 ///          - Text source (textbox buffer or caption)
 ///          - Layout build (lines + glyphs)
 ///          - Metrics + hit testing helpers
 ///          - Basic VB baking (glyphs only, default style)
 ///          Does NOT implement markup parsing or diagnostics underlines.
-/// @returns {Struct.WWTextRendererBase}
+/// @returns {Struct.WWTextRenderer}
 #endregion
-function WWTextRendererBase() : WWCore() constructor {
-    debug_name = "WWTextRendererBase";
+function WWTextRenderer() : WWCore() constructor {
+    debug_name = "WWTextRenderer";
 	
     #region Public
 
@@ -23,7 +23,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 ///         is no text in the buffer, or when the renderer is used
                 ///         for static labels.
                 /// @param  {String} _text
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_caption = function(_text) {
                     var _new_text = string(_text);
@@ -48,7 +48,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 ///
                 ///         Returning undefined disables processing for this build.
                 /// @param  {Function} _processor_fn
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_processor = function(_processor_fn) {
 					
@@ -69,7 +69,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 #region jsDoc
                 /// @func   clear_text_processor()
                 /// @desc   Clears the current text processor callback.
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static clear_text_processor = function() {
                     __text_processor__ = undefined;
@@ -85,7 +85,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_font()
                 /// @desc   Sets the font used for rendering. Also marks layout dirty.
                 /// @param  {Asset.GMFont} _font_asset
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_font = function(_font_asset) {
                     if (font == _font_asset) {
@@ -100,7 +100,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_font_fallbacks()
                 /// @desc   Sets an ordered list of fallback fonts (highest priority first).
                 /// @param  {Array<Asset.GMFont>} _font_array
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_font_fallbacks = function(_font_array) {
                     font_fallbacks = _font_array;
@@ -112,7 +112,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_text_color()
                 /// @desc   Sets the color used to render text.
                 /// @param  {Constant.Color} _color_value
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_color = function(_color_value) {
                     if (color == _color_value) {
@@ -127,7 +127,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_text_alpha()
                 /// @desc   Sets the alpha used to render text.
                 /// @param  {Real} _alpha_value
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_alpha = function(_alpha_value) {
                     if (alpha == _alpha_value) {
@@ -146,7 +146,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_wrap_enabled()
                 /// @desc   Sets if word wrapping is enabled.
                 /// @param  {Bool} _should_wrap
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_wrap_enabled = function(_should_wrap) {
                     should_wrap = _should_wrap;
@@ -158,7 +158,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_line_sep()
                 /// @desc   Sets the extra spacing between wrapped lines (in pixels).
                 /// @param  {Real} _line_sep_pixels
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_line_sep = function(_line_sep_pixels) {
                     line_sep = _line_sep_pixels;
@@ -170,7 +170,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_tab_size_spaces()
                 /// @desc   Sets how many spaces per tab stop (usually 2 or 4).
                 /// @param  {Real} _space_count
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_tab_size_spaces = function(_space_count) {
                     var _space_count_int = floor(_space_count);
@@ -189,7 +189,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func   set_tab_use_stops()
                 /// @desc   If enabled, a tab advances to the next tab stop.
                 /// @param  {Bool} _use_stops
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_tab_use_stops = function(_use_stops) {
                     if (tab_use_stops == _use_stops) {
@@ -205,7 +205,7 @@ function WWTextRendererBase() : WWCore() constructor {
                 /// @func    set_formatting_enabled()
                 /// @desc    Enable or disable per-glyph formatting on advanced renders (style/size/font overrides).
                 /// @param   {Bool} _enabled
-                /// @returns {Struct.WWTextRendererBase}
+                /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_formatting_enabled = function(_enabled) {
 
@@ -227,7 +227,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @func    set_whitespace_visible()
 	                /// @desc    Toggle visualization of spaces/tabs using marker glyphs.
 	                /// @param   {Bool} _visible
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_visible = function(_visible) {
 
@@ -248,7 +248,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @desc    Set marker characters used for space and tab.
 	                /// @param   {String} _space_marker
 	                /// @param   {String} _tab_marker
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_markers = function(_space_marker, _tab_marker) {
 
@@ -269,7 +269,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @desc    Set whitespace marker color and alpha.
 	                /// @param   {Real} _color_value
 	                /// @param   {Real} _alpha_value
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_color = function(_color_value, _alpha_value=undefined) {
 
@@ -300,7 +300,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @func    set_underline_offset()
 	                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
 	                /// @param   {Real} _offset
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_offset = function(_offset) {
 
@@ -314,7 +314,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @func    set_underline_thickness()
 	                /// @desc    Set thickness for plain underline in pixels.
 	                /// @param   {Real} _thickness
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_thickness = function(_thickness) {
 
@@ -330,7 +330,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @param   {Asset.GMSprite} _sprite_white
 	                /// @param   {Asset.GMSprite} _sprite_warning
 	                /// @param   {Asset.GMSprite} _sprite_error
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
 
@@ -350,7 +350,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @func    set_strike_offset()
 	                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
 	                /// @param   {Real} _offset
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_offset = function(_offset) {
 
@@ -364,7 +364,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @func    set_strike_thickness()
 	                /// @desc    Set thickness for plain strike-through in pixels.
 	                /// @param   {Real} _thickness
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_thickness = function(_thickness) {
 
@@ -380,7 +380,7 @@ function WWTextRendererBase() : WWCore() constructor {
 	                /// @param   {Asset.GMSprite} _sprite_white
 	                /// @param   {Asset.GMSprite} _sprite_warning
 	                /// @param   {Asset.GMSprite} _sprite_error
-	                /// @returns {Struct.WWTextRendererBase}
+	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
 
@@ -508,11 +508,183 @@ function WWTextRendererBase() : WWCore() constructor {
         #region Public API - Core queries
 
             #region jsDoc
+            /// @func   get_caption()
+            /// @returns {String}
+            #endregion
+            static get_caption = function() {
+                return caption;
+            };
+
+            #region jsDoc
+            /// @func   get_text_color()
+            /// @returns {Constant.Color}
+            #endregion
+            static get_text_color = function() {
+                return color;
+            };
+
+            #region jsDoc
+            /// @func   get_text_alpha()
+            /// @returns {Real}
+            #endregion
+            static get_text_alpha = function() {
+                return alpha;
+            };
+
+            #region jsDoc
+            /// @func   get_text_processor()
+            /// @desc   Returns the current processor function (or undefined).
+            /// @returns {Any}
+            #endregion
+            static get_text_processor = function() {
+                return __text_processor__;
+            };
+
+            #region jsDoc
             /// @func   get_font()
             /// @returns {Asset.GMFont}
             #endregion
             static get_font = function() {
                 return font;
+            };
+
+            #region jsDoc
+            /// @func   get_font_fallbacks()
+            /// @returns {Array<Asset.GMFont>}
+            #endregion
+            static get_font_fallbacks = function() {
+                return font_fallbacks;
+            };
+
+            #region jsDoc
+            /// @func   get_wrap_enabled()
+            /// @returns {Bool}
+            #endregion
+            static get_wrap_enabled = function() {
+                return should_wrap;
+            };
+
+            #region jsDoc
+            /// @func   get_line_sep()
+            /// @returns {Real}
+            #endregion
+            static get_line_sep = function() {
+                return line_sep;
+            };
+
+            #region jsDoc
+            /// @func   get_tab_size_spaces()
+            /// @returns {Real}
+            #endregion
+            static get_tab_size_spaces = function() {
+                return tab_size_spaces;
+            };
+
+            #region jsDoc
+            /// @func   get_tab_use_stops()
+            /// @returns {Bool}
+            #endregion
+            static get_tab_use_stops = function() {
+                return tab_use_stops;
+            };
+
+            #region jsDoc
+            /// @func   get_formatting_enabled()
+            /// @returns {Bool}
+            #endregion
+            static get_formatting_enabled = function() {
+                return formatting_enabled;
+            };
+
+            #region jsDoc
+            /// @func   get_whitespace_visible()
+            /// @returns {Bool}
+            #endregion
+            static get_whitespace_visible = function() {
+                return whitespace_visible;
+            };
+
+            #region jsDoc
+            /// @func   get_whitespace_markers()
+            /// @returns {Struct}
+            #endregion
+            static get_whitespace_markers = function() {
+                return {
+                    space: whitespace_marker_space,
+                    tab: whitespace_marker_tab,
+                };
+            };
+
+            #region jsDoc
+            /// @func   get_whitespace_color()
+            /// @returns {Real}
+            #endregion
+            static get_whitespace_color = function() {
+                return whitespace_color;
+            };
+
+            #region jsDoc
+            /// @func   get_whitespace_alpha()
+            /// @returns {Real}
+            #endregion
+            static get_whitespace_alpha = function() {
+                return whitespace_alpha;
+            };
+
+            #region jsDoc
+            /// @func   get_underline_offset()
+            /// @returns {Real}
+            #endregion
+            static get_underline_offset = function() {
+                return underline_y_offset;
+            };
+
+            #region jsDoc
+            /// @func   get_underline_thickness()
+            /// @returns {Real}
+            #endregion
+            static get_underline_thickness = function() {
+                return underline_thickness;
+            };
+
+            #region jsDoc
+            /// @func   get_underline_sprites()
+            /// @returns {Struct}
+            #endregion
+            static get_underline_sprites = function() {
+                return {
+                    white: underline_sprite_white,
+                    warning: underline_sprite_warning,
+                    error: underline_sprite_error,
+                };
+            };
+
+            #region jsDoc
+            /// @func   get_strike_offset()
+            /// @returns {Real}
+            #endregion
+            static get_strike_offset = function() {
+                return strike_y_offset;
+            };
+
+            #region jsDoc
+            /// @func   get_strike_thickness()
+            /// @returns {Real}
+            #endregion
+            static get_strike_thickness = function() {
+                return strike_thickness;
+            };
+
+            #region jsDoc
+            /// @func   get_strike_sprites()
+            /// @returns {Struct}
+            #endregion
+            static get_strike_sprites = function() {
+                return {
+                    white: strike_sprite_white,
+                    warning: strike_sprite_warning,
+                    error: strike_sprite_error,
+                };
             };
 
             #region jsDoc

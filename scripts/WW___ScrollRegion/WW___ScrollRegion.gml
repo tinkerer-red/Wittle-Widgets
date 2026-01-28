@@ -1,10 +1,10 @@
 #region jsDoc
-/// @func    WWScrollRegion()
+/// @func    WW___ScrollRegion()
 /// @desc    Scrollable view wrapper that owns a scroll view and its two scrollbars.
-/// @returns {Struct.WWScrollRegion}
+/// @returns {Struct.WW___ScrollRegion}
 #endregion
-function WWScrollRegion() : WWCore() constructor {
-	debug_name = "WWScrollRegion";
+function WW___ScrollRegion() : WWCore() constructor {
+	debug_name = "WW___ScrollRegion";
 
 	#region Public
 
@@ -13,9 +13,9 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_scrollbar_thickness()
 			/// @desc    Sets the thickness (pixels) of both scrollbars.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _thickness : Scrollbar thickness in pixels.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_scrollbar_thickness = function(_thickness) {
 				scrollbar_thickness = _thickness;
@@ -26,9 +26,9 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_wheel_step()
 			/// @desc    Sets the number of pixels scrolled per mouse wheel unit.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _pixels_per_wheel : Pixels per wheel unit.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_wheel_step = function(_pixels_per_wheel) {
 				wheel_step = _pixels_per_wheel;
@@ -38,10 +38,10 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_viewport_size()
 			/// @desc    Sets the visible viewport size (excludes scrollbars).
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _width : Viewport width.
 			/// @param   {Real} _height : Viewport height.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_viewport_size = function(_width, _height) {
 				viewport_width = _width;
@@ -56,9 +56,9 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_canvas()
 			/// @desc    Assigns the canvas component that will be scrolled inside the view.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Struct.WWCore} _canvas : Canvas component to scroll.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_canvas = function(_canvas) {
 				view.set_canvas(_canvas);
@@ -69,10 +69,10 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_content_size()
 			/// @desc    Sets the content size used for clamping scroll offsets.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _width : Content width.
 			/// @param   {Real} _height : Content height.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_content_size = function(_width, _height) {
 				view.set_content_size(_width, _height);
@@ -83,10 +83,10 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_scroll_offset()
 			/// @desc    Sets the scroll offset in pixels (clamped).
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _xoff : Horizontal scroll offset.
 			/// @param   {Real} _yoff : Vertical scroll offset.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_scroll_offset = function(_xoff=0, _yoff=0) {
 				view.set_scroll_offset(_xoff, _yoff);
@@ -97,10 +97,10 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    scroll_by()
 			/// @desc    Adds a delta to the current scroll offset (clamped).
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _dx : Horizontal delta.
 			/// @param   {Real} _dy : Vertical delta.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static scroll_by = function(_dx=0, _dy=0) {
 				view.scroll_by(_dx, _dy);
@@ -111,10 +111,10 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_size()
 			/// @desc    Sets the total region size (includes scrollbars).
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @param   {Real} _width : Total width.
 			/// @param   {Real} _height : Total height.
-			/// @returns {Struct.WWScrollRegion}
+			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_size = function(_width, _height) {
 				
@@ -138,7 +138,7 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_view()
 			/// @desc    Returns the internal scroll view component.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static get_view = function() {
@@ -148,7 +148,7 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_scrollbar_horz()
 			/// @desc    Returns the horizontal scrollbar component.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @returns {Struct.WWScrollBarHorz}
 			#endregion
 			static get_scrollbar_horz = function() {
@@ -158,7 +158,7 @@ function WWScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_scrollbar_vert()
 			/// @desc    Returns the vertical scrollbar component.
-			/// @self    WWScrollRegion
+			/// @self    WW___ScrollRegion
 			/// @returns {Struct.WWScrollBarVert}
 			#endregion
 			static get_scrollbar_vert = function() {
@@ -278,7 +278,9 @@ function WWScrollRegion() : WWCore() constructor {
 		scrollbar_horz = new WWScrollBarHorz();
 		scrollbar_vert = new WWScrollBarVert();
 
-		view.set_scrollbars(scrollbar_horz, scrollbar_vert);
+		view.scrollbar_horz = scrollbar_horz;
+		view.scrollbar_vert = scrollbar_vert;
+		view.set_scrollbars_enabled(true, true);
 
 		add([view, scrollbar_horz, scrollbar_vert]);
 
@@ -289,17 +291,17 @@ function WWScrollRegion() : WWCore() constructor {
 
 	#region Events
 
-		on_scroll(method({this: self}, function(_input) {
-			with (this) __on_wheel__(_input);
-		}));
+		on_scroll(function(_input) {
+			__on_wheel__(_input);
+		});
 
-		scrollbar_horz.set_callback(method({this: self}, function() {
+		scrollbar_horz.set_callback(function() {
 			with (this) __on_scrollbar_horz__();
-		}));
+		});
 
-		scrollbar_vert.set_callback(method({this: self}, function() {
+		scrollbar_vert.set_callback(function() {
 			with (this) __on_scrollbar_vert__();
-		}));
+		});
 
 	#endregion
 

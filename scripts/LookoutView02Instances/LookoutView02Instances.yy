@@ -6,7 +6,7 @@
   "name":"LookoutView02Instances",
   "parent":{
     "name":"02. Public",
-    "path":"folders/Lookout/02. Public.yy",
+    "path":"folders/_Libraries/Lookout/02. Public.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

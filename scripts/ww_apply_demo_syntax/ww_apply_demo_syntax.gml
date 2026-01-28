@@ -5,8 +5,8 @@
 ///         This:
 ///         - Applies once immediately
 ///         - Re-applies on every text change (layout rebuild recreates glyphs)
-/// @param  {Struct.WWTextBoxV3} _textbox
-/// @returns {Struct.WWTextBoxV3}
+/// @param  {Struct.WWTextField} _textbox
+/// @returns {Struct.WWTextField}
 #endregion
 function ww_apply_demo_syntax_to_textbox(_textbox) {
 
@@ -25,7 +25,7 @@ function ww_apply_demo_syntax_to_textbox(_textbox) {
 /// @func   ww_apply_demo_syntax()
 /// @desc   Reads the textbox current text, highlights via regex_hljs_gml_highlight(),
 ///         and applies formatting ranges to the renderer.
-/// @param  {Struct.WWTextBoxV3} _textbox
+/// @param  {Struct.WWTextField} _textbox
 #endregion
 function ww_apply_demo_syntax(_textbox) {
 
@@ -130,7 +130,7 @@ function ww__find_line_end_0(_text, _start_0) {
 /// @func   ww__apply_comment_underline()
 /// @desc   Applies underline enum to lines containing a specific comment tag.
 ///         Underline range is from tag start to end-of-line.
-/// @param  {Struct.WWTextBoxV3} _textbox
+/// @param  {Struct.WWTextField} _textbox
 /// @param  {String} _text
 /// @param  {String} _tag
 /// @param  {Real} _underline_enum
@@ -176,7 +176,7 @@ function ww__apply_comment_underline(_textbox, _text, _tag, _underline_enum) {
 ///         //underline  -> straight underline
 ///         //warning or //warn -> warning squiggle
 ///         //error or //err    -> error squiggle
-/// @param  {Struct.WWTextBoxV3} _textbox
+/// @param  {Struct.WWTextField} _textbox
 /// @param  {String} _text
 #endregion
 function ww__apply_demo_comment_underlines(_textbox, _text) {
@@ -265,7 +265,7 @@ function ww__is_ident_start(_char_val) {
 /// @func   ww__set_color_span_1()
 /// @desc   Applies a color range using 1-based inclusive start/end indices,
 ///         converting to 0-based [start,end) for the renderer.
-/// @param  {Struct.WWTextRendererBase} _renderer
+/// @param  {Struct.WWTextRenderer} _renderer
 /// @param  {Real} _start_1
 /// @param  {Real} _end_1_inclusive
 /// @param  {Constant.Color} _col
@@ -287,7 +287,7 @@ function ww__set_color_span_1(_renderer, _start_1, _end_1_inclusive, _col) {
 #region jsDoc
 /// @func   ww__set_color_span_0()
 /// @desc   Applies a color range using 0-based [start,end) indices.
-/// @param  {Struct.WWTextRendererBase} _renderer
+/// @param  {Struct.WWTextRenderer} _renderer
 /// @param  {Real} _start_0
 /// @param  {Real} _end_0_excl
 /// @param  {Constant.Color} _col

@@ -51,6 +51,34 @@ function WWButtonText() : WWButtonSprite() constructor {
 				return self;
 			}
 			#region jsDoc
+			/// @func    set_text_alpha()
+			/// @desc    Sets the label text alpha.
+			/// @self    WWButtonText
+			/// @param   {Real} alpha : Alpha value.
+			/// @returns {Struct.WWButtonText}
+			#endregion
+			static set_text_alpha = function(_alpha=1) {
+				text_component.set_text_alpha(_alpha);
+				return self;
+			}
+			#region jsDoc
+			/// @func    set_text_processor()
+			/// @desc    Sets the label text processor (bbcode/markdown/css/etc).
+			/// @self    WWButtonText
+			/// @param   {Any} proc_or_name : Processor function or name.
+			/// @returns {Struct.WWButtonText}
+			#endregion
+			static set_text_processor = function(_proc_or_name) {
+				text_component.set_text_processor(_proc_or_name);
+				if (!__size_set__) {
+					set_sprite_to_auto_wrap();
+				}
+				return self;
+			}
+			// Child wrapper parity: WWLabel exposes set_color as an alias.
+			static set_color = set_text_color;
+			
+			#region jsDoc
 			/// @func    set_sprite_to_auto_wrap()
 			/// @desc    Auto-sizes the button to fit the label using the current nine-slice margins.
 			/// @self    WWButtonText
@@ -131,6 +159,26 @@ function WWButtonText() : WWButtonSprite() constructor {
 		#region Functions
 			
 			#region jsDoc
+			/// @func    get_sprite_to_auto_wrap()
+			/// @desc    Returns the auto-wrap sizing info the button would use for the current sprite + label.
+			/// @self    WWButtonText
+			/// @returns {Struct} info_struct_with_width_height_and_slice
+			#endregion
+			static get_sprite_to_auto_wrap = function() {
+				var _slice = sprite_get_nineslice(sprite_index);
+				var _width  = text_component.width  + (_slice.left + _slice.right);
+				var _height = text_component.height + (_slice.top  + _slice.bottom);
+				return {
+					width: _width,
+					height: _height,
+					left: _slice.left,
+					top: _slice.top,
+					right: _slice.right,
+					bottom: _slice.bottom,
+				};
+			};
+			
+			#region jsDoc
 			/// @func    get_text()
 			/// @desc    Returns the current label text.
 			/// @self    WWButtonText
@@ -156,6 +204,28 @@ function WWButtonText() : WWButtonSprite() constructor {
 			#endregion
 			static get_text_color = function() {
 				return text_component.get_text_color();
+			};
+			// Child wrapper parity: WWLabel exposes set_color as an alias.
+			static get_color = get_text_color;
+			
+			#region jsDoc
+			/// @func    get_text_alpha()
+			/// @desc    Returns the current label alpha.
+			/// @self    WWButtonText
+			/// @returns {Real} alpha_value
+			#endregion
+			static get_text_alpha = function() {
+				return text_component.get_text_alpha();
+			};
+			
+			#region jsDoc
+			/// @func    get_text_processor()
+			/// @desc    Returns the last processor value set via set_text_processor().
+			/// @self    WWButtonText
+			/// @returns {Any} proc_or_name
+			#endregion
+			static get_text_processor = function() {
+				return text_component.get_text_processor();
 			};
 			#region jsDoc
 			/// @func    get_text_offsets()

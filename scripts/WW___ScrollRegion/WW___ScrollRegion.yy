@@ -1,12 +1,12 @@
 {
   "$GMScript":"v1",
-  "%Name":"WWTextRendererBase",
+  "%Name":"WW___ScrollRegion",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"WWTextRendererBase",
+  "name":"WW___ScrollRegion",
   "parent":{
-    "name":"Renderers",
-    "path":"folders/TextBoxV3/Renderers.yy",
+    "name":"__Deprecated",
+    "path":"folders/__Deprecated.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

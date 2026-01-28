@@ -6,7 +6,7 @@
   "name":"__LookoutUtility",
   "parent":{
     "name":"03. Private",
-    "path":"folders/Lookout/03. Private.yy",
+    "path":"folders/_Libraries/Lookout/03. Private.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

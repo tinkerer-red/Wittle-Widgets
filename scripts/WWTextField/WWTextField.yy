@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"WWTextField",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"WWTextField",
+  "parent":{
+    "name":"TextBoxV3",
+    "path":"folders/TextBoxV3.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

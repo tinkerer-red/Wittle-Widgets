@@ -87,7 +87,7 @@ function WWTextBuffer() : WWCore() constructor {
 				#region jsDoc
 				/// @func	get_size()
 				/// @desc	Get the number of characters stored in the buffer.
-				///		  (Used by select_all in WWTextBoxV3.)
+				///		  (Used by select_all in WWTextField.)
 				/// @returns {Real}
 				#endregion
 				static get_size = function() {

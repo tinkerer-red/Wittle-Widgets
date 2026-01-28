@@ -237,28 +237,73 @@ __build_mirror_pair__ = function(
         .set_background_color(_frame_color);
     _root.add(_right_frame);
 
-    // Left textbox (inset inside frame)
-    var _left_box = new WWTextBoxV3()
+    // Each textbox gets its own scroll region
+    var _viewport_w = _box_w - (_frame * 2);
+    var _viewport_h = _box_h - (_frame * 2);
+
+    // Left scroll region + textbox
+    var _left_canvas = new WWCore().set_offset(0, 0);
+    var _left_sb_v = new WWScrollbarVert();
+    var _left_region = new WWViewScrollRegion()
         .set_offset(_base_x + _frame, _base_y + _frame)
-        .set_size(_box_w - (_frame * 2), _box_h - (_frame * 2))
+        .set_size(_viewport_w, _viewport_h)
+        .set_region_mode(true)
+        .set_scrollbars_enabled(false, true)
+        .set_scrollbars_auto_hide(true, true)
+        .set_scrollbar_thickness(12)
+        .set_wheel_step(32)
+        .set_smooth_scrolling(true)
+        .set_canvas(_left_canvas);
+
+    _left_region.scrollbar_vert = _left_sb_v;
+    _left_region.set_smooth_scrolling(true);
+    _left_region.set_scrollbars_enabled(false, true);
+    _root.add(_left_sb_v);
+    _root.add(_left_region);
+
+    var _left_box = new WWTextField()
+        .set_offset(0, 0)
+        .set_size(_viewport_w, _viewport_h)
         .set_background_color(_textbox_bg)
         .set_text(_text_value)
         .set_text_color(c_white)
         .set_highlight_color(#78848A)
         .set_cursor_color(c_white)
-        .set_wrap_enabled(true);
+        .set_wrap_enabled(true)
+        .set_read_only(false);
+    _left_canvas.add(_left_box);
 
-    // Right textbox (inset inside frame)
-    var _right_box = new WWTextBoxV3()
+    // Right scroll region + textbox (preview)
+    var _right_canvas = new WWCore().set_offset(0, 0);
+    var _right_sb_v = new WWScrollbarVert();
+    var _right_region = new WWViewScrollRegion()
         .set_offset((_base_x + _box_w + _gap_x) + _frame, _base_y + _frame)
-        .set_size(_box_w - (_frame * 2), _box_h - (_frame * 2))
+        .set_size(_viewport_w, _viewport_h)
+        .set_region_mode(true)
+        .set_scrollbars_enabled(false, true)
+        .set_scrollbars_auto_hide(true, true)
+        .set_scrollbar_thickness(12)
+        .set_wheel_step(32)
+        .set_smooth_scrolling(true)
+        .set_canvas(_right_canvas);
+
+    _right_region.scrollbar_vert = _right_sb_v;
+    _right_region.set_smooth_scrolling(true);
+    _right_region.set_scrollbars_enabled(false, true);
+    _root.add(_right_sb_v);
+    _root.add(_right_region);
+
+    var _right_box = new WWTextField()
+        .set_offset(0, 0)
+        .set_size(_viewport_w, _viewport_h)
         .set_background_color(_textbox_bg)
         .set_text(_text_value)
         .set_text_color(c_white)
         .set_highlight_color(_preview_highlight)
         .set_cursor_color(_preview_cursor)
         .set_wrap_enabled(true)
-		.set_read_only(true);
+        .set_read_only(true);
+    _right_canvas.add(_right_box);
     
     // Init hooks
     if (is_callable(_left_init_fn)) {
@@ -268,13 +313,32 @@ __build_mirror_pair__ = function(
         _right_init_fn(_right_box);
     }
 
-    // Left drives right
-    _left_box.on_change(method({ left_ref: _left_box, right_ref: _right_box }, function() {
-        right_ref.set_text(left_ref.get_text());
-    }));
+    var __fit_scroll__ = method({
+        left_ref: _left_box,
+        right_ref: _right_box,
+        left_region: _left_region,
+        right_region: _right_region,
+        vw: _viewport_w,
+        vh: _viewport_h
+    }, function() {
+        var _lh = left_ref.get_content_height();
+        if (_lh < vh) { _lh = vh; }
+        left_ref.set_size(vw, _lh);
+        left_region.set_canvas_size_from_children();
 
-    _root.add(_left_box);
-    _root.add(_right_box);
+        var _rh = right_ref.get_content_height();
+        if (_rh < vh) { _rh = vh; }
+        right_ref.set_size(vw, _rh);
+        right_region.set_canvas_size_from_children();
+    });
+
+    __fit_scroll__();
+
+    // Left drives right and keeps scroll ranges up-to-date
+    _left_box.on_change(method({ left_ref: _left_box, right_ref: _right_box, fit_ref: __fit_scroll__ }, function() {
+        right_ref.set_text(left_ref.get_text());
+        fit_ref();
+    }));
 
     return {
         text_left: _left_box,

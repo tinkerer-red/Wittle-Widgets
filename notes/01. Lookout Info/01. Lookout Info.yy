@@ -4,7 +4,7 @@
   "name":"01. Lookout Info",
   "parent":{
     "name":"Lookout",
-    "path":"folders/Lookout.yy",
+    "path":"folders/_Libraries/Lookout.yy",
   },
   "resourceType":"GMNotes",
   "resourceVersion":"2.0",

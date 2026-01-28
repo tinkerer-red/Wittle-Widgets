@@ -1455,8 +1455,8 @@ function WWCore() constructor {
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0; //long press timer
-			__last_click_time__  = 0; //timer to measure the previous click time for double and triple clicks
-			__last_click_was_double__ = false; //used to differenciate between double and triple clicks
+			__last_click_time_single__ = 0; //timer to measure the distance from a single click to a double
+			__last_click_time_double__ = 0; //timer to measure the distance from a double click to a triple
 			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
 			__is_focused__ = false; // is currently the component capturing the input, and accepting keyboard inputs
 			__is_hovered__ = false; // is currently consuming the input through depth order (the mouse projected down onto this component, instead of others)
@@ -1529,31 +1529,20 @@ function WWCore() constructor {
 				
 			})
 			on_pressed(function(){
-				var _double_trigger = false;
-				if (current_time - __last_click_time__ < 1_000/3) {
-					_double_trigger = true;
-				}
-				
 				set_interact(true);
-				__last_click_time__ = current_time;
-				__click_held_timer__ = current_time;
 				
-				//tripple click
-				if (__last_click_was_double__) {
-					__last_click_was_double__ = false;
+				if (current_time - __last_click_time_double__ < 1_000/3) {
 					trigger_event(self.events.triple_click);
 					return;
 				}
 				
-				//double click
-				if (_double_trigger) {
-					__last_click_was_double__ = true
+				if (current_time - __last_click_time_single__ < 1_000/3) {
+					__last_click_time_double__ = current_time;
 					trigger_event(self.events.double_click);
 					return;
 				}
 				
-				//reset
-				__last_click_was_double__ = false;
+				__last_click_time_single__ = current_time;
 			})
 			on_interact_enter(function(){
 				if (!__is_enabled__ || !__is_focusable__) {

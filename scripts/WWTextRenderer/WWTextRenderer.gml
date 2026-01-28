@@ -421,6 +421,7 @@ function WWTextRenderer() : WWCore() constructor {
 
             on_post_draw(function(_input) {
                 __draw_text_vb__(x, y, 0, undefined);
+				__draw_carets__();
             });
 			
 		#endregion
@@ -4423,68 +4424,122 @@ function WWTextRenderer() : WWCore() constructor {
                 if (is_undefined(__textbox_parent__)) {
                     return;
                 }
+				if (!is_struct(__textbox_parent__)) {
+					return;
+				}
 
-                var _cursor = __textbox_parent__.cursor;
-                if (is_undefined(_cursor)) {
-                    return;
-                }
-
-                if (!_cursor.get_highlight_active()) {
-                    return;
-                }
-
-                var _start_index = _cursor.get_highlight_start_index();
-                var _end_index = _cursor.get_highlight_end_index();
-
-                if (_start_index == _end_index) {
-                    return;
-                }
+                var _cursors = __textbox_parent__.__cursors__;
+                if (is_undefined(_cursors) || array_length(_cursors) <= 0) return;
 
                 __ensure_layout__();
-
-                var _sel_start = min(_start_index, _end_index);
-                var _sel_end = max(_start_index, _end_index);
-
-                var _start_line = get_line_from_index(_sel_start);
-                var _end_line = get_line_from_index(_sel_end);
 
                 var _pre_color = draw_get_color();
                 var _pre_alpha = draw_get_alpha();
 
-                draw_set_color(_cursor.highlight_color);
+                var _hl = __textbox_parent__.__highlight_color__;
+                if (is_undefined(_hl)) _hl = c_aqua;
+
+                draw_set_color(_hl);
                 draw_set_alpha(1);
 
-                var _line_index = _start_line;
-                repeat ((_end_line - _start_line) + 1) {
+                var _ci = 0;
+                var _cn = array_length(_cursors);
+                repeat (_cn) {
+                    var _c = _cursors[_ci];
+                    if (!is_undefined(_c) && _c.highlight_active) {
+                        var _start_index = _c.highlight_start_index;
+                        var _end_index = _c.highlight_end_index;
+                        if (_start_index != _end_index) {
+                            var _sel_start = min(_start_index, _end_index);
+                            var _sel_end = max(_start_index, _end_index);
+                            var _start_line = get_line_from_index(_sel_start);
+                            var _end_line = get_line_from_index(_sel_end);
+                            var _line_index = _start_line;
+                            repeat ((_end_line - _start_line) + 1) {
+                                var _line_y = get_line_y_offset(_line_index);
+                                var _line_h = get_line_height(_line_index) - 1;
+                                if (_line_h < 1) { _line_h = 1; }
 
-                    var _line_y = get_line_y_offset(_line_index);
-                    var _line_h = get_line_height(_line_index) - 1;
-                    if (_line_h < 1) { _line_h = 1; }
+                                var _line_w = get_line_width(_line_index);
+                                if (_line_w < 0) { _line_w = 0; }
 
-                    var _line_w = get_line_width(_line_index);
-                    if (_line_w < 0) { _line_w = 0; }
+                                var _range_start = 0;
+                                var _range_end = _line_w;
 
-                    var _range_start = 0;
-                    var _range_end = _line_w;
+                                if (_line_index == _start_line) {
+                                    _range_start = get_x_from_index(_sel_start);
+                                }
+                                if (_line_index == _end_line) {
+                                    _range_end = get_x_from_index(_sel_end);
+                                }
 
-                    if (_line_index == _start_line) {
-                        _range_start = get_x_from_index(_sel_start);
+                                var _draw_w = _range_end - _range_start;
+                                if (_draw_w < 0) { _draw_w = 0; }
+                                if (_draw_w > 0) {
+                                    draw_sprite_stretched_ext(spr_ww_pixel, 0, x + _range_start, y + _line_y, _draw_w, _line_h, draw_get_color(), 1);
+                                }
+                                _line_index += 1;
+                            }
+                        }
                     }
-
-                    if (_line_index == _end_line) {
-                        _range_end = get_x_from_index(_sel_end);
-                    }
-
-                    var _draw_w = _range_end - _range_start;
-                    if (_draw_w < 0) { _draw_w = 0; }
-
-                    if (_draw_w > 0) {
-                        draw_sprite_stretched_ext(spr_ww_pixel, 0, x + _range_start, y + _line_y, _draw_w, _line_h, draw_get_color(), 1);
-                    }
-
-                    _line_index += 1;
+                    _ci += 1;
                 }
 
+                draw_set_alpha(_pre_alpha);
+                draw_set_color(_pre_color);
+            };
+
+            static __draw_carets__ = function() {
+                if (is_undefined(__textbox_parent__)) return;
+                if (!is_struct(__textbox_parent__)) return;
+                var _cursors = __textbox_parent__.__cursors__;
+                if (is_undefined(_cursors) || array_length(_cursors) <= 0) return;
+                if (!__textbox_parent__.__cursor_visible__) return;
+				
+                var _period_ms = __textbox_parent__.__cursor_blink_period_ms__;
+                var _show_ms = __textbox_parent__.__cursor_blink_show_ms__;
+                var _start_ms = __textbox_parent__.__cursor_blink_start_ms__;
+                if (is_undefined(_period_ms) || _period_ms <= 0) {
+                    // Always visible when period is invalid.
+                }
+                else if (is_undefined(_show_ms) || _show_ms <= 0) {
+                    return;
+                }
+                else if (_show_ms >= _period_ms) {
+                    // Always visible when show window covers period.
+                }
+                else {
+                    if (is_undefined(_start_ms)) _start_ms = 0;
+                    var _t = current_time - _start_ms;
+                    if (_t < 0) _t = 0;
+                    if ((_t mod _period_ms) >= _show_ms) return;
+                }
+				
+                __ensure_layout__();
+				
+                var _pre_color = draw_get_color();
+                var _pre_alpha = draw_get_alpha();
+                var _cc = __textbox_parent__.__cursor_color__;
+                if (is_undefined(_cc)) _cc = c_white;
+                draw_set_color(_cc);
+                draw_set_alpha(1);
+				
+                var _ci = 0;
+                var _cn = array_length(_cursors);
+                repeat (_cn) {
+                    var _c = _cursors[_ci];
+                    if (!is_undefined(_c)) {
+                        var _idx = _c.index;
+                        var _line = get_line_from_index(_idx);
+                        var _cx = get_x_from_index(_idx);
+                        var _cy = get_line_y_offset(_line);
+                        var _h = get_line_height(_line);
+                        if (_h < 1) _h = 1;
+                        draw_sprite_stretched_ext(spr_ww_pixel, 0, x + _cx, y + _cy, 1, _h, draw_get_color(), 1);
+                    }
+                    _ci += 1;
+                }
+				
                 draw_set_alpha(_pre_alpha);
                 draw_set_color(_pre_color);
             };

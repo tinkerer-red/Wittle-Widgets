@@ -22,7 +22,7 @@ function WWTextRenderer() : WWCore() constructor {
                 /// @desc   Sets the caption or placeholder string. Used when there
                 ///         is no text in the buffer, or when the renderer is used
                 ///         for static labels.
-                /// @param  {String} _text
+                /// @param  {String} text
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_caption = function(_text) {
@@ -47,7 +47,7 @@ function WWTextRenderer() : WWCore() constructor {
                 ///         - String (text only, spans will be defaulted)
                 ///
                 ///         Returning undefined disables processing for this build.
-                /// @param  {Function} _processor_fn
+                /// @param  {Function} processor_fn
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_processor = function(_processor_fn) {
@@ -84,7 +84,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_font()
                 /// @desc   Sets the font used for rendering. Also marks layout dirty.
-                /// @param  {Asset.GMFont} _font_asset
+                /// @param  {Asset.GMFont} font_asset
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_font = function(_font_asset) {
@@ -99,7 +99,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_font_fallbacks()
                 /// @desc   Sets an ordered list of fallback fonts (highest priority first).
-                /// @param  {Array<Asset.GMFont>} _font_array
+                /// @param  {Array<Asset.GMFont>} font_array
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_font_fallbacks = function(_font_array) {
@@ -111,7 +111,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_text_color()
                 /// @desc   Sets the color used to render text.
-                /// @param  {Constant.Color} _color_value
+                /// @param  {Constant.Color} color_value
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_color = function(_color_value) {
@@ -126,7 +126,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_text_alpha()
                 /// @desc   Sets the alpha used to render text.
-                /// @param  {Real} _alpha_value
+                /// @param  {Real} alpha_value
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_text_alpha = function(_alpha_value) {
@@ -145,7 +145,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_wrap_enabled()
                 /// @desc   Sets if word wrapping is enabled.
-                /// @param  {Bool} _should_wrap
+                /// @param  {Bool} should_wrap
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_wrap_enabled = function(_should_wrap) {
@@ -157,7 +157,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_line_sep()
                 /// @desc   Sets the extra spacing between wrapped lines (in pixels).
-                /// @param  {Real} _line_sep_pixels
+                /// @param  {Real} line_sep_pixels
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_line_sep = function(_line_sep_pixels) {
@@ -169,7 +169,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_tab_size_spaces()
                 /// @desc   Sets how many spaces per tab stop (usually 2 or 4).
-                /// @param  {Real} _space_count
+                /// @param  {Real} space_count
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_tab_size_spaces = function(_space_count) {
@@ -188,7 +188,7 @@ function WWTextRenderer() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_tab_use_stops()
                 /// @desc   If enabled, a tab advances to the next tab stop.
-                /// @param  {Bool} _use_stops
+                /// @param  {Bool} use_stops
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_tab_use_stops = function(_use_stops) {
@@ -204,7 +204,7 @@ function WWTextRenderer() : WWCore() constructor {
 				#region jsDoc
                 /// @func    set_formatting_enabled()
                 /// @desc    Enable or disable per-glyph formatting on advanced renders (style/size/font overrides).
-                /// @param   {Bool} _enabled
+                /// @param   {Bool} enabled
                 /// @returns {Struct.WWTextRenderer}
                 #endregion
                 static set_formatting_enabled = function(_enabled) {
@@ -226,7 +226,7 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_whitespace_visible()
 	                /// @desc    Toggle visualization of spaces/tabs using marker glyphs.
-	                /// @param   {Bool} _visible
+                    /// @param   {Bool} visible
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_visible = function(_visible) {
@@ -246,8 +246,8 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_whitespace_markers()
 	                /// @desc    Set marker characters used for space and tab.
-	                /// @param   {String} _space_marker
-	                /// @param   {String} _tab_marker
+                    /// @param   {String} space_marker
+                    /// @param   {String} tab_marker
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_markers = function(_space_marker, _tab_marker) {
@@ -267,8 +267,8 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_whitespace_color()
 	                /// @desc    Set whitespace marker color and alpha.
-	                /// @param   {Real} _color_value
-	                /// @param   {Real} _alpha_value
+                    /// @param   {Constant.Color} color_value
+                    /// @param   {Real} alpha_value
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_whitespace_color = function(_color_value, _alpha_value=undefined) {
@@ -283,7 +283,13 @@ function WWTextRenderer() : WWCore() constructor {
 	                    return self;
 	                }
 
-		            static set_whitespace_alpha = function(_alpha_value) {
+                    #region jsDoc
+                    /// @func    set_whitespace_alpha()
+                    /// @desc    Sets the alpha used for whitespace marker glyphs.
+                    /// @param   {Real} alpha_value
+                    /// @returns {Struct.WWTextRenderer}
+                    #endregion
+					static set_whitespace_alpha = function(_alpha_value) {
 		                if (whitespace_alpha == _alpha_value) {
 		                    return self;
 		                }
@@ -299,7 +305,7 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_underline_offset()
 	                /// @desc    Adjust underline Y offset in pixels (added after glyph height).
-	                /// @param   {Real} _offset
+                    /// @param   {Real} offset
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_offset = function(_offset) {
@@ -313,7 +319,7 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_underline_thickness()
 	                /// @desc    Set thickness for plain underline in pixels.
-	                /// @param   {Real} _thickness
+                    /// @param   {Real} thickness
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_thickness = function(_thickness) {
@@ -327,9 +333,9 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_underline_sprites()
 	                /// @desc    Set sprites used for underline styles.
-	                /// @param   {Asset.GMSprite} _sprite_white
-	                /// @param   {Asset.GMSprite} _sprite_warning
-	                /// @param   {Asset.GMSprite} _sprite_error
+                    /// @param   {Asset.GMSprite} sprite_white
+                    /// @param   {Asset.GMSprite} sprite_warning
+                    /// @param   {Asset.GMSprite} sprite_error
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_underline_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
@@ -349,7 +355,7 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_strike_offset()
 	                /// @desc    Adjust strike-through Y offset in pixels (added around midline).
-	                /// @param   {Real} _offset
+                    /// @param   {Real} offset
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_offset = function(_offset) {
@@ -363,7 +369,7 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_strike_thickness()
 	                /// @desc    Set thickness for plain strike-through in pixels.
-	                /// @param   {Real} _thickness
+                    /// @param   {Real} thickness
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_thickness = function(_thickness) {
@@ -377,9 +383,9 @@ function WWTextRenderer() : WWCore() constructor {
 	                #region jsDoc
 	                /// @func    set_strike_sprites()
 	                /// @desc    Set sprites used for strike-through styles.
-	                /// @param   {Asset.GMSprite} _sprite_white
-	                /// @param   {Asset.GMSprite} _sprite_warning
-	                /// @param   {Asset.GMSprite} _sprite_error
+                    /// @param   {Asset.GMSprite} sprite_white
+                    /// @param   {Asset.GMSprite} sprite_warning
+                    /// @param   {Asset.GMSprite} sprite_error
 	                /// @returns {Struct.WWTextRenderer}
 	                #endregion
 	                static set_strike_sprites = function(_sprite_white, _sprite_warning, _sprite_error) {
@@ -401,6 +407,13 @@ function WWTextRenderer() : WWCore() constructor {
         #region Events
 
             events.change = variable_get_hash("change");
+
+            #region jsDoc
+            /// @func    on_change()
+            /// @desc    Adds a listener for the renderer's change event.
+            /// @param   {Function} func
+            /// @returns {Struct.WWTextRenderer}
+            #endregion
             static on_change = function(_func) {
                 add_event_listener(events.change, _func);
                 return self;
@@ -710,7 +723,7 @@ function WWTextRenderer() : WWCore() constructor {
 
                 #region jsDoc
                 /// @func   get_x_from_index()
-                /// @param  {Real} _index
+                /// @param  {Real} index
                 /// @returns {Real}
                 #endregion
                 static get_x_from_index = function(_index) {
@@ -756,7 +769,7 @@ function WWTextRenderer() : WWCore() constructor {
 				
                 #region jsDoc
                 /// @func   get_y_from_index()
-                /// @param  {Real} _index
+                /// @param  {Real} index
                 /// @returns {Real}
                 #endregion
                 static get_y_from_index = function(_index) {
@@ -774,8 +787,8 @@ function WWTextRenderer() : WWCore() constructor {
 
                 #region jsDoc
                 /// @func   get_index_from_xy()
-                /// @param  {Real} _x
-                /// @param  {Real} _y
+                /// @param  {Real} x
+                /// @param  {Real} y
                 /// @returns {Real}
                 #endregion
                 static get_index_from_xy = function(_x, _y) {
@@ -860,7 +873,7 @@ function WWTextRenderer() : WWCore() constructor {
 
                 #region jsDoc
                 /// @func   get_line_from_index()
-                /// @param  {Real} _index
+                /// @param  {Real} index
                 /// @returns {Real}
                 #endregion
                 static get_line_from_index = function(_index) {
@@ -897,7 +910,7 @@ function WWTextRenderer() : WWCore() constructor {
 
                 #region jsDoc
                 /// @func   get_col_from_index()
-                /// @param  {Real} _index
+                /// @param  {Real} index
                 /// @returns {Real}
                 #endregion
                 static get_col_from_index = function(_index) {
@@ -919,8 +932,8 @@ function WWTextRenderer() : WWCore() constructor {
 
                 #region jsDoc
                 /// @func   get_index_from_line_col()
-                /// @param  {Real} _line
-                /// @param  {Real} _col
+                /// @param  {Real} line
+                /// @param  {Real} col
                 /// @returns {Real}
                 #endregion
                 static get_index_from_line_col = function(_line, _col) {
@@ -954,11 +967,22 @@ function WWTextRenderer() : WWCore() constructor {
 
             #region Line getters
 
+                #region jsDoc
+                /// @func   get_line_count()
+                /// @desc   Returns the number of laid-out (wrapped) lines.
+                /// @returns {Real}
+                #endregion
                 static get_line_count = function() {
                     __ensure_layout__();
                     return __layout_lines_count__;
                 };
 
+                #region jsDoc
+                /// @func   get_line()
+                /// @desc   Returns a line descriptor struct for a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Struct}
+                #endregion
                 static get_line = function(_line_index) {
                     __ensure_layout__();
 
@@ -981,6 +1005,12 @@ function WWTextRenderer() : WWCore() constructor {
                     };
                 };
 
+                #region jsDoc
+                /// @func   get_line_text()
+                /// @desc   Returns the cached line text for a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {String}
+                #endregion
                 static get_line_text = function(_line_index) {
                     __ensure_layout__();
 
@@ -992,6 +1022,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.Text];
                 };
 
+                #region jsDoc
+                /// @func   get_line_index_start()
+                /// @desc   Returns the start character index for a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
                 static get_line_index_start = function(_line_index) {
                     __ensure_layout__();
 
@@ -1003,6 +1039,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.Start_Index];
                 };
 
+                #region jsDoc
+                /// @func   get_line_index_end()
+                /// @desc   Returns the end character index for a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
                 static get_line_index_end = function(_line_index) {
                     __ensure_layout__();
 
@@ -1014,6 +1056,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.End_Index];
                 };
 
+                #region jsDoc
+                /// @func   get_line_width()
+                /// @desc   Returns the pixel width of a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
                 static get_line_width = function(_line_index) {
                     __ensure_layout__();
 
@@ -1025,6 +1073,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.Width];
                 };
 
+                #region jsDoc
+                /// @func   get_line_height()
+                /// @desc   Returns the pixel height of a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
                 static get_line_height = function(_line_index) {
                     __ensure_layout__();
 
@@ -1036,6 +1090,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.Height];
                 };
 
+                #region jsDoc
+                /// @func   get_line_y_offset()
+                /// @desc   Returns the y offset (in pixels) for a laid-out line.
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
                 static get_line_y_offset = function(_line_index) {
                     __ensure_layout__();
 
@@ -1047,6 +1107,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_lines__[_index + __WW_Layout_Line.Y_Offset];
                 };
 
+                #region jsDoc
+                /// @func   get_line_forced_wrapped()
+                /// @desc   Returns true if the line ended due to forced wrapping.
+                /// @param  {Real} line_index
+                /// @returns {Bool}
+                #endregion
                 static get_line_forced_wrapped = function(_line_index) {
                     __ensure_layout__();
 
@@ -1062,11 +1128,22 @@ function WWTextRenderer() : WWCore() constructor {
 
             #region Glyph getters
 
+                #region jsDoc
+                /// @func   get_glyph_count()
+                /// @desc   Returns the number of laid-out glyphs.
+                /// @returns {Real}
+                #endregion
                 static get_glyph_count = function() {
                     __ensure_layout__();
                     return __layout_glyphs_count__;
                 };
 
+                #region jsDoc
+                /// @func   get_glyph()
+                /// @desc   Returns a glyph descriptor struct for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Struct|Undefined}
+                #endregion
                 static get_glyph = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1088,6 +1165,12 @@ function WWTextRenderer() : WWCore() constructor {
                     };
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_char()
+                /// @desc   Returns the character for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {String|Undefined}
+                #endregion
                 static get_glyph_char = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1099,6 +1182,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_glyphs__[_index + __WW_Layout_Glyph.Char];
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_index()
+                /// @desc   Returns the source text index for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Real|Undefined}
+                #endregion
                 static get_glyph_index = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1110,6 +1199,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_glyphs__[_index + __WW_Layout_Glyph.Index];
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_x()
+                /// @desc   Returns the x position (in pixels) for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Real}
+                #endregion
                 static get_glyph_x = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1121,6 +1216,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_glyphs__[_index + __WW_Layout_Glyph.X];
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_y()
+                /// @desc   Returns the y position (in pixels) for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Real}
+                #endregion
                 static get_glyph_y = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1132,6 +1233,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_glyphs__[_index + __WW_Layout_Glyph.Y];
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_width()
+                /// @desc   Returns the width (in pixels) for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Real|Undefined}
+                #endregion
                 static get_glyph_width = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1143,6 +1250,12 @@ function WWTextRenderer() : WWCore() constructor {
                     return __layout_glyphs__[_index + __WW_Layout_Glyph.Width];
                 };
 
+                #region jsDoc
+                /// @func   get_glyph_height()
+                /// @desc   Returns the height (in pixels) for a laid-out glyph.
+                /// @param  {Real} glyph_index
+                /// @returns {Real|Undefined}
+                #endregion
                 static get_glyph_height = function(_glyph_index) {
                     __ensure_layout__();
 
@@ -1229,11 +1342,21 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Dirty flags
 
+            #region jsDoc
+            /// @func   __mark_dirty__()
+            /// @ignore
+            /// @desc   Marks the renderer layout as dirty and also marks the VB cache dirty.
+            #endregion
             static __mark_dirty__ = function() {
                 __is_dirty__ = true;
                 __mark_vb_dirty__();
             };
 
+            #region jsDoc
+            /// @func   __mark_vb_dirty__()
+            /// @ignore
+            /// @desc   Marks the VB cache as dirty and resets progressive chunk-build state.
+            #endregion
             static __mark_vb_dirty__ = function() {
                 __vb_is_dirty__ = true;
                 __vb_needs_full_rebuild__ = true;
@@ -1253,6 +1376,12 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region VB batch helpers
 
+            #region jsDoc
+            /// @func   __vb_queue_chunk_unique__()
+            /// @ignore
+            /// @desc   Queues a chunk id for VB building (normal priority) if not already queued/built.
+            /// @param  {Real} chunk_id
+            #endregion
             static __vb_queue_chunk_unique__ = function(_chunk_id) {
                 if (is_undefined(_chunk_id) || _chunk_id < 0) {
                     return;
@@ -1281,6 +1410,12 @@ function WWTextRenderer() : WWCore() constructor {
                 array_push(__vb_pending_chunks__, _chunk_id);
             };
 
+            #region jsDoc
+            /// @func   __vb_queue_chunk_unique_front__()
+            /// @ignore
+            /// @desc   Queues a chunk id for VB building with high priority.
+            /// @param  {Real} chunk_id
+            #endregion
             static __vb_queue_chunk_unique_front__ = function(_chunk_id) {
                 if (is_undefined(_chunk_id) || _chunk_id < 0) {
                     return;
@@ -1301,6 +1436,12 @@ function WWTextRenderer() : WWCore() constructor {
                 array_push(__vb_pending_front__, _chunk_id);
             };
 
+            #region jsDoc
+            /// @func   __vb_pop_next_pending_chunk__()
+            /// @ignore
+            /// @desc   Pops the next pending chunk id (prefers high priority, respects keep range).
+            /// @returns {Real} chunk_id
+            #endregion
             static __vb_pop_next_pending_chunk__ = function() {
 
                 if (__vb_chunk_count__ <= 0) {
@@ -1345,6 +1486,12 @@ function WWTextRenderer() : WWCore() constructor {
                 return -1;
             };
 
+            #region jsDoc
+            /// @func   __vb_pick_unbuilt_visible_chunk__()
+            /// @ignore
+            /// @desc   Picks an unbuilt chunk id within the current visible chunk window.
+            /// @returns {Real} chunk_id
+            #endregion
             static __vb_pick_unbuilt_visible_chunk__ = function() {
 
                 if (__vb_chunk_count__ <= 0) {
@@ -1373,6 +1520,12 @@ function WWTextRenderer() : WWCore() constructor {
                 return -1;
             };
 
+            #region jsDoc
+            /// @func   __vb_queue_visible_chunk_now__()
+            /// @ignore
+            /// @desc   Picks a visible unbuilt chunk and queues it at high priority.
+            /// @returns {Real} chunk_id
+            #endregion
             static __vb_queue_visible_chunk_now__ = function() {
                 var _picked = __vb_pick_unbuilt_visible_chunk__();
                 if (_picked >= 0) {
@@ -1381,6 +1534,11 @@ function WWTextRenderer() : WWCore() constructor {
                 return _picked;
             };
 
+            #region jsDoc
+            /// @func   __vb_build_visible_chunks_now__()
+            /// @ignore
+            /// @desc   Builds queued visible chunks immediately (progressive mode only).
+            #endregion
             static __vb_build_visible_chunks_now__ = function() {
 
                 if (__vb_render_mode__ != 2 || !vb_progressive_emit_enabled || !vb_cull_emits_to_scissor) {
@@ -1412,6 +1570,12 @@ function WWTextRenderer() : WWCore() constructor {
                 }
             };
 
+            #region jsDoc
+            /// @func   __vb_delete_batches_for_chunk__()
+            /// @ignore
+            /// @desc   Frees draw batches (materials + vertex buffers) associated with a given chunk.
+            /// @param  {Real} chunk_id
+            #endregion
             static __vb_delete_batches_for_chunk__ = function(_chunk_id) {
                 if (is_undefined(_chunk_id) || _chunk_id < 0) {
                     return;
@@ -1435,10 +1599,12 @@ function WWTextRenderer() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func   __vb_get_batch_for_material__()
-			/// @param  {Id.Texture} _tex
-			/// @param  {Real} _layer
-			/// @param  {Id.Shader|Undefined} _shader
-			/// @param  {Real} _spread
+            /// @ignore
+            /// @param  {Id.Texture} tex
+            /// @param  {Real} layer
+            /// @param  {Id.Shader|Undefined} shader
+            /// @param  {Real} spread
+            /// @param  {Real} chunk_id
 			/// @returns {Struct} batch
 			#endregion
             static __vb_get_batch_for_material__ = function(_tex, _layer, _shader, _spread, _chunk_id) {
@@ -1510,6 +1676,11 @@ function WWTextRenderer() : WWCore() constructor {
 			    return _new_batch;
 			};
 
+                #region jsDoc
+                /// @func   __vb_ensure_format__()
+                /// @ignore
+                /// @desc   Lazily creates the vertex format used for text draw batches.
+                #endregion
             static __vb_ensure_format__ = function() {
                 if (!is_undefined(__vb_format__)) {
                     return;
@@ -1526,6 +1697,13 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Tabs
 
+            #region jsDoc
+            /// @func   __tab_advance__()
+            /// @ignore
+            /// @desc   Returns the pixel advance for a tab at the given cursor x position.
+            /// @param  {Real} cursor_x
+            /// @returns {Real}
+            #endregion
             static __tab_advance__ = function(_cursor_x) {
                 var _tab_width_local = __tab_width__;
                 if (_tab_width_local <= 0) {
@@ -1544,6 +1722,13 @@ function WWTextRenderer() : WWCore() constructor {
                 return _tab_width_local - _pos_mod;
             };
 
+            #region jsDoc
+            /// @func   __measure_line_width_tabs__()
+            /// @ignore
+            /// @desc   Measures the width of a line of text, accounting for tab stops.
+            /// @param  {String} line_text
+            /// @returns {Real}
+            #endregion
             static __measure_line_width_tabs__ = function(_line_text) {
                 var _line_len = string_length(_line_text);
                 if (_line_len <= 0) {
@@ -1574,11 +1759,26 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Text + layout
 
+            #region jsDoc
+            /// @func   __set_textbox__()
+            /// @ignore
+            /// @desc   Binds this renderer to a textbox-like parent component.
+            /// @param  {Struct|Undefined} comp
+            /// @returns {Struct.WWTextRenderer}
+            #endregion
             static __set_textbox__ = function(_comp) {
                 __textbox_parent__ = _comp;
                 return self;
             };
 
+            #region jsDoc
+            /// @func   __string_split_and_retain__()
+            /// @ignore
+            /// @desc   Splits a string by delimiter while retaining the delimiter on each segment except the last.
+            /// @param  {String} str
+            /// @param  {String} delim
+            /// @returns {Array<String>}
+            #endregion
             static __string_split_and_retain__ = function(_str, _delim) {
                 static __closure = {};
                 static __fn = method(__closure, function(_value, _index) {
@@ -1593,6 +1793,11 @@ function WWTextRenderer() : WWCore() constructor {
                 return _arr;
             };
 
+            #region jsDoc
+            /// @func   __ensure_layout__()
+            /// @ignore
+            /// @desc   Builds the internal layout (lines + glyphs) if marked dirty.
+            #endregion
             static __ensure_layout__ = function() {
                 if (!__is_dirty__) {
                     return;
@@ -1682,6 +1887,12 @@ function WWTextRenderer() : WWCore() constructor {
                 __is_dirty__ = false;
             };
 			
+            #region jsDoc
+            /// @func   __layout_reset__()
+            /// @ignore
+            /// @desc   Resets all layout arrays and sets the active span list.
+            /// @param  {Array} spans
+            #endregion
 			static __layout_reset__ = function(_spans) {
 
                 __layout_lines__ = [];
@@ -1695,6 +1906,20 @@ function WWTextRenderer() : WWCore() constructor {
                 __layout_content_height__ = 0;
             };
 
+            #region jsDoc
+            /// @func   __layout_add_line__()
+            /// @ignore
+            /// @desc   Appends a line record to the layout storage.
+            /// @param  {String} text
+            /// @param  {Real} start_ind
+            /// @param  {Real} end_ind
+            /// @param  {Real} width
+            /// @param  {Real} height
+            /// @param  {Real} yoff
+            /// @param  {Bool} force_wrapped
+            /// @param  {Real} alignment
+            /// @returns {Real} line_index
+            #endregion
             static __layout_add_line__ = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment) {
 
                 var _lines = __layout_lines__;
@@ -1728,6 +1953,19 @@ function WWTextRenderer() : WWCore() constructor {
                 return _line_index;
             };
 
+            #region jsDoc
+            /// @func   __layout_add_glyph__()
+            /// @ignore
+            /// @desc   Appends a glyph record to the layout storage.
+            /// @param  {String} char
+            /// @param  {Real} index
+            /// @param  {Real} x
+            /// @param  {Real} y
+            /// @param  {Real} width
+            /// @param  {Real} height
+            /// @param  {Real} span_index
+            /// @returns {Real} glyph_index
+            #endregion
             static __layout_add_glyph__ = function(_char, _index, _x, _y, _width, _height, _span_index) {
 
                 var _glyphs = __layout_glyphs__;
@@ -1761,6 +1999,14 @@ function WWTextRenderer() : WWCore() constructor {
                 return _glyph_index;
             };
 
+            #region jsDoc
+            /// @func   __layout_get_line_x_offset__()
+            /// @ignore
+            /// @desc   Computes horizontal x-offset for a line based on its alignment and available width.
+            /// @param  {Real} line_index
+            /// @param  {Real} available_width
+            /// @returns {Real}
+            #endregion
             static __layout_get_line_x_offset__ = function(_line_index, _available_width) {
 
                 if (_line_index < 0 || _line_index >= __layout_lines_count__) {
@@ -1793,6 +2039,12 @@ function WWTextRenderer() : WWCore() constructor {
                 return 0;
             };
 
+            #region jsDoc
+            /// @func   __layout_apply_line_alignment__()
+            /// @ignore
+            /// @desc   Applies per-line horizontal alignment by shifting glyph x positions.
+            /// @param  {Real} available_width
+            #endregion
             static __layout_apply_line_alignment__ = function(_available_width) {
 
                 if (is_undefined(_available_width)) {
@@ -1854,6 +2106,13 @@ function WWTextRenderer() : WWCore() constructor {
                 }
             };
 
+            #region jsDoc
+            /// @func   __layout_apply_inline_align_runs__()
+            /// @ignore
+            /// @desc   Applies alignment segments within lines by shifting glyph ranges.
+            /// @param  {Array} align_runs
+            /// @param  {Real} available_width
+            #endregion
             static __layout_apply_inline_align_runs__ = function(_align_runs, _available_width) {
 
 			    if (!is_array(_align_runs)) { return; }
@@ -2033,7 +2292,17 @@ function WWTextRenderer() : WWCore() constructor {
 			    }
 			};
 
-			static __layout_apply_xoff_range__ = function(
+            #region jsDoc
+            /// @func   __layout_apply_xoff_range__()
+            /// @ignore
+            /// @desc   Applies an x offset to glyph positions within a glyph index range.
+            /// @param  {Array} glyphs
+            /// @param  {Real} glyph_count
+            /// @param  {Real} start_ind
+            /// @param  {Real} end_ind
+            /// @param  {Real} xoff
+            #endregion
+            static __layout_apply_xoff_range__ = function(
 			    _glyphs,
 			    _glyph_count,
 			    _start_ind,
@@ -2061,9 +2330,10 @@ function WWTextRenderer() : WWCore() constructor {
 
 
 			#region jsDoc
-            /// @func   __build_layout__(_str, _spans)
-            /// @param  {String} _str
-            /// @param  {Array|Undefined} _spans
+            /// @func   __build_layout__()
+            /// @ignore
+            /// @param  {String} str
+            /// @param  {Array|Undefined} spans
             #endregion
             static __build_layout__ = function(_str, _spans=undefined) {
 
@@ -2679,6 +2949,13 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Font render data
 
+            #region jsDoc
+            /// @func   __font_get_render_data__()
+            /// @ignore
+            /// @desc   Fetches and caches render data for a font asset (texture, uvs, glyphs, SDF settings).
+            /// @param  {Asset.GMFont} font_asset
+            /// @returns {Struct|Undefined}
+            #endregion
 			static __font_get_render_data__ = function(_font_asset) {
 
 			    var _cached = __font_cache__[$ _font_asset];
@@ -2739,6 +3016,15 @@ function WWTextRenderer() : WWCore() constructor {
 			    return _render_data;
 			};
 			
+            #region jsDoc
+            /// @func   __glyph_resolve_font_data__()
+            /// @ignore
+            /// @desc   Resolves font render data for a given glyph, trying requested font then fallbacks.
+            /// @param  {Asset.GMFont} font_asset
+            /// @param  {String} char
+            /// @param  {Struct|Undefined} default_font_data
+            /// @returns {Struct|Undefined}
+            #endregion
 			static __glyph_resolve_font_data__ = function(_font_asset, _char, _default_font_data) {
 
 			    // Try the requested font first
@@ -2782,6 +3068,7 @@ function WWTextRenderer() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func   __text_state_make_default__()
+            /// @ignore
 			/// @desc   Creates a complete default text state from the renderer's current settings.
 			/// @returns {Struct}
 			#endregion
@@ -2807,8 +3094,9 @@ function WWTextRenderer() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func   __text_state_clone__()
+            /// @ignore
 			/// @desc   Clones a complete text state struct (all expected keys must exist).
-			/// @param  {Struct} _state
+            /// @param  {Struct} state
 			/// @returns {Struct}
 			#endregion
 			static __text_state_clone__ = function(_state) {
@@ -2830,7 +3118,15 @@ function WWTextRenderer() : WWCore() constructor {
 				};
 			};
 
-			static __text_state_equals_span__ = function(_state_a, _state_b) {
+            #region jsDoc
+            /// @func   __text_state_equals_span__()
+            /// @ignore
+            /// @desc   Returns true if two complete text states are span-equivalent (ignores alignment keys).
+            /// @param  {Struct} state_a
+            /// @param  {Struct} state_b
+            /// @returns {Bool}
+            #endregion
+            static __text_state_equals_span__ = function(_state_a, _state_b) {
 				return (
 				    _state_a.font_asset == _state_b.font_asset
 				    && _state_a.style == _state_b.style
@@ -2844,16 +3140,25 @@ function WWTextRenderer() : WWCore() constructor {
 				);
 			};
 
-			static __text_state_equals_align__ = function(_state_a, _state_b) {
+            #region jsDoc
+            /// @func   __text_state_equals_align__()
+            /// @ignore
+            /// @desc   Returns true if two complete text states are alignment-equivalent.
+            /// @param  {Struct} state_a
+            /// @param  {Struct} state_b
+            /// @returns {Bool}
+            #endregion
+            static __text_state_equals_align__ = function(_state_a, _state_b) {
 				return (_state_a.align_value == _state_b.align_value);
 			};
 				
 			#region jsDoc
 			/// @func   __text_state_apply_patch__()
+            /// @ignore
 			/// @desc   Applies a partial patch struct to an existing complete text state.
-			///         Only keys present in _patch are applied.
-			/// @param  {Struct} _state
-			/// @param  {Struct} _patch
+            ///         Only keys present in patch are applied.
+            /// @param  {Struct} state
+            /// @param  {Struct} patch
 			#endregion
 			static __text_state_apply_patch__ = function(_state, _patch) {
 
@@ -2892,9 +3197,10 @@ function WWTextRenderer() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func   __text_state_clone_patch__()
+            /// @ignore
 			/// @desc   Clones a complete text state then applies a patch.
-			/// @param  {Struct} _state
-			/// @param  {Struct} _patch
+            /// @param  {Struct} state
+            /// @param  {Struct} patch
 			/// @returns {Struct}
 			#endregion
 			static __text_state_clone_patch__ = function(_state, _patch) {
@@ -2905,10 +3211,11 @@ function WWTextRenderer() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func   __text_span_run_from_state__()
+            /// @ignore
 			/// @desc   Converts a complete text state into a layout span run.
-			/// @param  {Real} _start_index
-            /// @param  {Real} _end_index
-			/// @param  {Struct} _state
+            /// @param  {Real} start_index
+            /// @param  {Real} end_index
+            /// @param  {Struct} state
 			/// @returns {Struct}
 			#endregion
 			static __text_span_run_from_state__ = function(_start_index, _end_index, _state) {
@@ -2931,7 +3238,16 @@ function WWTextRenderer() : WWCore() constructor {
 				};
 			};
 				
-			static __text_align_run_from_state__ = function(_start_index, _end_index, _state) {
+            #region jsDoc
+            /// @func   __text_align_run_from_state__()
+            /// @ignore
+            /// @desc   Converts a complete text state into an alignment run.
+            /// @param  {Real} start_index
+            /// @param  {Real} end_index
+            /// @param  {Struct} state
+            /// @returns {Struct}
+            #endregion
+            static __text_align_run_from_state__ = function(_start_index, _end_index, _state) {
 				return {
 				    start_index: _start_index,
                 end_index: _end_index,
@@ -2943,6 +3259,21 @@ function WWTextRenderer() : WWCore() constructor {
         
         #region VB emit styled glyph
 
+            #region jsDoc
+            /// @func   __vb_emit_glyph_styled_to_buffer__()
+            /// @ignore
+            /// @desc   Emits a single glyph quad (with optional bold/italic styling) into the given vertex buffer.
+            /// @param  {Id.VertexBuffer} vb_buffer
+            /// @param  {Struct} font_data
+            /// @param  {String} char
+            /// @param  {Real} pos_x
+            /// @param  {Real} pos_y
+            /// @param  {Constant.Color} col
+            /// @param  {Real} alp
+            /// @param  {Real} size_mul
+            /// @param  {Real} style
+            /// @returns {Bool}
+            #endregion
             static __vb_emit_glyph_styled_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp, _size_mul, _style) {
 
 			    var _glyph_info = _font_data.info.glyphs[$ _char];
@@ -3072,6 +3403,12 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Underline flush span
 
+            #region jsDoc
+            /// @func   __ul_flush_span__()
+            /// @ignore
+            /// @desc   Emits underline geometry for the current underline span state, then deactivates it.
+            /// @param  {Struct} span_state
+            #endregion
             static __ul_flush_span__ = function(_span_state) {
 
                 if (!_span_state.active) {
@@ -3248,6 +3585,12 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Background flush span
 
+            #region jsDoc
+            /// @func   __bg_flush_span__()
+            /// @ignore
+            /// @desc   Emits background geometry for the current background span state, then deactivates it.
+            /// @param  {Struct} span_state
+            #endregion
             static __bg_flush_span__ = function(_span_state) {
 
                 if (!_span_state.active) {
@@ -3311,6 +3654,12 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region Strike-through flush span
 
+            #region jsDoc
+            /// @func   __st_flush_span__()
+            /// @ignore
+            /// @desc   Emits strike-through geometry for the current strike span state, then deactivates it.
+            /// @param  {Struct} span_state
+            #endregion
             static __st_flush_span__ = function(_span_state) {
 
                 if (!_span_state.active) {
@@ -3483,6 +3832,11 @@ function WWTextRenderer() : WWCore() constructor {
 
         #region VB build and draw (unified)
 
+            #region jsDoc
+            /// @func   __ensure_vb__()
+            /// @ignore
+            /// @desc   Ensures VB draw batches exist for the current layout (builds if dirty).
+            #endregion
             static __ensure_vb__ = function() {
 
                 if (!__vb_is_dirty__) {
@@ -3521,6 +3875,13 @@ function WWTextRenderer() : WWCore() constructor {
                 __vb_built_this_frame__ = true;
             };
 
+            #region jsDoc
+            /// @func   __vb_update_emit_clip_for_draw__()
+            /// @ignore
+            /// @desc   Updates the VB emission clip/mode based on current GPU scissor and draw origin.
+            /// @param  {Real} origin_x
+            /// @param  {Real} origin_y
+            #endregion
             static __vb_update_emit_clip_for_draw__ = function(_origin_x, _origin_y) {
 
                 // Small-text fast path: always build full VB.
@@ -3725,6 +4086,11 @@ function WWTextRenderer() : WWCore() constructor {
                 }
             };
 
+            #region jsDoc
+            /// @func   __vb_progressive_emit_step__()
+            /// @ignore
+            /// @desc   Schedules additional offscreen chunks for progressive VB emission.
+            #endregion
             static __vb_progressive_emit_step__ = function() {
 
                 if (!vb_progressive_emit_enabled || !vb_cull_emits_to_scissor) {
@@ -3787,6 +4153,11 @@ function WWTextRenderer() : WWCore() constructor {
                 __vb_is_dirty__ = true;
             };
 
+            #region jsDoc
+            /// @func   __build_vb__()
+            /// @ignore
+            /// @desc   Builds VB geometry into draw batches (full or chunked depending on mode).
+            #endregion
 			static __build_vb__ = function() {
 
 			    var _old_font = draw_get_font();
@@ -4419,6 +4790,11 @@ function WWTextRenderer() : WWCore() constructor {
 			    }
 			};
 
+            #region jsDoc
+            /// @func   __draw_selection_highlight__()
+            /// @ignore
+            /// @desc   Draws selection highlights for the bound textbox cursors (if any).
+            #endregion
             static __draw_selection_highlight__ = function() {
 
                 if (is_undefined(__textbox_parent__)) {
@@ -4489,6 +4865,11 @@ function WWTextRenderer() : WWCore() constructor {
                 draw_set_color(_pre_color);
             };
 
+            #region jsDoc
+            /// @func   __draw_carets__()
+            /// @ignore
+            /// @desc   Draws caret(s) for the bound textbox cursors (if any).
+            #endregion
             static __draw_carets__ = function() {
                 if (is_undefined(__textbox_parent__)) return;
                 if (!is_struct(__textbox_parent__)) return;
@@ -4544,6 +4925,15 @@ function WWTextRenderer() : WWCore() constructor {
                 draw_set_color(_pre_color);
             };
 			
+            #region jsDoc
+            /// @func   __draw_text_vb__()
+            /// @ignore
+            /// @desc   Submits built VB draw batches, optionally filtering by layer.
+            /// @param  {Real} origin_x
+            /// @param  {Real} origin_y
+            /// @param  {Real|Undefined} layer_min
+            /// @param  {Real|Undefined} layer_max
+            #endregion
             static __draw_text_vb__ = function(_origin_x, _origin_y, _layer_min, _layer_max) {
 
                 if (_layer_min < 0) {
@@ -4786,6 +5176,11 @@ function WWTextRenderer() : WWCore() constructor {
 		
         #region Cleanup
 
+            #region jsDoc
+            /// @func   __cleanup__()
+            /// @ignore
+            /// @desc   Releases renderer GPU resources (batches and vertex format).
+            #endregion
             static __cleanup__ = function() {
                 __vb_free__();
 
@@ -4795,6 +5190,11 @@ function WWTextRenderer() : WWCore() constructor {
                 }
             };
 			
+            #region jsDoc
+            /// @func   __vb_free__()
+            /// @ignore
+            /// @desc   Frees all VB draw batches and resets progressive emission state.
+            #endregion
             static __vb_free__ = function() {
                 var _batch_index = 0;
                 var _batch_count = array_length(__draw_batches__);

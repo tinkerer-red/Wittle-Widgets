@@ -31,14 +31,11 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    set_size()
-			/// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.  
-			///          This updates the region and marks the size as user–preferred so that future internal updates won't override it.
-			/// @self    WWCore
-			/// @param   {Real} left : The left side of the bounding box
-			/// @param   {Real} top : The top side of the bounding box
-			/// @param   {Real} right : The right side of the bounding box
-			/// @param   {Real} bottom : The bottom side of the bounding box
-			/// @returns {Struct.WWCore}
+			/// @desc    Sets the component's size (i.e., its interactive boundaries).
+			/// @self    WWTextBoxV3
+			/// @param   {Real} width
+			/// @param   {Real} height
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_size = function(_width, _height) {
 				renderer.set_size(_width, _height);
@@ -52,9 +49,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_text()
 				/// @desc	Sets the main text content to display in the component. This text is selectable by the user.
-				/// @self	WWTextBase
-				/// @param   {String} _text : The text to display.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {String} text : The text to display.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_text = function(_text = "") {
 					if (buffer.get_text() == _text) return self;
@@ -66,9 +63,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_caption()
 				/// @desc	Sets the text displayed when the text feild is empty. This text is not selectable or editable by the user. Will also effect how consoles display a header for the on screen keyboard
-				/// @self	WWTextBase
-				/// @param   {String} _text : The caption text to display.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {String} text : The caption text to display.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_caption = function(_text = "") {
 					renderer.set_caption(_text);
@@ -77,9 +74,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_text_font()
 				/// @desc	Sets the font used for rendering text.
-				/// @self	WWTextBase
-				/// @param   {Asset.GMFont} _font : The font asset to use.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {Asset.GMFont} font : The font asset to use.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_text_font = function(_font = fGUIDefault) {
 					renderer.set_font(_font);
@@ -88,9 +85,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_text_color()
 				/// @desc	Sets the font color used for rendering the text.
-				/// @self	WWTextBase
-				/// @param   {Constant.Color} _color : The color to use.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {Constant.Color} color : The color to use.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_text_color = function(_color = #D9D9D9) {
 					renderer.set_text_color(_color);
@@ -99,9 +96,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_text_alpha()
 				/// @desc    Sets the text alpha used for rendering the text.
-				/// @self    WWTextBase
+				/// @self    WWTextBoxV3
 				/// @param   {Real} alpha : The alpha to use.
-				/// @returns {Struct.WWTextBase}
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_text_alpha = function(_alpha = 1) {
 					renderer.set_text_alpha(_alpha)
@@ -109,8 +106,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				}
 				
 				#region jsDoc
-				/// @func   set_wrap_width()
+				/// @func   set_wrap_enabled()
 				/// @desc   Sets if word wrapping is enabled, true will wrap words to next line.
+				/// @self   WWTextBoxV3
 				/// @param  {Bool} should_wrap
 				/// @returns {Struct.WWTextBoxV3}
 				#endregion
@@ -122,7 +120,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func   set_line_sep()
 				/// @desc   Sets the extra spacing between wrapped lines (in pixels).
-				/// @param  {Real} _line_sep_pixels
+				/// @self   WWTextBoxV3
+				/// @param  {Real} line_sep_pixels
 				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_line_sep = function(_line_sep_pixels) {
@@ -138,9 +137,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @func    set_read_only()
 			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
 			///          like one would from a console or webpage, but modifying the text is prohibited.
-			/// @self    WWTextBase
-			/// @param   {Bool} is_read_only : If the text is read only.
-			/// @returns {Struct.WWTextBase}
+			/// @self    WWTextBoxV3
+			/// @param   {Bool} read_only : If the textbox is read-only.
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_read_only = function(_bool = false) {
 				is_read_only = _bool;
@@ -153,9 +152,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @desc   Sets the allowed characters to be used in this textbox. 
 			///         If undefined, the allowed characters are generated from the current font.
 			///         Will also infer and set keyboard type if not already user-defined.
-			/// @self   WWTextBase
-			/// @param  {String} _allowed_char : A string of allowed characters (optional).
-			/// @returns {Struct.WWTextBase}
+			/// @self   WWTextBoxV3
+			/// @param  {String} allowed_char : A string of allowed characters (optional).
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_allowed_char = function(_allowed_char = undefined) {
 				if (is_undefined(_allowed_char)) {
@@ -184,9 +183,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @func   set_keyboard_type()
 			/// @desc   Sets the keyboard type used in this textbox. 
 			///         If undefined, the keyboard type is generated from the allowed char.
-			/// @self   WWTextBase
-			/// @param  {Constant.VirtualKeyboardType} _keyboard_type : Which keyset will be available on the virtual keyboard (optional).
-			/// @returns {Struct.WWTextBase}
+			/// @self   WWTextBoxV3
+			/// @param  {Constant.VirtualKeyboardType} keyboard_type : Which keyset will be available on the virtual keyboard (optional).
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_keyboard_type = function(_keyboard_type = undefined) {
 				if (is_undefined(_keyboard_type)) {
@@ -209,9 +208,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @func   set_enter_submits_text()
 			/// @desc   Sets if pressing enter will submit and exit editing text,
 			///         false will result in attempting to insert the newline glyph `\n`
-			/// @self   WWTextBase
-			/// @param  {Bool} _enabled : Wheather pressing enter will submit the text.
-			/// @returns {Struct.WWTextBase}
+			/// @self   WWTextBoxV3
+			/// @param  {Bool} enabled : Wheather pressing enter will submit the text.
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_enter_submits_text = function(_enabled = false) {
 				enter_submits_text = _enabled;
@@ -222,9 +221,9 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @func   set_tab_exits_text()
 			/// @desc   Sets if pressing tab will exit editing text,
 			///         false will result in attempting to insert the tab glyph `\t`
-			/// @self   WWTextBase
-			/// @param  {Bool} _enabled : Wheather pressing tab will exit the editing of text.
-			/// @returns {Struct.WWTextBase}
+			/// @self   WWTextBoxV3
+			/// @param  {Bool} enabled : Wheather pressing tab will exit the editing of text.
+			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_tab_exits_text = function(_enabled) {
 				tab_exits_text = _enabled;
@@ -238,9 +237,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_cursor_color()
 				/// @desc	Sets the color for the selection highlight.
-				/// @self	WWTextBase
-				/// @param   {Constant.Color} _color : The highlight color.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {Constant.Color} color : The highlight color.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_color = function(_color = #FFFFFF) {
 					cursor.set_cursor_color(_color);
@@ -249,9 +248,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func	set_highlight_color()
 				/// @desc	Sets the color for the selection highlight.
-				/// @self	WWTextBase
-				/// @param   {Constant.Color} _color : The highlight color.
-				/// @returns {Struct.WWTextBase}
+				/// @self	WWTextBoxV3
+				/// @param   {Constant.Color} color : The highlight color.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_highlight_color = function(_color = #0A68D8) {
 					cursor.set_highlight_color(_color);
@@ -260,19 +259,20 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    set_cursor_index()
-				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @param  {String} _allowed_char : A string of allowed characters (optional).
-				/// @returns {Real}
+				/// @desc    Sets the cursor index.
+				/// @self    WWTextBoxV3
+				/// @param   {Real} index
+				/// @returns {Real} The resulting cursor index.
 				#endregion
 				static set_cursor_index = function(_index) {
 					return __cursor_set_index_synced__(_index);
 				}
 				#region jsDoc
 				/// @func    set_cursor_highlight_start_index()
-				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @desc    Sets the selection start index.
+				/// @self    WWTextBoxV3
+				/// @param   {Real} index
+				/// @returns {Real} The resulting start index.
 				#endregion
 				static set_cursor_highlight_start_index = function(_index) {
 					return cursor.set_highlight_start_index(_index);
@@ -371,7 +371,7 @@ function WWTextBoxV3() : WWCore() constructor {
                 ///         - String (text only, spans will be defaulted)
                 ///
                 ///         Returning undefined disables processing for this build.
-                /// @param  {Function} _processor_fn
+				/// @param  {Function} processor_fn
                 /// @returns {Struct.WWTextRendererBase}
                 #endregion
                 static set_text_processor = function(_processor_fn) {
@@ -391,8 +391,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			///          When swapped:
 			///          - old renderer is detached (set_active(false), removed from children if supported)
 			///          - new renderer is attached, positioned to (0,0) within textbox content area
-			/// @param   {Struct|Function|Undefined} _renderer_or_ctor
-			/// @param   {Bool} _owns_instance
+			/// @param   {Struct|Function|Undefined} renderer_or_ctor
+			/// @param   {Bool} owns_instance
 			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_renderer = function(_renderer_constructor) {
@@ -428,31 +428,73 @@ function WWTextBoxV3() : WWCore() constructor {
 		#region Events
 			
 			events.select    = variable_get_hash("select"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_select()
+			/// @desc    Registers a handler for when the textbox is selected/focused.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_select = function(_func) {
 				add_event_listener(events.select, _func);
 				return self;
 			}
 			events.copy    = variable_get_hash("copy"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_copy()
+			/// @desc    Registers a handler for copy requests.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_copy = function(_func) {
 				add_event_listener(events.copy, _func);
 				return self;
 			}
 			events.paste    = variable_get_hash("paste"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_paste()
+			/// @desc    Registers a handler for paste requests.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_paste = function(_func) {
 				add_event_listener(events.paste, _func);
 				return self;
 			}
 			events.change    = variable_get_hash("change"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_change()
+			/// @desc    Registers a handler for when the textbox content changes.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_change = function(_func) {
 				add_event_listener(events.change, _func);
 				return self;
 			}
 			events.submit    = variable_get_hash("submit"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_submit()
+			/// @desc    Registers a handler for when the textbox is submitted.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_submit = function(_func) {
 				add_event_listener(events.submit, _func);
 				return self;
 			}
 			events.cursor_move = variable_get_hash("cursor_move"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_cursor_move()
+			/// @desc    Registers a handler for when the cursor moves.
+			/// @self    WWTextBoxV3
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBoxV3}
+			#endregion
 			static on_cursor_move = function(_func) {
 				add_event_listener(events.cursor_move, _func);
 				return self;
@@ -1380,7 +1422,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_x()
 				/// @desc    Convert a buffer index into gui x coordinate
-				/// @param   {Real} _index
+				/// @param   {Real} index
 				/// @returns {Real} x
 				#endregion
 				static index_to_x = function(_index) {
@@ -1389,7 +1431,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_y()
 				/// @desc    Convert a buffer index into gui y coordinate
-				/// @param   {Real} _index
+				/// @param   {Real} index
 				/// @returns {Real} y
 				#endregion
 				static index_to_y = function(_index) {
@@ -1398,8 +1440,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    xy_to_index()
 				/// @desc    Convert gui x,y coordinates into the nearest buffer index.
-				/// @param   {Real} _x
-				/// @param   {Real} _y
+				/// @param   {Real} x
+				/// @param   {Real} y
 				/// @returns {Real}
 				#endregion
 				static xy_to_index = function(_x, _y) {
@@ -1409,7 +1451,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_line()
 				/// @desc    Convert a buffer index into a line number. Lines and columns are 0-based.
-				/// @param   {Real} _index
+				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
 				static index_to_line = function(_index) {
@@ -1418,7 +1460,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_col()
 				/// @desc    Convert a buffer index into a column number. Lines and columns are 0-based.
-				/// @param   {Real} _index
+				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
 				static index_to_col = function(_index) {
@@ -1427,8 +1469,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    line_col_to_index()
 				/// @desc    Convert a line and column (0-based) into a buffer index.
-				/// @param   {Real} _line
-				/// @param   {Real} _col
+				/// @param   {Real} line
+				/// @param   {Real} col
 				/// @returns {Real}
 				#endregion
 				static line_col_to_index = function(_line, _col) {
@@ -1471,9 +1513,11 @@ function WWTextBoxV3() : WWCore() constructor {
 			
 				#region jsDoc
 				/// @func    __build_allowed_char__()
+				/// @ignore
 				/// @desc    Returns a struct of allowed characters from the supplied font.
-				/// @self    WWTextBase
-				/// @param   {Asset.GMFont} _font : The font to build the allowed character list.
+				/// @self    WWTextBoxV3
+				/// @param   {Asset.GMFont} font : The font to build the allowed character list.
+				/// @param   {Bool} include_nl : If true, include "\n" in the palette.
 				/// @returns {Struct} Allowed Characters Struct
 				#endregion
 				static __build_allowed_char__ = function(_font, _include_nl=true) {
@@ -1489,7 +1533,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				}
 				
 				#region jsDoc
-				/// @func    __infer_keyboard_type__
+				/// @func    __infer_keyboard_type__()
+				/// @ignore
 				/// @desc    Choose a best-fit virtual keyboard type from an allowed-character palette.
 				///         Heuristics are ordered from most-specific to most-generic and are conservative:
 				///         - Pure digits -> numbers
@@ -1499,8 +1544,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				///         - ASCII-only palette (no non-ascii) -> ascii
 				///         - Name-like (letters, spaces, dash, apostrophe; no digits) -> phone_name
 				///         - Otherwise -> default
-				/// @param   {String|Undefined} _allowed
-				/// @returns {Real} kbv_type_* constant
+				/// @self    WWTextBoxV3
+				/// @param   {String|Undefined} allowed
+				/// @returns {Constant.VirtualKeyboardType} A kbv_type_* constant.
 				#endregion
 				static __infer_keyboard_type__ = function(_allowed) {
 					// Defensive defaults
@@ -1509,9 +1555,25 @@ function WWTextBoxV3() : WWCore() constructor {
 					}
 					
 					// Local helpers (all ASCII-safe)
+					#region jsDoc
+					/// @func    __has__()
+					/// @ignore
+					/// @desc    Returns true if a character exists in a palette string.
+					/// @param   {String} pool
+					/// @param   {String} ch
+					/// @returns {Bool}
+					#endregion
 					static __has__ = function(_pool, _ch) {
 						return string_pos(_ch, _pool) > 0;
 					};
+					#region jsDoc
+					/// @func    __all_in__()
+					/// @ignore
+					/// @desc    Returns true if every character in pool exists in set.
+					/// @param   {String} pool
+					/// @param   {String} set
+					/// @returns {Bool}
+					#endregion
 					static __all_in__ = function(_pool, _set) {
 						var idx = 1, len = string_length(_pool);
 						while (idx <= len) {
@@ -1522,6 +1584,13 @@ function WWTextBoxV3() : WWCore() constructor {
 						return true;
 					};
 					static __is_subset_of__ = __all_in__;
+					#region jsDoc
+					/// @func    __is_ascii_only__()
+					/// @ignore
+					/// @desc    Returns true if every character in pool is ASCII.
+					/// @param   {String} pool
+					/// @returns {Bool}
+					#endregion
 					static __is_ascii_only__ = function(_pool) {
 						var idx = 1, len = string_length(_pool);
 						while (idx <= len) {
@@ -1593,12 +1662,13 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __check_minput__()
+				/// @ignore
 				/// @desc    Updates the cursor position based on mouse input. When selection mode is enabled,
 				///          if no selection anchor exists, it sets the anchor to the current cursor position.
 				///          Then it updates the cursor position from the mouse coordinates. If the new cursor
 				///          equals the anchor, selection is cleared; otherwise, selection remains active.
-				/// @self    WWTextInputSingle
-				/// @param   {Bool} _select : Whether selection mode is enabled.
+				/// @self    WWTextBoxV3
+				/// @param   {Bool} select : Whether selection mode is enabled.
 				/// @returns {Undefined}
 				#endregion
 				static __check_minput__ = function(_select) {
@@ -1611,12 +1681,14 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __move_cursor_offset__()
+				/// @ignore
 				/// @desc    Moves the cursor based on input and optionally extends selection. When shift is
 				///          held, it preserves the selection anchor; otherwise, any active selection is cleared.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _change : The amount to move the cursor.
-				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
-				/// @param   {Bool} _vertical : Whether the movement is vertical (if false, horizontal).
+				/// @self    WWTextBoxV3
+				/// @param   {Real} vector : The amount to move the cursor.
+				/// @param   {Bool} shift  : Whether to extend the selection (shift key held).
+				/// @param   {Bool} vertical : Whether the movement is vertical (if false, horizontal).
+				/// @param   {Bool} word_mode : If true, use word-boundary movement.
 				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
@@ -1688,10 +1760,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __move_cursor_paged_offset__()
+				/// @ignore
 				/// @desc    Moves the cursor based on page up and down, keepnig relation to the cursor width offset
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _vector : The direction to move the cursor.
-				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
+				/// @self    WWTextBoxV3
+				/// @param   {Real} vector : The direction to move the cursor.
+				/// @param   {Bool} shift  : Whether to extend the selection (shift key held).
 				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_paged_offset__ = function(_vector, _shift) {
@@ -1919,9 +1992,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __insert_string_at_cursor__()
+				/// @ignore
 				/// @desc    Inserts a new string at the cursor position, respecting allowed characters.
-				/// @self    WWTextInputSingle
-				/// @param   {String} _str : The string to insert.
+				/// @self    WWTextBoxV3
+				/// @param   {String} str : The string to insert.
 				/// @returns {Undefined}
 				#endregion
 				static __insert_string_at_cursor__ = function(_str) {
@@ -1959,14 +2033,15 @@ function WWTextBoxV3() : WWCore() constructor {
 
 				
 				#region jsDoc
-				/// @func    __update_word_selection_drag__
+				/// @func    __update_word_selection_drag__()
+				/// @ignore
 				/// @desc    Updates the word selection during a mouse drag after a double-click.
 				///          Uses the renderer to convert GUI coordinates into a buffer index,
 				///          then expands that index to full word boundaries using
 				///          __compute_word_boundaries__. The selection is extended from the
 				///          original anchor word to the current word span, including intermediate
 				///          whitespace.
-				/// @self    WWTextBase
+				/// @self    WWTextBoxV3
 				/// @returns {Undefined}
 				#endregion
 				static __update_word_selection_drag__ = function() {
@@ -2005,8 +2080,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __clipboard_get_text__()
+				/// @ignore
 				/// @desc    Retrieves text from the clipboard for pasting into the input field.
-				/// @self    WWTextInputSingle
+				/// @self    WWTextBoxV3
 				/// @returns {String}
 				#endregion
 				static __clipboard_get_text__ = function() {
@@ -2030,9 +2106,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __clipboard_set_text__()
+				/// @ignore
 				/// @desc    Sets the clipboard text.
-				/// @self    WWTextInputSingle
-				/// @returns {String}
+				/// @self    WWTextBoxV3
+				/// @param   {String} str
+				/// @returns {Undefined}
 				#endregion
 				static __clipboard_set_text__ = function(_str) {
 					__global_clipboard_container__.text = _str;
@@ -2046,9 +2124,14 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __history_record_create__()
+				/// @ignore
 				/// @desc    Constructor for an undo/redo snapshot.
-				/// @param   {String} _content       : Full text content.
-				/// @param   {Real}   _cursor_index  : Global cursor index.
+				/// @self    WWTextBoxV3
+				/// @param   {String} content       : Full text content.
+				/// @param   {Real} cursor_index    : Global cursor index.
+				/// @param   {Bool} highlight_active
+				/// @param   {Real} highlight_start_index
+				/// @param   {Real} highlight_end_index
 				/// @returns {Struct} A history snapshot.
 				#endregion
 				static __history_record_create__ = function(_content, _cursor_index, _highlight_active, _highlight_start_index, _highlight_end_index) constructor {
@@ -2061,7 +2144,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __history_add_record__()
+				/// @ignore
 				/// @desc    Captures a new snapshot and pushes it to the undo history.
+				/// @self    WWTextBoxV3
 				/// @returns {Undefined}
 				#endregion
 				static __history_add_record__ = function() {
@@ -2095,7 +2180,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __history_update_latest_cursor__()
+				/// @ignore
 				/// @desc    Updates the most recent snapshot's cursor field.
+				/// @self    WWTextBoxV3
 				/// @returns {Undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {
@@ -2108,9 +2195,11 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __history_jump__()
+				/// @ignore
 				/// @desc    Moves through undo/redo history by a signed offset
 				///          and restores the corresponding snapshot.
-				/// @param   {Real} _change : Negative=undo, Positive=redo.
+				/// @self    WWTextBoxV3
+				/// @param   {Real} change : Negative=undo, Positive=redo.
 				/// @returns {Undefined}
 				#endregion
 				static __history_jump__ = function(_change) {
@@ -2139,6 +2228,13 @@ function WWTextBoxV3() : WWCore() constructor {
 				
 			#endregion
 			
+			#region jsDoc
+			/// @func    __force_rebuild__()
+			/// @ignore
+			/// @desc    Marks buffer/cursor/renderer dirty and refreshes layout.
+			/// @self    WWTextBoxV3
+			/// @returns {Undefined}
+			#endregion
 			static __force_rebuild__ = function(){
 				buffer.__mark_dirty__();
 				cursor.__mark_dirty__();
@@ -2147,17 +2243,26 @@ function WWTextBoxV3() : WWCore() constructor {
 				cursor.__update_gui_position__()
 			}
 			
+			#region jsDoc
+			/// @func    __get_renderer__()
+			/// @ignore
+			/// @desc    Returns the active renderer instance.
+			/// @self    WWTextBoxV3
+			/// @returns {Struct}
+			#endregion
 			static __get_renderer__ = function(){
 				return renderer;
 			}
 			
 			#region jsDoc
-			/// @func    __cursor_set_index_synced__
+			/// @func    __cursor_set_index_synced__()
+			/// @ignore
 			/// @desc    Sets cursor index, syncs selection rules, and optionally updates sticky x (cursor_last_width).
-			/// @param   {Real} _new_index
-			/// @param   {Bool} _shift_select
-			/// @param   {Bool} _update_history
-			/// @param   {Bool} _update_width
+			/// @self    WWTextBoxV3
+			/// @param   {Real} new_index
+			/// @param   {Bool} shift_select
+			/// @param   {Bool} update_history
+			/// @param   {Bool} update_width
 			/// @returns {Real}
 			#endregion
 			static __cursor_set_index_synced__ = function(_new_index, _shift_select = false, _update_history = true, _update_width = true) {
@@ -2198,8 +2303,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __delete_selection_if_any__
 			/// @desc    If a highlight selection exists, erase it from the buffer and place the cursor.
-			/// @param   {Bool} _force_rebuild
-			/// @param   {Bool} _push_history
+			/// @param   {Bool} force_rebuild
+			/// @param   {Bool} push_history
 			/// @returns {Bool} True if something was deleted, false otherwise
 			#endregion
 			static __delete_selection_if_any__ = function(_force_rebuild = true, _push_history = true) {

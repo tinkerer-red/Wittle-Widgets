@@ -15,7 +15,7 @@ function WWView() : WWCore() constructor {
 			/// @func    set_canvas()
 			/// @desc    Assigns the scrollable canvas component displayed inside the viewport.
 			/// @self    WWView
-			/// @param   {Struct.WWCore} _canvas : Canvas component to mount into the viewport.
+			/// @param   {Struct.WWCore} canvas : Canvas component to mount into the viewport.
 			/// @returns {Struct.WWView}
 			#endregion
 			static set_canvas = function(_canvas) {

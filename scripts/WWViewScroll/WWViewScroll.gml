@@ -14,7 +14,7 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    set_canvas()
 			/// @desc    Assigns the canvas component and reapplies the current scroll offset.
 			/// @self    WWViewScroll
-			/// @param   {Struct.WWCore} _canvas : Canvas component to mount into the view.
+			/// @param   {Struct.WWCore} canvas : Canvas component to mount into the view.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static set_canvas = function(_canvas) {
@@ -33,8 +33,8 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    set_size()
 			/// @desc    Sets the view size and re-clamps the current scroll offset.
 			/// @self    WWViewScroll
-			/// @param   {Real} _width : View width.
-			/// @param   {Real} _height : View height.
+			/// @param   {Real} width : View width.
+			/// @param   {Real} height : View height.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -52,8 +52,8 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    set_scroll_offset()
 			/// @desc    Sets the scroll offset in pixels (clamped to content bounds).
 			/// @self    WWViewScroll
-			/// @param   {Real} _xoff : Horizontal scroll offset.
-			/// @param   {Real} _yoff : Vertical scroll offset.
+			/// @param   {Real} xoff : Horizontal scroll offset.
+			/// @param   {Real} yoff : Vertical scroll offset.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static set_scroll_offset = function(_xoff=0, _yoff=0) {
@@ -70,8 +70,8 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    scroll_by()
 			/// @desc    Adds a delta to the current scroll offset (clamped).
 			/// @self    WWViewScroll
-			/// @param   {Real} _dx : Horizontal delta.
-			/// @param   {Real} _dy : Vertical delta.
+			/// @param   {Real} dx : Horizontal delta.
+			/// @param   {Real} dy : Vertical delta.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static scroll_by = function(_dx=0, _dy=0) {
@@ -82,8 +82,8 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    set_content_size()
 			/// @desc    Sets the content size used for clamping (also sizes the canvas if present).
 			/// @self    WWViewScroll
-			/// @param   {Real} _width : Content width.
-			/// @param   {Real} _height : Content height.
+			/// @param   {Real} width : Content width.
+			/// @param   {Real} height : Content height.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static set_content_size = function(_width, _height) {
@@ -105,8 +105,8 @@ function WWViewScroll() : WWView() constructor {
 			/// @desc    Convenience: sets the maximum scroll offsets by converting them into a content size.
 			///          Equivalent to set_content_size(view_width + max_x, view_height + max_y).
 			/// @self    WWViewScroll
-			/// @param   {Real} _max_x : Max horizontal scroll in pixels.
-			/// @param   {Real} _max_y : Max vertical scroll in pixels.
+			/// @param   {Real} max_x : Max horizontal scroll in pixels.
+			/// @param   {Real} max_y : Max vertical scroll in pixels.
 			/// @returns {Struct.WWViewScroll}
 			#endregion
 			static set_scroll_max = function(_max_x=0, _max_y=0) {
@@ -177,7 +177,7 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    __sync_content_size__()
 			/// @desc    Updates cached content size from the current canvas.
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __sync_content_size__ = function() {
 				if (canvas == undefined) {
@@ -194,7 +194,7 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    __clamp_scroll__()
 			/// @desc    Clamps scroll offsets to [0..max] based on content size and view size.
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __clamp_scroll__ = function() {
 				var _max_x = content_width - width;
@@ -211,7 +211,7 @@ function WWViewScroll() : WWView() constructor {
 			/// @func    __apply_scroll__()
 			/// @desc    Applies the current scroll offset to the canvas.
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __apply_scroll__ = function() {
 				if (canvas == undefined) { return; }

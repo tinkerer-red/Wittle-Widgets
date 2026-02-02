@@ -74,7 +74,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @func    set_rounding()
 		/// @desc    Enables or disables rounding (useful for integer sliders).
 		/// @self    WWSliderBase
-		/// @param   {Bool} _round : True to round, false to keep fractional values.
+		/// @param   {Bool} round : True to round, false to keep fractional values.
 		/// @returns {Struct.WWSliderBase}
 		#endregion
 		static set_rounding = function(_round=false) {
@@ -88,7 +88,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @func    set_lerp_target()
 		/// @desc    Sets the smoothing target value (the slider eases toward this value).
 		/// @self    WWSliderBase
-		/// @param   {Real} _lerp_target : Target value to ease toward.
+		/// @param   {Real} lerp_target : Target value to ease toward.
 		/// @returns {Struct.WWSliderBase}
 		#endregion
 		static set_lerp_target = function(_lerp_target) {
@@ -106,7 +106,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @func    set_inverted()
 		/// @desc    Flips the bar growth direction.
 		/// @self    WWSliderBase
-		/// @param   {Bool} _invert : True to invert direction.
+		/// @param   {Bool} invert : True to invert direction.
 		/// @returns {Struct.WWSliderBase}
 		#endregion
 		static set_inverted = function(_invert) {
@@ -118,10 +118,10 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @func    set_bar_size()
 		/// @desc    Sets the bar component region relative to the slider.
 		/// @self    WWSliderBase
-		/// @param   {Real} _left : Left.
-		/// @param   {Real} _top : Top.
-		/// @param   {Real} _right : Right.
-		/// @param   {Real} _bottom : Bottom.
+		/// @param   {Real} left : Left.
+		/// @param   {Real} top : Top.
+		/// @param   {Real} right : Right.
+		/// @param   {Real} bottom : Bottom.
 		/// @returns {Struct.WWSliderBase}
 		#endregion
 		static set_bar_size = function(_left, _top, _right, _bottom) {
@@ -132,10 +132,10 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @func    set_background_size()
 		/// @desc    Sets the background component region relative to the slider.
 		/// @self    WWSliderBase
-		/// @param   {Real} _left : Left.
-		/// @param   {Real} _top : Top.
-		/// @param   {Real} _right : Right.
-		/// @param   {Real} _bottom : Bottom.
+		/// @param   {Real} left : Left.
+		/// @param   {Real} top : Top.
+		/// @param   {Real} right : Right.
+		/// @param   {Real} bottom : Bottom.
 		/// @returns {Struct.WWSliderBase}
 		#endregion
 		static set_background_size = function(_left, _top, _right, _bottom) {
@@ -279,8 +279,8 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		};
         #region jsDoc
 		/// @func    get_value()
-		/// @desc    Returns the value of the component
-		/// @self    WWSlider
+		/// @desc    Returns the value of the component.
+		/// @self    WWSliderBase
 		/// @returns {Real}
 		#endregion
 		static get_value = function() {
@@ -300,7 +300,13 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		#endregion
 		
 		#region Functions
-			
+			#region jsDoc
+			/// @func    __set_value__()
+			/// @desc    Sets the slider value, applying clamp + rounding, and triggers value change events.
+			/// @param   {Real} value : New raw value.
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
 			static __set_value__ = function(_value) {
 				value = clamp(_value, min_value, max_value);
 				
@@ -323,6 +329,13 @@ function WWSliderBase() : WWButtonSprite() constructor {
 				__prev_value__ = value;
 			}
 			
+			#region jsDoc
+			/// @func    __set_normalized_value__()
+			/// @desc    Sets the slider value from a normalized 0..1 input, applying clamp + rounding, and triggers value change events.
+			/// @param   {Real} value : New normalized value (0..1).
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
 			static __set_normalized_value__ = function(_value) {
 				__prev_value__ = value;
 				

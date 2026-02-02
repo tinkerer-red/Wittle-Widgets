@@ -13,7 +13,7 @@ function WWButtonSprite() : WWSprite() constructor {
 			/// @func    set_callback()
 			/// @desc    Sets the callback invoked when the button is released.
 			/// @self    WWButtonSprite
-			/// @param   {Function} _callback : Function called on release.
+			/// @param   {Function} callback : Function called on release.
 			/// @returns {Struct.WWButtonSprite}
 			#endregion
 			static set_callback = function(_callback) {

@@ -1562,59 +1562,116 @@ function WWTextField() : WWCore() constructor {
 			};
 			
 			// --- Public API symmetry getters (demo library validation) ---
+			#region jsDoc
+			/// @func    get_caption()
+			/// @desc    Returns the renderer caption.
+			/// @returns {String}
+			#endregion
 			static get_caption = function() {
 				return renderer.get_caption();
 			};
-			
+			#region jsDoc
+			/// @func    get_text_font()
+			/// @desc    Returns the renderer font.
+			/// @returns {Asset.GMFont}
+			#endregion
 			static get_text_font = function() {
 				// WWTextRenderer exposes this as get_font()
 				return renderer.get_font();
 			};
-			
+			#region jsDoc
+			/// @func    get_text_color()
+			/// @desc    Returns the renderer text color.
+			/// @returns {Constant.Color}
+			#endregion
 			static get_text_color = function() {
 				return renderer.get_text_color();
 			};
-			
+			#region jsDoc
+			/// @func    get_text_alpha()
+			/// @desc    Returns the renderer text alpha.
+			/// @returns {Real}
+			#endregion
 			static get_text_alpha = function() {
 				return renderer.get_text_alpha();
 			};
-			
+			#region jsDoc
+			/// @func    get_wrap_enabled()
+			/// @desc    Returns whether word-wrapping is enabled.
+			/// @returns {Bool}
+			#endregion
 			static get_wrap_enabled = function() {
 				return renderer.get_wrap_enabled();
 			};
-			
+			#region jsDoc
+			/// @func    get_line_sep()
+			/// @desc    Returns the current line separator string.
+			/// @returns {String}
+			#endregion
 			static get_line_sep = function() {
 				return renderer.get_line_sep();
 			};
-			
+			#region jsDoc
+			/// @func    get_read_only()
+			/// @desc    Returns whether the field is read-only.
+			/// @returns {Bool}
+			#endregion
 			static get_read_only = function() {
 				return is_read_only;
 			};
-			
+			#region jsDoc
+			/// @func    get_keyboard_type()
+			/// @desc    Returns the configured virtual keyboard type (kbv_type_*).
+			/// @returns {Real}
+			#endregion
 			static get_keyboard_type = function() {
 				return __keyboard_type__;
 			};
-			
+			#region jsDoc
+			/// @func    get_enter_submits_text()
+			/// @desc    Returns whether Enter submits text.
+			/// @returns {Bool}
+			#endregion
 			static get_enter_submits_text = function() {
 				return enter_submits_text;
 			};
-			
+			#region jsDoc
+			/// @func    get_tab_exits_text()
+			/// @desc    Returns whether Tab exits text editing.
+			/// @returns {Bool}
+			#endregion
 			static get_tab_exits_text = function() {
 				return tab_exits_text;
 			};
-			
+			#region jsDoc
+			/// @func    get_cursor_color()
+			/// @desc    Returns the cursor color.
+			/// @returns {Constant.Color}
+			#endregion
 			static get_cursor_color = function() {
 				return __cursor_color__;
 			};
-			
+			#region jsDoc
+			/// @func    get_highlight_color()
+			/// @desc    Returns the selection highlight color.
+			/// @returns {Constant.Color}
+			#endregion
 			static get_highlight_color = function() {
 				return __highlight_color__;
 			};
-			
+			#region jsDoc
+			/// @func    get_multi_cursor_enabled()
+			/// @desc    Returns whether multi-cursor is enabled.
+			/// @returns {Bool}
+			#endregion
 			static get_multi_cursor_enabled = function() {
 				return multi_cursor_enabled;
 			};
-			
+			#region jsDoc
+			/// @func    get_cursor_xy()
+			/// @desc    Returns the cursor position in local renderer coordinates.
+			/// @returns {Struct} struct_with_x_y
+			#endregion
 			static get_cursor_xy = function() {
 				var _idx = __cursor_get_index__();
 				var _line = renderer.get_line_from_index(_idx);
@@ -1623,7 +1680,11 @@ function WWTextField() : WWCore() constructor {
 					y: renderer.get_line_y_offset(_line),
 				};
 			};
-			
+			#region jsDoc
+			/// @func    get_text_processor()
+			/// @desc    Returns the active text processor used by the renderer.
+			/// @returns {Any}
+			#endregion
 			static get_text_processor = function() {
 				return renderer.get_text_processor();
 			};
@@ -2045,6 +2106,7 @@ function WWTextField() : WWCore() constructor {
 				/// @desc    Returns a struct of allowed characters from the supplied font.
 				/// @self    WWTextField
 				/// @param   {Asset.GMFont} font : The font to build the allowed character list.
+				/// @param   {Bool} include_nl : Whether to include '\n' in the allowed set.
 				/// @returns {Struct} Allowed Characters Struct
 				#endregion
 				static __build_allowed_char__ = function(_font, _include_nl=true) {

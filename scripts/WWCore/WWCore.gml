@@ -161,7 +161,7 @@ function WWCore() constructor {
 			/// @func    set_focusable()
 			/// @desc    Sets whether this component can be focused/hovered/interacted with.
 			/// @self    WWCore
-			/// @param   {Bool} _is_focusable : True to allow interaction.
+			/// @param   {Bool} is_focusable : True to allow interaction.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_focusable = function(_is_focusable) {
@@ -236,10 +236,11 @@ function WWCore() constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func   set_focus(_is_focused)
-			/// @desc   Sets focus state for this component.
-			/// @param  {Bool} _is_focused
-			/// @returns {Struct.WWCore} self
+			/// @func    set_focus()
+			/// @desc    Sets the focus state for this component.
+			/// @self    WWCore
+			/// @param   {Bool} is_focused : True to focus; false to unfocus.
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_focus = function(_focus) {
 			    if (_focus && !__is_focused__) {
@@ -254,10 +255,11 @@ function WWCore() constructor {
 			    return self;
 			}
 			#region jsDoc
-			/// @func   set_hover(_is_hovered)
-			/// @desc   Sets hover state for this component.
-			/// @param  {Bool} _is_hovered
-			/// @returns {Struct.WWCore} self
+			/// @func    set_hover()
+			/// @desc    Sets the hover state for this component.
+			/// @self    WWCore
+			/// @param   {Bool} is_hovered : True to hover; false to unhover.
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_hover = function(_hover) {
 			    if (_hover && !__is_hovered__) {
@@ -272,10 +274,11 @@ function WWCore() constructor {
 			    return self;
 			}
 			#region jsDoc
-			/// @func   set_interact(_is_interacting)
-			/// @desc   Sets interaction state for this component.
-			/// @param  {Bool} _is_interacting
-			/// @returns {Struct.WWCore} self
+			/// @func    set_interact()
+			/// @desc    Sets the interaction state for this component.
+			/// @self    WWCore
+			/// @param   {Bool} is_interacting : True while interacting; false to stop.
+			/// @returns {Struct.WWCore}
 			#endregion
 			static set_interact = function(_interact) {
 			    if (_interact && !__is_interacting__) {
@@ -295,6 +298,14 @@ function WWCore() constructor {
 		#region Events
 			
 			events = {};
+			#region jsDoc
+			/// @func    on_event()
+			/// @desc    Adds an event listener for a given event id or name.
+			/// @self    WWCore
+			/// @param   {String|Real} event : Event name (string) or event hash id.
+			/// @param   {Function} callback : Listener invoked with event payload.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_event = function(_event, _func) {
 				var _hash = is_string(_event) ? variable_get_hash(_event) : _event;
 				add_event_listener(_hash, _func);
@@ -305,14 +316,35 @@ function WWCore() constructor {
 			events.focus_enter = variable_get_hash("focus_enter"); //triggered when component first accepted keyboard inputs
 			events.focus       = variable_get_hash("focus"); //triggered every frame component can accept keyboard inputs
 			events.focus_exit  = variable_get_hash("focus_exit"); //triggered when the component can no longer accept keyboard inputs
+			#region jsDoc
+			/// @func    on_focus_enter()
+			/// @desc    Adds a listener for the focus_enter event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when focus enters.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_focus_enter = function(_func) {
 				add_event_listener(events.focus_enter, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_focus()
+			/// @desc    Adds a listener for the focus event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked while focused.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_focus = function(_func) {
 				add_event_listener(events.focus, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_focus_exit()
+			/// @desc    Adds a listener for the focus_exit event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when focus exits.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_focus_exit = function(_func) {
 				add_event_listener(events.focus_exit, _func);
 				return self;
@@ -322,14 +354,35 @@ function WWCore() constructor {
 			events.interact_enter = variable_get_hash("interact_enter"); //triggered when component first accepted keyboard inputs
 			events.interact       = variable_get_hash("interact"); //triggered every frame component can accept keyboard inputs
 			events.interact_exit  = variable_get_hash("interact_exit"); //triggered when the component can no longer accept keyboard inputs
+			#region jsDoc
+			/// @func    on_interact_enter()
+			/// @desc    Adds a listener for the interact_enter event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when interaction begins.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_interact_enter = function(_func) {
 				add_event_listener(events.interact_enter, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_interact()
+			/// @desc    Adds a listener for the interact event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked while interacting.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_interact = function(_func) {
 				add_event_listener(events.interact, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_interact_exit()
+			/// @desc    Adds a listener for the interact_exit event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when interaction ends.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_interact_exit = function(_func) {
 				add_event_listener(events.interact_exit, _func);
 				return self;
@@ -339,14 +392,35 @@ function WWCore() constructor {
 			events.hover_enter = variable_get_hash("hover_enter"); //triggered when component first accepted keyboard inputs
 			events.hover       = variable_get_hash("hover"); //triggered every frame component can accept keyboard inputs
 			events.hover_exit  = variable_get_hash("hover_exit"); //triggered when the component can no longer accept keyboard inputs
+			#region jsDoc
+			/// @func    on_hover_enter()
+			/// @desc    Adds a listener for the hover_enter event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when hover begins.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_hover_enter = function(_func) {
 				add_event_listener(events.hover_enter, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_hover()
+			/// @desc    Adds a listener for the hover event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked while hovered.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_hover = function(_func) {
 				add_event_listener(events.hover, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_hover_exit()
+			/// @desc    Adds a listener for the hover_exit event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when hover ends.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_hover_exit = function(_func) {
 				add_event_listener(events.hover_exit, _func);
 				return self;
@@ -360,26 +434,68 @@ function WWCore() constructor {
 			events.released   = variable_get_hash("released");
 			events.double_click = variable_get_hash("double_click");
 			events.triple_click = variable_get_hash("triple_click");
+			#region jsDoc
+			/// @func    on_pressed()
+			/// @desc    Adds a listener for the pressed event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when pressed.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_pressed = function(_func) {
 				add_event_listener(events.pressed, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_held()
+			/// @desc    Adds a listener for the held event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked while held.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_held = function(_func) {
 				add_event_listener(events.held, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_long_press()
+			/// @desc    Adds a listener for the long_press event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked on long press.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_long_press = function(_func) {
 				add_event_listener(events.long_press, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_released()
+			/// @desc    Adds a listener for the released event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when released.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_released = function(_func) {
 				add_event_listener(events.released, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_double_click()
+			/// @desc    Adds a listener for the double_click event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked on double click.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_double_click = function(_func) {
 				add_event_listener(events.double_click, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_triple_click()
+			/// @desc    Adds a listener for the triple_click event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked on triple click.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_triple_click = function(_func) {
 				add_event_listener(events.triple_click, _func);
 				return self;
@@ -389,10 +505,24 @@ function WWCore() constructor {
 			#region Step/Draw
 			events.pre_step  = variable_get_hash("pre_step"); //triggered every frame before the begin step event is activated
 			events.post_step = variable_get_hash("post_step"); //triggered every frame after the end step event is activated
+			#region jsDoc
+			/// @func    on_pre_step()
+			/// @desc    Adds a listener for the pre_step event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked before step.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_pre_step = function(_func) {
 				add_event_listener(events.pre_step, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_post_step()
+			/// @desc    Adds a listener for the post_step event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked after step.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_post_step = function(_func) {
 				add_event_listener(events.post_step, _func);
 				return self;
@@ -400,10 +530,24 @@ function WWCore() constructor {
 			
 			events.pre_draw    = variable_get_hash("pre_draw"); //triggered every frame after the end step event is activated
 			events.post_draw   = variable_get_hash("post_draw"); //triggered every frame after the end step event is activated
+			#region jsDoc
+			/// @func    on_pre_draw()
+			/// @desc    Adds a listener for the pre_draw event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked before draw.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_pre_draw = function(_func) {
 				add_event_listener(events.pre_draw, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_post_draw()
+			/// @desc    Adds a listener for the post_draw event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked after draw.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_post_draw = function(_func) {
 				add_event_listener(events.post_draw, _func);
 				return self;
@@ -413,10 +557,24 @@ function WWCore() constructor {
 			#region Mouse Over/Off
 			events.mouse_over = variable_get_hash("mouse_over");
 			events.mouse_off = variable_get_hash("mouse_off");
+			#region jsDoc
+			/// @func    on_mouse_over()
+			/// @desc    Adds a listener for the mouse_over event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when mouse enters.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_mouse_over = function(_func) {
 				add_event_listener(events.mouse_over, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_mouse_off()
+			/// @desc    Adds a listener for the mouse_off event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when mouse exits.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_mouse_off = function(_func) {
 				add_event_listener(events.mouse_off, _func);
 				return self;
@@ -424,10 +582,24 @@ function WWCore() constructor {
 			
 			events.mouse_over_group = variable_get_hash("mouse_over_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
 			events.mouse_off_group = variable_get_hash("mouse_off_group"); //triggered every frame the mouse is over the controller region bounding box, This will be a square box encapsulating all sub components.
+			#region jsDoc
+			/// @func    on_mouse_over_group()
+			/// @desc    Adds a listener for the mouse_over_group event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked while mouse is within group bounds.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_mouse_over_group = function(_func) {
 				add_event_listener(events.mouse_over_group, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_mouse_off_group()
+			/// @desc    Adds a listener for the mouse_off_group event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when mouse leaves group bounds.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_mouse_off_group = function(_func) {
 				add_event_listener(events.mouse_off_group, _func);
 				return self;
@@ -436,10 +608,24 @@ function WWCore() constructor {
 			
 			events.enabled     = variable_get_hash("enabled"); //triggered when the component is enabled (this is done by the developer)
 			events.disabled    = variable_get_hash("disabled"); //triggered when the component is disabled (this is done by the developer)
+			#region jsDoc
+			/// @func    on_enable()
+			/// @desc    Adds a listener for the enabled event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when enabled.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_enable = function(_func) {
 				add_event_listener(events.enabled, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_disabled()
+			/// @desc    Adds a listener for the disabled event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when disabled.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_disabled = function(_func) {
 				add_event_listener(events.disabled, _func);
 				return self;
@@ -447,16 +633,37 @@ function WWCore() constructor {
 			
 			events.activated   = variable_get_hash("activated"); //triggered when the component is enabled (this is done by the developer)
 			events.deactivated = variable_get_hash("deactivated"); //triggered when the component is disabled (this is done by the developer)
+			#region jsDoc
+			/// @func    on_activated()
+			/// @desc    Adds a listener for the activated event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when activated.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_activated = function(_func) {
 				add_event_listener(events.activated, _func);
 				return self;
 			}
+			#region jsDoc
+			/// @func    on_deactivated()
+			/// @desc    Adds a listener for the deactivated event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked when deactivated.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_deactivated = function(_func) {
 				add_event_listener(events.deactivated, _func);
 				return self;
 			}
 			
 			events.resize = variable_get_hash("resize"); //triggered when the component is disabled (this is done by the developer)
+			#region jsDoc
+			/// @func    on_resize()
+			/// @desc    Adds a listener for the resize event.
+			/// @self    WWCore
+			/// @param   {Function} callback : Listener invoked on resize.
+			/// @returns {Struct.WWCore}
+			#endregion
 			static on_resize = function(_func) {
 				add_event_listener(events.resize, _func);
 				return self;
@@ -466,11 +673,14 @@ function WWCore() constructor {
 		
 		#region Focus & Navigation
             
-            /// @func    navigate_focus()
-            /// @desc    Attempts to shift focus in the given _dir ('next', 'prev', 'up', 'down', etc.)
-            ///          This simple algorithm checks the parent's children list and, if needed, escalates upward.
-            /// @param   {String} _dir : The navigation _dir.
-            /// @returns {Struct.WWCore} The component that received focus, or self if none found.
+			#region jsDoc
+			/// @func    navigate_focus()
+			/// @desc    Attempts to shift focus in the given direction ("next", "prev", "up", "down", etc.).
+			///          This simple algorithm checks the parent's children list and, if needed, escalates upward.
+			/// @self    WWCore
+			/// @param   {String} dir : The navigation direction.
+			/// @returns {Struct.WWCore} The component that received focus, or self if none found.
+			#endregion
             static navigate_focus = function(_dir) {
                 // If no parent, we cannot navigate away.
                 if (__parent__ == noone) {
@@ -516,10 +726,14 @@ function WWCore() constructor {
                 return target != undefined ? target : self;
             }
 			
-            /// @func    handle_keyboard_navigation()
-            /// @desc    Checks for tab or arrow key presses and navigates focus accordingly.
-            ///          When tab is pressed, if shift is down, it navigates in reverse.
-            /// @param   {Struct} _input : The input struct (should contain keyboard state).
+			#region jsDoc
+			/// @func    handle_keyboard_navigation()
+			/// @desc    Checks for tab or arrow key presses and navigates focus accordingly.
+			///          When tab is pressed, if shift is down, it navigates in reverse.
+			/// @self    WWCore
+			/// @param   {Struct} input : The input struct (should contain keyboard state).
+			/// @returns {Undefined}
+			#endregion
             static handle_keyboard_navigation = function(_input) {
                 // Example pseudo-code for key checking; replace with your own input functions.
                 if (keyboard_check_pressed(vk_tab)) {
@@ -747,7 +961,8 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   event_name(_event_id)
 			/// @desc   Converts an event id into a readable event name string.
-			/// @param  {Real} _event_id
+			/// @self   WWCore
+			/// @param  {Real} event_id
 			/// @returns {String} event_name_string
 			#endregion
 			static event_name = function(_event_id) {
@@ -1089,10 +1304,15 @@ function WWCore() constructor {
 				
 			}
 			#region jsDoc
-			/// @func   add_inline(_inline_component)
-			/// @desc   Adds a component as an inline child of this component.
-			/// @param  {Struct.WWCore} _inline_component
-			/// @returns {Struct.WWCore} self
+			/// @func    add_inline()
+			/// @desc    Lays out and adds components inline inside this controller.
+			///          Components are grouped by a WWInline operator in the array.
+			/// @self    WWCore
+			/// @param   {Array<Struct>} componentsArray : Components and optional WWInline separators.
+			/// @param   {Real} horizontalSpacing : Spacing between inline items.
+			/// @param   {Real} verticalSpacing : Spacing between lines.
+			/// @param   {Bool} scaleInline : True to scale components to fit the container width.
+			/// @returns {Struct.WWCore}
 			#endregion
 			static add_inline = function(componentsArray, horizontalSpacing=0, verticalSpacing=0, scaleInline=true) {
 				var lines = [];
@@ -1312,6 +1532,7 @@ function WWCore() constructor {
 			/// @desc    Emulates the GML equivalant event.
 			/// @self    WWCore
 			/// @param   {Struct} input : The input struct components pass around to capture inputs
+			/// @param   {Bool} debug : True to enable additional debug drawing.
 			/// @returns {Undefined}
 			#endregion
 			static draw = function(_input=undefined, _debug=false) {
@@ -1649,10 +1870,10 @@ function WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    __update_group_region__()
-			/// @desc    This function is internally used to help assist updating the bounding box of controllers. This bounding box is used for many things but primarily used for collision check optimizations.
+			/// @desc    Internal: recalculates the controller bounding region based on children.
+			///          Used primarily for mouse hit testing and early-out collision checks.
 			/// @self    WWCore
-			/// @param   {Real} index : The index of the component to remove.
-			/// @returns {Struct.WWCore}
+			/// @returns {Undefined}
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
@@ -1709,8 +1930,9 @@ function WWCore() constructor {
 			/// @func    __adopt_children_events__()
 			/// @desc    Adopts all child component events into this component, wiring their events
 			///          to re-dispatch through this component.
+			/// @self    WWCore
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __adopt_children_events__ = function() {
 				for (var _i=0; _i<array_length(__children__); _i++) {
@@ -1723,9 +1945,10 @@ function WWCore() constructor {
 			/// @func    __adopt_child_events__()
 			/// @desc    Wires a child component's events so they bubble through this component,
 			///          and dynamically exposes on_<event>() helper functions for chaining.
-			/// @param   {Struct.WWCore} _comp : Child component whose events are adopted.
+			/// @self    WWCore
+			/// @param   {Struct.WWCore} comp : Child component whose events are adopted.
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __adopt_child_events__ = function(_comp) {
 				var _self = self;
@@ -1911,10 +2134,11 @@ function WWCore() constructor {
 			};
 			#region jsDoc
 			/// @func    __get_controller_archor_x__()
-			/// @desc    Get's the anchor's desired location from the controller region.
+			/// @desc    Gets the anchor's desired x location from the controller region.
 			/// @self    WWCore
 			/// @param   {Constant.HAlign} halign : Horizontal alignment.
 			/// @returns {Real}
+			/// @ignore
 			#endregion
 			static __get_controller_archor_x__ = function(_halign=fa_center) {
 				switch (_halign) {
@@ -1932,10 +2156,11 @@ function WWCore() constructor {
 			}
 			#region jsDoc
 			/// @func    __get_controller_archor_y__()
-			/// @desc    Get's the anchor's desired location from the controller region.
+			/// @desc    Gets the anchor's desired y location from the controller region.
 			/// @self    WWCore
 			/// @param   {Constant.VAlign} valign : Vertical alignment.
 			/// @returns {Real}
+			/// @ignore
 			#endregion
 			static __get_controller_archor_y__= function(_valign=fa_middle) {
 				switch (_valign) {

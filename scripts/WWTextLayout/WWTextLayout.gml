@@ -1,5 +1,6 @@
 /// @func    WWTextLayout()
-/// @desc    Layout handler that owns a ds_map-based text layout.
+/// @desc    Layout handler that owns an array-backed text layout struct.
+/// @returns {Struct.WWTextLayout}
 function WWTextLayout() constructor {
 	// Root layout map
 	layout_data = {};
@@ -16,9 +17,20 @@ function WWTextLayout() constructor {
 	layout_data.content_width = 0;
 	layout_data.content_height = 0;
 	
-	/// @func add_line(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment)
-	/// @desc Record a single laid-out line in the layout.
-	/// @param {Real} _alignment : 0=left (default), 1=center, 2=right
+	#region jsDoc
+	/// @func    add_line()
+	/// @desc    Records a single laid-out line in the layout.
+	/// @self    WWTextLayout
+	/// @param   {String} text
+	/// @param   {Real}   start_ind
+	/// @param   {Real}   end_ind
+	/// @param   {Real}   width
+	/// @param   {Real}   height
+	/// @param   {Real}   yoff
+	/// @param   {Bool}   force_wrapped
+	/// @param   {Real}   alignment     : 0=left (default), 1=center, 2=right
+	/// @returns {Real}                : Line index.
+	#endregion
 	static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment = 0) {
 		var _data = layout_data;
 		var _lines = _data.lines;
@@ -53,16 +65,17 @@ function WWTextLayout() constructor {
 	};
 
 	#region jsDoc
-	/// @func    add_glyph(_char, _index, _buffer_index, _buffer_size, _x, _y, _width, _height, _span_index)
+	/// @func    add_glyph()
 	/// @desc    Adds a glyph record to the layout. This glyph may represent a full Unicode cluster.
-	/// @param   {String} _char          : Representative character or cluster.
-	/// @param   {Real}   _index         : Logical text index (cluster index).
-	/// @param   {Real}   _x             : X position in layout space.
-	/// @param   {Real}   _y             : Y position in layout space.
-	/// @param   {Real}   _width         : Glyph width.
-	/// @param   {Real}   _height        : Glyph height.
-	/// @param   {Real}   _span_index    : Index into layout_data.spans for formatting/appearance.
-	/// @returns {Real}                  : Glyph slot index.
+	/// @self    WWTextLayout
+	/// @param   {String} char       : Representative character or cluster.
+	/// @param   {Real}   index      : Logical text index (cluster index).
+	/// @param   {Real}   x          : X position in layout space.
+	/// @param   {Real}   y          : Y position in layout space.
+	/// @param   {Real}   width      : Glyph width.
+	/// @param   {Real}   height     : Glyph height.
+	/// @param   {Real}   span_index : Index into `layout_data.spans` for formatting/appearance.
+	/// @returns {Real}             : Glyph slot index.
 	#endregion
 	static add_glyph = function(
 	    _char,
@@ -103,9 +116,10 @@ function WWTextLayout() constructor {
 	};
 	
 	#region jsDoc
-	/// @func    set_spans(_spans)
+	/// @func    set_spans()
 	/// @desc    Sets the span array used by glyph records (formatting/appearance).
-	/// @param   {Array<Struct>} _spans
+	/// @self    WWTextLayout
+	/// @param   {Array<Struct>} spans
 	#endregion
 	static set_spans = function(_spans) {
 	    layout_data.spans = _spans;
@@ -114,6 +128,7 @@ function WWTextLayout() constructor {
 	#region jsDoc
 	/// @func    get_spans()
 	/// @desc    Returns the current span array used by glyph records.
+	/// @self    WWTextLayout
 	/// @returns {Array<Struct>}
 	#endregion
 	static get_spans = function() {
@@ -125,6 +140,7 @@ function WWTextLayout() constructor {
 	#region jsDoc
 	/// @func    get_layout_data()
 	/// @desc    Returns the root data containing all layout information.
+	/// @self    WWTextLayout
 	/// @returns {Struct}
 	#endregion
 	static get_layout_data = function() {
@@ -134,6 +150,7 @@ function WWTextLayout() constructor {
 	#region jsDoc
 	/// @func    get_content_width()
 	/// @desc    Returns the full content width (max line or glyph x extent).
+	/// @self    WWTextLayout
 	/// @returns {Real}
 	#endregion
 	static get_content_width = function() {
@@ -143,6 +160,7 @@ function WWTextLayout() constructor {
 	#region jsDoc
 	/// @func    get_content_height()
 	/// @desc    Returns the full content height (max line or glyph y extent).
+	/// @self    WWTextLayout
 	/// @returns {Real}
 	#endregion
 	static get_content_height = function() {
@@ -156,6 +174,7 @@ function WWTextLayout() constructor {
 		#region jsDoc
 		/// @func    get_line_count()
 		/// @desc    Returns how many lines exist in the layout.
+		/// @self    WWTextLayout
 		/// @returns {Real}
 		#endregion
 		static get_line_count = function() {
@@ -163,10 +182,11 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line(_line_index)
+		/// @func    get_line()
 		/// @desc    Returns a new struct representing the requested line.
-		/// @param   {Real} _line_index : Zero-based line index.
-		/// @returns {Struct}
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
+		/// @returns {Struct|Real}     : Line struct, or 0 if the index is out of range.
 		#endregion
 		static get_line = function(_line_index) {
 			var _data = layout_data;
@@ -192,9 +212,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_text(_line_index)
+		/// @func    get_line_text()
 		/// @desc    Returns the raw text content of the given line.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {String}
 		#endregion
 		static get_line_text = function(_line_index) {
@@ -209,9 +230,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_index_start(_line_index)
+		/// @func    get_line_index_start()
 		/// @desc    Returns the text index that begins this line.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_index_start = function(_line_index) {
@@ -226,9 +248,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_index_end(_line_index)
+		/// @func    get_line_index_end()
 		/// @desc    Returns the text index immediately after the last char of the line.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_index_end = function(_line_index) {
@@ -243,9 +266,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_width(_line_index)
+		/// @func    get_line_width()
 		/// @desc    Returns the width of the given line.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_width = function(_line_index) {
@@ -260,9 +284,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_height(_line_index)
+		/// @func    get_line_height()
 		/// @desc    Returns the height of the given line.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_height = function(_line_index) {
@@ -277,9 +302,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_y_offset(_line_index)
+		/// @func    get_line_y_offset()
 		/// @desc    Returns the vertical offset of the line relative to layout top.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_y_offset = function(_line_index) {
@@ -294,9 +320,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_forced_wrapped(_line_index)
+		/// @func    get_line_forced_wrapped()
 		/// @desc    Returns 1 if the line was soft-wrapped, 0 if an explicit break.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_forced_wrapped = function(_line_index) {
@@ -311,9 +338,10 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_alignment(_line_index)
+		/// @func    get_line_alignment()
 		/// @desc    Returns the alignment for this line: 0=left, 1=center, 2=right.
-		/// @param   {Real} _line_index : Zero-based line index.
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index : Zero-based line index.
 		/// @returns {Real}
 		#endregion
 		static get_line_alignment = function(_line_index) {
@@ -328,12 +356,13 @@ function WWTextLayout() constructor {
 		};
 	
 		#region jsDoc
-		/// @func    get_line_x_offset(_line_index, _available_width)
+		/// @func    get_line_x_offset()
 		/// @desc    Calculates the horizontal offset for a line based on its alignment.
 		///          Use this offset when rendering glyphs to apply alignment.
-		/// @param   {Real} _line_index : Zero-based line index.
-		/// @param   {Real} _available_width : The container width to align within.
-		/// @returns {Real} : X offset to add to all glyphs on this line (0 for left-aligned).
+		/// @self    WWTextLayout
+		/// @param   {Real} line_index      : Zero-based line index.
+		/// @param   {Real} available_width : The container width to align within.
+		/// @returns {Real}                : X offset to add to all glyphs on this line (0 for left-aligned).
 		#endregion
 		static get_line_x_offset = function(_line_index, _available_width) {
 			var _data = layout_data;
@@ -376,6 +405,7 @@ function WWTextLayout() constructor {
 		#region jsDoc
 		/// @func    get_glyph_count()
 		/// @desc    Returns how many glyphs are recorded in the layout.
+		/// @self    WWTextLayout
 		/// @returns {Real}
 		#endregion
 		static get_glyph_count = function() {
@@ -383,10 +413,11 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph(_glyph_index)
+		/// @func    get_glyph()
 		/// @desc    Returns a new struct representing this glyph.
-		/// @param   {Real} _glyph_index
-		/// @returns {Struct}
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
+		/// @returns {Struct|Undefined} : Glyph struct, or `undefined` if the index is out of range.
 		#endregion
 		static get_glyph = function(_glyph_index)
 		{
@@ -411,10 +442,11 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_char(_glyph_index)
+		/// @func    get_glyph_char()
 		/// @desc    Returns the displayed character or Unicode cluster.
-		/// @param   {Real} _glyph_index
-		/// @returns {String}
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
+		/// @returns {String|Undefined} : Character/cluster, or `undefined` if the index is out of range.
 		#endregion
 		static get_glyph_char = function(_glyph_index)
 		{
@@ -429,9 +461,10 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_index(_glyph_index)
+		/// @func    get_glyph_index()
 		/// @desc    Returns the logical text index (cluster index) for this glyph.
-		/// @param   {Real} _glyph_index
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
 		/// @returns {Real}
 		#endregion
 		static get_glyph_index = function(_glyph_index)
@@ -447,9 +480,10 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_x(_glyph_index)
+		/// @func    get_glyph_x()
 		/// @desc    Returns the glyph's x position in layout space.
-		/// @param   {Real} _glyph_index
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
 		/// @returns {Real}
 		#endregion
 		static get_glyph_x = function(_glyph_index)
@@ -465,9 +499,10 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_y(_glyph_index)
+		/// @func    get_glyph_y()
 		/// @desc    Returns the glyph's y position in layout space.
-		/// @param   {Real} _glyph_index
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
 		/// @returns {Real}
 		#endregion
 		static get_glyph_y = function(_glyph_index)
@@ -483,10 +518,11 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_width(_glyph_index)
+		/// @func    get_glyph_width()
 		/// @desc    Returns the width of this glyph.
-		/// @param   {Real} _glyph_index
-		/// @returns {Real}
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
+		/// @returns {Real|Undefined} : Width, or `undefined` if the index is out of range.
 		#endregion
 		static get_glyph_width = function(_glyph_index)
 		{
@@ -501,10 +537,11 @@ function WWTextLayout() constructor {
 		};
 
 		#region jsDoc
-		/// @func    get_glyph_height(_glyph_index)
+		/// @func    get_glyph_height()
 		/// @desc    Returns the height of this glyph.
-		/// @param   {Real} _glyph_index
-		/// @returns {Real}
+		/// @self    WWTextLayout
+		/// @param   {Real} glyph_index
+		/// @returns {Real|Undefined} : Height, or `undefined` if the index is out of range.
 		#endregion
 		static get_glyph_height = function(_glyph_index)
 		{
@@ -526,7 +563,8 @@ function WWTextLayout() constructor {
 		/// @func    apply_line_alignment()
 		/// @desc    Mutates glyph X positions in-place based on each line's alignment.
 		///          This must be called after all lines/glyphs are added, and before VB build.
-		/// @param   {Real} _available_width
+		/// @self    WWTextLayout
+		/// @param   {Real} available_width
 		/// @returns {Struct.WWTextLayout}
 		#endregion
 		static apply_line_alignment = function(_available_width) {

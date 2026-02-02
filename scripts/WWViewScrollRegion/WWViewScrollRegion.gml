@@ -75,7 +75,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scroll()
 			/// @desc    Fires whenever scroll offset changes (any axis).
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func : callback(data)
+			/// @param   {Function} func : callback(data)
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scroll = function(_func) { add_event_listener(events.scroll, _func); return self; };
@@ -83,7 +83,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scroll_horz()
 			/// @desc    Fires whenever horizontal scroll offset changes.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func : callback(data)
+			/// @param   {Function} func : callback(data)
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scroll_horz = function(_func) { add_event_listener(events.scroll_horz, _func); return self; };
@@ -91,7 +91,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scroll_vert()
 			/// @desc    Fires whenever vertical scroll offset changes.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func : callback(data)
+			/// @param   {Function} func : callback(data)
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scroll_vert = function(_func) { add_event_listener(events.scroll_vert, _func); return self; };
@@ -99,7 +99,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scrolled_up()
 			/// @desc    Fires when vertical scroll decreases.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func
+			/// @param   {Function} func
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scrolled_up = function(_func) { add_event_listener(events.scrolled_up, _func); return self; };
@@ -107,7 +107,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scrolled_down()
 			/// @desc    Fires when vertical scroll increases.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func
+			/// @param   {Function} func
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scrolled_down = function(_func) { add_event_listener(events.scrolled_down, _func); return self; };
@@ -115,7 +115,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scrolled_left()
 			/// @desc    Fires when horizontal scroll decreases.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func
+			/// @param   {Function} func
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scrolled_left = function(_func) { add_event_listener(events.scrolled_left, _func); return self; };
@@ -123,7 +123,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    on_scrolled_right()
 			/// @desc    Fires when horizontal scroll increases.
 			/// @self    WWViewScrollRegion
-			/// @param   {Function} _func
+			/// @param   {Function} func
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static on_scrolled_right = function(_func) { add_event_listener(events.scrolled_right, _func); return self; };
@@ -158,7 +158,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @desc    Enables/disables "scroll region" behavior (auto layout + auto-hide scrollbars).
 			///          When enabled, this component treats its own width/height as the total region size.
 			/// @self    WWViewScrollRegion
-			/// @param   {Bool} _enabled : Enable scroll region behavior.
+			/// @param   {Bool} enabled : Enable scroll region behavior.
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_region_mode = function(_enabled=true) {
@@ -171,8 +171,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_scrollbars_enabled()
 			/// @desc    Enables/disables horizontal and/or vertical scrollbar usage.
 			/// @self    WWViewScrollRegion
-			/// @param   {Bool} _horz_enabled
-			/// @param   {Bool} _vert_enabled
+			/// @param   {Bool} horz_enabled
+			/// @param   {Bool} vert_enabled
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scrollbars_enabled = function(_horz_enabled=true, _vert_enabled=true) {
@@ -186,8 +186,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_scrollbars_auto_hide()
 			/// @desc    Sets auto-hide behavior. When true, scrollbars only appear if content exceeds the viewport.
 			/// @self    WWViewScrollRegion
-			/// @param   {Bool} _horz_auto
-			/// @param   {Bool} _vert_auto
+			/// @param   {Bool} horz_auto
+			/// @param   {Bool} vert_auto
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scrollbars_auto_hide = function(_horz_auto=true, _vert_auto=true) {
@@ -201,7 +201,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_scrollbar_thickness()
 			/// @desc    Sets the thickness (pixels) of both scrollbars when they are shown.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _thickness
+			/// @param   {Real} thickness
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scrollbar_thickness = function(_thickness) {
@@ -214,7 +214,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_wheel_step()
 			/// @desc    Sets pixels scrolled per mouse wheel unit.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _pixels_per_wheel
+			/// @param   {Real} pixels_per_wheel
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_wheel_step = function(_pixels_per_wheel) {
@@ -227,8 +227,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @desc    Enables/disables mouse wheel scrolling per-axis.
 			///          Note: horizontal wheel scrolling is triggered by Shift+wheel.
 			/// @self    WWViewScrollRegion
-			/// @param   {Bool} _horz_enabled
-			/// @param   {Bool} _vert_enabled
+			/// @param   {Bool} horz_enabled
+			/// @param   {Bool} vert_enabled
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_wheel_scroll_enabled = function(_horz_enabled=true, _vert_enabled=true) {
@@ -241,7 +241,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_smooth_scrolling()
 			/// @desc    Enables/disables smooth scrolling on attached scrollbars.
 			/// @self    WWViewScrollRegion
-			/// @param   {Bool} _smooth
+			/// @param   {Bool} smooth
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_smooth_scrolling = function(_smooth=false) {
@@ -255,7 +255,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_canvas()
 			/// @desc    Assigns the internal view canvas.
 			/// @self    WWViewScrollRegion
-			/// @param   {Struct.WWCore} _canvas
+			/// @param   {Struct.WWCore} canvas
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_canvas = function(_canvas) {
@@ -272,8 +272,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_canvas_size()
 			/// @desc    Sets the content size used for clamping. Pass -1 to auto-size from canvas children.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_canvas_size = function(_width, _height) {
@@ -308,8 +308,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_size()
 			/// @desc    Sets the total region size (region mode) or viewport size (normal mode).
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -323,8 +323,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @desc    Sets the desired viewport size. In non-region mode this matches set_size.
 			///          In region mode, adjusts total region size to converge on the requested viewport size.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_viewport_size = function(_width, _height) {
@@ -356,8 +356,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_scroll_offset()
 			/// @desc    Sets the scroll offset and updates scrollbars.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _xoff
-			/// @param   {Real} _yoff
+			/// @param   {Real} xoff
+			/// @param   {Real} yoff
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scroll_offset = function(_xoff=0, _yoff=0) {
@@ -374,8 +374,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    scroll_by()
 			/// @desc    Adds a delta to the current scroll offset (clamped).
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _dx
-			/// @param   {Real} _dy
+			/// @param   {Real} dx
+			/// @param   {Real} dy
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static scroll_by = function(_dx=0, _dy=0) {
@@ -386,8 +386,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_content_size()
 			/// @desc    Sets the content size used for clamping.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_content_size = function(_width, _height) {
@@ -403,8 +403,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    set_scroll_max()
 			/// @desc    Forwards to the internal view's set_scroll_max (convenience for sizing content via max scroll).
 			/// @self    WWViewScrollRegion
-			/// @param   {Real} _max_x
-			/// @param   {Real} _max_y
+			/// @param   {Real} max_x
+			/// @param   {Real} max_y
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scroll_max = function(_max_x=0, _max_y=0) {
@@ -424,7 +424,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    add()
 			/// @desc    Forwards additions into the internal canvas.
 			/// @self    WWViewScrollRegion
-			/// @param   {Struct.WWCore|Array} _comp
+			/// @param   {Struct.WWCore|Array} comp
 			/// @returns {Undefined}
 			#endregion
 			static add = function(_comp) {
@@ -437,8 +437,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    insert()
 			/// @desc    Forwards insertions into the internal canvas.
 			/// @self    WWViewScrollRegion
-			/// @param   {Real|Struct.WWCore|Array} _a
-			/// @param   {Real|Struct.WWCore|Array} _b
+			/// @param   {Real|Struct.WWCore|Array} a
+			/// @param   {Real|Struct.WWCore|Array} b
 			/// @returns {Undefined}
 			#endregion
 			static insert = function(_a, _b) {
@@ -460,7 +460,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @func    remove()
 			/// @desc    Removes from the canvas by default; removes wrapper-owned children (view/scrollbars) via base.
 			/// @self    WWViewScrollRegion
-			/// @param   {Struct.WWCore} _comp
+			/// @param   {Struct.WWCore} comp
 			/// @returns {Undefined}
 			#endregion
 			static remove = function(_comp) {
@@ -828,8 +828,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __trigger_scroll_events__()
 			/// @desc    Emits scroll events if the scroll offset changed.
-			/// @param   {Real} _old_x
-			/// @param   {Real} _old_y
+			/// @param   {Real} old_x
+			/// @param   {Real} old_y
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion

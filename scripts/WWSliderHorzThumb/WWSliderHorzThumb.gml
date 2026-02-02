@@ -1,8 +1,6 @@
 #region jsDoc
 /// @func    WWSliderHorzThumb()
 /// @desc    Creates a horizontal slider with a draggable thumb.
-/// @param   {Real} x : The x position of the component on screen.
-/// @param   {Real} y : The y position of the component on screen.
 /// @returns {Struct.WWSliderHorzThumb}
 #endregion
 function WWSliderHorzThumb() : WWSliderHorz() constructor {

@@ -14,8 +14,8 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			/// @func    set_scroll_speeds()
 			/// @desc    Sets the automatic scroll speed in pixels per step.
 			/// @self    WWViewScrollAuto
-			/// @param   {Real} _hspeed : Horizontal speed.
-			/// @param   {Real} _vspeed : Vertical speed.
+			/// @param   {Real} hspeed : Horizontal speed.
+			/// @param   {Real} vspeed : Vertical speed.
 			/// @returns {Struct.WWViewScrollAuto}
 			#endregion
 			static set_scroll_speeds = function(_hspeed=0, _vspeed=0) {
@@ -32,8 +32,8 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			/// @func    set_scroll_looping()
 			/// @desc    Enables or disables looping for each axis.
 			/// @self    WWViewScrollAuto
-			/// @param   {Bool} _x_loop : True to wrap horizontally.
-			/// @param   {Bool} _y_loop : True to wrap vertically.
+			/// @param   {Bool} x_loop : True to wrap horizontally.
+			/// @param   {Bool} y_loop : True to wrap vertically.
 			/// @returns {Struct.WWViewScrollAuto}
 			#endregion
 			static set_scroll_looping = function(_x_loop=false, _y_loop=false) {
@@ -47,7 +47,7 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			/// @func    set_scroll_pause()
 			/// @desc    Pauses or resumes automatic scrolling.
 			/// @self    WWViewScrollAuto
-			/// @param   {Bool} _paused : True to pause.
+			/// @param   {Bool} paused : True to pause.
 			/// @returns {Struct.WWViewScrollAuto}
 			#endregion
 			static set_scroll_pause = function(_paused=true) {
@@ -59,8 +59,8 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			/// @func    set_scroll_offsets()
 			/// @desc    Sets the current scroll offsets in pixels.
 			/// @self    WWViewScrollAuto
-			/// @param   {Real} _xoff : Horizontal scroll offset.
-			/// @param   {Real} _yoff : Vertical scroll offset.
+			/// @param   {Real} xoff : Horizontal scroll offset.
+			/// @param   {Real} yoff : Vertical scroll offset.
 			/// @returns {Struct.WWViewScrollAuto}
 			#endregion
 			static set_scroll_offsets = function(_xoff=0, _yoff=0) {
@@ -165,9 +165,9 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			#region jsDoc
 			/// @func    __auto_step__()
 			/// @desc    Advances the scroll offsets according to speed and looping settings.
-			/// @param   {Struct} _input : Input state (unused here).
+			/// @param   {Struct} input : Input state (unused here).
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __auto_step__ = function(_input) {
 				if (auto_paused) { return; }
@@ -198,10 +198,10 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			#region jsDoc
 			/// @func    __wrap_scroll_axis__()
 			/// @desc    Wraps a scroll value into the range [0.._max] when looping is enabled.
-			/// @param   {Real} _value : Scroll value to wrap.
-			/// @param   {Real} _max : Maximum scroll value.
+			/// @param   {Real} value : Scroll value to wrap.
+			/// @param   {Real} max : Maximum scroll value.
 			/// @returns {Real} wrapped_value
-			///@ignore
+			/// @ignore
 			#endregion
 			static __wrap_scroll_axis__ = function(_value, _max) {
 				if (_max <= 0) { return 0; }

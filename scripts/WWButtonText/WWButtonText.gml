@@ -42,7 +42,7 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @func    set_text_color()
 			/// @desc    Sets the label text color.
 			/// @self    WWButtonText
-			/// @param   {Real} _color : Color value.
+			/// @param   {Real} color : Color value.
 			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_text_color = function(_color=c_white) {

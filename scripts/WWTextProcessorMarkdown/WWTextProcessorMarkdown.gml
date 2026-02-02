@@ -3,8 +3,8 @@
 /// @desc    Markdown processor producing plain text + spans + align runs.
 ///          Emits plain output text, a span list (state snapshots in output index space),
 ///          and optional alignment runs (output index space).
-/// @param   {String} _raw_text
-/// @param   {Struct} _default_state
+/// @param   {String} raw_text
+/// @param   {Struct} default_state
 /// @returns {Struct} { text, spans, align_runs }
 #endregion
 

@@ -14,10 +14,10 @@ function WWScrollbarButtons() : WWCore() constructor {
             /// @func    set_size()
             /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
             ///          This updates the region and marks the size as user–preferred so that future internal updates won't override it.
-            /// @self    WWCore
+            /// @self    WWScrollbarButtons
             /// @param   {Real} width : The new width.
             /// @param   {Real} height : The new height.
-            /// @returns {Struct.WWCore}
+            /// @returns {Struct.WWScrollbarButtons}
             #endregion
             static set_size = function(_width, _height) {
                 __size_set__ = true;
@@ -33,7 +33,7 @@ function WWScrollbarButtons() : WWCore() constructor {
             /// @func    set_canvas_size()
             /// @desc    Sets the full height of the scrollable content.
             /// @self    WWScrollbarButtons
-            /// @param   {Real} _height : The height of the scrollable canvas.
+            /// @param   {Real} height : The height of the scrollable canvas.
             /// @returns {Struct.WWScrollbarButtons}
             #endregion
             static set_canvas_size = function(_height) {
@@ -46,7 +46,7 @@ function WWScrollbarButtons() : WWCore() constructor {
             /// @func    set_coverage_size()
             /// @desc    Sets the visible (viewport) height for the scroll area.
             /// @self    WWScrollbarButtons
-            /// @param   {Real} _height : The height of the visible area.
+            /// @param   {Real} height : The height of the visible area.
             /// @returns {Struct.WWScrollbarButtons}
             #endregion
             static set_coverage_size = function(_height) {
@@ -354,6 +354,12 @@ function WWScrollbarButtons() : WWCore() constructor {
                 return coverageHeight;
             }
 			
+			#region jsDoc
+			/// @func    update_slider_range()
+			/// @desc    Recomputes the slider scroll range from canvas/coverage sizes.
+			/// @self    WWScrollbarButtons
+			/// @returns {Undefined}
+			#endregion
             static update_slider_range = function() {
                 // Calculate the maximum scrollable offset.
                 var maxScroll = max(0, canvasHeight - coverageHeight);

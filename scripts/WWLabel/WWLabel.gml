@@ -38,7 +38,8 @@ function WWLabel() : WWTextRenderer() constructor {
             #region jsDoc
             /// @func   set_text()
             /// @desc   Sets caption text. Label auto-sizes to content.
-            /// @param  {String} _text
+            /// @self   WWLabel
+            /// @param  {String} text
             /// @returns {Struct.WWLabel}
             #endregion
             static set_text = function(_text) {
@@ -50,7 +51,8 @@ function WWLabel() : WWTextRenderer() constructor {
             #region jsDoc
             /// @func   set_text_font()
             /// @desc   Sets font. Label auto-sizes to content.
-            /// @param  {Asset.GMFont} _font
+            /// @self   WWLabel
+            /// @param  {Asset.GMFont} font
             /// @returns {Struct.WWLabel}
             #endregion
             static set_text_font = function(_font) {
@@ -60,10 +62,11 @@ function WWLabel() : WWTextRenderer() constructor {
             };
 			
             #region jsDoc
-            /// @func   set_renderer()
-            /// @desc   Swap the active renderer implementation (processor/render style),
-            ///         then auto-size to content. This assumes your base has a setter for it.
-            /// @param  {Any} _renderer_id_or_kind
+            /// @func   set_text_processor()
+            /// @desc   Sets the text processor (bbcode/markdown/css/etc) for this label,
+            ///         then auto-sizes to content.
+            /// @self   WWLabel
+            /// @param  {Any} proc_or_name
             /// @returns {Struct.WWLabel}
             #endregion
             static set_text_processor = function(_proc_or_name) {
@@ -102,6 +105,13 @@ function WWLabel() : WWTextRenderer() constructor {
 
         #region Functions
 
+            #region jsDoc
+            /// @func    __label_update_size__()
+            /// @desc    Internal: ensures layout and syncs this label's size to its rendered content.
+            /// @self    WWLabel
+            /// @returns {Undefined}
+            /// @ignore
+            #endregion
             static __label_update_size__ = function() {
 				__ensure_layout__();
 

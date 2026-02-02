@@ -63,7 +63,7 @@ function WWCheckbox() : WWButtonSprite() constructor {
 			/// @func    set_callback()
 			/// @desc    Sets the callback invoked when the checkbox is released (after toggle).
 			/// @self    WWCheckbox
-			/// @param   {Function} _callback : Function called with (is_checked).
+			/// @param   {Function} callback : Function called with (is_checked).
 			/// @returns {Struct.WWCheckbox}
 			#endregion
 			static set_callback = function(_callback) {

@@ -81,16 +81,16 @@ function ww_apply_demo_syntax(_textbox) {
 
         var _span = _spans[_si];
 
-        var _start_0 = _span.start;
-        var _end_0_excl = _span.end;
-        var _scope = _span.scope;
+        var _start_0 = variable_struct_get(_span, "start");
+        var _end_0_excl = variable_struct_get(_span, "end");
+        var _scope = variable_struct_get(_span, "scope");
 
         var _color = ww__scope_to_color(_scope, _theme);
         ww__set_color_span_0(_textbox, _start_0, _end_0_excl, _color);
 
         // Optional style: make keywords bold if supported
         if (_scope == "keyword") {
-            _textbox.set_glyph_style_range(_start_0, _end_0_excl, __WW_Text_Glyph_Style.Bold);
+			_textbox.apply_glyph_style_range(_start_0, _end_0_excl, __WW_Text_Glyph_Style.Bold);
         }
 
         _si += 1;
@@ -155,7 +155,7 @@ function ww__apply_comment_underline(_textbox, _text, _tag, _underline_enum) {
         var _end_0_excl = ww__find_line_end_0(_working_text, _start_0);
 
         if (_end_0_excl > _start_0) {
-            _textbox.set_glyph_underline_range(_start_0, _end_0_excl, _underline_enum);
+			_textbox.apply_glyph_underline_range(_start_0, _end_0_excl, _underline_enum);
         }
 
         // Mask this occurrence so we can safely search for the next one
@@ -262,32 +262,9 @@ function ww__is_ident_start(_char_val) {
 }
 
 #region jsDoc
-/// @func   ww__set_color_span_1()
-/// @desc   Applies a color range using 1-based inclusive start/end indices,
-///         converting to 0-based [start,end) for the renderer.
-/// @param  {Struct.WWTextRenderer} _renderer
-/// @param  {Real} _start_1
-/// @param  {Real} _end_1_inclusive
-/// @param  {Constant.Color} _col
-#endregion
-function ww__set_color_span_1(_renderer, _start_1, _end_1_inclusive, _col) {
-
-    var _start_0 = _start_1 - 1;
-    var _end_0_excl = _end_1_inclusive;
-
-    if (_end_0_excl <= _start_0) {
-        return;
-    }
-
-    if (!is_undefined(_renderer.set_glyph_color_range)) {
-        _renderer.set_glyph_color_range(_start_0, _end_0_excl, _col);
-    }
-}
-
-#region jsDoc
 /// @func   ww__set_color_span_0()
 /// @desc   Applies a color range using 0-based [start,end) indices.
-/// @param  {Struct.WWTextRenderer} _renderer
+/// @param  {Struct.WWTextField} _textbox
 /// @param  {Real} _start_0
 /// @param  {Real} _end_0_excl
 /// @param  {Constant.Color} _col
@@ -298,7 +275,7 @@ function ww__set_color_span_0(_textbox, _start_0, _end_0_excl, _col) {
         return;
     }
 
-    _textbox.set_glyph_color_range(_start_0, _end_0_excl, _col);
+    _textbox.apply_glyph_color_range(_start_0, _end_0_excl, _col);
 }
 
 #region jsDoc
@@ -311,68 +288,41 @@ function ww__set_color_span_0(_textbox, _start_0, _end_0_excl, _col) {
 function ww__scope_to_color(_scope, _theme) {
 
     if (_scope == "" || is_undefined(_scope)) {
-        return _theme.col_default;
+        return variable_struct_get(_theme, "col_default");
     }
 
-    if (_scope == "comment") return _theme.col_comments;
-    if (_scope == "string") return _theme.col_strings;
-    if (_scope == "number") return _theme.col_values;
+    if (_scope == "comment") return variable_struct_get(_theme, "col_comments");
+    if (_scope == "string") return variable_struct_get(_theme, "col_strings");
+    if (_scope == "number") return variable_struct_get(_theme, "col_values");
 
-    if (_scope == "keyword") return _theme.col_keywords;
-    if (_scope == "literal") return _theme.col_values;
+    if (_scope == "keyword") return variable_struct_get(_theme, "col_keywords");
+    if (_scope == "literal") return variable_struct_get(_theme, "col_values");
 
-    if (_scope == "built_in") return _theme.col_functions;
-    if (_scope == "builtin") return _theme.col_functions;
+    if (_scope == "built_in") return variable_struct_get(_theme, "col_functions");
+    if (_scope == "builtin") return variable_struct_get(_theme, "col_functions");
 
-    if (_scope == "variable.language") return _theme.col_builtin_variables;
+    if (_scope == "variable.language") return variable_struct_get(_theme, "col_builtin_variables");
 
-    if (_scope == "type") return _theme.col_enums;
-    if (_scope == "symbol") return _theme.col_constants;
-    if (_scope == "meta") return _theme.col_macros;
+    if (_scope == "type") return variable_struct_get(_theme, "col_enums");
+    if (_scope == "symbol") return variable_struct_get(_theme, "col_constants");
+    if (_scope == "meta") return variable_struct_get(_theme, "col_macros");
 
-    if (_scope == "title") return _theme.col_script_names;
-    if (_scope == "title.function") return _theme.col_functions;
+    if (_scope == "title") return variable_struct_get(_theme, "col_script_names");
+    if (_scope == "title.function") return variable_struct_get(_theme, "col_functions");
 
-    if (_scope == "meta.func.call") return _theme.col_functions;
-    if (_scope == "meta.function.decl") return _theme.col_functions;
+    if (_scope == "meta.func.call") return variable_struct_get(_theme, "col_functions");
+    if (_scope == "meta.function.decl") return variable_struct_get(_theme, "col_functions");
 
-    if (_scope == "meta.enum.decl") return _theme.col_enums;
+    if (_scope == "meta.enum.decl") return variable_struct_get(_theme, "col_enums");
 
-    if (_scope == "meta.macro") return _theme.col_macros;
-    if (_scope == "meta.macro.pair") return _theme.col_macros;
+    if (_scope == "meta.macro") return variable_struct_get(_theme, "col_macros");
+    if (_scope == "meta.macro.pair") return variable_struct_get(_theme, "col_macros");
 
-    if (_scope == "meta.prop.access") return _theme.col_struct_member;
-    if (_scope == "meta.prop.invoke") return _theme.col_struct_member;
-    if (_scope == "meta.struct.member") return _theme.col_struct_member;
+    if (_scope == "meta.prop.access") return variable_struct_get(_theme, "col_struct_member");
+    if (_scope == "meta.prop.invoke") return variable_struct_get(_theme, "col_struct_member");
+    if (_scope == "meta.struct.member") return variable_struct_get(_theme, "col_struct_member");
 
-    if (_scope == "variable.constant") return _theme.col_constants;
+    if (_scope == "variable.constant") return variable_struct_get(_theme, "col_constants");
 
-    return _theme.col_normal_text;
-}
-
-#region jsDoc
-/// @func   ww__try_get_renderer()
-/// @desc   Best-effort renderer fetch so the demo doesn't explode if wiring differs.
-/// @param  {Struct} _textbox
-/// @returns {Struct|Undefined}
-#endregion
-function ww__try_get_renderer(_textbox) {
-
-    if (is_undefined(_textbox)) {
-        return undefined;
-    }
-
-    if (!is_undefined(_textbox.get_renderer)) {
-        return _textbox.get_renderer();
-    }
-
-    if (!is_undefined(_textbox.renderer)) {
-        return _textbox.renderer;
-    }
-
-    if (!is_undefined(_textbox.text_renderer)) {
-        return _textbox.text_renderer;
-    }
-
-    return undefined;
+    return variable_struct_get(_theme, "col_normal_text");
 }

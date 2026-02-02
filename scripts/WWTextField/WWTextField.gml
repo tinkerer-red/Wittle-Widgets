@@ -437,137 +437,6 @@ function WWTextField() : WWCore() constructor {
 					return self;
 				}
 				
-				#region jsDoc
-				/// @func   set_format_range()
-				/// @desc   Applies formatting directly into glyph records for the logical index range.
-				///         This mutates the current layout glyphs. If the layout is dirty, it will be rebuilt first.
-				///         Range is [start_index, end_index) 0-based.
-				///         Pass undefined for any field you do not want to change.
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Constant.Color|Undefined} color_value
-				/// @param  {Real|Undefined} alpha_value
-				/// @param  {Asset.GMFont|Undefined} font_asset
-				/// @param  {Real|Undefined} style
-				/// @param  {Real|Undefined} size_mul
-				/// @param  {Real|Undefined} underline_value
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_format_range = function(
-					_start_index,
-					_end_index,
-					_color_value,
-					_alpha_value,
-					_font_asset,
-					_style,
-					_size_mul,
-					_underline_value
-				) {
-					renderer.set_format_range(
-						_start_index,
-						_end_index,
-						_color_value,
-						_alpha_value,
-						_font_asset,
-						_style,
-						_size_mul,
-						_underline_value
-					)
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   clear_format_range()
-				/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static clear_format_range = function(_start_index, _end_index) { 
-					renderer.set_format_range(_start_index, _end_index);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_color_range()
-				/// @desc   Sets per-glyph color for the logical index range [start,end).
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Constant.Color} color_value
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_color_range = function(_start_index, _end_index, _color_value) {
-					renderer.set_format_range(_start_index, _end_index, _color_value, undefined, undefined, undefined, undefined, undefined);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_alpha_range()
-				/// @desc   Sets per-glyph alpha for the logical index range [start,end).
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Real} alpha_value
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_alpha_range = function(_start_index, _end_index, _alpha_value) {
-					renderer.set_format_range(_start_index, _end_index, undefined, _alpha_value, undefined, undefined, undefined, undefined);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_font_range()
-				/// @desc   Sets per-glyph font override for [start,end).
-				///         Use -1 to clear override and use renderer font.
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Asset.GMFont|Real} font_asset_or_minus1
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_font_range = function(_start_index, _end_index, _font_asset_or_minus1) {
-					renderer.set_format_range(_start_index, _end_index, undefined, undefined, _font_asset_or_minus1, undefined, undefined, undefined);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_style_range()
-				/// @desc   Sets per-glyph style enum for [start,end).
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Real} style
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_style_range = function(_start_index, _end_index, _style) {
-					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style, undefined, undefined);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_size_range()
-				/// @desc   Sets per-glyph size multiplier for [start,end).
-				///         Values <= 0 clamp to 1.
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Real} size_mul
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_size_range = function(_start_index, _end_index, _size_mul) {
-					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, _size_mul, undefined);
-					return self;
-				};
-				
-				#region jsDoc
-				/// @func   set_glyph_underline_range()
-				/// @desc   Sets per-glyph underline enum for [start,end).
-				/// @param  {Real} start_index
-				/// @param  {Real} end_index
-				/// @param  {Real} underline_value
-				/// @returns {Struct.WWTextField}
-				#endregion
-				static set_glyph_underline_range = function(_start_index, _end_index, _underline_value) {
-					renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, undefined, _underline_value);
-					return self;
-				};
-				
 			#endregion
 			
 			#region jsDoc
@@ -1691,6 +1560,205 @@ function WWTextField() : WWCore() constructor {
 			static get_allowed_char = function() {
 				return buffer.get_allowed_char();
 			};
+			
+			// --- Public API symmetry getters (demo library validation) ---
+			static get_caption = function() {
+				return renderer.get_caption();
+			};
+			
+			static get_text_font = function() {
+				// WWTextRenderer exposes this as get_font()
+				return renderer.get_font();
+			};
+			
+			static get_text_color = function() {
+				return renderer.get_text_color();
+			};
+			
+			static get_text_alpha = function() {
+				return renderer.get_text_alpha();
+			};
+			
+			static get_wrap_enabled = function() {
+				return renderer.get_wrap_enabled();
+			};
+			
+			static get_line_sep = function() {
+				return renderer.get_line_sep();
+			};
+			
+			static get_read_only = function() {
+				return is_read_only;
+			};
+			
+			static get_keyboard_type = function() {
+				return __keyboard_type__;
+			};
+			
+			static get_enter_submits_text = function() {
+				return enter_submits_text;
+			};
+			
+			static get_tab_exits_text = function() {
+				return tab_exits_text;
+			};
+			
+			static get_cursor_color = function() {
+				return __cursor_color__;
+			};
+			
+			static get_highlight_color = function() {
+				return __highlight_color__;
+			};
+			
+			static get_multi_cursor_enabled = function() {
+				return multi_cursor_enabled;
+			};
+			
+			static get_cursor_xy = function() {
+				var _idx = __cursor_get_index__();
+				var _line = renderer.get_line_from_index(_idx);
+				return {
+					x: renderer.get_x_from_index(_idx),
+					y: renderer.get_line_y_offset(_line),
+				};
+			};
+			
+			static get_text_processor = function() {
+				return renderer.get_text_processor();
+			};
+			
+			#region Syntax Highlight (non-builder actions)
+			
+			#region jsDoc
+			/// @func   apply_format_range()
+			/// @desc   Applies formatting directly into glyph records for the logical index range.
+			///         Range is [start_index, end_index) 0-based.
+			///         Pass undefined for any field you do not want to change.
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Constant.Color|Undefined} color_value
+			/// @param  {Real|Undefined} alpha_value
+			/// @param  {Asset.GMFont|Undefined} font_asset
+			/// @param  {Real|Undefined} style
+			/// @param  {Real|Undefined} size_mul
+			/// @param  {Real|Undefined} underline_value
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_format_range = function(
+				_start_index,
+				_end_index,
+				_color_value,
+				_alpha_value,
+				_font_asset,
+				_style,
+				_size_mul,
+				_underline_value
+			) {
+				renderer.set_format_range(
+					_start_index,
+					_end_index,
+					_color_value,
+					_alpha_value,
+					_font_asset,
+					_style,
+					_size_mul,
+					_underline_value
+				);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   clear_format_range()
+			/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static clear_format_range = function(_start_index, _end_index) {
+				renderer.set_format_range(_start_index, _end_index);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_color_range()
+			/// @desc   Sets per-glyph color for the logical index range [start,end).
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Constant.Color} color_value
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_color_range = function(_start_index, _end_index, _color_value) {
+				renderer.set_format_range(_start_index, _end_index, _color_value, undefined, undefined, undefined, undefined, undefined);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_alpha_range()
+			/// @desc   Sets per-glyph alpha for the logical index range [start,end).
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Real} alpha_value
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_alpha_range = function(_start_index, _end_index, _alpha_value) {
+				renderer.set_format_range(_start_index, _end_index, undefined, _alpha_value, undefined, undefined, undefined, undefined);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_font_range()
+			/// @desc   Sets per-glyph font override for [start,end). Use -1 to clear override.
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Asset.GMFont|Real} font_asset_or_minus1
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_font_range = function(_start_index, _end_index, _font_asset_or_minus1) {
+				renderer.set_format_range(_start_index, _end_index, undefined, undefined, _font_asset_or_minus1, undefined, undefined, undefined);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_style_range()
+			/// @desc   Sets per-glyph style enum for [start,end).
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Real} style
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_style_range = function(_start_index, _end_index, _style) {
+				renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, _style, undefined, undefined);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_size_range()
+			/// @desc   Sets per-glyph size multiplier for [start,end). Values <= 0 clamp to 1.
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Real} size_mul
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_size_range = function(_start_index, _end_index, _size_mul) {
+				renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, _size_mul, undefined);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func   apply_glyph_underline_range()
+			/// @desc   Sets per-glyph underline enum for [start,end).
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Real} underline_value
+			/// @returns {Struct.WWTextField}
+			#endregion
+			static apply_glyph_underline_range = function(_start_index, _end_index, _underline_value) {
+				renderer.set_format_range(_start_index, _end_index, undefined, undefined, undefined, undefined, undefined, _underline_value);
+				return self;
+			};
+			
+			#endregion
 			
 			#region jsDoc
 			/// @func    clear_text()

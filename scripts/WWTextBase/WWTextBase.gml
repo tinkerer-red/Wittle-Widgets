@@ -17,7 +17,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @func	set_text()
 				/// @desc	Sets the main text content to display in the component. This text is selectable by the user.
 				/// @self	WWTextBase
-				/// @param   {String} _text : The text to display.
+				/// @param   {String} text : The text to display.
 				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_text = function(_text = "") {
@@ -45,7 +45,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @func	set_caption()
 				/// @desc	Sets the text displayed when the text feild is empty. This text is not selectable or editable by the user. Will also effect how consoles display a header for the on screen keyboard
 				/// @self	WWTextBase
-				/// @param   {String} _text : The caption text to display.
+				/// @param   {String} text : The caption text to display.
 				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_caption = function(_text = "") {
@@ -59,7 +59,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @func	set_text_font()
 				/// @desc	Sets the font used for rendering text.
 				/// @self	WWTextBase
-				/// @param   {Asset.GMFont} _font : The font asset to use.
+				/// @param   {Asset.GMFont} font : The font asset to use.
 				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_text_font = function(_font = fGUIDefault) {
@@ -88,7 +88,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @func	set_text_color()
 				/// @desc	Sets the font color used for rendering the text.
 				/// @self	WWTextBase
-				/// @param   {Constant.Color} _color : The color to use.
+				/// @param   {Constant.Color} color : The color to use.
 				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_text_color = function(_color = #D9D9D9) {
@@ -122,7 +122,7 @@ function WWTextBase() : WWCore() constructor {
 			/// @func	set_highlight_color()
 			/// @desc	Sets the color for the selection highlight.
 			/// @self	WWTextBase
-			/// @param   {Constant.Color} _color : The highlight color.
+			/// @param   {Constant.Color} color : The highlight color.
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_highlight_color = function(_color = #0A68D8) {
@@ -134,9 +134,9 @@ function WWTextBase() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_dynamic_width()
 			/// @desc    Sets the textbox to break to a new line when reaching the width. This will still enforce new lines even for single line text boxes.
-			/// @self    GUICompTextbox
-			/// @param   {Bool} memory_limit : If the text box will break to a new line when reaching the width.
-			/// @returns {Struct.GUICompTextbox}
+			/// @self    WWTextBase
+			/// @param   {Bool} dynamic_width : If the text box will break to a new line when reaching the width.
+			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_dynamic_width = function(_dynamic_width=true) {
 				if (dynamic_width == _dynamic_width) return self;
@@ -150,8 +150,8 @@ function WWTextBase() : WWCore() constructor {
 			#region jsDoc
 			/// @func    set_line_height()
 			/// @desc    Explicitly sets the line height. Overrides the automatic value from the font.
-			/// @self    GUICompTextbox
-			/// @param   {Real} height : The desired line height.
+			/// @self    WWTextBase
+			/// @param   {Real} line_height : The desired line height.
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_line_height = function(_line_height=0) {
@@ -176,7 +176,7 @@ function WWTextBase() : WWCore() constructor {
 			///         If undefined, the allowed characters are generated from the current font.
 			///         Will also infer and set keyboard type if not already user-defined.
 			/// @self   WWTextBase
-			/// @param  {String} _allowed_char : A string of allowed characters (optional).
+			/// @param  {String} allowed_char : A string of allowed characters (optional).
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_allowed_char = function(_allowed_char = undefined) {
@@ -203,9 +203,9 @@ function WWTextBase() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_x_pos()
 				/// @desc    Sets the x position of the cursor on the current line, a value of `0` will indicate the furthest left, and a value of `1` will place the cursor on the right of the first letter in the line's string.
-				/// @self    GUICompTextbox
-				/// @param   {Real} xpos : The x position of the cursor
-				/// @returns {Struct.GUICompTextbox}
+				/// @self    WWTextBase
+				/// @param   {Real} x_pos : The x position of the cursor
+				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_cursor_x_pos = function(_x_pos) {
 					if (_x_pos == cursor_x_pos) {
@@ -236,9 +236,9 @@ function WWTextBase() : WWCore() constructor {
 				///          NOTE:
 				///
 				///          This value corrilates to the line the cursor will be on and not the y position in the world. If you wish to set the cursor's location with coordinates use 
-				/// @self    GUICompTextbox
-				/// @param   {Real} ypos : The y position of the cursor.
-				/// @returns {Struct.GUICompTextbox}
+				/// @self    WWTextBase
+				/// @param   {Real} y_pos : The y position of the cursor.
+				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_cursor_y_pos = function(_y_pos) {
 					if (_y_pos == cursor_y_pos) {
@@ -261,10 +261,10 @@ function WWTextBase() : WWCore() constructor {
 				/// @desc    Sets the cursor position based on the provided GUI x/y coordinates. The function
 				///          converts the GUI coordinates to the text box's local coordinate space (accounting for scrolling)
 				///          and finds the best matching character position on the appropriate line.
-				/// @self    GUICompTextbox
-				/// @param   {Real} _gui_x : The x position in GUI space.
-				/// @param   {Real} _gui_y : The y position in GUI space.
-				/// @returns {Struct.GUICompTextbox}
+				/// @self    WWTextBase
+				/// @param   {Real} gui_x : The x position in GUI space.
+				/// @param   {Real} gui_y : The y position in GUI space.
+				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_cursor_gui_loc = function(_gui_x, _gui_y) {
 				    var _loc = __get_pos_from_gui__ (_gui_x, _gui_y)
@@ -284,9 +284,9 @@ function WWTextBase() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_width()
 				/// @desc    Sets the cursor's width. This is usually used if you're manipulating you're GUI resolution and would like to increase the visibility of the cursor.
-				/// @self    GUICompTextbox
+				/// @self    WWTextBase
 				/// @param   {Real} width : The width of the cursor.
-				/// @returns {Struct.GUICompTextbox}
+				/// @returns {Struct.WWTextBase}
 				#endregion
 				static set_cursor_width = function(_width) {
 					draw.cursor_width = _width
@@ -301,31 +301,73 @@ function WWTextBase() : WWCore() constructor {
         #region Events
 			
             events.select    = variable_get_hash("select"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_select()
+			/// @desc    Adds a listener for the component's select event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_select = function(_func) {
 				add_event_listener(events.select, _func);
 				return self;
 			}
 			events.copy    = variable_get_hash("copy"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_copy()
+			/// @desc    Adds a listener for the component's copy event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_copy = function(_func) {
 				add_event_listener(events.copy, _func);
 				return self;
 			}
 			events.paste    = variable_get_hash("paste"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_paste()
+			/// @desc    Adds a listener for the component's paste event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_paste = function(_func) {
 				add_event_listener(events.paste, _func);
 				return self;
 			}
 			events.change    = variable_get_hash("change"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_change()
+			/// @desc    Adds a listener for the component's change event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_change = function(_func) {
 				add_event_listener(events.change, _func);
 				return self;
 			}
 			events.submit    = variable_get_hash("submit"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_submit()
+			/// @desc    Adds a listener for the component's submit event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_submit = function(_func) {
 				add_event_listener(events.submit, _func);
 				return self;
 			}
 			events.cursor_move = variable_get_hash("cursor_move"); //triggered when the component gets focus, this commonly occurs when the mouse is clicked down on it.
+			#region jsDoc
+			/// @func    on_cursor_move()
+			/// @desc    Adds a listener for the component's cursor_move event.
+			/// @self    WWTextBase
+			/// @param   {Function} func
+			/// @returns {Struct.WWTextBase}
+			#endregion
 			static on_cursor_move = function(_func) {
 				add_event_listener(events.cursor_move, _func);
 				return self;
@@ -888,7 +930,7 @@ function WWTextBase() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_cursor_x_pos_gui()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
+				/// @self    WWTextBase
 				/// @returns {Real}
 				#endregion
 				static get_cursor_x_pos_gui = function() {
@@ -898,7 +940,7 @@ function WWTextBase() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_cursor_y_pos_gui()
 				/// @desc    Get cursor's y position in the GUI
-				/// @self    GUICompTextbox
+				/// @self    WWTextBase
 				/// @returns {Real}
 				#endregion
 				static get_cursor_y_pos_gui = function() {
@@ -975,6 +1017,14 @@ function WWTextBase() : WWCore() constructor {
 				
 		    #endregion
 			
+			#region jsDoc
+			/// @func    get_string_width_to_cursor_pos()
+			/// @desc    Returns the pixel width of the substring of a given line from the start to the cursor position.
+			/// @self    WWTextBase
+			/// @param   {Real} line
+			/// @param   {Real} cursor
+			/// @returns {Real}
+			#endregion
 			static get_string_width_to_cursor_pos = function(_line, _cursor) {
 				draw_set_font(text.font);
 				var _str = __lines__[_line];
@@ -1027,6 +1077,7 @@ function WWTextBase() : WWCore() constructor {
 			/// @desc    Draws the static parts (highlight selection and text) to a cached surface.
 			///          This function is called whenever the text or formatting changes, so that the
 			///          expensive drawing of text is only performed once.
+			/// @self    WWTextBase
 			/// @returns {Undefined}
 			#endregion
 			static draw_to_surface = function() {
@@ -1051,11 +1102,13 @@ function WWTextBase() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    __draw_highlight_selection__()
+			/// @ignore
 			/// @desc    Draws the selection highlight rectangles. This function uses the selection
 			///          anchor (highlight_x_pos, highlight_y_pos) and the current cursor (cursor_x_pos, cursor_y_pos)
 			///          to compute the rectangular areas for each affected line.
-			/// @param   {Real} _x : The x-offset (typically 0 when drawing to surface).
-			/// @param   {Real} _y : The y-offset.
+			/// @self    WWTextBase
+			/// @param   {Real} x : The x-offset (typically 0 when drawing to surface).
+			/// @param   {Real} y : The y-offset.
 			/// @returns {Undefined}
 			#endregion
 			static __draw_highlight_selection__ = function(_x, _y) {
@@ -1113,10 +1166,12 @@ function WWTextBase() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    __draw_text__()
+			/// @ignore
 			/// @desc    Draws text lines starting at offset (_x, _y). When not drawing to a surface,
 			///          the function uses the current GPU scissor region to determine which lines are visible.
-			/// @param   {Real} _x : The x-offset for drawing.
-			/// @param   {Real} _y : The y-offset for drawing.
+			/// @self    WWTextBase
+			/// @param   {Real} x : The x-offset for drawing.
+			/// @param   {Real} y : The y-offset for drawing.
 			/// @returns {Undefined}
 			#endregion
 			static __draw_text__ = function(_x, _y) {
@@ -1148,10 +1203,12 @@ function WWTextBase() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func    __draw_cursor__()
+			/// @ignore
 			/// @desc    Draws the blinking cursor at its current position. The cursor is drawn
 			///          directly (not cached) because it updates frequently.
-			/// @param   {Real} _x : The x-offset of the component.
-			/// @param   {Real} _y : The y-offset of the component.
+			/// @self    WWTextBase
+			/// @param   {Real} x : The x-offset of the component.
+			/// @param   {Real} y : The y-offset of the component.
 			/// @returns {Undefined}
 			#endregion
 			static __draw_cursor__ = function(_x, _y) {
@@ -1184,8 +1241,9 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __lines_to_text__()
+				/// @ignore
 				/// @desc    Converts the Text array into a single string. This does not account for addaptive width! See `__textbox_return__()` if you wish for adaptive width to be accounted.
-				/// @self    GUICompTextbox
+				/// @self    WWTextBase
 				/// @param   {Array<String>} arr : The array of strings
 				/// @returns {String}
 				#endregion
@@ -1195,8 +1253,9 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __text_to_lines__()
+				/// @ignore
 				/// @desc    Converts the a string into the Text array format.
-				/// @self    GUICompTextbox
+				/// @self    WWTextBase
 				/// @param   {String} str : The string to convert to an array
 				/// @returns {Array}
 				#endregion
@@ -1218,9 +1277,11 @@ function WWTextBase() : WWCore() constructor {
 			
 				#region jsDoc
 			    /// @func    __build_allowed_char__()
+			    /// @ignore
 			    /// @desc    Returns a struct of allowed characters from the supplied font.
 			    /// @self    WWTextBase
-			    /// @param   {Asset.GMFont} _font : The font to build the allowed character list.
+			    /// @param   {Asset.GMFont} font : The font to build the allowed character list.
+			    /// @param   {Bool} include_nl : If true, includes a newline character in the allowed set.
 			    /// @returns {Struct} Allowed Characters Struct
 			    #endregion
 			    static __build_allowed_char__ = function(_font, _include_nl=true) {
@@ -1241,11 +1302,12 @@ function WWTextBase() : WWCore() constructor {
 			
 			    #region jsDoc
 			    /// @func    __keep_allowed_char__()
+			    /// @ignore
 			    /// @desc    Removes all characters from a string except for the specified struct of allowed characters.
 			    ///          This acts as a whitelist for characters.
 			    /// @self    WWTextBase
-			    /// @param   {String} _text : The string to parse
-			    /// @param   {Struct} _allowed_char : The struct of allowed characters.
+			    /// @param   {String} text : The string to parse
+			    /// @param   {Struct} allowed_char : The struct of allowed characters.
 			    /// @returns {String}
 			    #endregion
 			    static __keep_allowed_char__ = function(_text, _allowed_char=__allowed_char__) {
@@ -1273,7 +1335,8 @@ function WWTextBase() : WWCore() constructor {
 			    }
 				
 				#region jsDoc
-				/// @func    __infer_keyboard_type__
+				/// @func    __infer_keyboard_type__()
+				/// @ignore
 				/// @desc    Choose a best-fit virtual keyboard type from an allowed-character palette.
 				///         Heuristics are ordered from most-specific to most-generic and are conservative:
 				///         - Pure digits -> numbers
@@ -1283,7 +1346,8 @@ function WWTextBase() : WWCore() constructor {
 				///         - ASCII-only palette (no non-ascii) -> ascii
 				///         - Name-like (letters, spaces, dash, apostrophe; no digits) -> phone_name
 				///         - Otherwise -> default
-				/// @param   {String|Undefined} _allowed
+				/// @self    WWTextBase
+				/// @param   {String|Undefined} allowed
 				/// @returns {Real} kbv_type_* constant
 				#endregion
 				static __infer_keyboard_type__ = function(_allowed) {
@@ -1293,9 +1357,27 @@ function WWTextBase() : WWCore() constructor {
 				    }
 
 				    // Local helpers (all ASCII-safe)
+				    #region jsDoc
+				    /// @func    __has__()
+				    /// @ignore
+				    /// @desc    Returns true if a character is present in a string.
+				    /// @self    WWTextBase
+				    /// @param   {String} pool
+				    /// @param   {String} ch
+				    /// @returns {Bool}
+				    #endregion
 				    static __has__ = function(_pool, _ch) {
 				        return string_pos(_ch, _pool) > 0;
 				    };
+				    #region jsDoc
+				    /// @func    __all_in__()
+				    /// @ignore
+				    /// @desc    Returns true if every character in pool exists within set.
+				    /// @self    WWTextBase
+				    /// @param   {String} pool
+				    /// @param   {String} set
+				    /// @returns {Bool}
+				    #endregion
 				    static __all_in__ = function(_pool, _set) {
 				        var idx = 1, len = string_length(_pool);
 				        while (idx <= len) {
@@ -1306,6 +1388,14 @@ function WWTextBase() : WWCore() constructor {
 				        return true;
 				    };
 				    static __is_subset_of__ = __all_in__;
+				    #region jsDoc
+				    /// @func    __is_ascii_only__()
+				    /// @ignore
+				    /// @desc    Returns true if all characters in pool are ASCII (ord 0..127).
+				    /// @self    WWTextBase
+				    /// @param   {String} pool
+				    /// @returns {Bool}
+				    #endregion
 				    static __is_ascii_only__ = function(_pool) {
 				        var idx = 1, len = string_length(_pool);
 				        while (idx <= len) {
@@ -1377,16 +1467,17 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __break_lines__()
+				/// @ignore
 				/// @desc    Handles word wrapping for text lines based on the textbox's width. This
 				///          function splits lines at appropriate word boundaries when the text exceeds
 				///          the available drawing width, and optionally adjusts the cursor position
 				///          after a forced line break.
 				/// @self    WWTextBase
-				/// @param   {Real} _start_line_index       : The index of the line from which to start processing.
-				/// @param   {Real} _number_of_lines           : The number of lines to process for wrapping.
-				/// @param   {Real} _char_limit          : (Optional) The target character offset at which to force a break.
-				/// @param   {Real} _cursor_line_offset   : (Optional) An offset applied to the cursor's line position after a forced break.
-				/// @returns {Undefeined}
+				/// @param   {Real} start_line_index : The index of the line from which to start processing.
+				/// @param   {Real} number_of_lines : The number of lines to process for wrapping.
+				/// @param   {Real} char_limit : (Optional) The target character offset at which to force a break.
+				/// @param   {Real} cursor_line_offset : (Optional) An offset applied to the cursor's line position after a forced break.
+				/// @returns {Undefined}
 				#endregion
 				static __break_lines__ = function(_start_line_index, _number_of_lines, _char_limit = 0, _cursor_line_offset = 0) {
 				    // Define characters that indicate a natural word-break.
@@ -1518,13 +1609,14 @@ function WWTextBase() : WWCore() constructor {
 				
 			    #region jsDoc
 				/// @func    __close_lines__()
+				/// @ignore
 				/// @desc    Removes unnecessary (soft) line breaks added due to dynamic width from a text string.
 				///          It scans the text using string_pos_ext (to avoid allocating new strings) and, for each
 				///          newline encountered, checks the corresponding flag in __lines_broken_by_width__. If the
 				///          flag is false (a soft break), the newline is removed from the text.
 				/// @self    WWTextBase
-				/// @param   {String} _text         : The text string with forced line breaks.
-				/// @param   {Real} _start_line     : The starting line index for checking/removing soft breaks.
+				/// @param   {String} text : The text string with forced line breaks.
+				/// @param   {Real} start_line : The starting line index for checking/removing soft breaks.
 				/// @returns {String} The cleaned text with adjusted line breaks.
 				#endregion
 				static __close_lines__ = function(_text, _start_line) {
@@ -1563,12 +1655,13 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __check_minput__()
+				/// @ignore
 				/// @desc    Updates the cursor position based on mouse input. When selection mode is enabled,
 				///          if no selection anchor exists, it sets the anchor to the current cursor position.
 				///          Then it updates the cursor position from the mouse coordinates. If the new cursor
 				///          equals the anchor, selection is cleared; otherwise, selection remains active.
-				/// @self    WWTextInputSingle
-				/// @param   {Bool} _select : Whether selection mode is enabled.
+				/// @self    WWTextBase
+				/// @param   {Bool} select : Whether selection mode is enabled.
 				/// @returns {Undefined}
 				#endregion
 				static __check_minput__ = function(_select) {
@@ -1600,12 +1693,14 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __move_cursor_offset__()
+				/// @ignore
 				/// @desc    Moves the cursor based on input and optionally extends selection. When shift is
 				///          held, it preserves the selection anchor; otherwise, any active selection is cleared.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _change : The amount to move the cursor.
-				/// @param   {Bool} _shift  : Whether to extend the selection (shift key held).
-				/// @param   {Bool} _vertical : Whether the movement is vertical (if false, horizontal).
+				/// @self    WWTextBase
+				/// @param   {Real} vector : The amount to move the cursor.
+				/// @param   {Bool} shift  : Whether to extend the selection (shift key held).
+				/// @param   {Bool} vertical : Whether the movement is vertical (if false, horizontal).
+				/// @param   {Bool} word_mode : If true, use word-boundary movement.
 				/// @returns {Undefined}
 				#endregion
 				static __move_cursor_offset__ = function(_vector, _shift, _vertical, _word_mode=false) {
@@ -1672,14 +1767,15 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __nudge_cursor_vert__()
+				/// @ignore
 				/// @desc    Adjusts the vertical cursor position based on movement input while trying to maintain
 				///          the horizontal pixel offset of the current cursor.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _line            : The current line index.
-				/// @param   {Real} _cursor          : The current cursor position (1-indexed) on that line.
-				/// @param   {Real} _vert_input_vector : Amount to adjust the vertical cursor position.
-				/// @param   {Real} _width_memory    : (Optional) The remembered horizontal offset. Default is -1, which means recalc.
-				/// @returns {Real} The new horizontal cursor position on the new line.
+				/// @self    WWTextBase
+				/// @param   {Real} line              : The current line index.
+				/// @param   {Real} cursor            : The current cursor position (1-indexed) on that line.
+				/// @param   {Real} vert_input_vector : Amount to adjust the vertical cursor position.
+				/// @param   {Real} width_memory      : (Optional) The remembered horizontal offset. Default is -1, which means recalc.
+				/// @returns {Struct} A struct with properties x, y, and width.
 				#endregion
 				static __nudge_cursor_vert__ = function(_line, _cursor, _vert_input_vector, _width_memory=-1) {
 					static __struct = { x: undefined, y: undefined, width: undefined };
@@ -1734,13 +1830,15 @@ function WWTextBase() : WWCore() constructor {
 				}
 				
 				#region jsDoc
-				/// @func    __nudge_cursor_horz__
+				/// @func    __nudge_cursor_horz__()
+				/// @ignore
 				/// @desc    Nudges the cursor one character in the given direction and recomputes the word boundaries
 				///          for that new position. If the cursor is at the edge of the line (or textbox), it handles
 				///          moving to the adjacent line as necessary.
-				/// @param   {Real} _line : The current line index.
-				/// @param   {Real} _cursor : The current cursor position (1-indexed) on that line.
-				/// @param   {Real} _horz_input_vector : Direction to nudge; positive moves right, negative moves left.
+				/// @self    WWTextBase
+				/// @param   {Real} line : The current line index.
+				/// @param   {Real} cursor : The current cursor position (1-indexed) on that line.
+				/// @param   {Real} horz_input_vector : Direction to nudge; positive moves right, negative moves left.
 				/// @returns {Struct} A struct containing the word boundaries { x_start, x_end } for the nudged position.
 				#endregion
 				static __nudge_cursor_horz__ = function(_line, _cursor, _horz_input_vector) {
@@ -1824,6 +1922,16 @@ function WWTextBase() : WWCore() constructor {
 					return __struct;
 				};
 				
+				#region jsDoc
+				/// @func    __control_skip_word__()
+				/// @ignore
+				/// @desc    Computes a cursor move that skips over a word boundary (ctrl+left/right behavior).
+				/// @self    WWTextBase
+				/// @param   {Real} line
+				/// @param   {Real} cursor
+				/// @param   {Real} horz_input_vector
+				/// @returns {Struct} Cursor target struct
+				#endregion
 				static __control_skip_word__ = function(_line, _cursor, _horz_input_vector) {
 					static __struct = { x: undefined, y: undefined, width: undefined }
 					static _word_breakers = "\n"+chr(9)+chr(34)+" ,.;:?!><#$%&'()*+-/=@[\]^`{|}~¡¢£¤¥¦§¨©«¬­®¯°±´¶·¸»¿×÷";
@@ -1884,9 +1992,10 @@ function WWTextBase() : WWCore() constructor {
 			
 		        #region jsDoc
 		        /// @func    __array_clone__()
+				/// @ignore
 		        /// @desc    Creates a shallow copy of an array.
 		        /// @self    WWTextBase
-		        /// @param   {Array} _arr : The array to clone.
+				/// @param   {Array} arr : The array to clone.
 		        /// @returns {Array} A new array with the same elements.
 		        #endregion
 		        static __array_clone__ = function(_arr) {
@@ -1901,11 +2010,12 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __compute_word_boundaries__
+				/// @ignore
 				/// @desc    Given a line of text and a cursor index (1-indexed), computes the word boundaries
 				///          based on a shared list of word breakers. Returns a struct containing:
 				///              { x_start, x_end }
 				///          where x_start is the start index and x_end is the end index of the word.
-				/// @param   {String} lineText   : The text content of the line.
+				/// @param   {Real} lineIndex   : The line index in the internal lines array.
 				/// @param   {Real} cursorIndex  : The current cursor position in the line (1-indexed).
 				/// @param   {Bool} include_whitespaces : (Optional) If true, adjust boundaries to exclude adjacent whitespace. Default is false.
 				/// @returns {Struct} A struct with properties x_start and x_end.
@@ -1996,16 +2106,17 @@ function WWTextBase() : WWCore() constructor {
 				};
 
 				#region jsDoc
-				/// @func    __get_pos_from_gui__
+				/// @func    __get_pos_from_gui__()
+				/// @ignore
 				/// @desc    Converts GUI coordinates (absolute x, y) into a text position within the text box.
-				///          It calculates the line index and character index in that line. If _wordMode is true,
+				///          It calculates the line index and character index in that line. If wordMode is true,
 				///          it returns the full word boundaries using __compute_word_boundaries__.
-				/// @param   {Real} _gui_x    : The x coordinate in GUI space.
-				/// @param   {Real} _gui_y    : The y coordinate in GUI space.
-				/// @param   {Bool} _wordMode : (Optional) If true, returns word boundaries; otherwise, returns just the cursor position.
+				/// @param   {Real} gui_x    : The x coordinate in GUI space.
+				/// @param   {Real} gui_y    : The y coordinate in GUI space.
+				/// @param   {Bool} wordMode : (Optional) If true, returns word boundaries; otherwise, returns just the cursor position.
 				/// @returns {Struct} A struct with properties:
-				///           - x_start: For _wordMode true, the start index of the word; otherwise, the cursor position.
-				///           - x_end  : For _wordMode true, the end index of the word; otherwise, equal to x_start.
+				///           - x_start: For wordMode true, the start index of the word; otherwise, the cursor position.
+				///           - x_end  : For wordMode true, the end index of the word; otherwise, equal to x_start.
 				///           - y      : The line index.
 				/// @self    WWTextBase
 				#endregion
@@ -2068,9 +2179,10 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 			    /// @func    __insert_string_at_cursor__()
+			    /// @ignore
 			    /// @desc    Inserts a new string at the cursor position, respecting allowed characters.
-			    /// @self    WWTextInputSingle
-			    /// @param   {String} _str : The string to insert.
+			    /// @self    WWTextBase
+			    /// @param   {String} str : The string to insert.
 			    /// @returns {Undefined}
 			    #endregion
 				static __insert_string_at_cursor__ = function(_str) {
@@ -2146,14 +2258,15 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func	__textbox_delete_string__()
+				/// @ignore
 				/// @desc	Deletes a character at the cursor position or removes a selection if active.
 				///		  For forward deletion (delete key), it removes the character after the cursor,
 				///		  merging with the next line if at the end. For backspace deletion, it removes the
 				///		  character before the cursor, merging with the previous line if at the start.
 				///		  When a selection is active, it deletes the entire selection and positions the cursor
 				///		  at the beginning of the selection.
-				/// @self	WWTextInputSingle
-				/// @param   {Bool} _is_del_key : True if the delete key is pressed (forward delete), false if backspace.
+				/// @self	WWTextBase
+				/// @param   {Bool} is_del_key : True if the delete key is pressed (forward delete), false if backspace.
 				/// @returns {Undefined}
 				#endregion
 				static __textbox_delete_string__ = function(_is_del_key) {
@@ -2262,6 +2375,7 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __highlight_word_at_cursor__
+				/// @ignore
 				/// @desc    Highlights the word at the current cursor position.  
 				///          - If the character at the cursor is not a word breaker (as defined by __word_breakers),  
 				///            it expands the selection left and right until a word breaker is encountered.  
@@ -2287,6 +2401,7 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 				/// @func    __update_word_selection_drag__
+				/// @ignore
 				/// @desc    Updates the word selection during a mouse drag after a double-click.
 				///          The cursor is updated based on the mouse position using __get_pos_from_gui__
 				///          while the selection anchors (stored in __word_anchor_start__, __word_anchor_end__, and __word_anchor_line__)
@@ -2344,8 +2459,9 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 			    /// @func    __clipboard_get_text__()
+			    /// @ignore
 			    /// @desc    Retrieves text from the clipboard for pasting into the input field.
-			    /// @self    WWTextInputSingle
+			    /// @self    WWTextBase
 			    /// @returns {String}
 			    #endregion
 			    static __clipboard_get_text__ = function() {
@@ -2366,9 +2482,11 @@ function WWTextBase() : WWCore() constructor {
 				
 				#region jsDoc
 			    /// @func    __clipboard_set_text__()
+			    /// @ignore
 			    /// @desc    Sets the clipboard text.
-			    /// @self    WWTextInputSingle
-			    /// @returns {String}
+			    /// @self    WWTextBase
+			    /// @param   {String} str
+			    /// @returns {Undefined}
 			    #endregion
 			    static __clipboard_set_text__ = function(_str) {
 			        if (os_browser == browser_not_a_browser) {
@@ -2388,13 +2506,14 @@ function WWTextBase() : WWCore() constructor {
 
 			    #region jsDoc
 				/// @func    __record__()
+				/// @ignore
 				/// @desc    Snapshot record constructor for undo/redo history.
 				///          Stores a clone of the text lines, the active line, cursor position, and the width‐breakpoints.
-				/// @self    WWTextInputSingle
-				/// @param   {Array<String>} _lines_arr : The text content as an array of lines.
-				/// @param   {Real} _line              : The active line index.
-				/// @param   {Real} _cursor            : The cursor position within the active line.
-				/// @param   {Array<Bool>} _break_arr  : The array of soft-break flags.
+				/// @self    WWTextBase
+				/// @param   {Array<String>} lines_arr : The text content as an array of lines.
+				/// @param   {Real} line               : The active line index.
+				/// @param   {Real} cursor             : The cursor position within the active line.
+				/// @param   {Array<Bool>} break_arr   : The array of soft-break flags.
 				/// @returns {Struct} A record object.
 				#endregion
 				static __record__ = function(_lines_arr, _line, _cursor, _break_arr) constructor {
@@ -2406,10 +2525,11 @@ function WWTextBase() : WWCore() constructor {
 
 				#region jsDoc
 				/// @func    __textbox_records_add__()
+				/// @ignore
 				/// @desc    Adds a new snapshot to the history stack for undo/redo.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _line   : The active line index.
-				/// @param   {Real} _cursor : The cursor position in the active line.
+				/// @self    WWTextBase
+				/// @param   {Real} line   : The active line index.
+				/// @param   {Real} cursor : The cursor position in the active line.
 				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_add__ = function(_line, _cursor) {
@@ -2441,10 +2561,11 @@ function WWTextBase() : WWCore() constructor {
 
 				#region jsDoc
 				/// @func    __textbox_records_rec__()
+				/// @ignore
 				/// @desc    Updates the latest history record with the current cursor position.
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _line   : The active line index.
-				/// @param   {Real} _cursor : The cursor position in the active line.
+				/// @self    WWTextBase
+				/// @param   {Real} line   : The active line index.
+				/// @param   {Real} cursor : The cursor position in the active line.
 				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_rec__ = function(_line, _cursor) {
@@ -2456,9 +2577,10 @@ function WWTextBase() : WWCore() constructor {
 
 				#region jsDoc
 				/// @func    __textbox_records_set__()
+				/// @ignore
 				/// @desc    Moves the history cursor by _change steps and restores that snapshot (for undo/redo).
-				/// @self    WWTextInputSingle
-				/// @param   {Real} _change : The number of steps to move in the history (negative for undo, positive for redo).
+				/// @self    WWTextBase
+				/// @param   {Real} change : The number of steps to move in the history (negative for undo, positive for redo).
 				/// @returns {Undefined}
 				#endregion
 				static __textbox_records_set__ = function(_change) {
@@ -2484,29 +2606,100 @@ function WWTextBase() : WWCore() constructor {
 			
 			#region Built in Function Overwrites
 			
+			#region jsDoc
+			/// @func    __string_width()
+			/// @ignore
+			/// @desc    Wrapper around `string_width()` that ensures the component font is set.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @returns {Real}
+			#endregion
 			static __string_width = function(_string) {
 				draw_set_font(text.font)
 				return string_width(_string)
 			}
+			#region jsDoc
+			/// @func    __string_height()
+			/// @ignore
+			/// @desc    Wrapper around `string_height()` that ensures the component font is set.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @returns {Real}
+			#endregion
 			static __string_height = function(_string) {
 				draw_set_font(text.font)
 				return string_height(_string)
 			}
+			#region jsDoc
+			/// @func    __string_copy()
+			/// @ignore
+			/// @desc    Wrapper around `string_copy()`.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @param   {Real} index
+			/// @param   {Real} count
+			/// @returns {String}
+			#endregion
 			static __string_copy = function(_string, _index, _count) {
 				return string_copy(_string, _index, _count)
 			}
+			#region jsDoc
+			/// @func    __string_length()
+			/// @ignore
+			/// @desc    Wrapper around `string_length()`.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @returns {Real}
+			#endregion
 			static __string_length = function(_string) {
 				return string_length(_string)
 			}
+			#region jsDoc
+			/// @func    __string_char_at()
+			/// @ignore
+			/// @desc    Wrapper around `string_char_at()`.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @param   {Real} index
+			/// @returns {String}
+			#endregion
 			static __string_char_at = function(_string, _index) {
 				return string_char_at(_string, _index)
 			}
+			#region jsDoc
+			/// @func    __string_pos()
+			/// @ignore
+			/// @desc    Wrapper around `string_pos()`.
+			/// @self    WWTextBase
+			/// @param   {String} substr
+			/// @param   {String} str
+			/// @returns {Real}
+			#endregion
 			static __string_pos = function(_substr, _str) {
 				return string_pos(_substr, _str)
 			}
+			#region jsDoc
+			/// @func    __string_count()
+			/// @ignore
+			/// @desc    Wrapper around `string_count()`.
+			/// @self    WWTextBase
+			/// @param   {String} substr
+			/// @param   {String} str
+			/// @returns {Real}
+			#endregion
 			static __string_count = function(_substr, _str) {
 				return string_count(_substr, _str)
 			}
+			#region jsDoc
+			/// @func    __string_delete()
+			/// @ignore
+			/// @desc    Wrapper around `string_delete()`.
+			/// @self    WWTextBase
+			/// @param   {String} string
+			/// @param   {Real} index
+			/// @param   {Real} count
+			/// @returns {String}
+			#endregion
 			static __string_delete = function(_string, _index, _count) {
 				return string_delete(_string, _index, _count)
 			}
@@ -2537,7 +2730,8 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#region jsDoc
             /// @func    set_accept_return()
             /// @desc    Allow Enter to insert a newline.
-            /// @param   {Bool} _allow
+			/// @self    WWTextInputMulti
+			/// @param   {Bool} allow
             /// @returns {Struct.WWTextInputMulti}
             #endregion
 			static set_accept_return = function(_allow=true) {
@@ -2548,7 +2742,8 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#region jsDoc
             /// @func    set_auto_indent()
             /// @desc    Inherit leading whitespace when pressing Enter.
-            /// @param   {Bool} _enable
+			/// @self    WWTextInputMulti
+			/// @param   {Bool} enable
             /// @returns {Struct.WWTextInputMulti}
             #endregion
 			static set_auto_indent = function(_enable=true) {
@@ -2559,7 +2754,8 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#region jsDoc
             /// @func    set_indent_string()
             /// @desc    Set the indentation token inserted by Tab. Code editor may set "\t".
-            /// @param   {String} _str
+			/// @self    WWTextInputMulti
+			/// @param   {String} str
             /// @returns {Struct.WWTextInputMulti}
             #endregion
 			static set_indent_string = function(_str="    ") {
@@ -2570,7 +2766,8 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#region jsDoc
             /// @func    set_submit_ctrl_enter()
             /// @desc    If true, Ctrl+Enter will trigger the submit event.
-            /// @param   {Bool} _enable
+			/// @self    WWTextInputMulti
+			/// @param   {Bool} enable
             /// @returns {Struct.WWTextInputMulti}
             #endregion
 			static set_submit_ctrl_enter = function(_enable=true) {
@@ -2581,8 +2778,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			#region jsDoc
             /// @func    set_max_length()
             /// @desc    Cap character count (excluding newline characters).
-            /// @param   {Real} _max
-            /// @returns {Struct.WWTextInputMulti}
+				/// @self    WWTextInputMulti
+			/// @param   {Real} max
+				/// @returns {Struct.WWTextInputMulti}
             #endregion
 			static set_max_length = function(_max=infinity) {
                 max_char_length = _max;
@@ -2593,9 +2791,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			/// @func   set_keyboard_type()
 			/// @desc   Sets the keyboard type to be used in this textbox. 
 			///         If not set, the type may be inferred when allowed characters are defined.
-			/// @self   WWTextBase
-			/// @param  {String} _keyboard_type : The keyboard type (e.g. "default", "numeric", "email").
-			/// @returns {Struct.WWTextBase}
+				/// @self   WWTextInputMulti
+			/// @param  {String} keyboard_type : The keyboard type (e.g. "default", "numeric", "email").
+				/// @returns {Struct.WWTextInputMulti}
 			#endregion
 			static set_keyboard_type = function(_keyboard_type) {
 			    __keyboard_type__ = _keyboard_type;
@@ -2621,6 +2819,12 @@ function WWTextInputMulti() : WWTextBase() constructor {
         
         #region Functions
 			
+			#region jsDoc
+			/// @func    WWTextInputMulti.render_text()
+			/// @desc    Renders the current text and selection/caret visuals.
+			/// @self    WWTextInputMulti
+			/// @returns {Undefined}
+			#endregion
             static render_text = function() {
                 var currentY = y;
                 for (var i = 0; i < array_length(lines); i++) {
@@ -2692,8 +2896,10 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __emit_change__()
+				/// @ignore
             /// @desc    Mark render dirty, push history snapshot, and fire change event.
-            /// @param   {Bool} _push_history
+				/// @self    WWTextInputMulti
+				/// @param   {Bool} push_history
             /// @returns {Undefined}
             #endregion
             static __emit_change__ = function(_push_history=true) {
@@ -2709,8 +2915,10 @@ function WWTextInputMulti() : WWTextBase() constructor {
             }
 
             #region jsDoc
-            /// @func    __get_clipboard_text__
+				/// @func    __get_clipboard_text__()
+				/// @ignore
             /// @desc    Get text from clipboard (desktop or html5 shim).
+				/// @self    WWTextInputMulti
             /// @returns {String}
             #endregion
             static __get_clipboard_text__ = function() {
@@ -2725,8 +2933,10 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __delete_selection_or_char__()
+				/// @ignore
             /// @desc    Wrapper around base deletion that also emits change.
-            /// @param   {Bool} _forward
+			/// @self    WWTextInputMulti
+			/// @param   {Bool} forward
             /// @returns {Undefined}
             #endregion
 			static __delete_selection_or_char__ = function(_forward) {
@@ -2737,7 +2947,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __delete_word_left__()
+				/// @ignore
             /// @desc    Delete the previous word (selection-aware).
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __delete_word_left__ = function() {
@@ -2756,7 +2968,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __delete_word_right__()
+				/// @ignore
             /// @desc    Delete the next word (selection-aware).
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __delete_word_right__ = function() {
@@ -2775,7 +2989,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __delete_to_line_start__()
+				/// @ignore
             /// @desc    Delete from cursor to beginning of line.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __delete_to_line_start__ = function() {
@@ -2788,7 +3004,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __delete_to_line_end__()
+				/// @ignore
             /// @desc    Delete from cursor to end of line.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __delete_to_line_end__ = function() {
@@ -2805,8 +3023,10 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __insert_text__()
+				/// @ignore
             /// @desc    Insert text with max-length enforcement and change event.
-            /// @param   {String} _text
+				/// @self    WWTextInputMulti
+				/// @param   {String} text
             /// @returns {Undefined}
             #endregion
             static __insert_text__ = function(_text) {
@@ -2837,7 +3057,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __insert_newline__()
+				/// @ignore
             /// @desc    Insert newline, optionally inheriting indentation, and emit change.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __insert_newline__ = function() {
@@ -2867,7 +3089,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __indent_selection_or_cursor__()
+				/// @ignore
             /// @desc    Tab behavior: if selection spans multiple lines, indent each line; otherwise insert indent_string.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __indent_selection_or_cursor__ = function() {
@@ -2924,7 +3148,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __unindent_selection_or_cursor__()
+				/// @ignore
             /// @desc    Shift+Tab behavior: remove one indent_string or single leading tab/spaces from lines in selection.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __unindent_selection_or_cursor__ = function() {
@@ -2990,7 +3216,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 
             #region jsDoc
             /// @func    __cut_selection__()
+				/// @ignore
             /// @desc    Copy selection and delete.
+				/// @self    WWTextInputMulti
             /// @returns {Undefined}
             #endregion
             static __cut_selection__ = function() {
@@ -3013,6 +3241,12 @@ function WWCodeEditor() : WWTextInputMulti() constructor {
     
     #region Public
         #region Functions
+			#region jsDoc
+			/// @func    WWCodeEditor.render_text()
+			/// @desc    Renders the code editor text (optionally including syntax highlighting and line numbers).
+			/// @self    WWCodeEditor
+			/// @returns {Undefined}
+			#endregion
             static render_text = function() {
                 // Example: iterate through lines and apply syntax highlighting.
                 var currentY = y;
@@ -3050,9 +3284,9 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			#region jsDoc
 			/// @func    set_shift_only_new_line()
 			/// @desc    Set the text box to only accept new line breaks when you press shift. This is commonly used for when you wish to take advantage of the "submit" event when hiting enter.
-			/// @self    GUICompTextbox
-			/// @param   {Bool} memory_limit : If pressing shift+enter is the only way to break to a new line. if so then the default press of enter will submit the text.
-			/// @returns {Struct.GUICompTextbox}
+			/// @self    WWTextInputSingle
+			/// @param   {Bool} shift_only_nl : If Shift+Enter is required to insert a newline.
+			/// @returns {Struct.WWTextInputSingle}
 			#endregion
 			static set_shift_only_new_line = function(_shift_only_nl=true) {
 				curt.shift_only_new_line = _shift_only_nl;
@@ -3063,10 +3297,10 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			}
 			#region jsDoc
 			/// @func    set_password_mode()
-			/// @desc    Sets the cursor's width. This is usually used if you're manipulating you're GUI resolution and would like to increase the visibility of the cursor.
-			/// @self    GUICompTextbox
-			/// @param   {Real} width : The width of the cursor.
-			/// @returns {Struct.GUICompTextbox}
+			/// @desc    Enables/disables password mode.
+			/// @self    WWTextInputSingle
+			/// @param   {Bool} width : Whether password mode is enabled.
+			/// @returns {Struct.WWTextInputSingle}
 			#endregion
 			static set_password_mode = function(_width) {
 				password_mode = _width
@@ -3074,13 +3308,13 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func	set_caption()
+			/// @func	WWTextInputSingle.set_caption()
 			/// @desc	Sets the caption; aka: "placeholder" text, that is displayed when no user input exists.
 			///		 This text is not selectable; for selectable text, use set_text().
 			///		 This will also effect how console's display the keyboard.
-			/// @self	WWTextBase
-			/// @param   {String} _text : The caption/placeholder text.
-			/// @returns {Struct.WWTextBase}
+			/// @self	WWTextInputSingle
+				/// @param   {String} text : The caption/placeholder text.
+			/// @returns {Struct.WWTextInputSingle}
 			#endregion
 			static set_caption = function(_text = "") {
 				if (text.caption == _text) return self;
@@ -3090,12 +3324,12 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 				return self;
 			}
 			#region jsDoc
-			/// @func	set_max_length()
+			/// @func	WWTextInputSingle.set_max_length()
 			/// @desc	Sets the maximum number of characters allowed in the text component.
 			///		 A value of infinity allows unlimited characters.
-			/// @self	WWTextBase
-			/// @param   {Real} _max_length : The maximum character count.
-			/// @returns {Struct.WWTextBase}
+			/// @self	WWTextInputSingle
+				/// @param   {Real} max_length : The maximum character count.
+			/// @returns {Struct.WWTextInputSingle}
 			#endregion
 			static set_max_length = function(_max_length = infinity) {
 				curt.max_length = _max_length;
@@ -3105,7 +3339,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 			/// @func	set_records_limit()
 			/// @desc	Sets the limit for undo/redo records, useful when memory is a concern.
 			/// @self	WWTextBase
-			/// @param   {Real} _memory_limit : The maximum number of records to keep.
+				/// @param   {Real} memory_limit : The maximum number of records to keep.
 			/// @returns {Struct.WWTextBase}
 			#endregion
 			static set_records_limit = function(_memory_limit = 64) {
@@ -3161,8 +3395,9 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 
 			    #region jsDoc
 			    /// @func    __textbox_max_length__()
+				/// @ignore
 			    /// @desc    Enforces the maximum character limit for the text input component.
-			    /// @self    WWTextInputSingle
+				/// @self    WWTextBase
 			    /// @returns {Undefined}
 			    #endregion
 			    static __textbox_max_length__ = function() {
@@ -3202,8 +3437,9 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
 				
 			    #region jsDoc
 			    /// @func    __textbox_break_line__()
+				/// @ignore
 			    /// @desc    Inserts a new line at the cursor position.
-			    /// @self    WWTextInputSingle
+				/// @self    WWTextBase
 			    /// @returns {Undefined}
 			    #endregion
 			    static __textbox_break_line__ = function() {

@@ -138,7 +138,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
 			///          like one would from a console or webpage, but modifying the text is prohibited.
 			/// @self    WWTextBoxV3
-			/// @param   {Bool} read_only : If the textbox is read-only.
+			/// @param   {Bool} bool : If the textbox is read-only.
 			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_read_only = function(_bool = false) {
@@ -272,16 +272,17 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @desc    Sets the selection start index.
 				/// @self    WWTextBoxV3
 				/// @param   {Real} index
-				/// @returns {Real} The resulting start index.
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_start_index = function(_index) {
 					return cursor.set_highlight_start_index(_index);
 				}
 				#region jsDoc
 				/// @func    set_cursor_highlight_end_index()
-				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @desc    Sets the selection end index.
+				/// @self    WWTextBoxV3
+				/// @param   {Real} index
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_end_index = function(_index) {
 					return cursor.set_highlight_end_index(_index);
@@ -291,8 +292,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_col()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_col = function() {
 					return cursor.set_col();
@@ -300,8 +301,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_line()
 				/// @desc    Get cursor's y position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_line = function() {
 					return cursor.set_line();
@@ -309,8 +310,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_highlight_start_line()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_start_line = function() {
 					return cursor.set_highlight_start_line();
@@ -318,8 +319,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_highlight_start_col()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_start_col = function() {
 					return cursor.set_highlight_start_col();
@@ -327,8 +328,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_highlight_end_line()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_end_line = function() {
 					return cursor.set_highlight_end_line();
@@ -336,8 +337,8 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_highlight_end_col()
 				/// @desc    Get cursor's x position in the GUI
-				/// @self    GUICompTextbox
-				/// @returns {Real}
+				/// @self    WWTextBoxV3
+				/// @returns {Struct.WWTextBoxV3}
 				#endregion
 				static set_cursor_highlight_end_col = function() {
 					return cursor.set_highlight_end_col();
@@ -347,7 +348,9 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    set_cursor_xy()
 				/// @desc    Get cursor's xy position in the GUI
-				/// @self    GUICompTextbox
+				/// @self    WWTextBoxV3
+				/// @param   {Real} x
+				/// @param   {Real} y
 				/// @returns {Real}
 				#endregion
 				static set_cursor_xy = function(_x, _y) {
@@ -371,8 +374,9 @@ function WWTextBoxV3() : WWCore() constructor {
                 ///         - String (text only, spans will be defaulted)
                 ///
                 ///         Returning undefined disables processing for this build.
+				/// @self   WWTextBoxV3
 				/// @param  {Function} processor_fn
-                /// @returns {Struct.WWTextRendererBase}
+				/// @returns {Struct.WWTextBoxV3}
                 #endregion
                 static set_text_processor = function(_processor_fn) {
 					renderer.set_text_processor(_processor_fn);
@@ -391,8 +395,8 @@ function WWTextBoxV3() : WWCore() constructor {
 			///          When swapped:
 			///          - old renderer is detached (set_active(false), removed from children if supported)
 			///          - new renderer is attached, positioned to (0,0) within textbox content area
-			/// @param   {Struct|Function|Undefined} renderer_or_ctor
-			/// @param   {Bool} owns_instance
+			/// @self    WWTextBoxV3
+			/// @param   {Struct|Function|Undefined} renderer_constructor
 			/// @returns {Struct.WWTextBoxV3}
 			#endregion
 			static set_renderer = function(_renderer_constructor) {
@@ -1122,6 +1126,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @desc   Applies formatting directly into glyph records for the logical index range.
 			///         Range is [start_index, end_index) 0-based.
 			///         Pass undefined for any field you do not want to change.
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Constant.Color|Undefined} color_value
@@ -1158,6 +1163,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   clear_format_range()
 			/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @returns {Struct.WWTextBoxV3}
@@ -1170,6 +1176,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_color_range()
 			/// @desc   Sets per-glyph color for the logical index range [start,end).
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Constant.Color} color_value
@@ -1183,6 +1190,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_alpha_range()
 			/// @desc   Sets per-glyph alpha for the logical index range [start,end).
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} alpha_value
@@ -1196,6 +1204,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_font_range()
 			/// @desc   Sets per-glyph font override for [start,end). Use -1 to clear override.
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Asset.GMFont|Real} font_asset_or_minus1
@@ -1209,6 +1218,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_style_range()
 			/// @desc   Sets per-glyph style enum for [start,end).
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} style
@@ -1222,6 +1232,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_size_range()
 			/// @desc   Sets per-glyph size multiplier for [start,end). Values <= 0 clamp to 1.
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} size_mul
@@ -1235,6 +1246,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_underline_range()
 			/// @desc   Sets per-glyph underline enum for [start,end).
+			/// @self   WWTextBoxV3
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} underline_value
@@ -1413,6 +1425,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_renderer()
 				/// @desc    Returns the active renderer instance.
+				/// @self    WWTextBoxV3
 				/// @returns {Struct|Undefined}
 				#endregion
 				static get_renderer = function() {
@@ -1422,6 +1435,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_x()
 				/// @desc    Convert a buffer index into gui x coordinate
+				/// @self    WWTextBoxV3
 				/// @param   {Real} index
 				/// @returns {Real} x
 				#endregion
@@ -1431,6 +1445,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_y()
 				/// @desc    Convert a buffer index into gui y coordinate
+				/// @self    WWTextBoxV3
 				/// @param   {Real} index
 				/// @returns {Real} y
 				#endregion
@@ -1440,6 +1455,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    xy_to_index()
 				/// @desc    Convert gui x,y coordinates into the nearest buffer index.
+				/// @self    WWTextBoxV3
 				/// @param   {Real} x
 				/// @param   {Real} y
 				/// @returns {Real}
@@ -1451,6 +1467,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_line()
 				/// @desc    Convert a buffer index into a line number. Lines and columns are 0-based.
+				/// @self    WWTextBoxV3
 				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
@@ -1460,6 +1477,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_col()
 				/// @desc    Convert a buffer index into a column number. Lines and columns are 0-based.
+				/// @self    WWTextBoxV3
 				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
@@ -1469,6 +1487,7 @@ function WWTextBoxV3() : WWCore() constructor {
 				#region jsDoc
 				/// @func    line_col_to_index()
 				/// @desc    Convert a line and column (0-based) into a buffer index.
+				/// @self    WWTextBoxV3
 				/// @param   {Real} line
 				/// @param   {Real} col
 				/// @returns {Real}
@@ -1559,6 +1578,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					/// @func    __has__()
 					/// @ignore
 					/// @desc    Returns true if a character exists in a palette string.
+					/// @self    WWTextBoxV3
 					/// @param   {String} pool
 					/// @param   {String} ch
 					/// @returns {Bool}
@@ -1570,6 +1590,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					/// @func    __all_in__()
 					/// @ignore
 					/// @desc    Returns true if every character in pool exists in set.
+					/// @self    WWTextBoxV3
 					/// @param   {String} pool
 					/// @param   {String} set
 					/// @returns {Bool}
@@ -1588,6 +1609,7 @@ function WWTextBoxV3() : WWCore() constructor {
 					/// @func    __is_ascii_only__()
 					/// @ignore
 					/// @desc    Returns true if every character in pool is ASCII.
+					/// @self    WWTextBoxV3
 					/// @param   {String} pool
 					/// @returns {Bool}
 					#endregion
@@ -1828,9 +1850,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				///              { x_start, x_end }
 				///          where x_start is the start index and x_end is the end index of the word.
 				/// @param   {Real} index : The glyph index.
-				/// @param   {Bool} include_whitespaces : (Optional) If true, adjust boundaries to exclude adjacent whitespace. Default is false.
+				/// @param   {Bool} include_whitespace : (Optional) If true, adjust boundaries to exclude adjacent whitespace. Default is false.
 				/// @returns {Struct} A struct with properties index_start and index_end.
-				/// @self    WWTextBase
+				/// @self    WWTextBoxV3
+				/// @ignore
 				#endregion
 				static __compute_word_boundaries__ = function(_index, _include_whitespace = false) {
 					// Reusable return struct: global buffer indices (inclusive).
@@ -2303,9 +2326,11 @@ function WWTextBoxV3() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __delete_selection_if_any__
 			/// @desc    If a highlight selection exists, erase it from the buffer and place the cursor.
+			/// @self    WWTextBoxV3
 			/// @param   {Bool} force_rebuild
 			/// @param   {Bool} push_history
 			/// @returns {Bool} True if something was deleted, false otherwise
+			/// @ignore
 			#endregion
 			static __delete_selection_if_any__ = function(_force_rebuild = true, _push_history = true) {
 				if (!cursor.get_highlight_active()) return false;

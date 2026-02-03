@@ -36,7 +36,7 @@ function WWWindow() : WWCore() constructor {
             /// @func    set_title()
             /// @desc    Sets the window's title text.
             /// @self    WWWindow
-            /// @param   {String} _title : The title text.
+            /// @param   {String} title : The title text.
             /// @returns {Struct.WWWindow}
             #endregion
             static set_title = function(_title) {
@@ -48,7 +48,7 @@ function WWWindow() : WWCore() constructor {
             /// @func    set_content()
             /// @desc    Sets the content (viewport) of the window. This component should be a WWCore (or derivative).
             /// @self    WWWindow
-            /// @param   {Struct.WWCore} _content : The content component.
+            /// @param   {Struct.WWCore} content : The content component.
             /// @returns {Struct.WWWindow}
             #endregion
             static set_content = function(_content) {
@@ -166,10 +166,16 @@ function WWWindow() : WWCore() constructor {
         #endregion
         
         #region Functions
-        static center = function() {
+            #region jsDoc
+            /// @func    center()
+            /// @desc    Centers the window in the default 1280x720 GUI space.
+            /// @self    WWWindow
+            /// @returns {Struct.WWWindow}
+            #endregion
+            static center = function() {
             self.set_offset((1280 - self.width) / 2, (720 - self.height) / 2);
             return self;
-        }
+            }
         #endregion
         
     #endregion

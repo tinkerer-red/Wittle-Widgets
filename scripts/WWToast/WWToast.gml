@@ -9,14 +9,28 @@ function WWToast() : WWCore() constructor {
     #region Public
         
         #region Builder Functions
-        static set_message = function(_msg) {
+            #region jsDoc
+            /// @func    set_message()
+            /// @desc    Sets the toast message text.
+            /// @self    WWToast
+            /// @param   {String} msg : Toast message.
+            /// @returns {Struct.WWToast}
+            #endregion
+            static set_message = function(_msg) {
             messageText.set_text(_msg);
             return self;
-        }
-        static set_duration = function(_dur) {
+            }
+            #region jsDoc
+            /// @func    set_duration()
+            /// @desc    Sets the duration (in steps/frames) before the toast auto-hides.
+            /// @self    WWToast
+            /// @param   {Real} dur : Duration in frames.
+            /// @returns {Struct.WWToast}
+            #endregion
+            static set_duration = function(_dur) {
             duration = _dur;
             return self;
-        }
+            }
         #endregion
         
         #region Components

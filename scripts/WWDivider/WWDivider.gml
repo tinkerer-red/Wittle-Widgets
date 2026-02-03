@@ -9,10 +9,24 @@ function WWDivider() : WWCore() constructor {
     #region Public
         
         #region Builder Functions
+        #region jsDoc
+        /// @func    set_thickness()
+        /// @desc    Sets the divider thickness in pixels.
+        /// @self    WWDivider
+        /// @param   {Real} thickness : The divider thickness.
+        /// @returns {Struct.WWDivider}
+        #endregion
         static set_thickness = function(_thickness) {
             thickness = _thickness;
             return self;
         }
+        #region jsDoc
+        /// @func    set_color()
+        /// @desc    Sets the divider color used when drawing.
+        /// @self    WWDivider
+        /// @param   {Real} color : The divider draw color.
+        /// @returns {Struct.WWDivider}
+        #endregion
         static set_color = function(_color) {
             dividerColor = _color;
             return self;
@@ -33,6 +47,13 @@ function WWDivider() : WWCore() constructor {
         #endregion
         
         #region Functions
+        #region jsDoc
+        /// @func    draw()
+        /// @desc    Draws the divider as a simple rectangle.
+        /// @self    WWDivider
+        /// @param   {Struct} input : Per-frame input state (unused).
+        /// @returns {Undefined}
+        #endregion
         static draw = function(_input) {
             draw_set_color(dividerColor);
             draw_rectangle(x, y, x + width, y + thickness, true);

@@ -9,10 +9,17 @@ function WWTooltip() : WWLabel() constructor {
     #region Public
         
         #region Builder Functions
-        static set_delay = function(_delay) {
+            #region jsDoc
+            /// @func    set_delay()
+            /// @desc    Sets the delay (in steps/frames) before the tooltip appears.
+            /// @self    WWTooltip
+            /// @param   {Real} delay : Delay in frames.
+            /// @returns {Struct.WWTooltip}
+            #endregion
+            static set_delay = function(_delay) {
             delay = _delay;
             return self;
-        }
+            }
         #endregion
         
         #region Components
@@ -36,13 +43,19 @@ function WWTooltip() : WWLabel() constructor {
         #endregion
         
         #region Functions
-        static update_visibility = function() {
+            #region jsDoc
+            /// @func    update_visibility()
+            /// @desc    Enables/disables the tooltip based on hover state.
+            /// @self    WWTooltip
+            /// @returns {Undefined}
+            #endregion
+            static update_visibility = function() {
             if (tooltipVisible) {
                 self.set_enabled(true);
             } else {
                 self.set_enabled(false);
             }
-        }
+            }
         #endregion
         
     #endregion

@@ -16,8 +16,9 @@ function WWTextInputMultiLine() : WWTextInput() constructor {
 			#region jsDoc
 			/// @func    set_size(_width, _height)
 			/// @desc    Sets control size and re-fits internal canvas.
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @self    WWTextInputMultiLine
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWTextInputMultiLine}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -37,8 +38,9 @@ function WWTextInputMultiLine() : WWTextInput() constructor {
 			#region jsDoc
 			/// @func    __fit_canvas__()
 			/// @desc    Sizes the internal field height to content height (min viewport height) so vertical scrolling works.
+			/// @self    WWTextInputMultiLine
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __fit_canvas__ = function() {
 				var _vw = region.viewport_width;

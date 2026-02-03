@@ -47,10 +47,11 @@ function WWFolder() : WWButtonText() constructor {
 		#region Builder Functions
 
 			#region jsDoc
-			/// @func    set_size(_width, _height)
-			/// @desc    Sets the header size. If _height <= 0, uses default header height.
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @func    set_size()
+			/// @desc    Sets the header size. If height <= 0, uses default header height.
+			/// @self    WWFolder
+			/// @param   {Real} width : The header width.
+			/// @param   {Real} height : The header height.
 			/// @returns {Struct.WWFolder} self
 			#endregion
 			static set_size = function(_width, _height) {
@@ -72,9 +73,10 @@ function WWFolder() : WWButtonText() constructor {
 			}
 
 			#region jsDoc
-			/// @func    set_header_height(_height)
+			/// @func    set_header_height()
 			/// @desc    Sets the default header height used when set_size(_, 0) is called.
-			/// @param   {Real} _height
+			/// @self    WWFolder
+			/// @param   {Real} height : The default header height.
 			/// @returns {Struct.WWFolder} self
 			#endregion
 			static set_header_height = function(_height) {
@@ -92,10 +94,11 @@ function WWFolder() : WWButtonText() constructor {
 			}
 
 			#region jsDoc
-			/// @func    set_children_offsets(_xoff, _yoff)
+			/// @func    set_children_offsets()
 			/// @desc    Sets indenting and vertical spacing for sub components inside the folder container.
-			/// @param   {Real} _xoff
-			/// @param   {Real} _yoff
+			/// @self    WWFolder
+			/// @param   {Real} xoff : Horizontal indent for child components.
+			/// @param   {Real} yoff : Vertical spacing between child components.
 			/// @returns {Struct.WWFolder} self
 			#endregion
 			static set_children_offsets = function(_xoff, _yoff) {
@@ -116,9 +119,10 @@ function WWFolder() : WWButtonText() constructor {
 			}
 
 			#region jsDoc
-			/// @func    set_open(_is_open)
+			/// @func    set_open()
 			/// @desc    Sets the folder open state. If the parent is a WWFolder, requests parent to reflow.
-			/// @param   {Bool} _is_open
+			/// @self    WWFolder
+			/// @param   {Bool} is_open : True to open; false to close.
 			/// @returns {Struct.WWFolder} self
 			#endregion
 			static set_open = function(_is_open) {
@@ -149,9 +153,10 @@ function WWFolder() : WWButtonText() constructor {
 		#region Functions
 
 			#region jsDoc
-			/// @func    add(_comp)
+			/// @func    add()
 			/// @desc    Adds a component (or array) into the folder container.
-			/// @param   {Struct.WWCore|Array} _comp
+			/// @self    WWFolder
+			/// @param   {Struct.WWCore|Array} comp : Component(s) to add.
 			/// @returns {Undefined}
 			#endregion
 			static add = function(_comp) {
@@ -168,11 +173,12 @@ function WWFolder() : WWButtonText() constructor {
 			}
 
 			#region jsDoc
-			/// @func    insert(_comp, _index)
+			/// @func    insert()
 			/// @desc    Inserts a component (or array) into the folder container children.
-			/// @param   {Struct.WWCore|Array} _comp
-			/// @param   {Real} _index
-			/// @returns {Undefined}
+			/// @self    WWFolder
+			/// @param   {Struct.WWCore|Array} comp : Component(s) to insert.
+			/// @param   {Real} index : Index to insert at.
+			/// @returns {Real}
 			#endregion
 			static insert = function(_comp, _index) {
 				var _result = __container__.insert(_comp, _index);
@@ -190,6 +196,7 @@ function WWFolder() : WWButtonText() constructor {
 			#region jsDoc
 			/// @func    clear_children()
 			/// @desc    Clears only folder items (does not remove the container itself).
+			/// @self    WWFolder
 			/// @returns {Struct.WWFolder} self
 			#endregion
 			static clear_children = function() {
@@ -209,6 +216,7 @@ function WWFolder() : WWButtonText() constructor {
 			#region jsDoc
 			/// @func    get_container()
 			/// @desc    Returns the internal container (advanced usage).
+			/// @self    WWFolder
 			/// @returns {Struct.WWCore}
 			#endregion
 			static get_container = function() {
@@ -219,6 +227,7 @@ function WWFolder() : WWButtonText() constructor {
 			/// @func    relayout_children()
 			/// @desc    Forces a reflow of this folder's container children and group size.
 			///          Safe to call from a child folder when it opens/closes.
+			/// @self    WWFolder
 			/// @returns {Undefined}
 			#endregion
 			static relayout_children = function() {
@@ -233,6 +242,7 @@ function WWFolder() : WWButtonText() constructor {
 			#region jsDoc
 			/// @func    update_component_positions()
 			/// @desc    Updates the container position and lays out children when open.
+			/// @self    WWFolder
 			/// @returns {Undefined}
 			#endregion
 			static update_component_positions = function() {
@@ -286,7 +296,9 @@ function WWFolder() : WWButtonText() constructor {
 			/// @func    __layout_container_children__()
 			/// @desc    Stacks the container children vertically using offsets.
 			///          Ensures each child has up-to-date group sizing before stacking.
+			/// @self    WWFolder
 			/// @returns {Undefined}
+			/// @ignore
 			#endregion
 			static __layout_container_children__ = function() {
 				var _current_y = 0;
@@ -314,7 +326,9 @@ function WWFolder() : WWButtonText() constructor {
 			#region jsDoc
 			/// @func    __update_group_region__()
 			/// @desc    Group sizing but ignores the container when closed.
+			/// @self    WWFolder
 			/// @returns {Undefined}
+			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
 				var _group_width = width;
@@ -345,7 +359,9 @@ function WWFolder() : WWButtonText() constructor {
 			#region jsDoc
 			/// @func    __notify_parent_folder_reflow__()
 			/// @desc    If our parent is a WWFolder, request it to relayout its children.
+			/// @self    WWFolder
 			/// @returns {Undefined}
+			/// @ignore
 			#endregion
 			static __notify_parent_folder_reflow__ = function() {
 				if (!__is_child__) { exit; }

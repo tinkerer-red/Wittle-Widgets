@@ -20,7 +20,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_cursor_color()
 			/// @desc   Sets the cursor color.
-			/// @param  {Constant.Color} _new_color
+			/// @self   WWTextCursor
+			/// @param  {Constant.Color} new_color
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_cursor_color = function(_new_color) {
@@ -31,7 +32,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_highlight_color()
 			/// @desc   Sets the highlight color drawn behind selected text.
-			/// @param  {Constant.Color} _new_color
+			/// @self   WWTextCursor
+			/// @param  {Constant.Color} new_color
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_highlight_color = function(_new_color) {
@@ -42,7 +44,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_cursor_visibility()
 			/// @desc   Sets caret index and updates line, col, and GUI position.
-			/// @param  {Bool} read_only
+			/// @self   WWTextCursor
+			/// @param  {Bool} bool
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_cursor_visibility = function(_bool) {
@@ -56,7 +59,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_index()
 			/// @desc   Sets caret index and updates line, col, and GUI position.
-			/// @param  {Real} _index_new
+			/// @self   WWTextCursor
+			/// @param  {Real} index_new
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_index = function(_index_new) {
@@ -71,6 +75,7 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_highlight_active()
 			/// @desc   Sets highlight as active.
+			/// @self   WWTextCursor
 			/// @param  {Bool} bool
 			/// @returns {Struct.WWTextCursor}
 			#endregion
@@ -82,7 +87,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_highlight_start_index()
 			/// @desc   Sets highlight start and resolves its line/col.
-			/// @param  {Real} _ind
+			/// @self   WWTextCursor
+			/// @param  {Real} ind
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_highlight_start_index = function(_ind) {
@@ -96,7 +102,8 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   set_highlight_end_index()
 			/// @desc   Sets highlight end and resolves its line/col.
-			/// @param  {Real} _ind
+			/// @self   WWTextCursor
+			/// @param  {Real} ind
 			/// @returns {Struct.WWTextCursor}
 			#endregion
 			static set_highlight_end_index = function(_ind) {
@@ -159,6 +166,7 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   get_index()
 			/// @desc   Returns the caret index within the buffer.
+			/// @self   WWTextCursor
 			/// @returns {Real}
 			#endregion
 			static get_index = function() {
@@ -168,6 +176,7 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   get_highlight_active()
 			/// @desc   Returns if the highlight is active.
+			/// @self   WWTextCursor
 			/// @returns {Real}
 			#endregion
 			static get_highlight_active = function() {
@@ -177,6 +186,7 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   get_highlight_start_index()
 			/// @desc   Returns highlight start index.
+			/// @self   WWTextCursor
 			/// @returns {Real}
 			#endregion
 			static get_highlight_start_index = function() {
@@ -186,6 +196,7 @@ function WWTextCursor() : WWCore() constructor {
 			#region jsDoc
 			/// @func   get_highlight_end_index()
 			/// @desc   Returns highlight end index.
+			/// @self   WWTextCursor
 			/// @returns {Real}
 			#endregion
 			static get_highlight_end_index = function() {
@@ -233,7 +244,10 @@ function WWTextCursor() : WWCore() constructor {
 			
 			#region jsDoc
             /// @func   __mark_dirty__()
+			/// @ignore
             /// @desc   Marks the cursor as needing recomputation.
+			/// @self   WWTextCursor
+			/// @returns {Undefined}
             #endregion
             static __mark_dirty__ = function() {
                 __is_dirty__ = true;
@@ -242,7 +256,10 @@ function WWTextCursor() : WWCore() constructor {
 						
 			#region jsDoc
 			/// @func   __blink_reset__()
+			/// @ignore
 			/// @desc   Resets the caret blink timer so the caret is immediately visible.
+			/// @self   WWTextCursor
+			/// @returns {Undefined}
 			#endregion
 			static __blink_reset__ = function() {
 				__blink_start_ms__ = current_time;
@@ -250,7 +267,10 @@ function WWTextCursor() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func   __blink_is_visible__()
+			/// @ignore
 			/// @desc   Returns true if the caret should be visible for the current time.
+			/// @self   WWTextCursor
+			/// @returns {Bool}
 			#endregion
 			static __blink_is_visible__ = function() {
 				var _elapsed = current_time - __blink_start_ms__;
@@ -268,7 +288,10 @@ function WWTextCursor() : WWCore() constructor {
 			
 			#region jsDoc
 			/// @func   __update_gui_position__()
+			/// @ignore
 			/// @desc   Resolves GUI x,y from the renderer based on caret index.
+			/// @self   WWTextCursor
+			/// @returns {Undefined}
 			#endregion
 			static __update_gui_position__ = function() {
 				if (!__is_dirty__) return;
@@ -286,6 +309,14 @@ function WWTextCursor() : WWCore() constructor {
 				}
 			};
 			
+			#region jsDoc
+			/// @func   __set_textbox__()
+			/// @ignore
+			/// @desc   Associates a textbox component with this cursor.
+			/// @self   WWTextCursor
+			/// @param  {Any} comp : Textbox component.
+			/// @returns {Struct.WWTextCursor}
+			#endregion
 			static __set_textbox__ = function(_comp) {
 				__textbox_parent__ = _comp;
 				__blink_reset__();

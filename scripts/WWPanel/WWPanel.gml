@@ -9,6 +9,13 @@ function WWPanel() : WWCore() constructor {
     #region Public
         
         #region Builder Functions
+		#region jsDoc
+		/// @func    set_border_color()
+		/// @desc    Sets the border color for this panel.
+		/// @self    WWPanel
+		/// @param   {Real} color : The border color.
+		/// @returns {Struct.WWPanel}
+		#endregion
         static set_border_color = function(_color) {
             borderColor = _color;
             return self;

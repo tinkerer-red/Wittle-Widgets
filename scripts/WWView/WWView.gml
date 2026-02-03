@@ -161,6 +161,7 @@ function WWView() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __update_group_region__()
 			/// @desc    Updates this viewport's cached group bounds used for collision early-outs.
+			/// @self    WWView
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion

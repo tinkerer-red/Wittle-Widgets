@@ -303,6 +303,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 			#region jsDoc
 			/// @func    __set_value__()
 			/// @desc    Sets the slider value, applying clamp + rounding, and triggers value change events.
+			/// @self    WWSliderBase
 			/// @param   {Real} value : New raw value.
 			/// @returns {Undefined}
 			/// @ignore
@@ -332,6 +333,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 			#region jsDoc
 			/// @func    __set_normalized_value__()
 			/// @desc    Sets the slider value from a normalized 0..1 input, applying clamp + rounding, and triggers value change events.
+			/// @self    WWSliderBase
 			/// @param   {Real} value : New normalized value (0..1).
 			/// @returns {Undefined}
 			/// @ignore

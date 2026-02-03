@@ -146,6 +146,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func   set_line_sep()
 				/// @desc   Sets the extra spacing between wrapped lines (in pixels).
+				/// @self   WWTextField
 				/// @param  {Real} line_sep_pixels
 				/// @returns {Struct.WWTextField}
 				#endregion
@@ -163,7 +164,7 @@ function WWTextField() : WWCore() constructor {
 			/// @desc    Sets textbox to be read only, this will still allow for selecting and copying
 			///          like one would from a console or webpage, but modifying the text is prohibited.
 			/// @self    WWTextField
-			/// @param   {Bool} is_read_only : If the text is read only.
+			/// @param   {Bool} bool : If the text is read only.
 			/// @returns {Struct.WWTextField}
 			#endregion
 			static set_read_only = function(_bool = false) {
@@ -1524,6 +1525,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_substring()
 			/// @desc    Returns a substring from the internal text buffer.
+			/// @self    WWTextField
 			/// @param   {Real} start_index
 			/// @param   {Real} end_index
 			/// @returns {String}
@@ -1535,6 +1537,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_byte_index_from_index()
 			/// @desc    Converts a character index to a byte index (UTF-8).
+			/// @self    WWTextField
 			/// @param   {Real} index
 			/// @returns {Real}
 			#endregion
@@ -1545,6 +1548,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_index_from_byte_index()
 			/// @desc    Converts a byte index (UTF-8) back to a character index.
+			/// @self    WWTextField
 			/// @param   {Real} byte_index
 			/// @returns {Real}
 			#endregion
@@ -1555,6 +1559,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_allowed_char()
 			/// @desc    Returns the current allowed character map/structure.
+			/// @self    WWTextField
 			/// @returns {Any}
 			#endregion
 			static get_allowed_char = function() {
@@ -1565,6 +1570,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_caption()
 			/// @desc    Returns the renderer caption.
+			/// @self    WWTextField
 			/// @returns {String}
 			#endregion
 			static get_caption = function() {
@@ -1573,6 +1579,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_text_font()
 			/// @desc    Returns the renderer font.
+			/// @self    WWTextField
 			/// @returns {Asset.GMFont}
 			#endregion
 			static get_text_font = function() {
@@ -1582,6 +1589,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_text_color()
 			/// @desc    Returns the renderer text color.
+			/// @self    WWTextField
 			/// @returns {Constant.Color}
 			#endregion
 			static get_text_color = function() {
@@ -1590,6 +1598,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_text_alpha()
 			/// @desc    Returns the renderer text alpha.
+			/// @self    WWTextField
 			/// @returns {Real}
 			#endregion
 			static get_text_alpha = function() {
@@ -1598,6 +1607,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_wrap_enabled()
 			/// @desc    Returns whether word-wrapping is enabled.
+			/// @self    WWTextField
 			/// @returns {Bool}
 			#endregion
 			static get_wrap_enabled = function() {
@@ -1606,6 +1616,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_line_sep()
 			/// @desc    Returns the current line separator string.
+			/// @self    WWTextField
 			/// @returns {String}
 			#endregion
 			static get_line_sep = function() {
@@ -1614,6 +1625,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_read_only()
 			/// @desc    Returns whether the field is read-only.
+			/// @self    WWTextField
 			/// @returns {Bool}
 			#endregion
 			static get_read_only = function() {
@@ -1622,6 +1634,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_keyboard_type()
 			/// @desc    Returns the configured virtual keyboard type (kbv_type_*).
+			/// @self    WWTextField
 			/// @returns {Real}
 			#endregion
 			static get_keyboard_type = function() {
@@ -1630,6 +1643,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_enter_submits_text()
 			/// @desc    Returns whether Enter submits text.
+			/// @self    WWTextField
 			/// @returns {Bool}
 			#endregion
 			static get_enter_submits_text = function() {
@@ -1638,6 +1652,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_tab_exits_text()
 			/// @desc    Returns whether Tab exits text editing.
+			/// @self    WWTextField
 			/// @returns {Bool}
 			#endregion
 			static get_tab_exits_text = function() {
@@ -1646,6 +1661,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_cursor_color()
 			/// @desc    Returns the cursor color.
+			/// @self    WWTextField
 			/// @returns {Constant.Color}
 			#endregion
 			static get_cursor_color = function() {
@@ -1654,6 +1670,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_highlight_color()
 			/// @desc    Returns the selection highlight color.
+			/// @self    WWTextField
 			/// @returns {Constant.Color}
 			#endregion
 			static get_highlight_color = function() {
@@ -1662,6 +1679,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_multi_cursor_enabled()
 			/// @desc    Returns whether multi-cursor is enabled.
+			/// @self    WWTextField
 			/// @returns {Bool}
 			#endregion
 			static get_multi_cursor_enabled = function() {
@@ -1670,6 +1688,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_cursor_xy()
 			/// @desc    Returns the cursor position in local renderer coordinates.
+			/// @self    WWTextField
 			/// @returns {Struct} struct_with_x_y
 			#endregion
 			static get_cursor_xy = function() {
@@ -1683,6 +1702,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func    get_text_processor()
 			/// @desc    Returns the active text processor used by the renderer.
+			/// @self    WWTextField
 			/// @returns {Any}
 			#endregion
 			static get_text_processor = function() {
@@ -1696,6 +1716,7 @@ function WWTextField() : WWCore() constructor {
 			/// @desc   Applies formatting directly into glyph records for the logical index range.
 			///         Range is [start_index, end_index) 0-based.
 			///         Pass undefined for any field you do not want to change.
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Constant.Color|Undefined} color_value
@@ -1732,6 +1753,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   clear_format_range()
 			/// @desc   Resets glyph formatting back to renderer defaults for [start,end).
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @returns {Struct.WWTextField}
@@ -1744,6 +1766,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_color_range()
 			/// @desc   Sets per-glyph color for the logical index range [start,end).
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Constant.Color} color_value
@@ -1757,6 +1780,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_alpha_range()
 			/// @desc   Sets per-glyph alpha for the logical index range [start,end).
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} alpha_value
@@ -1770,6 +1794,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_font_range()
 			/// @desc   Sets per-glyph font override for [start,end). Use -1 to clear override.
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Asset.GMFont|Real} font_asset_or_minus1
@@ -1783,6 +1808,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_style_range()
 			/// @desc   Sets per-glyph style enum for [start,end).
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} style
@@ -1796,6 +1822,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_size_range()
 			/// @desc   Sets per-glyph size multiplier for [start,end). Values <= 0 clamp to 1.
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} size_mul
@@ -1809,6 +1836,7 @@ function WWTextField() : WWCore() constructor {
 			#region jsDoc
 			/// @func   apply_glyph_underline_range()
 			/// @desc   Sets per-glyph underline enum for [start,end).
+			/// @self   WWTextField
 			/// @param  {Real} start_index
 			/// @param  {Real} end_index
 			/// @param  {Real} underline_value
@@ -1987,6 +2015,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_renderer()
 				/// @desc    Returns the active renderer instance.
+				/// @self    WWTextField
 				/// @returns {Struct|Undefined}
 				#endregion
 				static get_renderer = function() {
@@ -1996,6 +2025,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_x()
 				/// @desc    Convert a buffer index into gui x coordinate
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Real} x
 				#endregion
@@ -2005,6 +2035,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_y()
 				/// @desc    Convert a buffer index into gui y coordinate
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Real} y
 				#endregion
@@ -2014,6 +2045,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    xy_to_index()
 				/// @desc    Convert gui x,y coordinates into the nearest buffer index.
+				/// @self    WWTextField
 				/// @param   {Real} x
 				/// @param   {Real} y
 				/// @returns {Real}
@@ -2025,6 +2057,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_line()
 				/// @desc    Convert a buffer index into a line number. Lines and columns are 0-based.
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
@@ -2034,6 +2067,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    index_to_col()
 				/// @desc    Convert a buffer index into a column number. Lines and columns are 0-based.
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Real} line
 				#endregion
@@ -2043,6 +2077,7 @@ function WWTextField() : WWCore() constructor {
 				#region jsDoc
 				/// @func    line_col_to_index()
 				/// @desc    Convert a line and column (0-based) into a buffer index.
+				/// @self    WWTextField
 				/// @param   {Real} line
 				/// @param   {Real} col
 				/// @returns {Real}
@@ -2148,6 +2183,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __has__()
 					/// @ignore
 					/// @desc    Returns true if the single-character string exists within the pool.
+					/// @self    WWTextField
 					/// @param   {String} pool
 					/// @param   {String} ch
 					/// @returns {Bool}
@@ -2159,6 +2195,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __all_in__()
 					/// @ignore
 					/// @desc    Returns true if every character in the pool exists within the allowed set.
+					/// @self    WWTextField
 					/// @param   {String} pool
 					/// @param   {String} set
 					/// @returns {Bool}
@@ -2177,6 +2214,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __is_ascii_only__()
 					/// @ignore
 					/// @desc    Returns true if the pool contains only ASCII characters (ord 0..127).
+					/// @self    WWTextField
 					/// @param   {String} pool
 					/// @returns {Bool}
 					#endregion
@@ -2381,6 +2419,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Computes the index interval [a,b] on a single visual line for box selection.
 					///          Returned fields are inclusive indices in buffer-index space, clamped to the line.
+					/// @self    WWTextField
 					/// @param   {Real} line
 					/// @param   {Real} x0
 					/// @param   {Real} x1
@@ -2409,6 +2448,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_build_ranges__()
 					/// @ignore
 					/// @desc    Builds an array of per-line box-selection ranges from two drag points.
+					/// @self    WWTextField
 					/// @param   {Real} x0
 					/// @param   {Real} y0
 					/// @param   {Real} x1
@@ -2437,6 +2477,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_build_cursors__()
 					/// @ignore
 					/// @desc    Converts box-selection ranges into cursor records (one cursor per line).
+					/// @self    WWTextField
 					/// @param   {Array} ranges : Array of { a, b } ranges.
 					/// @returns {Array} Cursor record array.
 					#endregion
@@ -2473,6 +2514,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __ranges_merge__()
 					/// @ignore
 					/// @desc    Sorts and merges an array of ranges in-place (touching/overlapping ranges merge).
+					/// @self    WWTextField
 					/// @param   {Array} ranges : Array of { a, b } ranges.
 					/// @returns {Array} Merged range array.
 					#endregion
@@ -2512,6 +2554,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_merge_overlaps_all__()
 					/// @ignore
 					/// @desc    Merges overlapping cursor selections/carets into a minimal non-overlapping set.
+					/// @self    WWTextField
 					/// @returns {Undefined}
 					#endregion
 					static __cursors_merge_overlaps_all__ = function() {
@@ -2568,6 +2611,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __ranges_point_in_any__()
 					/// @ignore
 					/// @desc    Returns true if a point index lies within any range (half-open) or equals a caret.
+					/// @self    WWTextField
 					/// @param   {Array} ranges : Array of { a, b } ranges.
 					/// @param   {Real} idx
 					/// @returns {Bool}
@@ -2592,6 +2636,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __ranges_subtract__()
 					/// @ignore
 					/// @desc    Subtracts an array of ranges from an input interval, returning remaining segments.
+					/// @self    WWTextField
 					/// @param   {Real} a
 					/// @param   {Real} b
 					/// @param   {Array} subs : Array of { a, b } ranges.
@@ -2623,6 +2668,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_apply_override_or_add__()
 					/// @ignore
 					/// @desc    Applies the current box selection as override (mode 0) or additive (mode 1).
+					/// @self    WWTextField
 					/// @param   {Real} mx
 					/// @param   {Real} my
 					/// @returns {Undefined}
@@ -2662,6 +2708,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_apply_subtractive__()
 					/// @ignore
 					/// @desc    Applies the current box selection subtractively (mode 2), cutting ranges/carets.
+					/// @self    WWTextField
 					/// @param   {Real} mx
 					/// @param   {Real} my
 					/// @returns {Undefined}
@@ -2730,6 +2777,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_begin__()
 					/// @ignore
 					/// @desc    Starts a box-selection drag gesture.
+					/// @self    WWTextField
 					/// @param   {Real} mode : 0 override, 1 additive, 2 subtractive.
 					/// @param   {Real} mx
 					/// @param   {Real} my
@@ -2768,6 +2816,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_update__()
 					/// @ignore
 					/// @desc    Updates the active box-selection drag with the current mouse position.
+					/// @self    WWTextField
 					/// @param   {Real} mx
 					/// @param   {Real} my
 					/// @returns {Undefined}
@@ -2785,6 +2834,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __box_select_end__()
 					/// @ignore
 					/// @desc    Ends a box-selection drag gesture and records the resulting selection state.
+					/// @self    WWTextField
 					/// @returns {Undefined}
 					#endregion
 					static __box_select_end__ = function() {
@@ -2954,6 +3004,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_record_create__()
 				/// @ignore
 				/// @desc    Creates a data-only cursor record used by WWTextField multi-cursor logic.
+				/// @self    WWTextField
 				/// @param   {Real} index : Initial buffer index.
 				/// @returns {Struct} Cursor record { index, highlight_active, highlight_start_index, highlight_end_index, sticky_px }
 				#endregion
@@ -3305,6 +3356,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __clipboard_strip_trailing_cr__()
 					/// @ignore
 					/// @desc    Removes a single trailing '\r' from a line (Windows-style split cleanup).
+					/// @self    WWTextField
 					/// @param   {String|Undefined} s
 					/// @returns {String}
 					#endregion
@@ -3321,6 +3373,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __clipboard_split_lines__()
 					/// @ignore
 					/// @desc    Splits text by '\n' into lines and strips trailing '\r' per line.
+					/// @self    WWTextField
 					/// @param   {String|Undefined} s
 					/// @returns {Array} String array.
 					#endregion
@@ -3345,6 +3398,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Captures a snapshot of cursor + selection state for selection-undo.
 					///          Returns a 2-element array: [cursors_snapshot_array, active_cursor_index].
+					/// @self    WWTextField
 					/// @returns {Array}
 					#endregion
 					static __cursors_clone_state__ = function() {
@@ -3371,6 +3425,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Creates a lightweight signature string for a cursor/selection snapshot.
 					///          Used to de-dupe consecutive identical history states.
+					/// @self    WWTextField
 					/// @param   {Array} st : Snapshot as returned by __cursors_clone_state__.
 					/// @returns {String}
 					#endregion
@@ -3391,6 +3446,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_add_record_state__()
 					/// @ignore
 					/// @desc    Appends a snapshot to selection history, truncating any redo states and enforcing max history length.
+					/// @self    WWTextField
 					/// @param   {Array} st : Snapshot as returned by __cursors_clone_state__.
 					/// @returns {Bool} True if a new state was recorded, false if it was de-duped/ignored.
 					#endregion
@@ -3430,6 +3486,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Helper for double/triple click: removes intermediate click-created history entries and ensures
 					///          the history tail is the selection state from just before the multi-click gesture started.
+					/// @self    WWTextField
 					/// @returns {Bool}
 					#endregion
 					static __selection_records_rollback_to_multiclick_anchor__ = function() {
@@ -3454,6 +3511,7 @@ function WWTextField() : WWCore() constructor {
 					/// @desc    Records the current cursor/selection state into the selection history.
 					///          Uses a single history array + position cursor (undo/redo style) and de-duplicates
 					///          consecutive identical states. This is used by Ctrl+U / Ctrl+Shift+U.
+					/// @self    WWTextField
 					/// @returns {Undefined}
 					#endregion
 					static __selection_add_record__ = function() {
@@ -3464,6 +3522,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_jump__()
 					/// @ignore
 					/// @desc    Moves through selection undo/redo history by a signed offset and restores that snapshot.
+					/// @self    WWTextField
 					/// @param   {Real} change : Negative=undo, Positive=redo.
 					/// @returns {Bool} True if a snapshot was restored.
 					#endregion
@@ -3497,6 +3556,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_undo_snapshot_push__()
 					/// @ignore
 					/// @desc    Backwards-compatible alias for __selection_add_record__.
+					/// @self    WWTextField
 					/// @returns {Undefined}
 					/// @deprecated Use __selection_add_record__.
 					#endregion
@@ -3507,6 +3567,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_undo_snapshot_pop__()
 					/// @ignore
 					/// @desc    Backwards-compatible alias for __selection_jump__(-1) (Ctrl+U).
+					/// @self    WWTextField
 					/// @returns {Bool}
 					/// @deprecated Use __selection_jump__.
 					#endregion
@@ -3517,6 +3578,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_undo_snapshot_redo__()
 					/// @ignore
 					/// @desc    Backwards-compatible alias for __selection_jump__(+1) (Ctrl+Shift+U).
+					/// @self    WWTextField
 					/// @returns {Bool}
 					/// @deprecated Use __selection_jump__.
 					#endregion
@@ -3527,6 +3589,8 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_undo_push__()
 					/// @ignore
 					/// @desc    Backwards-compatible alias for __selection_add_record__.
+					/// @self    WWTextField
+					/// @returns {Undefined}
 					/// @deprecated Use __selection_add_record__.
 					#endregion
 					static __selection_undo_push__ = function() {
@@ -3536,6 +3600,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __selection_undo_pop__()
 					/// @ignore
 					/// @desc    Backwards-compatible alias for __selection_jump__(-1).
+					/// @self    WWTextField
 					/// @returns {Bool}
 					/// @deprecated Use __selection_jump__.
 					#endregion
@@ -3546,6 +3611,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_sort_and_dedupe_by_index__()
 					/// @ignore
 					/// @desc    Sorts __cursors__ by cursor index and removes duplicate carets at the same index.
+					/// @self    WWTextField
 					/// @returns {Undefined}
 					#endregion
 					static __cursors_sort_and_dedupe_by_index__ = function() {
@@ -3582,6 +3648,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_add_cursor_vertical__()
 					/// @ignore
 					/// @desc    Adds new cursors one line above/below each existing cursor (Sublime-style).
+					/// @self    WWTextField
 					/// @param   {Real} dir : -1 for up, +1 for down.
 					/// @returns {Bool} True if any cursor was added.
 					#endregion
@@ -3629,6 +3696,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursor_select_word_if_empty__()
 					/// @ignore
 					/// @desc    Ensures the active cursor has a non-empty selection; if empty, selects the word under the caret.
+					/// @self    WWTextField
 					/// @returns {Bool} True if a selection exists/was created.
 					#endregion
 					static __cursor_select_word_if_empty__ = function() {
@@ -3647,6 +3715,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_get_merged_selection_ranges__()
 					/// @ignore
 					/// @desc    Returns merged (unioned) selection ranges across all cursors as [{a,b},...], sorted by a.
+					/// @self    WWTextField
 					/// @returns {Array}
 					#endregion
 					static __cursors_get_merged_selection_ranges__ = function() {
@@ -3698,6 +3767,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __ranges_overlap_any__()
 					/// @ignore
 					/// @desc    Tests whether [a,b) overlaps any range in a range list.
+					/// @self    WWTextField
 					/// @param   {Array} ranges
 					/// @param   {Real}  a
 					/// @param   {Real}  b
@@ -3717,6 +3787,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_add_occurrence_selection__()
 					/// @ignore
 					/// @desc    Adds a new cursor with an active selection range [a,b].
+					/// @self    WWTextField
 					/// @param   {Real} a
 					/// @param   {Real} b
 					/// @returns {Undefined}
@@ -3736,6 +3807,7 @@ function WWTextField() : WWCore() constructor {
 					/// @func    __cursors_add_next_occurrence__()
 					/// @ignore
 					/// @desc    Adds the next occurrence of the current selection/word as a new selection cursor.
+					/// @self    WWTextField
 					/// @returns {Bool}
 					#endregion
 					static __cursors_add_next_occurrence__ = function() {
@@ -3790,6 +3862,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Adds cursors/selections for all non-overlapping occurrences of the current selection/word.
 					///         Intended for Sublime-style “select all occurrences”.
+					/// @self    WWTextField
 					/// @returns {Bool}
 					#endregion
 					static __cursors_add_all_occurrences__ = function() {
@@ -3830,6 +3903,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    For a single selection/word, moves the selection to the next occurrence (wraps).
 					///         Returns false when multi-cursor is active or no match exists.
+					/// @self    WWTextField
 					/// @returns {Bool}
 					#endregion
 					static __cursor_rotate_next_occurrence__ = function() {
@@ -3860,6 +3934,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Splits a single selection into per-line selections, producing one cursor per line.
 					///         Returns false if there is not exactly one non-empty selection.
+					/// @self    WWTextField
 					/// @returns {Bool}
 					#endregion
 					static __cursors_split_selection_into_lines__ = function() {
@@ -3906,6 +3981,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Copies multi-cursor selections to clipboard, merging overlapping/touching selections.
 					///         Clipboard output joins merged ranges with '\n'.
+					/// @self    WWTextField
 					/// @returns {Bool} True if clipboard was set; false if fewer than 2 cursors or any selection was empty.
 					#endregion
 					static __cursors_copy_selections_to_clipboard__ = function() {
@@ -3979,6 +4055,7 @@ function WWTextField() : WWCore() constructor {
 					/// @ignore
 					/// @desc    Multi-cursor paste helper. Inserts one string per cursor (mapped by cursor index order).
 					///         Returns false if cursor count != line count or if selections overlap.
+					/// @self    WWTextField
 					/// @param   {Array} lines : Array of strings, one per cursor.
 					/// @returns {Bool}
 					#endregion
@@ -4091,6 +4168,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __history_record_create__()
 				/// @ignore
 				/// @desc    Constructor for an undo/redo snapshot.
+				/// @self    WWTextField
 				/// @param   {String} content : Full text content.
 				/// @param   {Array} cursors : Cursor record array.
 				/// @param   {Real} cursor_active : Active cursor id.
@@ -4106,6 +4184,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __history_add_record__()
 				/// @ignore
 				/// @desc    Captures a new snapshot and pushes it to the undo history.
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __history_add_record__ = function() {
@@ -4139,6 +4218,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __history_update_latest_cursor__()
 				/// @ignore
 				/// @desc    Updates the most recent snapshot's cursor field.
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {
@@ -4152,6 +4232,7 @@ function WWTextField() : WWCore() constructor {
 				/// @ignore
 				/// @desc    Moves through undo/redo history by a signed offset
 				///          and restores the corresponding snapshot.
+				/// @self    WWTextField
 				/// @param   {Real} change : Negative=undo, Positive=redo.
 				/// @returns {Undefined}
 				#endregion
@@ -4192,6 +4273,7 @@ function WWTextField() : WWCore() constructor {
 			/// @func    __force_rebuild__()
 			/// @ignore
 			/// @desc    Marks buffer/renderer as dirty and forces the renderer to ensure a valid layout.
+			/// @self    WWTextField
 			/// @returns {Undefined}
 			#endregion
 			static __force_rebuild__ = function(){
@@ -4204,6 +4286,7 @@ function WWTextField() : WWCore() constructor {
 			/// @func    __get_renderer__()
 			/// @ignore
 			/// @desc    Returns the active renderer instance.
+			/// @self    WWTextField
 			/// @returns {Struct|Undefined}
 			#endregion
 			static __get_renderer__ = function(){
@@ -4214,6 +4297,7 @@ function WWTextField() : WWCore() constructor {
 			/// @func    __cursor_blink_reset__()
 			/// @ignore
 			/// @desc    Resets the caret blink timer so the caret is immediately visible.
+			/// @self    WWTextField
 			/// @returns {Undefined}
 			#endregion
 			static __cursor_blink_reset__ = function() {
@@ -4224,6 +4308,7 @@ function WWTextField() : WWCore() constructor {
 			/// @func    __cursor_set_index_synced__()
 			/// @ignore
 			/// @desc    Sets cursor index, syncs selection rules, and optionally updates sticky x (cursor_last_width).
+			/// @self    WWTextField
 			/// @param   {Real} new_index
 			/// @param   {Bool} shift_select
 			/// @param   {Bool} update_history
@@ -4276,6 +4361,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_sync_sticky_x__()
 				/// @ignore
 				/// @desc    Recomputes sticky-x for all cursors from their indices and updates cursor_last_width.
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __cursors_sync_sticky_x__ = function() {
@@ -4292,6 +4378,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_index_synced_for__()
 				/// @ignore
 				/// @desc    Sets index/selection state for a specific cursor id (used by multi-cursor movement).
+				/// @self    WWTextField
 				/// @param   {Real} cid
 				/// @param   {Real} new_index
 				/// @param   {Bool} shift_select
@@ -4330,6 +4417,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_move_offset__()
 				/// @ignore
 				/// @desc    Moves all cursors by a signed offset (horizontal/vertical) with optional word-mode.
+				/// @self    WWTextField
 				/// @param   {Real} vector
 				/// @param   {Bool} shift
 				/// @param   {Bool} vertical
@@ -4396,6 +4484,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_move_paged_offset__()
 				/// @ignore
 				/// @desc    Moves all cursors by a page-up/page-down style vertical offset while preserving sticky-x.
+				/// @self    WWTextField
 				/// @param   {Real} vector
 				/// @param   {Bool} shift
 				/// @returns {Undefined}
@@ -4456,6 +4545,7 @@ function WWTextField() : WWCore() constructor {
 			/// @func    __delete_selection_if_any__()
 			/// @ignore
 			/// @desc    If a highlight selection exists, erase it from the buffer and place the cursor.
+			/// @self    WWTextField
 			/// @param   {Bool} force_rebuild
 			/// @param   {Bool} push_history
 			/// @returns {Bool} True if something was deleted, false otherwise
@@ -4551,6 +4641,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_get_index__()
 				/// @ignore
 				/// @desc    Returns the active cursor index (global glyph index in renderer/buffer space).
+				/// @self    WWTextField
 				/// @returns {Real}
 				#endregion
 				static __cursor_get_index__ = function() {
@@ -4560,6 +4651,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_get_highlight_active__()
 				/// @ignore
 				/// @desc    Returns whether the active cursor has selection mode enabled.
+				/// @self    WWTextField
 				/// @returns {Bool}
 				#endregion
 				static __cursor_get_highlight_active__ = function() {
@@ -4569,6 +4661,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_get_highlight_start_index__()
 				/// @ignore
 				/// @desc    Returns the active cursor selection anchor/start index.
+				/// @self    WWTextField
 				/// @returns {Real}
 				#endregion
 				static __cursor_get_highlight_start_index__ = function() {
@@ -4578,6 +4671,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_get_highlight_end_index__()
 				/// @ignore
 				/// @desc    Returns the active cursor selection end index.
+				/// @self    WWTextField
 				/// @returns {Real}
 				#endregion
 				static __cursor_get_highlight_end_index__ = function() {
@@ -4587,6 +4681,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_active__()
 				/// @ignore
 				/// @desc    Sets highlight_active for the active cursor.
+				/// @self    WWTextField
 				/// @param   {Bool} active
 				/// @returns {Undefined}
 				#endregion
@@ -4597,6 +4692,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_start_index__()
 				/// @ignore
 				/// @desc    Sets highlight_start_index for the active cursor.
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Undefined}
 				#endregion
@@ -4607,6 +4703,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_end_index__()
 				/// @ignore
 				/// @desc    Sets highlight_end_index for the active cursor.
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Undefined}
 				#endregion
@@ -4617,6 +4714,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_col__()
 				/// @ignore
 				/// @desc    Sets the active cursor column on its current line.
+				/// @self    WWTextField
 				/// @param   {Real} col
 				/// @returns {Undefined}
 				#endregion
@@ -4629,6 +4727,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_line__()
 				/// @ignore
 				/// @desc    Sets the active cursor line while preserving its current column.
+				/// @self    WWTextField
 				/// @param   {Real} line
 				/// @returns {Undefined}
 				#endregion
@@ -4641,6 +4740,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_start_line__()
 				/// @ignore
 				/// @desc    Sets highlight_start_index by line while preserving its current column.
+				/// @self    WWTextField
 				/// @param   {Real} line
 				/// @returns {Undefined}
 				#endregion
@@ -4652,6 +4752,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_start_col__()
 				/// @ignore
 				/// @desc    Sets highlight_start_index by column on its current highlight-start line.
+				/// @self    WWTextField
 				/// @param   {Real} col
 				/// @returns {Undefined}
 				#endregion
@@ -4663,6 +4764,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_end_line__()
 				/// @ignore
 				/// @desc    Sets highlight_end_index by line while preserving its current column.
+				/// @self    WWTextField
 				/// @param   {Real} line
 				/// @returns {Undefined}
 				#endregion
@@ -4674,6 +4776,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursor_set_highlight_end_col__()
 				/// @ignore
 				/// @desc    Sets highlight_end_index by column on its current highlight-end line.
+				/// @self    WWTextField
 				/// @param   {Real} col
 				/// @returns {Undefined}
 				#endregion
@@ -4686,6 +4789,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_clear_to_single__()
 				/// @ignore
 				/// @desc    Replaces the cursor set with a single caret at the provided index.
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Undefined}
 				#endregion
@@ -4701,6 +4805,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_add_at_index__()
 				/// @ignore
 				/// @desc    Adds a new caret at the given index (no-op if one already exists there).
+				/// @self    WWTextField
 				/// @param   {Real} index
 				/// @returns {Undefined}
 				#endregion
@@ -4725,6 +4830,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_remove_nearest_to_xy__()
 				/// @ignore
 				/// @desc    Removes the cursor nearest to the provided GUI position (when multiple cursors exist).
+				/// @self    WWTextField
 				/// @param   {Real} mx
 				/// @param   {Real} my
 				/// @param   {Real} threshold
@@ -4775,6 +4881,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_sorted_ids_by_index__()
 				/// @ignore
 				/// @desc    Returns cursor ids sorted by cursor index.
+				/// @self    WWTextField
 				/// @param   {Bool} descending
 				/// @returns {Array} Array of cursor indices (ids).
 				#endregion
@@ -4811,6 +4918,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_shift_right_of__()
 				/// @ignore
 				/// @desc    Shifts all cursor and selection indices strictly greater than the given index.
+				/// @self    WWTextField
 				/// @param   {Real} index_exclusive
 				/// @param   {Real} delta
 				/// @returns {Undefined}
@@ -4830,6 +4938,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_shift_after_delete__()
 				/// @ignore
 				/// @desc    Adjusts cursor/selection indices after deleting the interval [_del_start,_del_end].
+				/// @self    WWTextField
 				/// @param   {Real} del_start
 				/// @param   {Real} del_end
 				/// @param   {Real} delta
@@ -4855,6 +4964,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_clone__()
 				/// @ignore
 				/// @desc    Deep-clones the current cursor array into new cursor records.
+				/// @self    WWTextField
 				/// @returns {Array} Cursor record array.
 				#endregion
 				static __cursors_clone__ = function() {
@@ -4878,6 +4988,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __cursors_clone_from__()
 				/// @ignore
 				/// @desc    Deep-clones a cursor array (or creates a single cursor if undefined/empty).
+				/// @self    WWTextField
 				/// @param   {Array|Undefined} src
 				/// @returns {Array} Cursor record array.
 				#endregion
@@ -4904,6 +5015,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_backspace_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes one glyph to the left of each cursor (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_backspace_all_cursors__ = function() {
@@ -4935,6 +5047,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_forward_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes one glyph to the right of each cursor (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_forward_all_cursors__ = function() {
@@ -4966,6 +5079,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_word_left_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes the word to the left of each cursor (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_word_left_all_cursors__ = function() {
@@ -5001,6 +5115,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_word_right_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes the word to the right of each cursor (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_word_right_all_cursors__ = function() {
@@ -5036,6 +5151,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_to_line_start_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes from each cursor to the start of its current line (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_to_line_start_all_cursors__ = function() {
@@ -5069,6 +5185,7 @@ function WWTextField() : WWCore() constructor {
 				/// @func    __delete_to_line_end_all_cursors__()
 				/// @ignore
 				/// @desc    Deletes from each cursor to the end of its current line (or deletes selections if any).
+				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
 				static __delete_to_line_end_all_cursors__ = function() {

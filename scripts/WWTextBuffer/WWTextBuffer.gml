@@ -16,7 +16,8 @@ function WWTextBuffer() : WWCore() constructor {
 			#region jsDoc
 			/// @func	set_text()
 			/// @desc	Replace the entire text stored in the buffer.
-			/// @param   {String} _text : New text to store.
+			/// @self    WWTextBuffer
+			/// @param   {String} text : New text to store.
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static set_text = function(_text) {
@@ -32,7 +33,8 @@ function WWTextBuffer() : WWCore() constructor {
 			///		  Accepts either:
 			///		  - A string of allowed characters, or
 			///		  - A struct where each key is a character.
-			/// @param   {Struct} _allowed : Struct defining allowed characters.
+			/// @self    WWTextBuffer
+			/// @param   {Struct} allowed : Struct defining allowed characters.
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static set_allowed_char = function(_allowed) {
@@ -65,6 +67,7 @@ function WWTextBuffer() : WWCore() constructor {
 				#region jsDoc
 				/// @func	get_text()
 				/// @desc	Get the entire text stored in the buffer.
+				/// @self    WWTextBuffer
 				/// @returns {String}
 				#endregion
 				static get_text = function() {
@@ -88,6 +91,7 @@ function WWTextBuffer() : WWCore() constructor {
 				/// @func	get_size()
 				/// @desc	Get the number of characters stored in the buffer.
 				///		  (Used by select_all in WWTextField.)
+				/// @self    WWTextBuffer
 				/// @returns {Real}
 				#endregion
 				static get_size = function() {
@@ -109,8 +113,9 @@ function WWTextBuffer() : WWCore() constructor {
 				#region jsDoc
 				/// @func	get_substring()
 				/// @desc	Get a substring using 0-based indices and [start,end) range.
-				/// @param   {Real} _start_index : Inclusive start index (0-based).
-				/// @param   {Real} _end_index   : Exclusive end index (0-based).
+				/// @self    WWTextBuffer
+				/// @param   {Real} start_index : Inclusive start index (0-based).
+				/// @param   {Real} end_index   : Exclusive end index (0-based).
 				/// @returns {String}
 				#endregion
 				static get_substring = function(_start_index, _end_index) {
@@ -138,7 +143,8 @@ function WWTextBuffer() : WWCore() constructor {
 				/// @func	get_byte_index_from_index()
 				/// @desc	Convert a 0-based character index to a 0-based UTF-8 byte index.
 				/// 		This is used by the textbox editing code to call insert/erase which operate on byte indices.
-				/// @param	{Real} _index
+				/// @self    WWTextBuffer
+				/// @param	{Real} index
 				/// @returns {Real}
 				#endregion
 				static get_byte_index_from_index = function(_index) {
@@ -152,7 +158,8 @@ function WWTextBuffer() : WWCore() constructor {
 				#region jsDoc
 				/// @func	get_index_from_byte_index()
 				/// @desc	Convert a 0-based UTF-8 byte index to a 0-based character index.
-				/// @param	{Real} _byte_index
+				/// @self    WWTextBuffer
+				/// @param	{Real} byte_index
 				/// @returns {Real}
 				#endregion
 				static get_index_from_byte_index = function(_byte_index) {
@@ -183,6 +190,7 @@ function WWTextBuffer() : WWCore() constructor {
 				#region jsDoc
 				/// @func	get_allowed_char()
 				/// @desc	Gets the allowed character struct.
+				/// @self    WWTextBuffer
 				/// @returns {Struct}
 				#endregion
 				static get_allowed_char = function() {
@@ -193,6 +201,7 @@ function WWTextBuffer() : WWCore() constructor {
 			#region jsDoc
 			/// @func	destroy()
 			/// @desc	Delete the underlying buffer. Do not use this instance after.
+			/// @self    WWTextBuffer
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static destroy = function() {
@@ -212,6 +221,7 @@ function WWTextBuffer() : WWCore() constructor {
 			#region jsDoc
 			/// @func	clear_text()
 			/// @desc	Clear the buffer to an empty string.
+			/// @self    WWTextBuffer
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static clear_text = function() {
@@ -232,8 +242,9 @@ function WWTextBuffer() : WWCore() constructor {
 			/// @func	insert()
 			/// @desc	Insert text at the given 0-based *byte* index. Existing bytes at and
 			///         after that index are shifted to the right.
-			/// @param	{Real}  _index : Insertion index (0-based, in bytes).
-			/// @param	{String} _text : Text to insert.
+			/// @self    WWTextBuffer
+			/// @param	{Real}  index : Insertion index (0-based, in bytes).
+			/// @param	{String} text : Text to insert.
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static insert = function(_index, _text) {
@@ -290,8 +301,9 @@ function WWTextBuffer() : WWCore() constructor {
 			#region jsDoc
 			/// @func    erase()
 			/// @desc    Erase bytes in the given 0-based index range (start, end).
-			/// @param   {Real} _start : Start index (0-based, inclusive, in bytes).
-			/// @param   {Real} _end   : End index (0-based, exclusive, in bytes).
+			/// @self    WWTextBuffer
+			/// @param   {Real} start : Start index (0-based, inclusive, in bytes).
+			/// @param   {Real} end   : End index (0-based, exclusive, in bytes).
 			/// @returns {Struct.WWTextBuffer}
 			#endregion
 			static erase = function(_start, _end) {
@@ -377,12 +389,26 @@ function WWTextBuffer() : WWCore() constructor {
 		#endregion
 		
 		#region Functions
-			
+			#region jsDoc
+			/// @func    __mark_dirty__()
+			/// @ignore
+			/// @desc    Marks cached text and byte offsets as dirty.
+			/// @self    WWTextBuffer
+			/// @returns {Undefined}
+			#endregion
 			static __mark_dirty__ = function() {
 				__is_dirty__ = true;
 				__byte_offsets_dirty__ = true;
 			};
 			
+			#region jsDoc
+			/// @func    __set_text__()
+			/// @ignore
+			/// @desc    Replaces the backing buffer contents and updates cached metadata.
+			/// @self    WWTextBuffer
+			/// @param   {String} text : New text content.
+			/// @returns {Undefined}
+			#endregion
 			static __set_text__ = function(_text) {
 				if (!buffer_exists(__buffer__)) {
 					__buffer__ = buffer_create(0, buffer_grow, 1);
@@ -398,6 +424,13 @@ function WWTextBuffer() : WWCore() constructor {
 					__byte_offsets_dirty__ = true;
 			};
 
+			#region jsDoc
+			/// @func    __ensure_byte_offsets__()
+			/// @ignore
+			/// @desc    Ensures the UTF-8 byte offset lookup table is up-to-date.
+			/// @self    WWTextBuffer
+			/// @returns {Undefined}
+			#endregion
 			static __ensure_byte_offsets__ = function() {
 				if (!__byte_offsets_dirty__) { return; }
 
@@ -475,6 +508,14 @@ function WWTextBuffer() : WWCore() constructor {
 				__byte_offsets_dirty__ = false;
 			};
 			
+			#region jsDoc
+			/// @func    __filter_allowed__()
+			/// @ignore
+			/// @desc    Normalizes newlines and filters text through the allowed character map.
+			/// @self    WWTextBuffer
+			/// @param   {String} text : Input text.
+			/// @returns {String}
+			#endregion
 			static __filter_allowed__ = function(_text) {
 				if (is_undefined(__allowed_char_map__)) {
 					_text = string_replace_all(_text, "\r\n", "\n")
@@ -508,6 +549,14 @@ function WWTextBuffer() : WWCore() constructor {
 				return _new_text;
 			};
 			
+			#region jsDoc
+			/// @func    __set_textbox__()
+			/// @ignore
+			/// @desc    Associates a textbox component with this buffer.
+			/// @self    WWTextBuffer
+			/// @param   {Any} comp : The textbox component.
+			/// @returns {Struct.WWTextBuffer}
+			#endregion
 			static __set_textbox__ = function(_comp) {
 				__textbox_parent__ = _comp;
 				return self;

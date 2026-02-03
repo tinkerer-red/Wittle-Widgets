@@ -21,8 +21,9 @@ function WWTextInputSingleLine() : WWTextInput() constructor {
 			#region jsDoc
 			/// @func    set_size(_width, _height)
 			/// @desc    Sets control size and re-fits internal canvas.
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @self    WWTextInputSingleLine
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWTextInputSingleLine}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -42,8 +43,9 @@ function WWTextInputSingleLine() : WWTextInput() constructor {
 			#region jsDoc
 			/// @func    __fit_canvas__()
 			/// @desc    Sizes the internal field to its content width (min viewport width) so horizontal scrolling works.
+			/// @self    WWTextInputSingleLine
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __fit_canvas__ = function() {
 				var _vw = region.viewport_width;

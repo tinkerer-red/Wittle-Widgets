@@ -272,6 +272,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __adjust_thumb_size__()
 			/// @desc    Recomputes the thumb size from canvas/coverage ratio and available track size.
+			/// @self    WWScrollbar
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -288,6 +289,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __get_mouse_pos__()
 			/// @desc    Returns the mouse position projected onto the scrollbar's primary axis.
+			/// @self    WWScrollbar
 			/// @returns {Real} mouse_position
 			/// @ignore
 			#endregion
@@ -295,6 +297,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __get_available_size__()
 			/// @desc    Returns the total distance the thumb is allowed to travel along the track.
+			/// @self    WWScrollbar
 			/// @returns {Real} available_size
 			/// @ignore
 			#endregion
@@ -302,6 +305,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __get_thumb_pos__()
 			/// @desc    Returns the current position of the thumb along the scroll axis.
+			/// @self    WWScrollbar
 			/// @returns {Real} thumb_position
 			/// @ignore
 			#endregion
@@ -309,6 +313,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __get_thumb_size__()
 			/// @desc    Returns the current size of the thumb along the scroll axis.
+			/// @self    WWScrollbar
 			/// @returns {Real} thumb_size
 			/// @ignore
 			#endregion
@@ -317,6 +322,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			/// @func    __get_scroll_origin__()
 			/// @desc    Returns the origin of the scroll region along the primary axis
 			///          (left for horizontal, top for vertical).
+			/// @self    WWScrollbar
 			/// @returns {Real} scroll_origin
 			/// @ignore
 			#endregion
@@ -324,6 +330,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __set_thumb_offset__()
 			/// @desc    Sets the thumb position along the scroll axis.
+			/// @self    WWScrollbar
 			/// @param   {Real} pos : New thumb position.
 			/// @returns {Undefined}
 			/// @ignore
@@ -332,6 +339,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#region jsDoc
 			/// @func    __set_thumb_size__()
 			/// @desc    Sets the thumb size along the scroll axis.
+			/// @self    WWScrollbar
 			/// @param   {Real} size : New thumb size.
 			/// @returns {Undefined}
 			/// @ignore

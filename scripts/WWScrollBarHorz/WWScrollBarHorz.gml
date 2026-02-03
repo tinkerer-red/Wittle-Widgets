@@ -10,6 +10,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __get_mouse_pos__()
     /// @desc    Returns the current mouse position projected onto the scrollbar axis (X).
+    /// @self    WWScrollbarHorz
     /// @returns {Real} mouse_pos
     /// @ignore
     #endregion
@@ -17,6 +18,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __get_available_size__()
     /// @desc    Returns the distance the thumb can travel along the track.
+    /// @self    WWScrollbarHorz
     /// @returns {Real} available_size
     /// @ignore
     #endregion
@@ -24,6 +26,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __get_thumb_pos__()
     /// @desc    Returns the thumb position along the track.
+    /// @self    WWScrollbarHorz
     /// @returns {Real} thumb_pos
     /// @ignore
     #endregion
@@ -31,6 +34,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __get_thumb_size__()
     /// @desc    Returns the thumb size along the track.
+    /// @self    WWScrollbarHorz
     /// @returns {Real} thumb_size
     /// @ignore
     #endregion
@@ -38,6 +42,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __get_scroll_origin__()
     /// @desc    Returns the scroll origin (left edge) along the track.
+    /// @self    WWScrollbarHorz
     /// @returns {Real} scroll_origin
     /// @ignore
     #endregion
@@ -45,6 +50,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __set_thumb_offset__()
     /// @desc    Sets the thumb position along the track.
+    /// @self    WWScrollbarHorz
     /// @param   {Real} pos : New thumb position.
     /// @returns {Undefined}
     /// @ignore
@@ -53,6 +59,7 @@ function WWScrollbarHorz() : WWScrollbar() constructor {
     #region jsDoc
     /// @func    __set_thumb_size__()
     /// @desc    Sets the thumb size along the track.
+    /// @self    WWScrollbarHorz
     /// @param   {Real} size : New thumb size.
     /// @returns {Undefined}
     /// @ignore

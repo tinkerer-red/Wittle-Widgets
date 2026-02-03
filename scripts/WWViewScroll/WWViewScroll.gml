@@ -176,6 +176,7 @@ function WWViewScroll() : WWView() constructor {
 			#region jsDoc
 			/// @func    __sync_content_size__()
 			/// @desc    Updates cached content size from the current canvas.
+			/// @self    WWViewScroll
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -193,6 +194,7 @@ function WWViewScroll() : WWView() constructor {
 			#region jsDoc
 			/// @func    __clamp_scroll__()
 			/// @desc    Clamps scroll offsets to [0..max] based on content size and view size.
+			/// @self    WWViewScroll
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -210,6 +212,7 @@ function WWViewScroll() : WWView() constructor {
 			#region jsDoc
 			/// @func    __apply_scroll__()
 			/// @desc    Applies the current scroll offset to the canvas.
+			/// @self    WWViewScroll
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion

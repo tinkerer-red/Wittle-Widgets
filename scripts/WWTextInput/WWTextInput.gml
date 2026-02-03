@@ -31,9 +31,10 @@ function WWTextInput() : WWCore() constructor {
 		#region Events
 
 			#region jsDoc
-			/// @func    on_change(_func)
+			/// @func    on_change(func)
 			/// @desc    Adds a listener for text changes.
-			/// @param   {Function} _func
+			/// @self    WWTextInput
+			/// @param   {Function} func
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static on_change = function(_func) {
@@ -42,9 +43,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    on_submit(_func)
+			/// @func    on_submit(func)
 			/// @desc    Adds a listener for submit.
-			/// @param   {Function} _func
+			/// @self    WWTextInput
+			/// @param   {Function} func
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static on_submit = function(_func) {
@@ -53,9 +55,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    on_cursor_move(_func)
+			/// @func    on_cursor_move(func)
 			/// @desc    Adds a listener for cursor movement.
-			/// @param   {Function} _func
+			/// @self    WWTextInput
+			/// @param   {Function} func
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static on_cursor_move = function(_func) {
@@ -68,10 +71,11 @@ function WWTextInput() : WWCore() constructor {
 		#region Builder Functions
 
 			#region jsDoc
-			/// @func    set_size(_width, _height)
+			/// @func    set_size(width, height)
 			/// @desc    Sets input size and resizes internal region/field.
-			/// @param   {Real} _width
-			/// @param   {Real} _height
+			/// @self    WWTextInput
+			/// @param   {Real} width
+			/// @param   {Real} height
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_size = function(_width, _height) {
@@ -87,9 +91,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_value(_text)
+			/// @func    set_value(text)
 			/// @desc    Sets the text content.
-			/// @param   {String} _text
+			/// @self    WWTextInput
+			/// @param   {String} text
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_value = function(_text) {
@@ -98,9 +103,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_read_only(_read_only)
+			/// @func    set_read_only(read_only)
 			/// @desc    Sets read-only state (select/copy still allowed).
-			/// @param   {Bool} _read_only
+			/// @self    WWTextInput
+			/// @param   {Bool} read_only
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_read_only = function(_read_only) {
@@ -109,10 +115,11 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_scrollbars_enabled(_horz_enabled, _vert_enabled)
+			/// @func    set_scrollbars_enabled(horz_enabled, vert_enabled)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Bool} _horz_enabled
-			/// @param   {Bool} _vert_enabled
+			/// @self    WWTextInput
+			/// @param   {Bool} horz_enabled
+			/// @param   {Bool} vert_enabled
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_scrollbars_enabled = function(_horz_enabled=true, _vert_enabled=true) {
@@ -121,10 +128,11 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_scrollbars_auto_hide(_horz_auto, _vert_auto)
+			/// @func    set_scrollbars_auto_hide(horz_auto, vert_auto)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Bool} _horz_auto
-			/// @param   {Bool} _vert_auto
+			/// @self    WWTextInput
+			/// @param   {Bool} horz_auto
+			/// @param   {Bool} vert_auto
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_scrollbars_auto_hide = function(_horz_auto=true, _vert_auto=true) {
@@ -133,9 +141,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_scrollbar_thickness(_thickness)
+			/// @func    set_scrollbar_thickness(thickness)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Real} _thickness
+			/// @self    WWTextInput
+			/// @param   {Real} thickness
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_scrollbar_thickness = function(_thickness) {
@@ -144,9 +153,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_wheel_step(_pixels_per_wheel)
+			/// @func    set_wheel_step(pixels_per_wheel)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Real} _pixels_per_wheel
+			/// @self    WWTextInput
+			/// @param   {Real} pixels_per_wheel
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_wheel_step = function(_pixels_per_wheel) {
@@ -155,9 +165,10 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_smooth_scrolling(_smooth)
+			/// @func    set_smooth_scrolling(smooth)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Bool} _smooth
+			/// @self    WWTextInput
+			/// @param   {Bool} smooth
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_smooth_scrolling = function(_smooth=false) {
@@ -166,10 +177,11 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_wheel_scroll_enabled(_horz_enabled, _vert_enabled)
+			/// @func    set_wheel_scroll_enabled(horz_enabled, vert_enabled)
 			/// @desc    Forwards to the internal WWViewScrollRegion.
-			/// @param   {Bool} _horz_enabled
-			/// @param   {Bool} _vert_enabled
+			/// @self    WWTextInput
+			/// @param   {Bool} horz_enabled
+			/// @param   {Bool} vert_enabled
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_wheel_scroll_enabled = function(_horz_enabled=true, _vert_enabled=true) {
@@ -178,11 +190,12 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_scrollbar_thumb_sprite(_sprite, _apply_horz, _apply_vert)
+			/// @func    set_scrollbar_thumb_sprite(sprite, apply_horz, apply_vert)
 			/// @desc    Convenience forwarder for reskinning thumb sprite(s).
-			/// @param   {Asset.GMSprite} _sprite
-			/// @param   {Bool} _apply_horz
-			/// @param   {Bool} _apply_vert
+			/// @self    WWTextInput
+			/// @param   {Asset.GMSprite} sprite
+			/// @param   {Bool} apply_horz
+			/// @param   {Bool} apply_vert
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_scrollbar_thumb_sprite = function(_sprite, _apply_horz=true, _apply_vert=true) {
@@ -198,11 +211,12 @@ function WWTextInput() : WWCore() constructor {
 			};
 
 			#region jsDoc
-			/// @func    set_scrollbar_thumb_color(_color, _apply_horz, _apply_vert)
+			/// @func    set_scrollbar_thumb_color(color, apply_horz, apply_vert)
 			/// @desc    Convenience forwarder for reskinning thumb color(s).
-			/// @param   {Int} _color
-			/// @param   {Bool} _apply_horz
-			/// @param   {Bool} _apply_vert
+			/// @self    WWTextInput
+			/// @param   {Int} color
+			/// @param   {Bool} apply_horz
+			/// @param   {Bool} apply_vert
 			/// @returns {Struct.WWTextInput} self
 			#endregion
 			static set_scrollbar_thumb_color = function(_color, _apply_horz=true, _apply_vert=true) {
@@ -224,6 +238,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_value()
 				/// @desc    Gets the current text content.
+				/// @self    WWTextInput
 				/// @returns {String}
 				#endregion
 				static get_value = function() {
@@ -233,6 +248,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_field()
 				/// @desc    Returns the internal WWTextField (advanced usage/customization).
+				/// @self    WWTextInput
 				/// @returns {Struct.WWTextField}
 				#endregion
 				static get_field = function() {
@@ -242,6 +258,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_region()
 				/// @desc    Returns the internal WWViewScrollRegion (advanced usage/customization).
+				/// @self    WWTextInput
 				/// @returns {Struct.WWViewScrollRegion}
 				#endregion
 				static get_region = function() {
@@ -251,6 +268,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_scrollbar_horz()
 				/// @desc    Returns the internal horizontal scrollbar instance.
+				/// @self    WWTextInput
 				/// @returns {Struct.WWScrollbarHorz}
 				#endregion
 				static get_scrollbar_horz = function() {
@@ -260,6 +278,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_scrollbar_vert()
 				/// @desc    Returns the internal vertical scrollbar instance.
+				/// @self    WWTextInput
 				/// @returns {Struct.WWScrollbarVert}
 				#endregion
 				static get_scrollbar_vert = function() {
@@ -269,6 +288,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_scrollbar_thumb_horz()
 				/// @desc    Returns the horizontal scrollbar's thumb (for reskinning).
+				/// @self    WWTextInput
 				/// @returns {Struct.WWSliderThumb}
 				#endregion
 				static get_scrollbar_thumb_horz = function() {
@@ -278,6 +298,7 @@ function WWTextInput() : WWCore() constructor {
 				#region jsDoc
 				/// @func    get_scrollbar_thumb_vert()
 				/// @desc    Returns the vertical scrollbar's thumb (for reskinning).
+				/// @self    WWTextInput
 				/// @returns {Struct.WWSliderThumb}
 				#endregion
 				static get_scrollbar_thumb_vert = function() {
@@ -295,9 +316,10 @@ function WWTextInput() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func    __ensure_caret_visible_horz__()
+			/// @ignore
 			/// @desc    Scrolls horizontally only if caret is outside viewport.
+			/// @self    WWTextInput
 			/// @returns {Undefined}
-			///@ignore
 			#endregion
 			static __ensure_caret_visible_horz__ = function() {
 				var _vw = region.viewport_width;
@@ -325,9 +347,10 @@ function WWTextInput() : WWCore() constructor {
 
 			#region jsDoc
 			/// @func    __ensure_caret_visible_vert__()
+			/// @ignore
 			/// @desc    Scrolls vertically only if caret is outside viewport.
+			/// @self    WWTextInput
 			/// @returns {Undefined}
-			///@ignore
 			#endregion
 			static __ensure_caret_visible_vert__ = function() {
 				var _vh = region.viewport_height;

@@ -655,6 +655,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __sync_cached_state_from_view__()
 			/// @desc    Mirrors internal view state into wrapper compatibility fields.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -675,6 +676,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __sync_content_size_from_canvas__()
 			/// @desc    Ensures internal view content size matches canvas size (and clamps scroll if needed).
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -693,6 +695,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __on_scrollbar_horz__()
 			/// @desc    Applies the horizontal scrollbar value to the region scroll.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -705,6 +708,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __on_scrollbar_vert__()
 			/// @desc    Applies the vertical scrollbar value to the region scroll.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -717,6 +721,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __set_content_size_from_canvas_children__()
 			/// @desc    Updates content size from canvas group bounds.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -731,6 +736,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __get_thickness__()
 			/// @desc    Returns scrollbar thickness.
+			/// @self    WWViewScrollRegion
 			/// @returns {Real}
 			/// @ignore
 			#endregion
@@ -741,6 +747,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __sync_scrollbars__()
 			/// @desc    Updates scrollbar sizes and values from current content and viewport state.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -781,6 +788,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __layout_scrollbars__()
 			/// @desc    Sizes/positions scrollbars and applies their active state.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
@@ -828,6 +836,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __trigger_scroll_events__()
 			/// @desc    Emits scroll events if the scroll offset changed.
+			/// @self    WWViewScrollRegion
 			/// @param   {Real} old_x
 			/// @param   {Real} old_y
 			/// @returns {Undefined}
@@ -860,6 +869,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __reflow__()
 			/// @desc    Recomputes scrollbar visibility, viewport size, layout, and clamps scroll.
+			/// @self    WWViewScrollRegion
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion

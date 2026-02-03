@@ -165,6 +165,7 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			#region jsDoc
 			/// @func    __auto_step__()
 			/// @desc    Advances the scroll offsets according to speed and looping settings.
+			/// @self    WWViewScrollAuto
 			/// @param   {Struct} input : Input state (unused here).
 			/// @returns {Undefined}
 			/// @ignore
@@ -198,6 +199,7 @@ function WWViewScrollAuto() : WWViewScroll() constructor {
 			#region jsDoc
 			/// @func    __wrap_scroll_axis__()
 			/// @desc    Wraps a scroll value into the range [0.._max] when looping is enabled.
+			/// @self    WWViewScrollAuto
 			/// @param   {Real} value : Scroll value to wrap.
 			/// @param   {Real} max : Maximum scroll value.
 			/// @returns {Real} wrapped_value

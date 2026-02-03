@@ -123,7 +123,7 @@ function WWCore() constructor {
 			/// @func    set_sprite_color()
 			/// @desc    Sets the color of the sprite to be drawn.
 			/// @self    WWCore
-			/// @param   {Real} color : The color of the sprite.
+			/// @param   {Real} col : The color of the sprite.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite_color = function(_col) {
@@ -145,7 +145,7 @@ function WWCore() constructor {
 			/// @func    set_background_color()
 			/// @desc    Sets the color of the background.
 			/// @self    WWCore
-			/// @param   {Real} color : The color of the background.
+			/// @param   {Real} col : The color of the background.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_background_color = function(_col) {
@@ -239,7 +239,7 @@ function WWCore() constructor {
 			/// @func    set_focus()
 			/// @desc    Sets the focus state for this component.
 			/// @self    WWCore
-			/// @param   {Bool} is_focused : True to focus; false to unfocus.
+			/// @param   {Bool} focus : True to focus; false to unfocus.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_focus = function(_focus) {
@@ -258,7 +258,7 @@ function WWCore() constructor {
 			/// @func    set_hover()
 			/// @desc    Sets the hover state for this component.
 			/// @self    WWCore
-			/// @param   {Bool} is_hovered : True to hover; false to unhover.
+			/// @param   {Bool} hover : True to hover; false to unhover.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_hover = function(_hover) {
@@ -277,7 +277,7 @@ function WWCore() constructor {
 			/// @func    set_interact()
 			/// @desc    Sets the interaction state for this component.
 			/// @self    WWCore
-			/// @param   {Bool} is_interacting : True while interacting; false to stop.
+			/// @param   {Bool} interact : True while interacting; false to stop.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_interact = function(_interact) {
@@ -303,7 +303,7 @@ function WWCore() constructor {
 			/// @desc    Adds an event listener for a given event id or name.
 			/// @self    WWCore
 			/// @param   {String|Real} event : Event name (string) or event hash id.
-			/// @param   {Function} callback : Listener invoked with event payload.
+			/// @param   {Function} func : Listener invoked with event payload.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_event = function(_event, _func) {
@@ -320,7 +320,7 @@ function WWCore() constructor {
 			/// @func    on_focus_enter()
 			/// @desc    Adds a listener for the focus_enter event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when focus enters.
+			/// @param   {Function} func : Listener invoked when focus enters.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_focus_enter = function(_func) {
@@ -331,7 +331,7 @@ function WWCore() constructor {
 			/// @func    on_focus()
 			/// @desc    Adds a listener for the focus event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked while focused.
+			/// @param   {Function} func : Listener invoked while focused.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_focus = function(_func) {
@@ -342,7 +342,7 @@ function WWCore() constructor {
 			/// @func    on_focus_exit()
 			/// @desc    Adds a listener for the focus_exit event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when focus exits.
+			/// @param   {Function} func : Listener invoked when focus exits.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_focus_exit = function(_func) {
@@ -358,7 +358,7 @@ function WWCore() constructor {
 			/// @func    on_interact_enter()
 			/// @desc    Adds a listener for the interact_enter event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when interaction begins.
+			/// @param   {Function} func : Listener invoked when interaction begins.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_interact_enter = function(_func) {
@@ -369,7 +369,7 @@ function WWCore() constructor {
 			/// @func    on_interact()
 			/// @desc    Adds a listener for the interact event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked while interacting.
+			/// @param   {Function} func : Listener invoked while interacting.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_interact = function(_func) {
@@ -380,7 +380,7 @@ function WWCore() constructor {
 			/// @func    on_interact_exit()
 			/// @desc    Adds a listener for the interact_exit event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when interaction ends.
+			/// @param   {Function} func : Listener invoked when interaction ends.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_interact_exit = function(_func) {
@@ -396,7 +396,7 @@ function WWCore() constructor {
 			/// @func    on_hover_enter()
 			/// @desc    Adds a listener for the hover_enter event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when hover begins.
+			/// @param   {Function} func : Listener invoked when hover begins.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_hover_enter = function(_func) {
@@ -407,7 +407,7 @@ function WWCore() constructor {
 			/// @func    on_hover()
 			/// @desc    Adds a listener for the hover event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked while hovered.
+			/// @param   {Function} func : Listener invoked while hovered.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_hover = function(_func) {
@@ -418,7 +418,7 @@ function WWCore() constructor {
 			/// @func    on_hover_exit()
 			/// @desc    Adds a listener for the hover_exit event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when hover ends.
+			/// @param   {Function} func : Listener invoked when hover ends.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_hover_exit = function(_func) {
@@ -438,7 +438,7 @@ function WWCore() constructor {
 			/// @func    on_pressed()
 			/// @desc    Adds a listener for the pressed event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when pressed.
+			/// @param   {Function} func : Listener invoked when pressed.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_pressed = function(_func) {
@@ -449,7 +449,7 @@ function WWCore() constructor {
 			/// @func    on_held()
 			/// @desc    Adds a listener for the held event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked while held.
+			/// @param   {Function} func : Listener invoked while held.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_held = function(_func) {
@@ -460,7 +460,7 @@ function WWCore() constructor {
 			/// @func    on_long_press()
 			/// @desc    Adds a listener for the long_press event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked on long press.
+			/// @param   {Function} func : Listener invoked on long press.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_long_press = function(_func) {
@@ -471,7 +471,7 @@ function WWCore() constructor {
 			/// @func    on_released()
 			/// @desc    Adds a listener for the released event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when released.
+			/// @param   {Function} func : Listener invoked when released.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_released = function(_func) {
@@ -482,7 +482,7 @@ function WWCore() constructor {
 			/// @func    on_double_click()
 			/// @desc    Adds a listener for the double_click event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked on double click.
+			/// @param   {Function} func : Listener invoked on double click.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_double_click = function(_func) {
@@ -493,7 +493,7 @@ function WWCore() constructor {
 			/// @func    on_triple_click()
 			/// @desc    Adds a listener for the triple_click event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked on triple click.
+			/// @param   {Function} func : Listener invoked on triple click.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_triple_click = function(_func) {
@@ -509,7 +509,7 @@ function WWCore() constructor {
 			/// @func    on_pre_step()
 			/// @desc    Adds a listener for the pre_step event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked before step.
+			/// @param   {Function} func : Listener invoked before step.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_pre_step = function(_func) {
@@ -520,7 +520,7 @@ function WWCore() constructor {
 			/// @func    on_post_step()
 			/// @desc    Adds a listener for the post_step event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked after step.
+			/// @param   {Function} func : Listener invoked after step.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_post_step = function(_func) {
@@ -534,7 +534,7 @@ function WWCore() constructor {
 			/// @func    on_pre_draw()
 			/// @desc    Adds a listener for the pre_draw event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked before draw.
+			/// @param   {Function} func : Listener invoked before draw.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_pre_draw = function(_func) {
@@ -545,7 +545,7 @@ function WWCore() constructor {
 			/// @func    on_post_draw()
 			/// @desc    Adds a listener for the post_draw event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked after draw.
+			/// @param   {Function} func : Listener invoked after draw.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_post_draw = function(_func) {
@@ -561,7 +561,7 @@ function WWCore() constructor {
 			/// @func    on_mouse_over()
 			/// @desc    Adds a listener for the mouse_over event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when mouse enters.
+			/// @param   {Function} func : Listener invoked when mouse enters.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_mouse_over = function(_func) {
@@ -572,7 +572,7 @@ function WWCore() constructor {
 			/// @func    on_mouse_off()
 			/// @desc    Adds a listener for the mouse_off event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when mouse exits.
+			/// @param   {Function} func : Listener invoked when mouse exits.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_mouse_off = function(_func) {
@@ -586,7 +586,7 @@ function WWCore() constructor {
 			/// @func    on_mouse_over_group()
 			/// @desc    Adds a listener for the mouse_over_group event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked while mouse is within group bounds.
+			/// @param   {Function} func : Listener invoked while mouse is within group bounds.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_mouse_over_group = function(_func) {
@@ -597,7 +597,7 @@ function WWCore() constructor {
 			/// @func    on_mouse_off_group()
 			/// @desc    Adds a listener for the mouse_off_group event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when mouse leaves group bounds.
+			/// @param   {Function} func : Listener invoked when mouse leaves group bounds.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_mouse_off_group = function(_func) {
@@ -612,7 +612,7 @@ function WWCore() constructor {
 			/// @func    on_enable()
 			/// @desc    Adds a listener for the enabled event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when enabled.
+			/// @param   {Function} func : Listener invoked when enabled.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_enable = function(_func) {
@@ -623,7 +623,7 @@ function WWCore() constructor {
 			/// @func    on_disabled()
 			/// @desc    Adds a listener for the disabled event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when disabled.
+			/// @param   {Function} func : Listener invoked when disabled.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_disabled = function(_func) {
@@ -637,7 +637,7 @@ function WWCore() constructor {
 			/// @func    on_activated()
 			/// @desc    Adds a listener for the activated event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when activated.
+			/// @param   {Function} func : Listener invoked when activated.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_activated = function(_func) {
@@ -648,7 +648,7 @@ function WWCore() constructor {
 			/// @func    on_deactivated()
 			/// @desc    Adds a listener for the deactivated event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked when deactivated.
+			/// @param   {Function} func : Listener invoked when deactivated.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_deactivated = function(_func) {
@@ -661,7 +661,7 @@ function WWCore() constructor {
 			/// @func    on_resize()
 			/// @desc    Adds a listener for the resize event.
 			/// @self    WWCore
-			/// @param   {Function} callback : Listener invoked on resize.
+			/// @param   {Function} func : Listener invoked on resize.
 			/// @returns {Struct.WWCore}
 			#endregion
 			static on_resize = function(_func) {
@@ -1100,6 +1100,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_position()
 			/// @desc   Returns the current position of this component.
+			/// @self   WWCore
 			/// @returns {Struct} position_struct_with_x_y
 			#endregion
 			static get_position = function() {
@@ -1108,6 +1109,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_size()
 			/// @desc   Returns the current size of this component.
+			/// @self   WWCore
 			/// @returns {Struct} size_struct_with_width_height
 			#endregion
 			static get_size = function() {
@@ -1116,6 +1118,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_offset()
 			/// @desc   Returns the current draw offset for this component.
+			/// @self   WWCore
 			/// @returns {Struct} offset_struct_with_x_y
 			#endregion
 			static get_offset = function() {
@@ -1124,6 +1127,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_alignment()
 			/// @desc   Returns the current horizontal and vertical alignment.
+			/// @self   WWCore
 			/// @returns {Struct} alignment_struct_with_halign_valign
 			#endregion
 			static get_alignment = function() {
@@ -1132,6 +1136,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_width()
 			/// @desc   Returns the current width of this component.
+			/// @self   WWCore
 			/// @returns {Real} width_value
 			#endregion
 			static get_width = function() {
@@ -1140,6 +1145,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_height()
 			/// @desc   Returns the current height of this component.
+			/// @self   WWCore
 			/// @returns {Real} height_value
 			#endregion
 			static get_height = function() {
@@ -1148,6 +1154,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_sprite()
 			/// @desc   Returns the current sprite assigned to this component.
+			/// @self   WWCore
 			/// @returns {Asset.GMSprite} sprite_asset
 			#endregion
 			static get_sprite = function() {
@@ -1156,6 +1163,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_sprite_angle()
 			/// @desc   Returns the current sprite rotation angle.
+			/// @self   WWCore
 			/// @returns {Real} angle_degrees
 			#endregion
 			static get_sprite_angle = function() {
@@ -1164,6 +1172,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_sprite_color()
 			/// @desc   Returns the current sprite color multiplier.
+			/// @self   WWCore
 			/// @returns {Real} color_value
 			#endregion
 			static get_sprite_color = function() {
@@ -1172,6 +1181,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_sprite_alpha()
 			/// @desc   Returns the current sprite alpha multiplier.
+			/// @self   WWCore
 			/// @returns {Real} alpha_value
 			#endregion
 			static get_sprite_alpha = function() {
@@ -1180,6 +1190,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_background_color()
 			/// @desc   Returns the current background color and whether it is set.
+			/// @self   WWCore
 			/// @returns {Real} background_color
 			#endregion
 			static get_background_color = function() {
@@ -1188,6 +1199,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_enabled()
 			/// @desc   Returns whether this component is enabled.
+			/// @self   WWCore
 			/// @returns {Bool} is_enabled
 			#endregion
 			static get_enabled = function() {
@@ -1196,6 +1208,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_active()
 			/// @desc   Returns whether this component is active.
+			/// @self   WWCore
 			/// @returns {Bool} is_active
 			#endregion
 			static get_active = function() {
@@ -1204,6 +1217,7 @@ function WWCore() constructor {
 			#region jsDoc
 			/// @func   get_debug()
 			/// @desc   Returns whether debug drawing is enabled for this component.
+			/// @self   WWCore
 			/// @returns {Bool} is_debug_enabled
 			#endregion
 			static get_debug = function() {
@@ -1442,7 +1456,7 @@ function WWCore() constructor {
 			/// @func    find()
 			/// @desc    Find the index of the given component. Will return -1 if the component was not found.
 			/// @self    WWCore
-			/// @param   {Struct.WWCore} component : The component you wish to find the index of.
+			/// @param   {Struct.WWCore} comp : The component you wish to find the index of.
 			/// @returns {Real}
 			#endregion
 			static find = function(_comp) {
@@ -1833,8 +1847,9 @@ function WWCore() constructor {
 			/// @func    __include_children__()
 			/// @desc    Includes the children by either pushing them into the list or inserting them into the list. Any index under 0 will push the component.
 			/// @self    WWCore
-			/// @param   {Array<Struct>} arr_of_comp : The array of components you wish to include into the children.
+			/// @param   {Array<Struct>} arr : The array of components you wish to include into the children.
 			/// @param   {Real} index : The index the array will be inserted into. Note: a value of -1 will push the array to the end.
+			/// @returns {Undefined}
 			/// @ignore
 			#endregion
 			static __include_children__ = function(_arr, _index) {

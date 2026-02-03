@@ -9,6 +9,13 @@ function WWIcon() : WWCore() constructor {
     #region Public
         
         #region Builder Functions
+        #region jsDoc
+        /// @func    set_icon()
+        /// @desc    Sets the icon sprite.
+        /// @self    WWIcon
+        /// @param   {Asset.GMSprite} sprite : The sprite to use for the icon.
+        /// @returns {Struct.WWIcon}
+        #endregion
         static set_icon = function(_sprite) {
             set_sprite(_sprite);
             return self;

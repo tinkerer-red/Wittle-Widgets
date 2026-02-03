@@ -20,6 +20,7 @@ function WWLabel() : WWTextRenderer() constructor {
             #region jsDoc
             /// @func   get_text()
             /// @desc   Returns caption text.
+            /// @self   WWLabel
             /// @returns {String}
             #endregion
             static get_text = function() {
@@ -29,6 +30,7 @@ function WWLabel() : WWTextRenderer() constructor {
             #region jsDoc
             /// @func   get_text_font()
             /// @desc   Returns the font currently used by the label.
+            /// @self   WWLabel
             /// @returns {Asset.GMFont}
             #endregion
             static get_text_font = function() {

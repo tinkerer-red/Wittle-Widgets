@@ -1,899 +1,546 @@
 {
-
   "FolderOrderSettings":[
-
     {"name":"__Deprecated","order":19,"path":"folders/__Deprecated.yy",},
-
     {"name":"_Config","order":5,"path":"folders/_Config.yy",},
-
     {"name":"Settings","order":1,"path":"folders/_Config/Settings.yy",},
-
     {"name":"_internal","order":1,"path":"folders/_Config/Settings/_internal.yy",},
-
     {"name":"_Libraries","order":1,"path":"folders/_Libraries.yy",},
-
     {"name":"ControlPanel","order":2,"path":"folders/_Libraries/ControlPanel.yy",},
-
     {"name":"Assets","order":4,"path":"folders/_Libraries/ControlPanel/Assets.yy",},
-
     {"name":"Components","order":2,"path":"folders/_Libraries/ControlPanel/Components.yy",},
-
     {"name":"Execute Shell Simple","order":5,"path":"folders/_Libraries/Execute Shell Simple.yy",},
-
     {"name":"Lookout","order":7,"path":"folders/_Libraries/Lookout.yy",},
-
     {"name":"02. Public","order":1,"path":"folders/_Libraries/Lookout/02. Public.yy",},
-
     {"name":"03. Private","order":2,"path":"folders/_Libraries/Lookout/03. Private.yy",},
-
     {"name":"__Views","order":1,"path":"folders/_Libraries/Lookout/03. Private/__Views.yy",},
-
     {"name":"MSDF","order":4,"path":"folders/_Libraries/MSDF.yy",},
-
     {"name":"(System)","order":1,"path":"folders/_Libraries/MSDF/(System).yy",},
-
     {"name":"Functions","order":2,"path":"folders/_Libraries/MSDF/Functions.yy",},
-
     {"name":"RegEx","order":3,"path":"folders/_Libraries/RegEx.yy",},
-
     {"name":"Helper","order":1,"path":"folders/_Libraries/RegEx/_internal/Helper.yy",},
-
     {"name":"Pattern Exe","order":2,"path":"folders/_Libraries/RegEx/_internal/Pattern Exe.yy",},
-
     {"name":"SubClasses","order":3,"path":"folders/_Libraries/RegEx/_internal/SubClasses.yy",},
-
     {"name":"Highlight.gml","order":5,"path":"folders/_Libraries/RegEx/Highlight.gml.yy",},
-
     {"name":"Unit Tests","order":1,"path":"folders/_Libraries/RegEx/Unit Tests.yy",},
-
     {"name":"SNAP","order":6,"path":"folders/_Libraries/SNAP.yy",},
-
     {"name":"XML","order":1,"path":"folders/_Libraries/SNAP/XML.yy",},
-
     {"name":"Wittle Widgets","order":20,"path":"folders/_Libraries/Wittle Widgets.yy",},
-
     {"name":"_Components","order":1,"path":"folders/_Libraries/Wittle Widgets/_Components.yy",},
-
     {"name":"AI Driven","order":1,"path":"folders/_Libraries/Wittle Widgets/_Components/AI Driven.yy",},
-
     {"name":"Buttons","order":1,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Buttons.yy",},
-
     {"name":"Checkbox","order":5,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Checkbox.yy",},
-
     {"name":"ProgressBar","order":4,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/ProgressBar.yy",},
-
     {"name":"Scrollbars","order":3,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Scrollbars.yy",},
-
     {"name":"Sliders","order":2,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Sliders.yy",},
-
     {"name":"Text","order":9,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Text.yy",},
-
     {"name":"Viewports","order":6,"path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Viewports.yy",},
-
     {"name":"_Internal","order":6,"path":"folders/_Libraries/Wittle Widgets/_Internal.yy",},
-
     {"name":"Assets","order":4,"path":"folders/_Libraries/Wittle Widgets/Assets.yy",},
-
     {"name":"9Slice","order":22,"path":"folders/_Libraries/Wittle Widgets/Assets/9Slice.yy",},
-
     {"name":"Checkbox","order":1,"path":"folders/_Libraries/Wittle Widgets/Assets/Checkbox.yy",},
-
     {"name":"DropDown","order":2,"path":"folders/_Libraries/Wittle Widgets/Assets/DropDown.yy",},
-
     {"name":"Flat UI Rounded","order":19,"path":"folders/_Libraries/Wittle Widgets/Assets/Flat UI Rounded.yy",},
-
     {"name":"Fonts","order":17,"path":"folders/_Libraries/Wittle Widgets/Assets/Fonts.yy",},
-
     {"name":"Generated","order":21,"path":"folders/_Libraries/Wittle Widgets/Assets/Generated.yy",},
-
     {"name":"Pickers","order":23,"path":"folders/_Libraries/Wittle Widgets/Assets/Pickers.yy",},
-
     {"name":"Rings","order":24,"path":"folders/_Libraries/Wittle Widgets/Assets/Rings.yy",},
-
     {"name":"Scrollbar","order":5,"path":"folders/_Libraries/Wittle Widgets/Assets/Scrollbar.yy",},
-
     {"name":"Horz","order":5,"path":"folders/_Libraries/Wittle Widgets/Assets/Scrollbar/Horz.yy",},
-
     {"name":"Vert","order":4,"path":"folders/_Libraries/Wittle Widgets/Assets/Scrollbar/Vert.yy",},
-
     {"name":"Shaders","order":18,"path":"folders/_Libraries/Wittle Widgets/Assets/Shaders.yy",},
-
     {"name":"Slider","order":4,"path":"folders/_Libraries/Wittle Widgets/Assets/Slider.yy",},
-
     {"name":"Textbox","order":13,"path":"folders/_Libraries/Wittle Widgets/Assets/Textbox.yy",},
-
     {"name":"Triangles","order":25,"path":"folders/_Libraries/Wittle Widgets/Assets/Triangles.yy",},
-
     {"name":"Shaders","order":2,"path":"folders/_Libraries/Wittle Widgets/Shaders.yy",},
-
     {"name":"Util","order":7,"path":"folders/_Libraries/Wittle Widgets/Util.yy",},
-
     {"name":"Demo","order":18,"path":"folders/Demo.yy",},
-
     {"name":"_internal","order":3,"path":"folders/Demo/_internal.yy",},
-
     {"name":"Scripts","order":1,"path":"folders/Demo/Scripts.yy",},
-
     {"name":"Texboxes","order":2,"path":"folders/Demo/Texboxes.yy",},
-
     {"name":"__shared","order":7,"path":"folders/Demo/Texboxes/__shared.yy",},
-
     {"name":"Basic","order":1,"path":"folders/Demo/Texboxes/Basic.yy",},
-
     {"name":"BBCode","order":4,"path":"folders/Demo/Texboxes/BBCode.yy",},
-
     {"name":"CSS","order":3,"path":"folders/Demo/Texboxes/CSS.yy",},
-
     {"name":"GML","order":6,"path":"folders/Demo/Texboxes/GML.yy",},
-
     {"name":"Markdown","order":2,"path":"folders/Demo/Texboxes/Markdown.yy",},
-
     {"name":"Scribble","order":5,"path":"folders/Demo/Texboxes/Scribble.yy",},
-
     {"name":"Examples","order":6,"path":"folders/Examples.yy",},
-
     {"name":"Example 1","order":1,"path":"folders/Examples/Example 1.yy",},
-
     {"name":"Standalone Examples","order":2,"path":"folders/Examples/Standalone Examples.yy",},
-
     {"name":"_system","order":1,"path":"folders/Examples/Standalone Examples/_system.yy",},
-
     {"name":"TextBoxV3","order":14,"path":"folders/TextBoxV3.yy",},
-
     {"name":"Buffers","order":7,"path":"folders/TextBoxV3/Buffers.yy",},
-
     {"name":"Cursors","order":6,"path":"folders/TextBoxV3/Cursors.yy",},
-
     {"name":"LayoutHandler","order":8,"path":"folders/TextBoxV3/LayoutHandler.yy",},
-
     {"name":"Renderers","order":5,"path":"folders/TextBoxV3/Renderers.yy",},
-
     {"name":"PreProcessors","order":8,"path":"folders/TextBoxV3/Renderers/PreProcessors.yy",},
-
   ],
-
   "ResourceOrderSettings":[
-
     {"name":"__MsdfSacrificialAsset","order":3,"path":"fonts/__MsdfSacrificialAsset/__MsdfSacrificialAsset.yy",},
-
     {"name":"fnt_ww_consolas_msdf","order":1,"path":"fonts/fnt_ww_consolas_msdf/fnt_ww_consolas_msdf.yy",},
-
     {"name":"fnt_ww_default_big","order":2,"path":"fonts/fnt_ww_default_big/fnt_ww_default_big.yy",},
-
     {"name":"fnt_ww_default_small_msdf","order":5,"path":"fonts/fnt_ww_default_small_msdf/fnt_ww_default_small_msdf.yy",},
-
     {"name":"fnt_ww_default_small","order":3,"path":"fonts/fnt_ww_default_small/fnt_ww_default_small.yy",},
-
     {"name":"fnt_ww_noto_msdf","order":4,"path":"fonts/fnt_ww_noto_msdf/fnt_ww_noto_msdf.yy",},
-
     {"name":"01. Lookout Info","order":3,"path":"notes/01. Lookout Info/01. Lookout Info.yy",},
-
     {"name":"Msdf Replacement Blur Shader","order":3,"path":"notes/Msdf Replacement Blur Shader/Msdf Replacement Blur Shader.yy",},
-
     {"name":"Msdf Replacement Effect Shader","order":4,"path":"notes/Msdf Replacement Effect Shader/Msdf Replacement Effect Shader.yy",},
-
     {"name":"Msdf Replacement Shader","order":5,"path":"notes/Msdf Replacement Shader/Msdf Replacement Shader.yy",},
-
     {"name":"Msdf Setting Up","order":6,"path":"notes/Msdf Setting Up/Msdf Setting Up.yy",},
-
     {"name":"Note1","order":5,"path":"notes/Note1/Note1.yy",},
-
     {"name":"obj_gui_dropbox","order":4,"path":"objects/obj_gui_dropbox/obj_gui_dropbox.yy",},
-
     {"name":"obj_gui_textbox","order":2,"path":"objects/obj_gui_textbox/obj_gui_textbox.yy",},
-
     {"name":"obj_ww_demo_textbox_basic","order":1,"path":"objects/obj_ww_demo_textbox_basic/obj_ww_demo_textbox_basic.yy",},
-
     {"name":"obj_ww_demo_textbox_bbcode","order":1,"path":"objects/obj_ww_demo_textbox_bbcode/obj_ww_demo_textbox_bbcode.yy",},
-
     {"name":"obj_ww_demo_textbox_css","order":1,"path":"objects/obj_ww_demo_textbox_css/obj_ww_demo_textbox_css.yy",},
-
     {"name":"obj_ww_demo_textbox_gml","order":1,"path":"objects/obj_ww_demo_textbox_gml/obj_ww_demo_textbox_gml.yy",},
-
     {"name":"obj_ww_demo_textbox_markdown","order":1,"path":"objects/obj_ww_demo_textbox_markdown/obj_ww_demo_textbox_markdown.yy",},
-
     {"name":"obj_ww_demo_textbox_scribble","order":1,"path":"objects/obj_ww_demo_textbox_scribble/obj_ww_demo_textbox_scribble.yy",},
-
     {"name":"obj_ww_demo","order":2,"path":"objects/obj_ww_demo/obj_ww_demo.yy",},
-
     {"name":"objTest_TextPlugin","order":10,"path":"objects/objTest_TextPlugin/objTest_TextPlugin.yy",},
-
     {"name":"oGUIController","order":2,"path":"objects/oGUIController/oGUIController.yy",},
-
     {"name":"rm_stand_alone_xamples","order":3,"path":"rooms/rm_stand_alone_xamples/rm_stand_alone_xamples.yy",},
-
     {"name":"rmControlPanel","order":1,"path":"rooms/rmControlPanel/rmControlPanel.yy",},
-
     {"name":"__demo_inspector","order":1,"path":"scripts/__demo_inspector/__demo_inspector.yy",},
-
     {"name":"__LookoutInit","order":2,"path":"scripts/__LookoutInit/__LookoutInit.yy",},
-
     {"name":"__LookoutMacros","order":3,"path":"scripts/__LookoutMacros/__LookoutMacros.yy",},
-
     {"name":"__LookoutUtility","order":4,"path":"scripts/__LookoutUtility/__LookoutUtility.yy",},
-
     {"name":"__LookoutViewDisplay","order":1,"path":"scripts/__LookoutViewDisplay/__LookoutViewDisplay.yy",},
-
     {"name":"__MsdfLoud","order":1,"path":"scripts/__MsdfLoud/__MsdfLoud.yy",},
-
     {"name":"__MsdfSystem","order":4,"path":"scripts/__MsdfSystem/__MsdfSystem.yy",},
-
     {"name":"__MsdfTrace","order":5,"path":"scripts/__MsdfTrace/__MsdfTrace.yy",},
-
     {"name":"__ww_textproc_npp_udl_core__","order":1,"path":"scripts/__ww_textproc_npp_udl_core__/__ww_textproc_npp_udl_core__.yy",},
-
     {"name":"__WWConstants","order":1,"path":"scripts/__WWConstants/__WWConstants.yy",},
-
     {"name":"__WWTemplate","order":2,"path":"scripts/__WWTemplate/__WWTemplate.yy",},
-
     {"name":"_GUISystems","order":1,"path":"scripts/_GUISystems/_GUISystems.yy",},
-
     {"name":"_WittleWidgetsGUIConfig","order":9,"path":"scripts/_WittleWidgetsGUIConfig/_WittleWidgetsGUIConfig.yy",},
-
     {"name":"ControlPanelCheckbox","order":1,"path":"scripts/ControlPanelCheckbox/ControlPanelCheckbox.yy",},
-
     {"name":"ControlPanelDropdown","order":2,"path":"scripts/ControlPanelDropdown/ControlPanelDropdown.yy",},
-
     {"name":"ControlPanelFolder","order":6,"path":"scripts/ControlPanelFolder/ControlPanelFolder.yy",},
-
     {"name":"ControlPanelReal","order":3,"path":"scripts/ControlPanelReal/ControlPanelReal.yy",},
-
     {"name":"ControlPanelSlider","order":5,"path":"scripts/ControlPanelSlider/ControlPanelSlider.yy",},
-
     {"name":"ControlPanelString","order":4,"path":"scripts/ControlPanelString/ControlPanelString.yy",},
-
     {"name":"ControlPanelVisualMacros","order":3,"path":"scripts/ControlPanelVisualMacros/ControlPanelVisualMacros.yy",},
-
     {"name":"Debug","order":3,"path":"scripts/Debug/Debug.yy",},
-
     {"name":"draw_string_arr","order":1,"path":"scripts/draw_string_arr/draw_string_arr.yy",},
-
     {"name":"file_read_all_text","order":3,"path":"scripts/file_read_all_text/file_read_all_text.yy",},
-
     {"name":"font_get_msdf_enabled","order":2,"path":"scripts/font_get_msdf_enabled/font_get_msdf_enabled.yy",},
-
     {"name":"GUICompDropdown","order":3,"path":"scripts/GUICompDropdown/GUICompDropdown.yy",},
-
     {"name":"GUICompFolder","order":4,"path":"scripts/GUICompFolder/GUICompFolder.yy",},
-
     {"name":"GUICompHandler","order":5,"path":"scripts/GUICompHandler/GUICompHandler.yy",},
-
     {"name":"GUICompRadioMenu","order":6,"path":"scripts/GUICompRadioMenu/GUICompRadioMenu.yy",},
-
     {"name":"GUICompRegion","order":7,"path":"scripts/GUICompRegion/GUICompRegion.yy",},
-
     {"name":"GUICompTextBox","order":8,"path":"scripts/GUICompTextBox/GUICompTextBox.yy",},
-
     {"name":"LookoutView02Instances","order":1,"path":"scripts/LookoutView02Instances/LookoutView02Instances.yy",},
-
     {"name":"LookoutView03Display","order":2,"path":"scripts/LookoutView03Display/LookoutView03Display.yy",},
-
     {"name":"LookoutView04Rooms","order":3,"path":"scripts/LookoutView04Rooms/LookoutView04Rooms.yy",},
-
     {"name":"LookoutView05AudioEffects","order":4,"path":"scripts/LookoutView05AudioEffects/LookoutView05AudioEffects.yy",},
-
     {"name":"MsdfUpdateFonts","order":1,"path":"scripts/MsdfUpdateFonts/MsdfUpdateFonts.yy",},
-
     {"name":"regex__is_word_byte","order":1,"path":"scripts/regex__is_word_byte/regex__is_word_byte.yy",},
-
     {"name":"regex__pattern_finditer","order":1,"path":"scripts/regex__pattern_finditer/regex__pattern_finditer.yy",},
-
     {"name":"regex__pattern_match","order":2,"path":"scripts/regex__pattern_match/regex__pattern_match.yy",},
-
     {"name":"regex__pattern_search","order":3,"path":"scripts/regex__pattern_search/regex__pattern_search.yy",},
-
     {"name":"regex__pattern_sub","order":4,"path":"scripts/regex__pattern_sub/regex__pattern_sub.yy",},
-
     {"name":"regex_addstate","order":2,"path":"scripts/regex_addstate/regex_addstate.yy",},
-
     {"name":"regex_build_program","order":4,"path":"scripts/regex_build_program/regex_build_program.yy",},
-
     {"name":"regex_class","order":3,"path":"scripts/regex_class/regex_class.yy",},
-
     {"name":"regex_exec_advanced_unit_tests","order":1,"path":"scripts/regex_exec_advanced_unit_tests/regex_exec_advanced_unit_tests.yy",},
-
     {"name":"regex_exec_unit_tests","order":2,"path":"scripts/regex_exec_unit_tests/regex_exec_unit_tests.yy",},
-
     {"name":"regex_hljs_gml__build_rules","order":1,"path":"scripts/regex_hljs_gml__build_rules/regex_hljs_gml__build_rules.yy",},
-
     {"name":"regex_hljs_gml__dict","order":2,"path":"scripts/regex_hljs_gml__dict/regex_hljs_gml__dict.yy",},
-
     {"name":"regex_hljs_gml__postprocess_structured_spans","order":4,"path":"scripts/regex_hljs_gml__postprocess_structured_spans/regex_hljs_gml__postprocess_structured_spans.yy",},
-
     {"name":"regex_hljs_gml_highlight","order":3,"path":"scripts/regex_hljs_gml_highlight/regex_hljs_gml_highlight.yy",},
-
     {"name":"regex_input","order":4,"path":"scripts/regex_input/regex_input.yy",},
-
     {"name":"regex_pattern","order":3,"path":"scripts/regex_pattern/regex_pattern.yy",},
-
     {"name":"regex_run_from","order":5,"path":"scripts/regex_run_from/regex_run_from.yy",},
-
     {"name":"regex_tokenizing_helpers","order":6,"path":"scripts/regex_tokenizing_helpers/regex_tokenizing_helpers.yy",},
-
     {"name":"regex","order":2,"path":"scripts/regex/regex.yy",},
-
     {"name":"Script9","order":4,"path":"scripts/Script9/Script9.yy",},
-
     {"name":"Settings","order":2,"path":"scripts/Settings/Settings.yy",},
-
     {"name":"SnapBufferWriteXML","order":1,"path":"scripts/SnapBufferWriteXML/SnapBufferWriteXML.yy",},
-
     {"name":"SnapFromXML","order":2,"path":"scripts/SnapFromXML/SnapFromXML.yy",},
-
     {"name":"SnapToXML","order":3,"path":"scripts/SnapToXML/SnapToXML.yy",},
-
     {"name":"Super","order":1,"path":"scripts/Super/Super.yy",},
-
     {"name":"WW___ScrollRegion","order":14,"path":"scripts/WW___ScrollRegion/WW___ScrollRegion.yy",},
-
     {"name":"WWButton","order":2,"path":"scripts/WWButton/WWButton.yy",},
-
     {"name":"WWButtonText","order":1,"path":"scripts/WWButtonText/WWButtonText.yy",},
-
     {"name":"WWButtonTextScribble","order":13,"path":"scripts/WWButtonTextScribble/WWButtonTextScribble.yy",},
-
     {"name":"WWColorInput","order":19,"path":"scripts/WWColorInput/WWColorInput.yy",},
-
     {"name":"WWColorPicker","order":20,"path":"scripts/WWColorPicker/WWColorPicker.yy",},
-
     {"name":"WWCore","order":7,"path":"scripts/WWCore/WWCore.yy",},
-
     {"name":"WWDivider","order":2,"path":"scripts/WWDivider/WWDivider.yy",},
-
     {"name":"WWFolder","order":8,"path":"scripts/WWFolder/WWFolder.yy",},
-
     {"name":"WWIcon","order":3,"path":"scripts/WWIcon/WWIcon.yy",},
-
     {"name":"WWInputInt","order":17,"path":"scripts/WWInputInt/WWInputInt.yy",},
-
     {"name":"WWInputNumberBase","order":16,"path":"scripts/WWInputNumberBase/WWInputNumberBase.yy",},
-
     {"name":"WWInputReal","order":18,"path":"scripts/WWInputReal/WWInputReal.yy",},
-
     {"name":"WWInputString","order":15,"path":"scripts/WWInputString/WWInputString.yy",},
-
     {"name":"WWLabelScrolling","order":1,"path":"scripts/WWLabelScrolling/WWLabelScrolling.yy",},
-
     {"name":"WWMaterial","order":2,"path":"scripts/WWMaterial/WWMaterial.yy",},
-
     {"name":"WWNumInputFloat","order":12,"path":"scripts/WWNumInputFloat/WWNumInputFloat.yy",},
-
     {"name":"WWNumInputInt","order":13,"path":"scripts/WWNumInputInt/WWNumInputInt.yy",},
-
     {"name":"WWNumInputUInt","order":14,"path":"scripts/WWNumInputUInt/WWNumInputUInt.yy",},
-
     {"name":"WWPanel","order":1,"path":"scripts/WWPanel/WWPanel.yy",},
-
     {"name":"WWProgressBar","order":2,"path":"scripts/WWProgressBar/WWProgressBar.yy",},
-
     {"name":"WWProgressBarVert","order":1,"path":"scripts/WWProgressBarVert/WWProgressBarVert.yy",},
-
     {"name":"WWScrollbar","order":3,"path":"scripts/WWScrollbar/WWScrollbar.yy",},
-
     {"name":"WWScrollbarButtons","order":7,"path":"scripts/WWScrollbarButtons/WWScrollbarButtons.yy",},
-
     {"name":"WWScrollBarVert","order":2,"path":"scripts/WWScrollBarVert/WWScrollBarVert.yy",},
-
     {"name":"WWSliderBase","order":6,"path":"scripts/WWSliderBase/WWSliderBase.yy",},
-
     {"name":"WWSliderHorz","order":2,"path":"scripts/WWSliderHorz/WWSliderHorz.yy",},
-
     {"name":"WWSliderHorzThumb","order":4,"path":"scripts/WWSliderHorzThumb/WWSliderHorzThumb.yy",},
-
     {"name":"WWSliderVert","order":3,"path":"scripts/WWSliderVert/WWSliderVert.yy",},
-
     {"name":"WWSliderVertThumb","order":5,"path":"scripts/WWSliderVertThumb/WWSliderVertThumb.yy",},
-
     {"name":"WWSprite","order":8,"path":"scripts/WWSprite/WWSprite.yy",},
-
     {"name":"WWTextBase","order":12,"path":"scripts/WWTextBase/WWTextBase.yy",},
-
     {"name":"WWTextInput","order":8,"path":"scripts/WWTextInput/WWTextInput.yy",},
-
     {"name":"WWTextInputMultiLine","order":10,"path":"scripts/WWTextInputMultiLine/WWTextInputMultiLine.yy",},
-
     {"name":"WWTextInputPassword","order":11,"path":"scripts/WWTextInputPassword/WWTextInputPassword.yy",},
-
     {"name":"WWTextInputSingleLine","order":9,"path":"scripts/WWTextInputSingleLine/WWTextInputSingleLine.yy",},
-
     {"name":"WWTextProcessorBBCode","order":1,"path":"scripts/WWTextProcessorBBCode/WWTextProcessorBBCode.yy",},
-
     {"name":"WWTextProcessorCSS","order":2,"path":"scripts/WWTextProcessorCSS/WWTextProcessorCSS.yy",},
-
     {"name":"WWTextProcessorMarkdown","order":3,"path":"scripts/WWTextProcessorMarkdown/WWTextProcessorMarkdown.yy",},
-
     {"name":"WWTextRenderer","order":3,"path":"scripts/WWTextRenderer/WWTextRenderer.yy",},
-
     {"name":"WWTextRendererAdvanced","order":10,"path":"scripts/WWTextRendererAdvanced/WWTextRendererAdvanced.yy",},
-
     {"name":"WWTextRendererCore","order":11,"path":"scripts/WWTextRendererCore/WWTextRendererCore.yy",},
-
     {"name":"WWTextRendererHelpers","order":4,"path":"scripts/WWTextRendererHelpers/WWTextRendererHelpers.yy",},
-
     {"name":"WWToast","order":5,"path":"scripts/WWToast/WWToast.yy",},
-
     {"name":"WWTooltip","order":6,"path":"scripts/WWTooltip/WWTooltip.yy",},
-
     {"name":"WWView","order":1,"path":"scripts/WWView/WWView.yy",},
-
     {"name":"WWViewScroll","order":4,"path":"scripts/WWViewScroll/WWViewScroll.yy",},
-
     {"name":"WWViewScrollAutoHorz","order":2,"path":"scripts/WWViewScrollAutoHorz/WWViewScrollAutoHorz.yy",},
-
     {"name":"WWViewScrollAutoVert","order":3,"path":"scripts/WWViewScrollAutoVert/WWViewScrollAutoVert.yy",},
-
     {"name":"WWViewScrollRegion","order":5,"path":"scripts/WWViewScrollRegion/WWViewScrollRegion.yy",},
-
     {"name":"__shdMsdf","order":6,"path":"shaders/__shdMsdf/__shdMsdf.yy",},
-
     {"name":"shd_ww_msdf","order":1,"path":"shaders/shd_ww_msdf/shd_ww_msdf.yy",},
-
     {"name":"__MsdfPixel","order":2,"path":"sprites/__MsdfPixel/__MsdfPixel.yy",},
-
     {"name":"s9CheckBoxUnchecked","order":1,"path":"sprites/s9CheckBoxUnchecked/s9CheckBoxUnchecked.yy",},
-
     {"name":"s9CPDropDown","order":1,"path":"sprites/s9CPDropDown/s9CPDropDown.yy",},
-
     {"name":"s9CPDropDownBottom","order":2,"path":"sprites/s9CPDropDownBottom/s9CPDropDownBottom.yy",},
-
     {"name":"s9CPDropDownMiddle","order":3,"path":"sprites/s9CPDropDownMiddle/s9CPDropDownMiddle.yy",},
-
     {"name":"s9CPDropDownTop","order":4,"path":"sprites/s9CPDropDownTop/s9CPDropDownTop.yy",},
-
     {"name":"s9CPFolderClosed","order":5,"path":"sprites/s9CPFolderClosed/s9CPFolderClosed.yy",},
-
     {"name":"s9CPFolderOpened","order":6,"path":"sprites/s9CPFolderOpened/s9CPFolderOpened.yy",},
-
     {"name":"s9CPPixel","order":7,"path":"sprites/s9CPPixel/s9CPPixel.yy",},
-
     {"name":"s9CPScrollbarHorzBackground","order":8,"path":"sprites/s9CPScrollbarHorzBackground/s9CPScrollbarHorzBackground.yy",},
-
     {"name":"s9CPScrollbarThumbHorz","order":9,"path":"sprites/s9CPScrollbarThumbHorz/s9CPScrollbarThumbHorz.yy",},
-
     {"name":"s9CPScrollbarThumbVert","order":10,"path":"sprites/s9CPScrollbarThumbVert/s9CPScrollbarThumbVert.yy",},
-
     {"name":"s9CPScrollbarVertBackground","order":11,"path":"sprites/s9CPScrollbarVertBackground/s9CPScrollbarVertBackground.yy",},
-
     {"name":"s9DropDownBottom","order":1,"path":"sprites/s9DropDownBottom/s9DropDownBottom.yy",},
-
     {"name":"s9DropDownMiddle","order":2,"path":"sprites/s9DropDownMiddle/s9DropDownMiddle.yy",},
-
     {"name":"s9DropDownTop","order":3,"path":"sprites/s9DropDownTop/s9DropDownTop.yy",},
-
     {"name":"s9ScrollbarHorzButtonLeft","order":1,"path":"sprites/s9ScrollbarHorzButtonLeft/s9ScrollbarHorzButtonLeft.yy",},
-
     {"name":"s9ScrollbarHorzButtonRight","order":2,"path":"sprites/s9ScrollbarHorzButtonRight/s9ScrollbarHorzButtonRight.yy",},
-
     {"name":"s9ScrollbarThumb","order":3,"path":"sprites/s9ScrollbarThumb/s9ScrollbarThumb.yy",},
-
     {"name":"s9ScrollbarVertButtonDown","order":1,"path":"sprites/s9ScrollbarVertButtonDown/s9ScrollbarVertButtonDown.yy",},
-
     {"name":"s9ScrollbarVertButtonUp","order":2,"path":"sprites/s9ScrollbarVertButtonUp/s9ScrollbarVertButtonUp.yy",},
-
     {"name":"s9SliderBar","order":1,"path":"sprites/s9SliderBar/s9SliderBar.yy",},
-
     {"name":"s9SliderThumb","order":2,"path":"sprites/s9SliderThumb/s9SliderThumb.yy",},
-
     {"name":"sButton","order":1,"path":"sprites/sButton/sButton.yy",},
-
     {"name":"sCPCheckboxChecked","order":12,"path":"sprites/sCPCheckboxChecked/sCPCheckboxChecked.yy",},
-
     {"name":"sCPCheckboxUnChecked","order":13,"path":"sprites/sCPCheckboxUnChecked/sCPCheckboxUnChecked.yy",},
-
     {"name":"sCPColorPallet","order":14,"path":"sprites/sCPColorPallet/sCPColorPallet.yy",},
-
     {"name":"sCPScrollbarHorzButtonLeft","order":15,"path":"sprites/sCPScrollbarHorzButtonLeft/sCPScrollbarHorzButtonLeft.yy",},
-
     {"name":"sCPScrollbarHorzButtonRight","order":16,"path":"sprites/sCPScrollbarHorzButtonRight/sCPScrollbarHorzButtonRight.yy",},
-
     {"name":"sCPScrollbarVertButtonDown","order":17,"path":"sprites/sCPScrollbarVertButtonDown/sCPScrollbarVertButtonDown.yy",},
-
     {"name":"sCPScrollbarVertButtonUp","order":18,"path":"sprites/sCPScrollbarVertButtonUp/sCPScrollbarVertButtonUp.yy",},
-
     {"name":"spr_ww_picker_radial_s128","order":161,"path":"sprites/spr_ww_picker_radial_s128/spr_ww_picker_radial_s128.yy",},
-
     {"name":"spr_ww_picker_radial_s256","order":162,"path":"sprites/spr_ww_picker_radial_s256/spr_ww_picker_radial_s256.yy",},
-
     {"name":"spr_ww_picker_radial_s32","order":159,"path":"sprites/spr_ww_picker_radial_s32/spr_ww_picker_radial_s32.yy",},
-
     {"name":"spr_ww_picker_radial_s512","order":163,"path":"sprites/spr_ww_picker_radial_s512/spr_ww_picker_radial_s512.yy",},
-
     {"name":"spr_ww_picker_radial_s64","order":160,"path":"sprites/spr_ww_picker_radial_s64/spr_ww_picker_radial_s64.yy",},
-
     {"name":"spr_ww_pixel","order":9,"path":"sprites/spr_ww_pixel/spr_ww_pixel.yy",},
-
     {"name":"spr_ww_ring_or16_t1","order":208,"path":"sprites/spr_ww_ring_or16_t1/spr_ww_ring_or16_t1.yy",},
-
     {"name":"spr_ww_ring_or16_t2","order":209,"path":"sprites/spr_ww_ring_or16_t2/spr_ww_ring_or16_t2.yy",},
-
     {"name":"spr_ww_ring_or16_t4","order":210,"path":"sprites/spr_ww_ring_or16_t4/spr_ww_ring_or16_t4.yy",},
-
     {"name":"spr_ww_ring_or16_t8","order":211,"path":"sprites/spr_ww_ring_or16_t8/spr_ww_ring_or16_t8.yy",},
-
     {"name":"spr_ww_ring_or32_t1","order":212,"path":"sprites/spr_ww_ring_or32_t1/spr_ww_ring_or32_t1.yy",},
-
     {"name":"spr_ww_ring_or32_t2","order":213,"path":"sprites/spr_ww_ring_or32_t2/spr_ww_ring_or32_t2.yy",},
-
     {"name":"spr_ww_ring_or32_t4","order":214,"path":"sprites/spr_ww_ring_or32_t4/spr_ww_ring_or32_t4.yy",},
-
     {"name":"spr_ww_ring_or32_t8","order":215,"path":"sprites/spr_ww_ring_or32_t8/spr_ww_ring_or32_t8.yy",},
-
     {"name":"spr_ww_ring_or64_t1","order":216,"path":"sprites/spr_ww_ring_or64_t1/spr_ww_ring_or64_t1.yy",},
-
     {"name":"spr_ww_ring_or64_t2","order":217,"path":"sprites/spr_ww_ring_or64_t2/spr_ww_ring_or64_t2.yy",},
-
     {"name":"spr_ww_ring_or64_t4","order":218,"path":"sprites/spr_ww_ring_or64_t4/spr_ww_ring_or64_t4.yy",},
-
     {"name":"spr_ww_ring_or64_t8","order":219,"path":"sprites/spr_ww_ring_or64_t8/spr_ww_ring_or64_t8.yy",},
-
     {"name":"spr_ww_ring_or8_t1","order":204,"path":"sprites/spr_ww_ring_or8_t1/spr_ww_ring_or8_t1.yy",},
-
     {"name":"spr_ww_ring_or8_t2","order":205,"path":"sprites/spr_ww_ring_or8_t2/spr_ww_ring_or8_t2.yy",},
-
     {"name":"spr_ww_ring_or8_t4","order":206,"path":"sprites/spr_ww_ring_or8_t4/spr_ww_ring_or8_t4.yy",},
-
     {"name":"spr_ww_ring_or8_t8","order":207,"path":"sprites/spr_ww_ring_or8_t8/spr_ww_ring_or8_t8.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r16_all","order":95,"path":"sprites/spr_ww_rr9_border_t1_r16_all/spr_ww_rr9_border_t1_r16_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r16_bottom","order":99,"path":"sprites/spr_ww_rr9_border_t1_r16_bottom/spr_ww_rr9_border_t1_r16_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r16_left","order":97,"path":"sprites/spr_ww_rr9_border_t1_r16_left/spr_ww_rr9_border_t1_r16_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r16_right","order":96,"path":"sprites/spr_ww_rr9_border_t1_r16_right/spr_ww_rr9_border_t1_r16_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r16_top","order":98,"path":"sprites/spr_ww_rr9_border_t1_r16_top/spr_ww_rr9_border_t1_r16_top.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r2_all","order":26,"path":"sprites/spr_ww_rr9_border_t1_r2_all/spr_ww_rr9_border_t1_r2_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r2_bottom","order":30,"path":"sprites/spr_ww_rr9_border_t1_r2_bottom/spr_ww_rr9_border_t1_r2_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r2_left","order":28,"path":"sprites/spr_ww_rr9_border_t1_r2_left/spr_ww_rr9_border_t1_r2_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r2_right","order":27,"path":"sprites/spr_ww_rr9_border_t1_r2_right/spr_ww_rr9_border_t1_r2_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r2_top","order":29,"path":"sprites/spr_ww_rr9_border_t1_r2_top/spr_ww_rr9_border_t1_r2_top.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r32_all","order":118,"path":"sprites/spr_ww_rr9_border_t1_r32_all/spr_ww_rr9_border_t1_r32_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r32_bottom","order":122,"path":"sprites/spr_ww_rr9_border_t1_r32_bottom/spr_ww_rr9_border_t1_r32_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r32_left","order":120,"path":"sprites/spr_ww_rr9_border_t1_r32_left/spr_ww_rr9_border_t1_r32_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r32_right","order":119,"path":"sprites/spr_ww_rr9_border_t1_r32_right/spr_ww_rr9_border_t1_r32_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r32_top","order":121,"path":"sprites/spr_ww_rr9_border_t1_r32_top/spr_ww_rr9_border_t1_r32_top.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r4_all","order":49,"path":"sprites/spr_ww_rr9_border_t1_r4_all/spr_ww_rr9_border_t1_r4_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r4_bottom","order":53,"path":"sprites/spr_ww_rr9_border_t1_r4_bottom/spr_ww_rr9_border_t1_r4_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r4_left","order":51,"path":"sprites/spr_ww_rr9_border_t1_r4_left/spr_ww_rr9_border_t1_r4_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r4_right","order":50,"path":"sprites/spr_ww_rr9_border_t1_r4_right/spr_ww_rr9_border_t1_r4_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r4_top","order":52,"path":"sprites/spr_ww_rr9_border_t1_r4_top/spr_ww_rr9_border_t1_r4_top.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r64_all","order":141,"path":"sprites/spr_ww_rr9_border_t1_r64_all/spr_ww_rr9_border_t1_r64_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r64_bottom","order":145,"path":"sprites/spr_ww_rr9_border_t1_r64_bottom/spr_ww_rr9_border_t1_r64_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r64_left","order":143,"path":"sprites/spr_ww_rr9_border_t1_r64_left/spr_ww_rr9_border_t1_r64_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r64_right","order":142,"path":"sprites/spr_ww_rr9_border_t1_r64_right/spr_ww_rr9_border_t1_r64_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r64_top","order":144,"path":"sprites/spr_ww_rr9_border_t1_r64_top/spr_ww_rr9_border_t1_r64_top.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r8_all","order":72,"path":"sprites/spr_ww_rr9_border_t1_r8_all/spr_ww_rr9_border_t1_r8_all.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r8_bottom","order":76,"path":"sprites/spr_ww_rr9_border_t1_r8_bottom/spr_ww_rr9_border_t1_r8_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r8_left","order":74,"path":"sprites/spr_ww_rr9_border_t1_r8_left/spr_ww_rr9_border_t1_r8_left.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r8_right","order":73,"path":"sprites/spr_ww_rr9_border_t1_r8_right/spr_ww_rr9_border_t1_r8_right.yy",},
-
     {"name":"spr_ww_rr9_border_t1_r8_top","order":75,"path":"sprites/spr_ww_rr9_border_t1_r8_top/spr_ww_rr9_border_t1_r8_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r16_all","order":100,"path":"sprites/spr_ww_rr9_border_t2_r16_all/spr_ww_rr9_border_t2_r16_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r16_bottom","order":104,"path":"sprites/spr_ww_rr9_border_t2_r16_bottom/spr_ww_rr9_border_t2_r16_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r16_left","order":102,"path":"sprites/spr_ww_rr9_border_t2_r16_left/spr_ww_rr9_border_t2_r16_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r16_right","order":101,"path":"sprites/spr_ww_rr9_border_t2_r16_right/spr_ww_rr9_border_t2_r16_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r16_top","order":103,"path":"sprites/spr_ww_rr9_border_t2_r16_top/spr_ww_rr9_border_t2_r16_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r2_all","order":31,"path":"sprites/spr_ww_rr9_border_t2_r2_all/spr_ww_rr9_border_t2_r2_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r2_bottom","order":35,"path":"sprites/spr_ww_rr9_border_t2_r2_bottom/spr_ww_rr9_border_t2_r2_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r2_left","order":33,"path":"sprites/spr_ww_rr9_border_t2_r2_left/spr_ww_rr9_border_t2_r2_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r2_right","order":32,"path":"sprites/spr_ww_rr9_border_t2_r2_right/spr_ww_rr9_border_t2_r2_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r2_top","order":34,"path":"sprites/spr_ww_rr9_border_t2_r2_top/spr_ww_rr9_border_t2_r2_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r32_all","order":123,"path":"sprites/spr_ww_rr9_border_t2_r32_all/spr_ww_rr9_border_t2_r32_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r32_bottom","order":127,"path":"sprites/spr_ww_rr9_border_t2_r32_bottom/spr_ww_rr9_border_t2_r32_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r32_left","order":125,"path":"sprites/spr_ww_rr9_border_t2_r32_left/spr_ww_rr9_border_t2_r32_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r32_right","order":124,"path":"sprites/spr_ww_rr9_border_t2_r32_right/spr_ww_rr9_border_t2_r32_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r32_top","order":126,"path":"sprites/spr_ww_rr9_border_t2_r32_top/spr_ww_rr9_border_t2_r32_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r4_all","order":54,"path":"sprites/spr_ww_rr9_border_t2_r4_all/spr_ww_rr9_border_t2_r4_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r4_bottom","order":58,"path":"sprites/spr_ww_rr9_border_t2_r4_bottom/spr_ww_rr9_border_t2_r4_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r4_left","order":56,"path":"sprites/spr_ww_rr9_border_t2_r4_left/spr_ww_rr9_border_t2_r4_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r4_right","order":55,"path":"sprites/spr_ww_rr9_border_t2_r4_right/spr_ww_rr9_border_t2_r4_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r4_top","order":57,"path":"sprites/spr_ww_rr9_border_t2_r4_top/spr_ww_rr9_border_t2_r4_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r64_all","order":146,"path":"sprites/spr_ww_rr9_border_t2_r64_all/spr_ww_rr9_border_t2_r64_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r64_bottom","order":150,"path":"sprites/spr_ww_rr9_border_t2_r64_bottom/spr_ww_rr9_border_t2_r64_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r64_left","order":148,"path":"sprites/spr_ww_rr9_border_t2_r64_left/spr_ww_rr9_border_t2_r64_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r64_right","order":147,"path":"sprites/spr_ww_rr9_border_t2_r64_right/spr_ww_rr9_border_t2_r64_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r64_top","order":149,"path":"sprites/spr_ww_rr9_border_t2_r64_top/spr_ww_rr9_border_t2_r64_top.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r8_all","order":77,"path":"sprites/spr_ww_rr9_border_t2_r8_all/spr_ww_rr9_border_t2_r8_all.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r8_bottom","order":81,"path":"sprites/spr_ww_rr9_border_t2_r8_bottom/spr_ww_rr9_border_t2_r8_bottom.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r8_left","order":79,"path":"sprites/spr_ww_rr9_border_t2_r8_left/spr_ww_rr9_border_t2_r8_left.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r8_right","order":78,"path":"sprites/spr_ww_rr9_border_t2_r8_right/spr_ww_rr9_border_t2_r8_right.yy",},
-
     {"name":"spr_ww_rr9_border_t2_r8_top","order":80,"path":"sprites/spr_ww_rr9_border_t2_r8_top/spr_ww_rr9_border_t2_r8_top.yy",},
-
     {"name":"spr_ww_rr9_r16_all","order":90,"path":"sprites/spr_ww_rr9_r16_all/spr_ww_rr9_r16_all.yy",},
-
     {"name":"spr_ww_rr9_r16_bottom","order":94,"path":"sprites/spr_ww_rr9_r16_bottom/spr_ww_rr9_r16_bottom.yy",},
-
     {"name":"spr_ww_rr9_r16_left","order":92,"path":"sprites/spr_ww_rr9_r16_left/spr_ww_rr9_r16_left.yy",},
-
     {"name":"spr_ww_rr9_r16_right","order":91,"path":"sprites/spr_ww_rr9_r16_right/spr_ww_rr9_r16_right.yy",},
-
     {"name":"spr_ww_rr9_r16_top","order":93,"path":"sprites/spr_ww_rr9_r16_top/spr_ww_rr9_r16_top.yy",},
-
     {"name":"spr_ww_rr9_r2_all","order":21,"path":"sprites/spr_ww_rr9_r2_all/spr_ww_rr9_r2_all.yy",},
-
     {"name":"spr_ww_rr9_r2_bottom","order":25,"path":"sprites/spr_ww_rr9_r2_bottom/spr_ww_rr9_r2_bottom.yy",},
-
     {"name":"spr_ww_rr9_r2_left","order":23,"path":"sprites/spr_ww_rr9_r2_left/spr_ww_rr9_r2_left.yy",},
-
     {"name":"spr_ww_rr9_r2_right","order":22,"path":"sprites/spr_ww_rr9_r2_right/spr_ww_rr9_r2_right.yy",},
-
     {"name":"spr_ww_rr9_r2_top","order":24,"path":"sprites/spr_ww_rr9_r2_top/spr_ww_rr9_r2_top.yy",},
-
     {"name":"spr_ww_rr9_r32_all","order":113,"path":"sprites/spr_ww_rr9_r32_all/spr_ww_rr9_r32_all.yy",},
-
     {"name":"spr_ww_rr9_r32_bottom","order":117,"path":"sprites/spr_ww_rr9_r32_bottom/spr_ww_rr9_r32_bottom.yy",},
-
     {"name":"spr_ww_rr9_r32_left","order":115,"path":"sprites/spr_ww_rr9_r32_left/spr_ww_rr9_r32_left.yy",},
-
     {"name":"spr_ww_rr9_r32_right","order":114,"path":"sprites/spr_ww_rr9_r32_right/spr_ww_rr9_r32_right.yy",},
-
     {"name":"spr_ww_rr9_r32_top","order":116,"path":"sprites/spr_ww_rr9_r32_top/spr_ww_rr9_r32_top.yy",},
-
     {"name":"spr_ww_rr9_r4_all","order":44,"path":"sprites/spr_ww_rr9_r4_all/spr_ww_rr9_r4_all.yy",},
-
     {"name":"spr_ww_rr9_r4_bottom","order":48,"path":"sprites/spr_ww_rr9_r4_bottom/spr_ww_rr9_r4_bottom.yy",},
-
     {"name":"spr_ww_rr9_r4_left","order":46,"path":"sprites/spr_ww_rr9_r4_left/spr_ww_rr9_r4_left.yy",},
-
     {"name":"spr_ww_rr9_r4_right","order":45,"path":"sprites/spr_ww_rr9_r4_right/spr_ww_rr9_r4_right.yy",},
-
     {"name":"spr_ww_rr9_r4_top","order":47,"path":"sprites/spr_ww_rr9_r4_top/spr_ww_rr9_r4_top.yy",},
-
     {"name":"spr_ww_rr9_r64_all","order":136,"path":"sprites/spr_ww_rr9_r64_all/spr_ww_rr9_r64_all.yy",},
-
     {"name":"spr_ww_rr9_r64_bottom","order":140,"path":"sprites/spr_ww_rr9_r64_bottom/spr_ww_rr9_r64_bottom.yy",},
-
     {"name":"spr_ww_rr9_r64_left","order":138,"path":"sprites/spr_ww_rr9_r64_left/spr_ww_rr9_r64_left.yy",},
-
     {"name":"spr_ww_rr9_r64_right","order":137,"path":"sprites/spr_ww_rr9_r64_right/spr_ww_rr9_r64_right.yy",},
-
     {"name":"spr_ww_rr9_r64_top","order":139,"path":"sprites/spr_ww_rr9_r64_top/spr_ww_rr9_r64_top.yy",},
-
     {"name":"spr_ww_rr9_r8_all","order":67,"path":"sprites/spr_ww_rr9_r8_all/spr_ww_rr9_r8_all.yy",},
-
     {"name":"spr_ww_rr9_r8_bottom","order":71,"path":"sprites/spr_ww_rr9_r8_bottom/spr_ww_rr9_r8_bottom.yy",},
-
     {"name":"spr_ww_rr9_r8_left","order":69,"path":"sprites/spr_ww_rr9_r8_left/spr_ww_rr9_r8_left.yy",},
-
     {"name":"spr_ww_rr9_r8_right","order":68,"path":"sprites/spr_ww_rr9_r8_right/spr_ww_rr9_r8_right.yy",},
-
     {"name":"spr_ww_rr9_r8_top","order":70,"path":"sprites/spr_ww_rr9_r8_top/spr_ww_rr9_r8_top.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r16","order":110,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r16/spr_ww_rr9_tab_bottom_a15_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r2","order":41,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r2/spr_ww_rr9_tab_bottom_a15_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r32","order":133,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r32/spr_ww_rr9_tab_bottom_a15_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r4","order":64,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r4/spr_ww_rr9_tab_bottom_a15_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r64","order":156,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r64/spr_ww_rr9_tab_bottom_a15_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a15_r8","order":87,"path":"sprites/spr_ww_rr9_tab_bottom_a15_r8/spr_ww_rr9_tab_bottom_a15_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r16","order":106,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r16/spr_ww_rr9_tab_bottom_a7p50_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r2","order":37,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r2/spr_ww_rr9_tab_bottom_a7p50_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r32","order":129,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r32/spr_ww_rr9_tab_bottom_a7p50_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r4","order":60,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r4/spr_ww_rr9_tab_bottom_a7p50_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r64","order":152,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r64/spr_ww_rr9_tab_bottom_a7p50_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_bottom_a7p50_r8","order":83,"path":"sprites/spr_ww_rr9_tab_bottom_a7p50_r8/spr_ww_rr9_tab_bottom_a7p50_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r16","order":111,"path":"sprites/spr_ww_rr9_tab_left_a15_r16/spr_ww_rr9_tab_left_a15_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r2","order":42,"path":"sprites/spr_ww_rr9_tab_left_a15_r2/spr_ww_rr9_tab_left_a15_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r32","order":134,"path":"sprites/spr_ww_rr9_tab_left_a15_r32/spr_ww_rr9_tab_left_a15_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r4","order":65,"path":"sprites/spr_ww_rr9_tab_left_a15_r4/spr_ww_rr9_tab_left_a15_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r64","order":157,"path":"sprites/spr_ww_rr9_tab_left_a15_r64/spr_ww_rr9_tab_left_a15_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a15_r8","order":88,"path":"sprites/spr_ww_rr9_tab_left_a15_r8/spr_ww_rr9_tab_left_a15_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r16","order":107,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r16/spr_ww_rr9_tab_left_a7p50_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r2","order":38,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r2/spr_ww_rr9_tab_left_a7p50_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r32","order":130,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r32/spr_ww_rr9_tab_left_a7p50_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r4","order":61,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r4/spr_ww_rr9_tab_left_a7p50_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r64","order":153,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r64/spr_ww_rr9_tab_left_a7p50_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_left_a7p50_r8","order":84,"path":"sprites/spr_ww_rr9_tab_left_a7p50_r8/spr_ww_rr9_tab_left_a7p50_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r16","order":112,"path":"sprites/spr_ww_rr9_tab_right_a15_r16/spr_ww_rr9_tab_right_a15_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r2","order":43,"path":"sprites/spr_ww_rr9_tab_right_a15_r2/spr_ww_rr9_tab_right_a15_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r32","order":135,"path":"sprites/spr_ww_rr9_tab_right_a15_r32/spr_ww_rr9_tab_right_a15_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r4","order":66,"path":"sprites/spr_ww_rr9_tab_right_a15_r4/spr_ww_rr9_tab_right_a15_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r64","order":158,"path":"sprites/spr_ww_rr9_tab_right_a15_r64/spr_ww_rr9_tab_right_a15_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a15_r8","order":89,"path":"sprites/spr_ww_rr9_tab_right_a15_r8/spr_ww_rr9_tab_right_a15_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r16","order":108,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r16/spr_ww_rr9_tab_right_a7p50_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r2","order":39,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r2/spr_ww_rr9_tab_right_a7p50_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r32","order":131,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r32/spr_ww_rr9_tab_right_a7p50_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r4","order":62,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r4/spr_ww_rr9_tab_right_a7p50_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r64","order":154,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r64/spr_ww_rr9_tab_right_a7p50_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_right_a7p50_r8","order":85,"path":"sprites/spr_ww_rr9_tab_right_a7p50_r8/spr_ww_rr9_tab_right_a7p50_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r16","order":109,"path":"sprites/spr_ww_rr9_tab_top_a15_r16/spr_ww_rr9_tab_top_a15_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r2","order":40,"path":"sprites/spr_ww_rr9_tab_top_a15_r2/spr_ww_rr9_tab_top_a15_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r32","order":132,"path":"sprites/spr_ww_rr9_tab_top_a15_r32/spr_ww_rr9_tab_top_a15_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r4","order":63,"path":"sprites/spr_ww_rr9_tab_top_a15_r4/spr_ww_rr9_tab_top_a15_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r64","order":155,"path":"sprites/spr_ww_rr9_tab_top_a15_r64/spr_ww_rr9_tab_top_a15_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a15_r8","order":86,"path":"sprites/spr_ww_rr9_tab_top_a15_r8/spr_ww_rr9_tab_top_a15_r8.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r16","order":105,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r16/spr_ww_rr9_tab_top_a7p50_r16.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r2","order":36,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r2/spr_ww_rr9_tab_top_a7p50_r2.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r32","order":128,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r32/spr_ww_rr9_tab_top_a7p50_r32.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r4","order":59,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r4/spr_ww_rr9_tab_top_a7p50_r4.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r64","order":151,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r64/spr_ww_rr9_tab_top_a7p50_r64.yy",},
-
     {"name":"spr_ww_rr9_tab_top_a7p50_r8","order":82,"path":"sprites/spr_ww_rr9_tab_top_a7p50_r8/spr_ww_rr9_tab_top_a7p50_r8.yy",},
-
     {"name":"spr_ww_tri_down_round2_s12","order":175,"path":"sprites/spr_ww_tri_down_round2_s12/spr_ww_tri_down_round2_s12.yy",},
-
     {"name":"spr_ww_tri_down_round2_s8","order":167,"path":"sprites/spr_ww_tri_down_round2_s8/spr_ww_tri_down_round2_s8.yy",},
-
     {"name":"spr_ww_tri_down_round3_s16","order":183,"path":"sprites/spr_ww_tri_down_round3_s16/spr_ww_tri_down_round3_s16.yy",},
-
     {"name":"spr_ww_tri_down_round4_s24","order":191,"path":"sprites/spr_ww_tri_down_round4_s24/spr_ww_tri_down_round4_s24.yy",},
-
     {"name":"spr_ww_tri_down_round6_s32","order":199,"path":"sprites/spr_ww_tri_down_round6_s32/spr_ww_tri_down_round6_s32.yy",},
-
     {"name":"spr_ww_tri_down_sharp_s12","order":174,"path":"sprites/spr_ww_tri_down_sharp_s12/spr_ww_tri_down_sharp_s12.yy",},
-
     {"name":"spr_ww_tri_down_sharp_s16","order":182,"path":"sprites/spr_ww_tri_down_sharp_s16/spr_ww_tri_down_sharp_s16.yy",},
-
     {"name":"spr_ww_tri_down_sharp_s24","order":190,"path":"sprites/spr_ww_tri_down_sharp_s24/spr_ww_tri_down_sharp_s24.yy",},
-
     {"name":"spr_ww_tri_down_sharp_s32","order":198,"path":"sprites/spr_ww_tri_down_sharp_s32/spr_ww_tri_down_sharp_s32.yy",},
-
     {"name":"spr_ww_tri_down_sharp_s8","order":166,"path":"sprites/spr_ww_tri_down_sharp_s8/spr_ww_tri_down_sharp_s8.yy",},
-
     {"name":"spr_ww_tri_left_round2_s12","order":177,"path":"sprites/spr_ww_tri_left_round2_s12/spr_ww_tri_left_round2_s12.yy",},
-
     {"name":"spr_ww_tri_left_round2_s8","order":169,"path":"sprites/spr_ww_tri_left_round2_s8/spr_ww_tri_left_round2_s8.yy",},
-
     {"name":"spr_ww_tri_left_round3_s16","order":185,"path":"sprites/spr_ww_tri_left_round3_s16/spr_ww_tri_left_round3_s16.yy",},
-
     {"name":"spr_ww_tri_left_round4_s24","order":193,"path":"sprites/spr_ww_tri_left_round4_s24/spr_ww_tri_left_round4_s24.yy",},
-
     {"name":"spr_ww_tri_left_round6_s32","order":201,"path":"sprites/spr_ww_tri_left_round6_s32/spr_ww_tri_left_round6_s32.yy",},
-
     {"name":"spr_ww_tri_left_sharp_s12","order":176,"path":"sprites/spr_ww_tri_left_sharp_s12/spr_ww_tri_left_sharp_s12.yy",},
-
     {"name":"spr_ww_tri_left_sharp_s16","order":184,"path":"sprites/spr_ww_tri_left_sharp_s16/spr_ww_tri_left_sharp_s16.yy",},
-
     {"name":"spr_ww_tri_left_sharp_s24","order":192,"path":"sprites/spr_ww_tri_left_sharp_s24/spr_ww_tri_left_sharp_s24.yy",},
-
     {"name":"spr_ww_tri_left_sharp_s32","order":200,"path":"sprites/spr_ww_tri_left_sharp_s32/spr_ww_tri_left_sharp_s32.yy",},
-
     {"name":"spr_ww_tri_left_sharp_s8","order":168,"path":"sprites/spr_ww_tri_left_sharp_s8/spr_ww_tri_left_sharp_s8.yy",},
-
     {"name":"spr_ww_tri_right_round2_s12","order":179,"path":"sprites/spr_ww_tri_right_round2_s12/spr_ww_tri_right_round2_s12.yy",},
-
     {"name":"spr_ww_tri_right_round2_s8","order":171,"path":"sprites/spr_ww_tri_right_round2_s8/spr_ww_tri_right_round2_s8.yy",},
-
     {"name":"spr_ww_tri_right_round3_s16","order":187,"path":"sprites/spr_ww_tri_right_round3_s16/spr_ww_tri_right_round3_s16.yy",},
-
     {"name":"spr_ww_tri_right_round4_s24","order":195,"path":"sprites/spr_ww_tri_right_round4_s24/spr_ww_tri_right_round4_s24.yy",},
-
     {"name":"spr_ww_tri_right_round6_s32","order":203,"path":"sprites/spr_ww_tri_right_round6_s32/spr_ww_tri_right_round6_s32.yy",},
-
     {"name":"spr_ww_tri_right_sharp_s12","order":178,"path":"sprites/spr_ww_tri_right_sharp_s12/spr_ww_tri_right_sharp_s12.yy",},
-
     {"name":"spr_ww_tri_right_sharp_s16","order":186,"path":"sprites/spr_ww_tri_right_sharp_s16/spr_ww_tri_right_sharp_s16.yy",},
-
     {"name":"spr_ww_tri_right_sharp_s24","order":194,"path":"sprites/spr_ww_tri_right_sharp_s24/spr_ww_tri_right_sharp_s24.yy",},
-
     {"name":"spr_ww_tri_right_sharp_s32","order":202,"path":"sprites/spr_ww_tri_right_sharp_s32/spr_ww_tri_right_sharp_s32.yy",},
-
     {"name":"spr_ww_tri_right_sharp_s8","order":170,"path":"sprites/spr_ww_tri_right_sharp_s8/spr_ww_tri_right_sharp_s8.yy",},
-
     {"name":"spr_ww_tri_up_round2_s12","order":173,"path":"sprites/spr_ww_tri_up_round2_s12/spr_ww_tri_up_round2_s12.yy",},
-
     {"name":"spr_ww_tri_up_round2_s8","order":165,"path":"sprites/spr_ww_tri_up_round2_s8/spr_ww_tri_up_round2_s8.yy",},
-
     {"name":"spr_ww_tri_up_round3_s16","order":181,"path":"sprites/spr_ww_tri_up_round3_s16/spr_ww_tri_up_round3_s16.yy",},
-
     {"name":"spr_ww_tri_up_round4_s24","order":189,"path":"sprites/spr_ww_tri_up_round4_s24/spr_ww_tri_up_round4_s24.yy",},
-
     {"name":"spr_ww_tri_up_round6_s32","order":197,"path":"sprites/spr_ww_tri_up_round6_s32/spr_ww_tri_up_round6_s32.yy",},
-
     {"name":"spr_ww_tri_up_sharp_s12","order":172,"path":"sprites/spr_ww_tri_up_sharp_s12/spr_ww_tri_up_sharp_s12.yy",},
-
     {"name":"spr_ww_tri_up_sharp_s16","order":180,"path":"sprites/spr_ww_tri_up_sharp_s16/spr_ww_tri_up_sharp_s16.yy",},
-
     {"name":"spr_ww_tri_up_sharp_s24","order":188,"path":"sprites/spr_ww_tri_up_sharp_s24/spr_ww_tri_up_sharp_s24.yy",},
-
     {"name":"spr_ww_tri_up_sharp_s32","order":196,"path":"sprites/spr_ww_tri_up_sharp_s32/spr_ww_tri_up_sharp_s32.yy",},
-
     {"name":"spr_ww_tri_up_sharp_s8","order":164,"path":"sprites/spr_ww_tri_up_sharp_s8/spr_ww_tri_up_sharp_s8.yy",},
-
     {"name":"spr_ww_underline_error","order":1,"path":"sprites/spr_ww_underline_error/spr_ww_underline_error.yy",},
-
     {"name":"spr_ww_underline_warning","order":2,"path":"sprites/spr_ww_underline_warning/spr_ww_underline_warning.yy",},
-
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r2","order":220,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r2/spr_ww_rr9_tab_top_border_t1_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r2","order":221,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r2/spr_ww_rr9_tab_top_border_t2_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r2","order":222,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r2/spr_ww_rr9_tab_bottom_border_t1_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r2","order":223,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r2/spr_ww_rr9_tab_bottom_border_t2_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r2","order":224,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r2/spr_ww_rr9_tab_left_border_t1_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r2","order":225,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r2/spr_ww_rr9_tab_left_border_t2_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r2","order":226,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r2/spr_ww_rr9_tab_right_border_t1_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r2","order":227,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r2/spr_ww_rr9_tab_right_border_t2_a7p50_r2.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r2","order":228,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r2/spr_ww_rr9_tab_top_border_t1_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r2","order":229,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r2/spr_ww_rr9_tab_top_border_t2_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r2","order":230,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r2/spr_ww_rr9_tab_bottom_border_t1_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r2","order":231,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r2/spr_ww_rr9_tab_bottom_border_t2_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r2","order":232,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r2/spr_ww_rr9_tab_left_border_t1_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r2","order":233,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r2/spr_ww_rr9_tab_left_border_t2_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r2","order":234,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r2/spr_ww_rr9_tab_right_border_t1_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r2","order":235,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r2/spr_ww_rr9_tab_right_border_t2_a15_r2.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r4","order":236,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r4/spr_ww_rr9_tab_top_border_t1_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r4","order":237,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r4/spr_ww_rr9_tab_top_border_t2_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r4","order":238,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r4/spr_ww_rr9_tab_bottom_border_t1_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r4","order":239,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r4/spr_ww_rr9_tab_bottom_border_t2_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r4","order":240,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r4/spr_ww_rr9_tab_left_border_t1_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r4","order":241,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r4/spr_ww_rr9_tab_left_border_t2_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r4","order":242,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r4/spr_ww_rr9_tab_right_border_t1_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r4","order":243,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r4/spr_ww_rr9_tab_right_border_t2_a7p50_r4.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r4","order":244,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r4/spr_ww_rr9_tab_top_border_t1_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r4","order":245,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r4/spr_ww_rr9_tab_top_border_t2_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r4","order":246,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r4/spr_ww_rr9_tab_bottom_border_t1_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r4","order":247,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r4/spr_ww_rr9_tab_bottom_border_t2_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r4","order":248,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r4/spr_ww_rr9_tab_left_border_t1_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r4","order":249,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r4/spr_ww_rr9_tab_left_border_t2_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r4","order":250,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r4/spr_ww_rr9_tab_right_border_t1_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r4","order":251,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r4/spr_ww_rr9_tab_right_border_t2_a15_r4.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r8","order":252,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r8/spr_ww_rr9_tab_top_border_t1_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r8","order":253,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r8/spr_ww_rr9_tab_top_border_t2_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r8","order":254,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r8/spr_ww_rr9_tab_bottom_border_t1_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r8","order":255,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r8/spr_ww_rr9_tab_bottom_border_t2_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r8","order":256,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r8/spr_ww_rr9_tab_left_border_t1_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r8","order":257,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r8/spr_ww_rr9_tab_left_border_t2_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r8","order":258,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r8/spr_ww_rr9_tab_right_border_t1_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r8","order":259,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r8/spr_ww_rr9_tab_right_border_t2_a7p50_r8.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r8","order":260,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r8/spr_ww_rr9_tab_top_border_t1_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r8","order":261,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r8/spr_ww_rr9_tab_top_border_t2_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r8","order":262,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r8/spr_ww_rr9_tab_bottom_border_t1_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r8","order":263,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r8/spr_ww_rr9_tab_bottom_border_t2_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r8","order":264,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r8/spr_ww_rr9_tab_left_border_t1_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r8","order":265,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r8/spr_ww_rr9_tab_left_border_t2_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r8","order":266,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r8/spr_ww_rr9_tab_right_border_t1_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r8","order":267,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r8/spr_ww_rr9_tab_right_border_t2_a15_r8.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r16","order":268,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r16/spr_ww_rr9_tab_top_border_t1_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r16","order":269,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r16/spr_ww_rr9_tab_top_border_t2_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r16","order":270,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r16/spr_ww_rr9_tab_bottom_border_t1_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r16","order":271,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r16/spr_ww_rr9_tab_bottom_border_t2_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r16","order":272,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r16/spr_ww_rr9_tab_left_border_t1_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r16","order":273,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r16/spr_ww_rr9_tab_left_border_t2_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r16","order":274,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r16/spr_ww_rr9_tab_right_border_t1_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r16","order":275,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r16/spr_ww_rr9_tab_right_border_t2_a7p50_r16.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r16","order":276,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r16/spr_ww_rr9_tab_top_border_t1_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r16","order":277,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r16/spr_ww_rr9_tab_top_border_t2_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r16","order":278,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r16/spr_ww_rr9_tab_bottom_border_t1_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r16","order":279,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r16/spr_ww_rr9_tab_bottom_border_t2_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r16","order":280,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r16/spr_ww_rr9_tab_left_border_t1_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r16","order":281,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r16/spr_ww_rr9_tab_left_border_t2_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r16","order":282,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r16/spr_ww_rr9_tab_right_border_t1_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r16","order":283,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r16/spr_ww_rr9_tab_right_border_t2_a15_r16.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r32","order":284,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r32/spr_ww_rr9_tab_top_border_t1_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r32","order":285,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r32/spr_ww_rr9_tab_top_border_t2_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r32","order":286,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r32/spr_ww_rr9_tab_bottom_border_t1_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r32","order":287,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r32/spr_ww_rr9_tab_bottom_border_t2_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r32","order":288,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r32/spr_ww_rr9_tab_left_border_t1_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r32","order":289,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r32/spr_ww_rr9_tab_left_border_t2_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r32","order":290,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r32/spr_ww_rr9_tab_right_border_t1_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r32","order":291,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r32/spr_ww_rr9_tab_right_border_t2_a7p50_r32.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r32","order":292,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r32/spr_ww_rr9_tab_top_border_t1_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r32","order":293,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r32/spr_ww_rr9_tab_top_border_t2_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r32","order":294,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r32/spr_ww_rr9_tab_bottom_border_t1_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r32","order":295,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r32/spr_ww_rr9_tab_bottom_border_t2_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r32","order":296,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r32/spr_ww_rr9_tab_left_border_t1_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r32","order":297,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r32/spr_ww_rr9_tab_left_border_t2_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r32","order":298,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r32/spr_ww_rr9_tab_right_border_t1_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r32","order":299,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r32/spr_ww_rr9_tab_right_border_t2_a15_r32.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a7p50_r64","order":300,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a7p50_r64/spr_ww_rr9_tab_top_border_t1_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a7p50_r64","order":301,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a7p50_r64/spr_ww_rr9_tab_top_border_t2_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a7p50_r64","order":302,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a7p50_r64/spr_ww_rr9_tab_bottom_border_t1_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a7p50_r64","order":303,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a7p50_r64/spr_ww_rr9_tab_bottom_border_t2_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a7p50_r64","order":304,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a7p50_r64/spr_ww_rr9_tab_left_border_t1_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a7p50_r64","order":305,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a7p50_r64/spr_ww_rr9_tab_left_border_t2_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a7p50_r64","order":306,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a7p50_r64/spr_ww_rr9_tab_right_border_t1_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a7p50_r64","order":307,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a7p50_r64/spr_ww_rr9_tab_right_border_t2_a7p50_r64.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t1_a15_r64","order":308,"path":"sprites/spr_ww_rr9_tab_top_border_t1_a15_r64/spr_ww_rr9_tab_top_border_t1_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_top_border_t2_a15_r64","order":309,"path":"sprites/spr_ww_rr9_tab_top_border_t2_a15_r64/spr_ww_rr9_tab_top_border_t2_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t1_a15_r64","order":310,"path":"sprites/spr_ww_rr9_tab_bottom_border_t1_a15_r64/spr_ww_rr9_tab_bottom_border_t1_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_bottom_border_t2_a15_r64","order":311,"path":"sprites/spr_ww_rr9_tab_bottom_border_t2_a15_r64/spr_ww_rr9_tab_bottom_border_t2_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t1_a15_r64","order":312,"path":"sprites/spr_ww_rr9_tab_left_border_t1_a15_r64/spr_ww_rr9_tab_left_border_t1_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_left_border_t2_a15_r64","order":313,"path":"sprites/spr_ww_rr9_tab_left_border_t2_a15_r64/spr_ww_rr9_tab_left_border_t2_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t1_a15_r64","order":314,"path":"sprites/spr_ww_rr9_tab_right_border_t1_a15_r64/spr_ww_rr9_tab_right_border_t1_a15_r64.yy",},
+    {"name":"spr_ww_rr9_tab_right_border_t2_a15_r64","order":315,"path":"sprites/spr_ww_rr9_tab_right_border_t2_a15_r64/spr_ww_rr9_tab_right_border_t2_a15_r64.yy",},
   ],
-
 }

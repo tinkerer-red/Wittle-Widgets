@@ -142,7 +142,7 @@ function WWLabelScribbleScrolling() : WWLabelScrolling() constructor {
 			/// @func    set_scribble()
 			/// @desc    Sets the scribble instance used to render text.
 			/// @self    WWLabelScribbleScrolling
-			/// @param   {Any} scribble
+			/// @param   {Any} scrib
 			/// @returns {Struct.WWLabelScribbleScrolling}
 			#endregion
 			static set_scribble = function(_scrib) {

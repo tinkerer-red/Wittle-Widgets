@@ -5,7 +5,7 @@
 ///          Values: struct { "builder_name": [ {name,type}, ... ], ... }
 /// @returns {Struct}
 #endregion
-ww_inspector_lib = function() {
+function ww_inspector_lib() {
 	static __library = {
 		"$$register_order": [],
 	};
@@ -19,7 +19,7 @@ ww_inspector_lib = function() {
 /// @param   {Struct}   _builder_defs
 /// @returns {Undefined}
 #endregion
-demo_library_register = function(_constructor, _builder_defs) {
+function demo_library_register(_constructor, _builder_defs) {
 	static __library = ww_inspector_lib();
 
 	if (!is_callable(_constructor)) {
@@ -37,7 +37,7 @@ demo_library_register = function(_constructor, _builder_defs) {
 /// @param   {String} _constructor_name
 /// @returns {String} parent_name_or_empty
 #endregion
-__demo_library_get_parent_name__ = function(_constructor_name) {
+function __demo_library_get_parent_name__(_constructor_name) {
 	var _asset = asset_get_index(_constructor_name);
 	var _tags = asset_get_tags(_asset);
 
@@ -59,7 +59,7 @@ __demo_library_get_parent_name__ = function(_constructor_name) {
 /// @param   {String} _constructor_name
 /// @returns {Array} names
 #endregion
-__demo_library_collect_ancestor_builder_names__ = function(_library, _constructor_name) {
+function __demo_library_collect_ancestor_builder_names__(_library, _constructor_name) {
 	var _all_names = [];
 
 	var _current_name = _constructor_name;
@@ -95,7 +95,7 @@ __demo_library_collect_ancestor_builder_names__ = function(_library, _constructo
 /// @returns {Array<String>}
 ///@ignore
 #endregion
-__demo_library_filter_prefix__ = function(_names, _prefix) {
+function __demo_library_filter_prefix__(_names, _prefix) {
 	var _out = [];
 	var _count = array_length(_names);
 	for (var _i = 0; _i < _count; _i += 1) {
@@ -115,7 +115,7 @@ __demo_library_filter_prefix__ = function(_names, _prefix) {
 /// @returns {Array}
 ///@ignore
 #endregion
-__demo_library_array_union_unique__ = function(_a, _b) {
+function __demo_library_array_union_unique__(_a, _b) {
 	var _out = [];
 	var _ac = array_length(_a);
 	for (var _i = 0; _i < _ac; _i += 1) {
@@ -137,7 +137,7 @@ __demo_library_array_union_unique__ = function(_a, _b) {
 /// @returns {String}
 ///@ignore
 #endregion
-__demo_library_name_of_comp__ = function(_comp) {
+function __demo_library_name_of_comp__(_comp) {
 	if (is_undefined(_comp)) { return "<undefined>"; }
 	if (variable_struct_exists(_comp, "debug_name")) {
 		return variable_struct_get(_comp, "debug_name");
@@ -151,7 +151,7 @@ __demo_library_name_of_comp__ = function(_comp) {
 ///          builder functions, allowing inheritance fallback via @@parent tags.
 /// @returns {Undefined}
 #endregion
-demo_library_validate_all = function() {
+function demo_library_validate_all() {
 	static __library = ww_inspector_lib();
 
 	// Cache WWCore set/get names so validations don't demand wrappers for core methods
@@ -356,13 +356,13 @@ demo_library_register(WWCore, {
 		{ name:"angle", type:"Real" }
 	],
 	"set_sprite_color": [
-		{ name:"color", type:"Real" }
+		{ name:"color", type:"Color" }
 	],
 	"set_sprite_alpha": [
 		{ name:"alpha", type:"Real" }
 	],
 	"set_background_color": [
-		{ name:"color", type:"Real" }
+		{ name:"color", type:"Color" }
 	],
 	"set_focusable": [
 		{ name:"_is_focusable", type:"Bool" }
@@ -405,7 +405,7 @@ demo_library_register(WWButtonText, {
 		{ name:"font", type:"Asset.GMFont" }
 	],
 	"set_text_color": [
-		{ name:"color", type:"Real" }
+		{ name:"color", type:"Color" }
 	],
 	"set_text_alpha": [
 		{ name:"alpha", type:"Real" }
@@ -414,7 +414,7 @@ demo_library_register(WWButtonText, {
 		{ name:"proc_or_name", type:"Any" }
 	],
 	"set_color": [
-		{ name:"color", type:"Real" }
+		{ name:"color", type:"Color" }
 	],
 	"set_text_offsets": [
 		{ name:"x", type:"Real" },
@@ -699,7 +699,7 @@ demo_library_register(WWTextRenderer, {
 		{ name:"fonts", type:"Array<Asset.GMFont>" },
 	],
 	"set_text_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text_alpha": [
 		{ name:"alpha", type:"Real" },
@@ -711,7 +711,7 @@ demo_library_register(WWTextRenderer, {
 		{ name:"line_sep", type:"Real" },
 	],
 	"set_tab_size_spaces": [
-		{ name:"space_count", type:"Real" },
+		{ name:"space_count", type:"Int" },
 	],
 	"set_tab_use_stops": [
 		{ name:"use_stops", type:"Bool" },
@@ -727,7 +727,7 @@ demo_library_register(WWTextRenderer, {
 		{ name:"tab_marker", type:"String" },
 	],
 	"set_whitespace_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 		{ name:"alpha", type:"Real" },
 	],
 	"set_whitespace_alpha": [
@@ -759,7 +759,7 @@ demo_library_register(WWTextRenderer, {
 
 demo_library_register(WWLabelScrolling, {
 	"set_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text": [
 		{ name:"text", type:"String" },
@@ -768,7 +768,7 @@ demo_library_register(WWLabelScrolling, {
 		{ name:"font", type:"Asset.GMFont" },
 	],
 	"set_text_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text_alpha": [
 		{ name:"alpha", type:"Real" },
@@ -776,13 +776,13 @@ demo_library_register(WWLabelScrolling, {
 });
 demo_library_register(WWLabel, {
 	"set_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text": [
 		{ name:"text", type:"String" },
 	],
 	"set_text_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text_font": [
 		{ name:"font", type:"Asset.GMFont" },
@@ -806,7 +806,7 @@ demo_library_register(WWTextField, {
 		{ name:"font", type:"Asset.GMFont" },
 	],
 	"set_text_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_text_alpha": [
 		{ name:"alpha", type:"Real" },
@@ -833,19 +833,19 @@ demo_library_register(WWTextField, {
 		{ name:"enabled", type:"Bool" },
 	],
 	"set_cursor_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_highlight_color": [
-		{ name:"color", type:"Real" },
+		{ name:"color", type:"Color" },
 	],
 	"set_cursor_index": [
-		{ name:"index", type:"Real" },
+		{ name:"index", type:"Int" },
 	],
 	"set_cursor_highlight_start_index": [
-		{ name:"index", type:"Real" },
+		{ name:"index", type:"Int" },
 	],
 	"set_cursor_highlight_end_index": [
-		{ name:"index", type:"Real" },
+		{ name:"index", type:"Int" },
 	],
 	"set_cursor_col": [],
 	"set_cursor_line": [],

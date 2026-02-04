@@ -310,12 +310,12 @@ function WWFolder() : WWButtonText() constructor {
 					// Ensure child layout and group is current before we use its group height.
 					_child_comp.update_component_positions();
 					_child_comp.__update_group_region__();
-
+					
 					_child_comp.set_offset(__children_x_offset__, _current_y);
 
-					var _child_height = _child_comp.__group__.height;
-					if (is_undefined(_child_height)) { _child_height = _child_comp.height; }
-					if (is_undefined(_child_height)) { _child_height = 0; }
+					var _child_height = _child_comp.get_group_height();
+					//if (is_undefined(_child_height)) { _child_height = _child_comp.height; }
+					//if (is_undefined(_child_height)) { _child_height = 0; }
 
 					_current_y += _child_height + __children_y_spacing__;
 
@@ -341,8 +341,8 @@ function WWFolder() : WWButtonText() constructor {
 					var _xoff = __container__.x_offset;
 					var _yoff = __container__.y_offset;
 
-					_group_width = max(_group_width, _xoff + __container__.__group__.width);
-					_group_height = max(_group_height, _yoff + __container__.__group__.height);
+					_group_width = max(_group_width, _xoff + __container__.get_group_width());
+					_group_height = max(_group_height, _yoff + __container__.get_group_height());
 				}
 
 				__group__.width = _group_width;

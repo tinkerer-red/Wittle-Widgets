@@ -24,10 +24,14 @@ function WWHotkeyManager() constructor {
         last_fire: 0
     };
 	
+    #region jsDoc
     /// @func    register()
     /// @desc    Adds a hotkey combination to the registry.
-    /// @param   {Array<Real>} _key_arr : Array of key codes.
-    /// @param   {Function} _callback : The callback to invoke.
+    /// @self    WWHotkeyManager
+    /// @param   {Array<Real>} key_arr : Array of key codes.
+    /// @param   {Function} callback : The callback to invoke.
+    /// @returns {WWHotkeyManager}
+    #endregion
     static register = function(_key_arr, _callback) {
         array_push(__registry, {
             keys: _key_arr,
@@ -36,8 +40,12 @@ function WWHotkeyManager() constructor {
         return self;
     };
 
+    #region jsDoc
     /// @func    build()
     /// @desc    Builds the optimized lookup tree from all registered hotkeys.
+    /// @self    WWHotkeyManager
+    /// @returns {WWHotkeyManager}
+    #endregion
     static build = function() {
 		
 		// Count key frequency across all registrations
@@ -86,13 +94,22 @@ function WWHotkeyManager() constructor {
         return self;
     };
 	
-	static step = function(_node = __root, _depth = 0, _deepest = undefined) {
-		var _keys = struct_get_names(_node);
+    #region jsDoc
+    /// @func    step()
+    /// @desc    Processes hotkeys and invokes matching callbacks.
+    /// @self    WWHotkeyManager
+    /// @param   {Struct} node : Lookup tree node (internal recursion).
+    /// @param   {Real} depth : Current recursion depth (internal).
+    /// @param   {Any} deepest : Deepest match so far (internal).
+    /// @returns {Struct|Undefined}
+    #endregion
+    static step = function(_node = __root, _depth = 0, _deepest = undefined) {
+        var _keys = struct_get_names(_node);
 	    var _i = 0, _length = array_length(_keys);
 
 	    // Track the current deepest valid node
-	    if (_node[$ "callback"] != undefined) {
-	        if (_deepest == undefined || _depth > _deepest.depth) {
+        if (_node[$ "callback"] != undefined) {
+            if (_deepest == undefined || _depth > _deepest.depth) {
 	            _deepest = { node: _node, depth: _depth };
 	        }
 	    }
@@ -103,7 +120,7 @@ function WWHotkeyManager() constructor {
 
 	        var _key_id = real(_key);
 	        if (keyboard_check(_key_id)) {
-	            _deepest = step(_node[$ _key], _depth + 1, _deepest);
+                _deepest = step(_node[$ _key], _depth + 1, _deepest);
 	        }
 	    }
 
@@ -125,7 +142,7 @@ function WWHotkeyManager() constructor {
                     var _since_last = _now - _state.last_fire;
 
                     if (_since_start >= WW_TEXTBOX_REPEAT_DELAY && _since_last >= WW_TEXTBOX_REPEAT_INTERVAL) {
-                        _deepest.node.callback();
+	                    _deepest.node.callback();
                         _state.last_fire = _now;
                     }
                 }
@@ -136,7 +153,7 @@ function WWHotkeyManager() constructor {
             }
         }
 		
-	    return _deepest;
+        return _deepest;
 	};
 	
 }

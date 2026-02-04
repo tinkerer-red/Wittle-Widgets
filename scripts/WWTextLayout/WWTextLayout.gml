@@ -29,7 +29,7 @@ function WWTextLayout() constructor {
 	/// @param   {Real}   yoff
 	/// @param   {Bool}   force_wrapped
 	/// @param   {Real}   alignment     : 0=left (default), 1=center, 2=right
-	/// @returns {Real}                : Line index.
+	/// @returns {Struct.WWTextLayout} : self
 	#endregion
 	static add_line = function(_text, _start_ind, _end_ind, _width, _height, _yoff, _force_wrapped, _alignment = 0) {
 		var _data = layout_data;
@@ -75,7 +75,7 @@ function WWTextLayout() constructor {
 	/// @param   {Real}   width      : Glyph width.
 	/// @param   {Real}   height     : Glyph height.
 	/// @param   {Real}   span_index : Index into `layout_data.spans` for formatting/appearance.
-	/// @returns {Real}             : Glyph slot index.
+	/// @returns {Struct.WWTextLayout} : self
 	#endregion
 	static add_glyph = function(
 	    _char,
@@ -120,6 +120,7 @@ function WWTextLayout() constructor {
 	/// @desc    Sets the span array used by glyph records (formatting/appearance).
 	/// @self    WWTextLayout
 	/// @param   {Array<Struct>} spans
+	/// @returns {Struct.WWTextLayout} : self
 	#endregion
 	static set_spans = function(_spans) {
 	    layout_data.spans = _spans;

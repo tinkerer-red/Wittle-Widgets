@@ -166,8 +166,11 @@ function WWView() : WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __update_group_region__ = function() {
-				__group__.width  = x+width;
-				__group__.height = y+height;
+				// __group__ is defined in local space (extents relative to this component).
+				// Using x/y here makes group size depend on world position, which breaks
+				// parent layout/stacking when this view is inside a scrolled canvas.
+				__group__.width  = width;
+				__group__.height = height;
 				
 			}
 			

@@ -1,10 +1,7 @@
 #region jsDoc
 /// @func    WWButtonTextScribble()
-/// @desc    Creates a button component
-/// @self    WWButtonText
-/// @param   {Real} x : The x possition of the component on screen.
-/// @param   {Real} y : The y possition of the component on screen.
-/// @returns {Struct.WWButtonText}
+/// @desc    Creates a button that renders its label using Scribble/Typist.
+/// @returns {Struct.WWButtonTextScribble}
 #endregion
 function WWButtonTextScribble() : WWButtonSprite() constructor {
 	debug_name = "WWButtonText";
@@ -13,11 +10,26 @@ function WWButtonTextScribble() : WWButtonSprite() constructor {
 		
 		#region Builder Functions
 			
+			#region jsDoc
+			/// @func    set_scribble()
+			/// @desc    Sets the Scribble instance used by the internal label component.
+			/// @self    WWButtonTextScribble
+			/// @param   {Struct} scrib : The Scribble instance to render with.
+			/// @returns {Struct.WWButtonTextScribble}
+			#endregion
 			static set_scribble = function(_scrib) {
 				my_scribble = _scrib;
 				__update_region_from_text__()
 				return self;
 			}
+			
+			#region jsDoc
+			/// @func    set_scribble_typist()
+			/// @desc    Sets the Typist instance used by the internal label component.
+			/// @self    WWButtonTextScribble
+			/// @param   {Struct} typist
+			/// @returns {Struct.WWButtonTextScribble}
+			#endregion
 			static set_scribble_typist = function(_typist) {
 				my_typist = _typist;
 				__update_region_from_text__()
@@ -25,11 +37,10 @@ function WWButtonTextScribble() : WWButtonSprite() constructor {
 			}
 			#region jsDoc
 			/// @func    set_sprite_to_auto_wrap()
-			/// @desc    Automatically wrap the sprite around the suplied text. This will change the click region for you. Note: This should be called after calling the sprite and text builder functions.
-			/// @self    WWButtonText
-			/// @param   {Real} x : The x offset
-			/// @param   {Real} y : The y offset
-			/// @returns {Struct.WWButtonText}
+			/// @desc    Automatically wraps the sprite around the current text size and updates the click region.
+			///         Call this after setting the sprite and text.
+			/// @self    WWButtonTextScribble
+			/// @returns {Struct.WWButtonTextScribble}
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
 				
@@ -46,11 +57,11 @@ function WWButtonTextScribble() : WWButtonSprite() constructor {
 			#region jsDoc
 			/// @func    set_text_offsets()
 			/// @desc    Sets the Text's offsets reletive to the component's x/y. Note: click_y will be applied in addition to the y, when the component is actively being pressed.
-			/// @self    WWButtonText
+			/// @self    WWButtonTextScribble
 			/// @param   {Real} x : The x offset
 			/// @param   {Real} y : The y offset
-			/// @param   {Real} click_y : The additional y offset used when 
-			/// @returns {Struct.WWButtonText}
+			/// @param   {Real} click_y : Additional y offset while the button is pressed.
+			/// @returns {Struct.WWButtonTextScribble}
 			#endregion
 			static set_text_offsets = function(_x=0, _y=0, _click_y=2) {
 				text_component.set_offset(_x, _y);

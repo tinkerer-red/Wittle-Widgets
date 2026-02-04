@@ -22,7 +22,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 /// @desc   Sets the caption or placeholder string. Used when there
                 ///         is no text in the buffer, or when the renderer is used
                 ///         for static labels.
-                /// @param  {String} _text
+                /// @self   WWTextRendererCore
+                /// @param  {String} text
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_caption = function(_text) {
@@ -42,7 +43,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_font()
                 /// @desc   Sets the font used for rendering. Also marks layout dirty.
-                /// @param  {Asset.GMFont} _font_asset
+                /// @self   WWTextRendererCore
+                /// @param  {Asset.GMFont} font_asset
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_font = function(_font_asset) {
@@ -57,7 +59,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_font_fallbacks()
                 /// @desc   Sets an ordered list of fallback fonts (highest priority first).
-                /// @param  {Array<Asset.GMFont>} _font_array
+                /// @self   WWTextRendererCore
+                /// @param  {Array<Asset.GMFont>} font_array
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_font_fallbacks = function(_font_array) {
@@ -69,7 +72,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_text_color()
                 /// @desc   Sets the color used to render text.
-                /// @param  {Constant.Color} _color_value
+                /// @self   WWTextRendererCore
+                /// @param  {Constant.Color} color_value
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_text_color = function(_color_value) {
@@ -84,7 +88,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_text_alpha()
                 /// @desc   Sets the alpha used to render text.
-                /// @param  {Real} _alpha_value
+                /// @self   WWTextRendererCore
+                /// @param  {Real} alpha_value
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_text_alpha = function(_alpha_value) {
@@ -103,7 +108,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_wrap_enabled()
                 /// @desc   Sets if word wrapping is enabled.
-                /// @param  {Bool} _should_wrap
+                /// @self   WWTextRendererCore
+                /// @param  {Bool} should_wrap
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_wrap_enabled = function(_should_wrap) {
@@ -115,7 +121,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_line_sep()
                 /// @desc   Sets the extra spacing between wrapped lines (in pixels).
-                /// @param  {Real} _line_sep_pixels
+                /// @self   WWTextRendererCore
+                /// @param  {Real} line_sep_pixels
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_line_sep = function(_line_sep_pixels) {
@@ -127,7 +134,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_tab_size_spaces()
                 /// @desc   Sets how many spaces per tab stop (usually 2 or 4).
-                /// @param  {Real} _space_count
+                /// @self   WWTextRendererCore
+                /// @param  {Real} space_count
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_tab_size_spaces = function(_space_count) {
@@ -146,7 +154,8 @@ function WWTextRendererCore() : WWCore() constructor {
                 #region jsDoc
                 /// @func   set_tab_use_stops()
                 /// @desc   If enabled, a tab advances to the next tab stop.
-                /// @param  {Bool} _use_stops
+                /// @self   WWTextRendererCore
+                /// @param  {Bool} use_stops
                 /// @returns {Struct.WWTextRendererCore}
                 #endregion
                 static set_tab_use_stops = function(_use_stops) {
@@ -166,6 +175,14 @@ function WWTextRendererCore() : WWCore() constructor {
         #region Events
 
             events.text_change = variable_get_hash("text_change");
+
+            #region jsDoc
+            /// @func   on_change(func)
+            /// @desc   Adds a listener for text change events.
+            /// @self   WWTextRendererCore
+            /// @param  {Function} func
+            /// @returns {Struct.WWTextRendererCore} self
+            #endregion
             static on_change = function(_func) {
                 add_event_listener(events.text_change, _func);
                 return self;
@@ -208,6 +225,7 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_font()
+            /// @self   WWTextRendererCore
             /// @returns {Asset.GMFont}
             #endregion
             static get_font = function() {
@@ -216,6 +234,7 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_width()
+            /// @self   WWTextRendererCore
             /// @returns {Real}
             #endregion
             static get_width = function() {
@@ -225,6 +244,7 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_height()
+            /// @self   WWTextRendererCore
             /// @returns {Real}
             #endregion
             static get_height = function() {
@@ -236,7 +256,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_x_from_index()
-            /// @param  {Real} _index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} index
             /// @returns {Real}
             #endregion
             static get_x_from_index = function(_index) {
@@ -284,7 +305,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_y_from_index()
-            /// @param  {Real} _index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} index
             /// @returns {Real}
             #endregion
             static get_y_from_index = function(_index) {
@@ -295,8 +317,9 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_index_from_xy()
-            /// @param  {Real} _x
-            /// @param  {Real} _y
+            /// @self   WWTextRendererCore
+            /// @param  {Real} x
+            /// @param  {Real} y
             /// @returns {Real}
             #endregion
             static get_index_from_xy = function(_x, _y) {
@@ -366,7 +389,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_line_from_index()
-            /// @param  {Real} _index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} index
             /// @returns {Real}
             #endregion
             static get_line_from_index = function(_index) {
@@ -399,7 +423,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_col_from_index()
-            /// @param  {Real} _index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} index
             /// @returns {Real}
             #endregion
             static get_col_from_index = function(_index) {
@@ -415,8 +440,9 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_index_from_line_col()
-            /// @param  {Real} _line
-            /// @param  {Real} _col
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line
+            /// @param  {Real} col
             /// @returns {Real}
             #endregion
             static get_index_from_line_col = function(_line, _col) {
@@ -446,46 +472,108 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region Line getters
 
+            #region jsDoc
+            /// @func   get_line_count()
+            /// @desc   Returns how many lines exist in the layout.
+            /// @self   WWTextRendererCore
+            /// @returns {Real}
+            #endregion
             static get_line_count = function() {
                 __ensure_layout__();
                 return __layout__.get_line_count();
             };
 
+            #region jsDoc
+            /// @func   get_line()
+            /// @desc   Returns a new struct representing the requested line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Struct|Real} : Line struct, or 0 if the index is out of range.
+            #endregion
             static get_line = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_text()
+            /// @desc   Returns the raw text content of the given line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {String}
+            #endregion
             static get_line_text = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_text(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_index_start()
+            /// @desc   Returns the text index that begins this line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Real}
+            #endregion
             static get_line_index_start = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_index_start(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_index_end()
+            /// @desc   Returns the text index that ends this line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Real}
+            #endregion
             static get_line_index_end = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_index_end(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_width()
+            /// @desc   Returns the rendered width of this line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Real}
+            #endregion
             static get_line_width = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_width(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_height()
+            /// @desc   Returns the rendered height of this line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Real}
+            #endregion
             static get_line_height = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_height(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_y_offset()
+            /// @desc   Returns the y offset (layout space) of this line.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Real}
+            #endregion
             static get_line_y_offset = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_y_offset(_line_index);
             };
 
+            #region jsDoc
+            /// @func   get_line_forced_wrapped()
+            /// @desc   Returns whether this line was forced by wrapping.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} line_index : Zero-based line index.
+            /// @returns {Bool}
+            #endregion
             static get_line_forced_wrapped = function(_line_index) {
                 __ensure_layout__();
                 return __layout__.get_line_forced_wrapped(_line_index);
@@ -495,51 +583,120 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region Glyph getters
 
+            #region jsDoc
+            /// @func   get_glyph_count()
+            /// @desc   Returns how many glyphs are recorded in the layout.
+            /// @self   WWTextRendererCore
+            /// @returns {Real}
+            #endregion
             static get_glyph_count = function() {
                 __ensure_layout__();
                 return __layout__.get_glyph_count();
             };
 
+            #region jsDoc
+            /// @func   get_glyph()
+            /// @desc   Returns a new struct representing this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Struct|Undefined} : Glyph struct, or `undefined` if the index is out of range.
+            #endregion
             static get_glyph = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_char()
+            /// @desc   Returns the displayed character or Unicode cluster.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {String|Undefined} : Character/cluster, or `undefined` if the index is out of range.
+            #endregion
             static get_glyph_char = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_char(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_index()
+            /// @desc   Returns the logical text index (cluster index) for this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real}
+            #endregion
             static get_glyph_index = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_index(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_buffer_index()
+            /// @desc   Returns the start buffer index of this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real}
+            #endregion
             static get_glyph_buffer_index = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_buffer_index(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_buffer_size()
+            /// @desc   Returns the buffer size (bytes) for this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real}
+            #endregion
             static get_glyph_buffer_size = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_buffer_size(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_x()
+            /// @desc   Returns the glyph's x position in layout space.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real}
+            #endregion
             static get_glyph_x = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_x(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_y()
+            /// @desc   Returns the glyph's y position in layout space.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real}
+            #endregion
             static get_glyph_y = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_y(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_width()
+            /// @desc   Returns the width of this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real|Undefined} : Width, or `undefined` if the index is out of range.
+            #endregion
             static get_glyph_width = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_width(_glyph_index);
             };
 
+            #region jsDoc
+            /// @func   get_glyph_height()
+            /// @desc   Returns the height of this glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} glyph_index
+            /// @returns {Real|Undefined} : Height, or `undefined` if the index is out of range.
+            #endregion
             static get_glyph_height = function(_glyph_index) {
                 __ensure_layout__();
                 return __layout__.get_glyph_height(_glyph_index);
@@ -551,7 +708,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_buffer_index_from_index()
-            /// @param  {Real} _index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} index
             /// @returns {Real}
             #endregion
             static get_buffer_index_from_index = function(_index) {
@@ -561,7 +719,8 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   get_index_from_buffer_index()
-            /// @param  {Real} _buffer_index
+            /// @self   WWTextRendererCore
+            /// @param  {Real} buffer_index
             /// @returns {Real}
             #endregion
             static get_index_from_buffer_index = function(_buffer_index) {
@@ -720,11 +879,25 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region Dirty flags
 
+            #region jsDoc
+            /// @func   __mark_dirty__()
+            /// @ignore
+            /// @desc   Marks the layout as dirty (and also marks the VB as dirty).
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __mark_dirty__ = function() {
                 __is_dirty__ = true;
                 __mark_vb_dirty__();
             };
 
+            #region jsDoc
+            /// @func   __mark_vb_dirty__()
+            /// @ignore
+            /// @desc   Marks the vertex buffer as dirty.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __mark_vb_dirty__ = function() {
                 __vb_is_dirty__ = true;
             };
@@ -735,9 +908,12 @@ function WWTextRendererCore() : WWCore() constructor {
 
             #region jsDoc
             /// @func   __vb_get_batch_for_material__()
-            /// @param  {Id.Texture} _tex
-            /// @param  {Array} _uvs
-            /// @param  {Real} _layer
+            /// @ignore
+            /// @desc   Returns (or creates) a draw batch for the provided texture/UVs/layer.
+            /// @self   WWTextRendererCore
+            /// @param  {Id.Texture} tex
+            /// @param  {Array} uvs
+            /// @param  {Real} layer
             /// @returns {Struct} { batch, created }
             #endregion
             static __vb_get_batch_for_material__ = function(_tex, _uvs, _layer) {
@@ -801,6 +977,13 @@ function WWTextRendererCore() : WWCore() constructor {
                 return { batch: _new_batch, created: true };
             };
 
+            #region jsDoc
+            /// @func   __vb_ensure_format__()
+            /// @ignore
+            /// @desc   Lazily creates the vertex format used to build the VB.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __vb_ensure_format__ = function() {
                 if (!is_undefined(__vb_format__)) {
                     return;
@@ -817,6 +1000,14 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region Tabs
 
+            #region jsDoc
+            /// @func   __tab_advance__()
+            /// @ignore
+            /// @desc   Returns how many pixels a tab should advance given a cursor x.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} cursor_x
+            /// @returns {Real}
+            #endregion
             static __tab_advance__ = function(_cursor_x) {
                 var _tab_width_local = __tab_width__;
                 if (_tab_width_local <= 0) {
@@ -835,6 +1026,14 @@ function WWTextRendererCore() : WWCore() constructor {
                 return _tab_width_local - _pos_mod;
             };
 
+            #region jsDoc
+            /// @func   __measure_line_width_tabs__()
+            /// @ignore
+            /// @desc   Measures a line's width, treating tabs using __tab_advance__().
+            /// @self   WWTextRendererCore
+            /// @param  {String} line_text
+            /// @returns {Real}
+            #endregion
             static __measure_line_width_tabs__ = function(_line_text) {
                 var _line_len = string_length(_line_text);
                 if (_line_len <= 0) {
@@ -865,11 +1064,28 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region Text + layout
 
+            #region jsDoc
+            /// @func   __set_textbox__()
+            /// @ignore
+            /// @desc   Sets the parent textbox component used as the text source.
+            /// @self   WWTextRendererCore
+            /// @param  {Struct} comp
+            /// @returns {Struct.WWTextRendererCore} self
+            #endregion
             static __set_textbox__ = function(_comp) {
                 __textbox_parent__ = _comp;
                 return self;
             };
 
+            #region jsDoc
+            /// @func   __string_split_and_retain__()
+            /// @ignore
+            /// @desc   Splits a string but retains the delimiter in each segment except the last.
+            /// @self   WWTextRendererCore
+            /// @param  {String} str
+            /// @param  {String} delim
+            /// @returns {Array<String>}
+            #endregion
             static __string_split_and_retain__ = function(_str, _delim) {
                 static __closure = {};
                 static __fn = method(__closure, function(_value, _index) {
@@ -884,6 +1100,13 @@ function WWTextRendererCore() : WWCore() constructor {
                 return _arr;
             };
 
+            #region jsDoc
+            /// @func   __ensure_layout__()
+            /// @ignore
+            /// @desc   Ensures the internal text layout is built and up to date.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __ensure_layout__ = function() {
                 if (!__is_dirty__) {
                     return;
@@ -909,10 +1132,13 @@ function WWTextRendererCore() : WWCore() constructor {
             };
 			
 			#region jsDoc
-			/// @func   __build_layout__(_str, _metric_runs, _visual_runs)
-			/// @param  {String} _str
-			/// @param  {Array|Undefined} _metric_runs
-			/// @param  {Array|Undefined} _visual_runs
+            /// @func   __build_layout__()
+            /// @ignore
+            /// @desc   Builds a WWTextLayout for the provided string and optional run arrays.
+            /// @self   WWTextRendererCore
+            /// @param  {String} str
+            /// @param  {Array|Undefined} metric_runs
+            /// @param  {Array|Undefined} visual_runs
 			/// @returns {Struct.WWTextLayout}
 			#endregion
 			static __build_layout__ = function(_str, _metric_runs=undefined, _visual_runs=undefined) {
@@ -1492,6 +1718,14 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region Font render data
 
+            #region jsDoc
+            /// @func   __font_get_render_data__()
+            /// @ignore
+            /// @desc   Returns cached font render data (info + texture + UVs), if available.
+            /// @self   WWTextRendererCore
+            /// @param  {Asset.GMFont} font_asset
+            /// @returns {Struct|Undefined}
+            #endregion
             static __font_get_render_data__ = function(_font_asset) {
 
                 if (is_undefined(__font_info_cache__[$ _font_asset])) {
@@ -1522,6 +1756,15 @@ function WWTextRendererCore() : WWCore() constructor {
                 };
             };
 
+            #region jsDoc
+            /// @func   __glyph_resolve_font_data__()
+            /// @ignore
+            /// @desc   Resolves which font data should be used to render a glyph.
+            /// @self   WWTextRendererCore
+            /// @param  {Asset.GMFont|Real|Undefined} font_override_or_minus1
+            /// @param  {String} char
+            /// @returns {Struct|Undefined}
+            #endregion
             static __glyph_resolve_font_data__ = function(_font_override_or_minus1, _char) {
 
                 if (!is_undefined(_font_override_or_minus1) && _font_override_or_minus1 != -1 && font_exists(_font_override_or_minus1)) {
@@ -1572,6 +1815,20 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region VB glyph emitter (basic)
 
+            #region jsDoc
+            /// @func   __vb_emit_glyph_basic_to_buffer__()
+            /// @ignore
+            /// @desc   Emits a single glyph quad into the provided vertex buffer.
+            /// @self   WWTextRendererCore
+            /// @param  {Id.VertexBuffer} vb_buffer
+            /// @param  {Struct} font_data
+            /// @param  {String} char
+            /// @param  {Real} pos_x
+            /// @param  {Real} pos_y
+            /// @param  {Constant.Color} col
+            /// @param  {Real} alp
+            /// @returns {Bool}
+            #endregion
             static __vb_emit_glyph_basic_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp) {
 
                 if (_char == "" || is_undefined(_font_data)) {
@@ -1639,6 +1896,13 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region VB build and draw (core)
 
+            #region jsDoc
+            /// @func   __ensure_vb__()
+            /// @ignore
+            /// @desc   Ensures the vertex buffers are built and up to date.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __ensure_vb__ = function() {
                 if (!__vb_is_dirty__) {
                     return;
@@ -1651,6 +1915,13 @@ function WWTextRendererCore() : WWCore() constructor {
                 __vb_is_dirty__ = false;
             };
 
+            #region jsDoc
+            /// @func   __build_vb__()
+            /// @ignore
+            /// @desc   Builds vertex buffers for the current layout.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __build_vb__ = function() {
 
                 var _layout_data = __layout__.get_layout_data();
@@ -1700,6 +1971,15 @@ function WWTextRendererCore() : WWCore() constructor {
                 }
             };
 
+            #region jsDoc
+            /// @func   __draw_text_vb__()
+            /// @ignore
+            /// @desc   Draws the text using the built vertex buffers.
+            /// @self   WWTextRendererCore
+            /// @param  {Real} origin_x
+            /// @param  {Real} origin_y
+            /// @returns {Undefined}
+            #endregion
             static __draw_text_vb__ = function(_origin_x, _origin_y) {
                 __ensure_vb__();
 
@@ -1730,6 +2010,13 @@ function WWTextRendererCore() : WWCore() constructor {
 
         #region Cleanup
 
+            #region jsDoc
+            /// @func   __cleanup__()
+            /// @ignore
+            /// @desc   Frees all internal GPU resources used by the renderer.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __cleanup__ = function() {
                 __vb_free__();
 
@@ -1739,6 +2026,13 @@ function WWTextRendererCore() : WWCore() constructor {
                 }
             };
 
+            #region jsDoc
+            /// @func   __vb_free__()
+            /// @ignore
+            /// @desc   Frees all draw batches and their vertex buffers/materials.
+            /// @self   WWTextRendererCore
+            /// @returns {Undefined}
+            #endregion
             static __vb_free__ = function() {
                 var _batch_index = 0;
                 var _batch_count = array_length(__draw_batches__);

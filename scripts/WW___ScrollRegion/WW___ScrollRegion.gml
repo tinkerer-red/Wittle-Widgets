@@ -14,7 +14,7 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_scrollbar_thickness()
 			/// @desc    Sets the thickness (pixels) of both scrollbars.
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _thickness : Scrollbar thickness in pixels.
+			/// @param   {Real} thickness : Scrollbar thickness in pixels.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_scrollbar_thickness = function(_thickness) {
@@ -27,7 +27,7 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_wheel_step()
 			/// @desc    Sets the number of pixels scrolled per mouse wheel unit.
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _pixels_per_wheel : Pixels per wheel unit.
+			/// @param   {Real} pixels_per_wheel : Pixels per wheel unit.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_wheel_step = function(_pixels_per_wheel) {
@@ -39,8 +39,8 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_viewport_size()
 			/// @desc    Sets the visible viewport size (excludes scrollbars).
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _width : Viewport width.
-			/// @param   {Real} _height : Viewport height.
+			/// @param   {Real} width  : Viewport width.
+			/// @param   {Real} height : Viewport height.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_viewport_size = function(_width, _height) {
@@ -57,7 +57,7 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_canvas()
 			/// @desc    Assigns the canvas component that will be scrolled inside the view.
 			/// @self    WW___ScrollRegion
-			/// @param   {Struct.WWCore} _canvas : Canvas component to scroll.
+			/// @param   {Struct.WWCore} canvas : Canvas component to scroll.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_canvas = function(_canvas) {
@@ -70,8 +70,8 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_content_size()
 			/// @desc    Sets the content size used for clamping scroll offsets.
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _width : Content width.
-			/// @param   {Real} _height : Content height.
+			/// @param   {Real} width  : Content width.
+			/// @param   {Real} height : Content height.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_content_size = function(_width, _height) {
@@ -84,8 +84,8 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_scroll_offset()
 			/// @desc    Sets the scroll offset in pixels (clamped).
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _xoff : Horizontal scroll offset.
-			/// @param   {Real} _yoff : Vertical scroll offset.
+			/// @param   {Real} xoff : Horizontal scroll offset.
+			/// @param   {Real} yoff : Vertical scroll offset.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_scroll_offset = function(_xoff=0, _yoff=0) {
@@ -98,8 +98,8 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    scroll_by()
 			/// @desc    Adds a delta to the current scroll offset (clamped).
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _dx : Horizontal delta.
-			/// @param   {Real} _dy : Vertical delta.
+			/// @param   {Real} dx : Horizontal delta.
+			/// @param   {Real} dy : Vertical delta.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static scroll_by = function(_dx=0, _dy=0) {
@@ -112,8 +112,8 @@ function WW___ScrollRegion() : WWCore() constructor {
 			/// @func    set_size()
 			/// @desc    Sets the total region size (includes scrollbars).
 			/// @self    WW___ScrollRegion
-			/// @param   {Real} _width : Total width.
-			/// @param   {Real} _height : Total height.
+			/// @param   {Real} width  : Total width.
+			/// @param   {Real} height : Total height.
 			/// @returns {Struct.WW___ScrollRegion}
 			#endregion
 			static set_size = function(_width, _height) {
@@ -194,8 +194,9 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __layout_children__()
 			/// @desc    Updates child sizes and positions based on viewport size and scrollbar thickness.
+			/// @self    WW___ScrollRegion
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __layout_children__ = function() {
 				view
@@ -217,8 +218,9 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __sync_scrollbars__()
 			/// @desc    Synchronizes scrollbar ranges and values from the view state.
+			/// @self    WW___ScrollRegion
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __sync_scrollbars__ = function() {
 				var _content = view.get_content_size();
@@ -236,8 +238,9 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __on_scrollbar_horz__()
 			/// @desc    Applies the horizontal scrollbar value to the view.
+			/// @self    WW___ScrollRegion
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __on_scrollbar_horz__ = function() {
 				set_scroll_offset(scrollbar_horz.get_value(), view.get_scroll_offset().y);
@@ -246,8 +249,9 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __on_scrollbar_vert__()
 			/// @desc    Applies the vertical scrollbar value to the view.
+			/// @self    WW___ScrollRegion
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __on_scrollbar_vert__ = function() {
 				set_scroll_offset(view.get_scroll_offset().x, scrollbar_vert.get_value());
@@ -256,9 +260,10 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#region jsDoc
 			/// @func    __on_wheel__()
 			/// @desc    Handles mouse wheel scrolling when the mouse is over the view.
-			/// @param   {Struct} _input : Input state containing scroll_y.
+			/// @self    WW___ScrollRegion
+			/// @param   {Struct} input : Input state containing scroll_y.
 			/// @returns {Undefined}
-			///@ignore
+			/// @ignore
 			#endregion
 			static __on_wheel__ = function(_input) {
 				if (!view.mouse_on_comp()) { return; }

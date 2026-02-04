@@ -6,6 +6,7 @@
 #endregion
 function WWWindow() : WWCore() constructor {
     debug_name = "WWWindow";
+    var __window__ = self;
     
     #region Public
         
@@ -82,15 +83,15 @@ function WWWindow() : WWCore() constructor {
             .set_callback(function() {
                 if (!minimized) {
                     // Save current height then minimize.
-                    originalSize.height = self.height;
-                    self.set_size(self.width, titleBar.height);
+                    originalSize.height = __window__.height;
+                    __window__.set_size(__window__.width, titleBar.height);
                     minimized = true;
                 } else {
                     // Restore previous height.
-                    self.set_size(self.width, originalSize.height);
+                    __window__.set_size(__window__.width, originalSize.height);
                     minimized = false;
                 }
-                update_component_positions();
+                __window__.update_component_positions();
             });
         
         // Maximize Button (positioned next to minimize)
@@ -102,19 +103,19 @@ function WWWindow() : WWCore() constructor {
             .set_callback(function() {
                 if (!maximized) {
                     // Save current size and position.
-                    originalSize = { width: self.width, height: self.height };
-                    originalOffset = { x: self.x, y: self.y };
+                    originalSize = { width: __window__.width, height: __window__.height };
+                    originalOffset = { x: __window__.x, y: __window__.y };
                     // Maximize to full screen (or desired maximum size).
-                    self.set_offset(0, 0);
-                    self.set_size(1280, 720);
+                    __window__.set_offset(0, 0);
+                    __window__.set_size(1280, 720);
                     maximized = true;
                 } else {
                     // Restore original size and position.
-                    self.set_offset(originalOffset.x, originalOffset.y);
-                    self.set_size(originalSize.width, originalSize.height);
+                    __window__.set_offset(originalOffset.x, originalOffset.y);
+                    __window__.set_size(originalSize.width, originalSize.height);
                     maximized = false;
                 }
-                update_component_positions();
+                __window__.update_component_positions();
             });
         
         // Close Button (positioned at the far right)
@@ -124,7 +125,9 @@ function WWWindow() : WWCore() constructor {
             .set_size(30, 30)
             .set_text("X")
             .set_callback(function() {
-                __parent__.remove(self);
+                if (!is_undefined(__window__.__parent__)) {
+                    __window__.__parent__.remove(__window__);
+                }
             });
         
         // Title Label

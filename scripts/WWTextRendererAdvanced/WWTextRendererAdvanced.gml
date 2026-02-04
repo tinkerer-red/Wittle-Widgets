@@ -22,6 +22,13 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
             whitespace_marker_space = ".";
             whitespace_marker_tab = ">";
 
+			#region jsDoc
+			/// @func    set_whitespace_visible()
+			/// @desc    Enables or disables whitespace marker visualization.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Bool} is_visible
+			/// @returns {Struct.WWTextRendererAdvanced}
+			#endregion
             static set_whitespace_visible = function(_is_visible) {
                 if (whitespace_visible == _is_visible) {
                     return self;
@@ -31,6 +38,13 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                 return self;
             };
 
+			#region jsDoc
+			/// @func    set_whitespace_color()
+			/// @desc    Sets the marker color used for visible whitespace.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Constant.Color} color_value
+			/// @returns {Struct.WWTextRendererAdvanced}
+			#endregion
             static set_whitespace_color = function(_color_value) {
                 if (whitespace_color == _color_value) {
                     return self;
@@ -40,6 +54,13 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                 return self;
             };
 
+			#region jsDoc
+			/// @func    set_whitespace_alpha()
+			/// @desc    Sets the marker alpha used for visible whitespace.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Real} alpha_value
+			/// @returns {Struct.WWTextRendererAdvanced}
+			#endregion
             static set_whitespace_alpha = function(_alpha_value) {
                 if (whitespace_alpha == _alpha_value) {
                     return self;
@@ -58,14 +79,15 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
             /// @desc   Applies formatting directly into glyph records for the logical index range.
             ///         Range is [start_index, end_index).
             ///         Pass undefined for any field you do not want to change.
-            /// @param  {Real} _start_index
-            /// @param  {Real} _end_index
-            /// @param  {Constant.Color|Undefined} _color_value
-            /// @param  {Real|Undefined} _alpha_value
-            /// @param  {Asset.GMFont|Real|Undefined} _font_asset_or_minus1
-            /// @param  {Real|Undefined} _style
-            /// @param  {Real|Undefined} _size_mul
-            /// @param  {Real|Undefined} _underline_value
+			/// @self   WWTextRendererAdvanced
+			/// @param  {Real} start_index
+			/// @param  {Real} end_index
+			/// @param  {Constant.Color|Undefined} color_value
+			/// @param  {Real|Undefined} alpha_value
+			/// @param  {Asset.GMFont|Real|Undefined} font_asset_or_minus1
+			/// @param  {Real|Undefined} style
+			/// @param  {Real|Undefined} size_mul
+			/// @param  {Real|Undefined} underline_value
             /// @returns {Struct.WWTextRendererAdvanced}
             #endregion
             static set_format_range = function(
@@ -142,6 +164,14 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                 return self;
             };
 
+			#region jsDoc
+			/// @func    clear_format_range()
+			/// @desc    Clears formatting for the logical index range by restoring base renderer settings.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Real} start_index
+			/// @param   {Real} end_index
+			/// @returns {Struct.WWTextRendererAdvanced}
+			#endregion
             static clear_format_range = function(_start_index, _end_index) {
                 return set_format_range(
                     _start_index,
@@ -172,6 +202,22 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
 		
         #region VB emit styled glyph
 
+			#region jsDoc
+			/// @func    __vb_emit_glyph_styled_to_buffer__()
+			/// @desc    Emits a styled glyph quad into the given vertex buffer.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Id.VertexBuffer} vb_buffer
+			/// @param   {Struct} font_data
+			/// @param   {String} char
+			/// @param   {Real} pos_x
+			/// @param   {Real} pos_y
+			/// @param   {Constant.Color} col
+			/// @param   {Real} alp
+			/// @param   {Real} size_mul
+			/// @param   {Real} style
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
             static __vb_emit_glyph_styled_to_buffer__ = function(_vb_buffer, _font_data, _char, _pos_x, _pos_y, _col, _alp, _size_mul, _style) {
 
                 if (_char == "" || is_undefined(_font_data)) {
@@ -286,6 +332,14 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
 
         #region Underline flush span
 
+			#region jsDoc
+			/// @func    __ul_flush_span__()
+			/// @desc    Flushes the active underline span into the underline vertex batch.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Struct} span_state
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
 			static __ul_flush_span__ = function(_span_state) {
 
 			    if (!_span_state.active) {
@@ -453,6 +507,13 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
 
         #region VB override (advanced)
 
+			#region jsDoc
+			/// @func    __ensure_vb__()
+			/// @desc    Rebuilds the cached vertex buffers if they are marked dirty.
+			/// @self    WWTextRendererAdvanced
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
             static __ensure_vb__ = function() {
 
                 if (!__vb_is_dirty__) {
@@ -468,6 +529,13 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
                 __vb_is_dirty__ = false;
             };
 
+			#region jsDoc
+			/// @func    __build_vb__()
+			/// @desc    Builds draw batches (glyphs, whitespace markers, underlines) into vertex buffers.
+			/// @self    WWTextRendererAdvanced
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
 			static __build_vb__ = function() {
 
 			    var _old_font = draw_get_font();
@@ -703,7 +771,16 @@ function WWTextRendererAdvanced() : WWTextRendererCore() constructor {
 			    }
 			};
 
-            static __draw_text_vb__ = function(_origin_x, _origin_y) {
+			#region jsDoc
+			/// @func    __draw_text_vb__()
+			/// @desc    Draws the prepared vertex-buffer batches at the given origin.
+			/// @self    WWTextRendererAdvanced
+			/// @param   {Real} origin_x
+			/// @param   {Real} origin_y
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __draw_text_vb__ = function(_origin_x, _origin_y) {
 
                 __ensure_vb__();
 

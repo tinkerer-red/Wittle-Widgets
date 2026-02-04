@@ -825,10 +825,6 @@ function WWCore() constructor {
 			    static __depth = 0;
 			    static __queue = [];
 				
-			    if (__debug_enabled__) {
-			        log("Trigger: " + self.event_name(_event_id), __depth);
-			    }
-				
 			    // If we're in the middle of an event chain, queue this trigger rather than running it immediately.
 			    if (__depth > 0) {
 			        array_push(__queue, { event: _event_id, data: _data });
@@ -1122,7 +1118,7 @@ function WWCore() constructor {
 			/// @returns {Struct} offset_struct_with_x_y
 			#endregion
 			static get_offset = function() {
-				return { x: offset_x, y: offset_y };
+				return { x: x_offset, y: y_offset };
 			};
 			#region jsDoc
 			/// @func   get_alignment()
@@ -1131,7 +1127,7 @@ function WWCore() constructor {
 			/// @returns {Struct} alignment_struct_with_halign_valign
 			#endregion
 			static get_alignment = function() {
-				return { halign: halign, valign: valign };
+				return { halign: __halign__, valign: __valign__ };
 			};
 			#region jsDoc
 			/// @func   get_width()
@@ -1158,7 +1154,7 @@ function WWCore() constructor {
 			/// @returns {Asset.GMSprite} sprite_asset
 			#endregion
 			static get_sprite = function() {
-				return sprite;
+				return sprite_index;
 			};
 			#region jsDoc
 			/// @func   get_sprite_angle()
@@ -1167,7 +1163,7 @@ function WWCore() constructor {
 			/// @returns {Real} angle_degrees
 			#endregion
 			static get_sprite_angle = function() {
-				return sprite_angle;
+				return image_angle;
 			};
 			#region jsDoc
 			/// @func   get_sprite_color()
@@ -1176,7 +1172,7 @@ function WWCore() constructor {
 			/// @returns {Real} color_value
 			#endregion
 			static get_sprite_color = function() {
-				return sprite_color;
+				return image_blend;
 			};
 			#region jsDoc
 			/// @func   get_sprite_alpha()
@@ -1185,7 +1181,7 @@ function WWCore() constructor {
 			/// @returns {Real} alpha_value
 			#endregion
 			static get_sprite_alpha = function() {
-				return sprite_alpha;
+				return image_alpha;
 			};
 			#region jsDoc
 			/// @func   get_background_color()
@@ -1203,7 +1199,7 @@ function WWCore() constructor {
 			/// @returns {Bool} is_enabled
 			#endregion
 			static get_enabled = function() {
-				return is_enabled;
+				return __is_enabled__;
 			};
 			#region jsDoc
 			/// @func   get_active()
@@ -1212,7 +1208,7 @@ function WWCore() constructor {
 			/// @returns {Bool} is_active
 			#endregion
 			static get_active = function() {
-				return is_active;
+				return __is_active__;
 			};
 			#region jsDoc
 			/// @func   get_debug()
@@ -1221,7 +1217,27 @@ function WWCore() constructor {
 			/// @returns {Bool} is_debug_enabled
 			#endregion
 			static get_debug = function() {
-				return debug_enabled;
+				return __debug_enabled__;
+			};
+			#region jsDoc
+			/// @func   get_group_width()
+			/// @desc   Returns this component's cached group width (layout/collision extents).
+			///         Override in composite components when raw __group__ is not suitable.
+			/// @self   WWCore
+			/// @returns {Real} group_width
+			#endregion
+			static get_group_width = function() {
+				return __group__.width;
+			};
+			#region jsDoc
+			/// @func   get_group_height()
+			/// @desc   Returns this component's cached group height (layout/collision extents).
+			///         Override in composite components when raw __group__ is not suitable.
+			/// @self   WWCore
+			/// @returns {Real} group_height
+			#endregion
+			static get_group_height = function() {
+				return __group__.height;
 			};
 			#endregion
 			
@@ -1551,6 +1567,7 @@ function WWCore() constructor {
 			#endregion
 			static draw = function(_input=undefined, _debug=false) {
 				if (!__is_active__) return;
+				
 				
 				_input ??= {
 					consumed : false,
@@ -1905,8 +1922,8 @@ function WWCore() constructor {
 					xoff = _comp.x_offset;
 					yoff = _comp.y_offset;
 					
-					_w = max(_w, xoff + _comp.__group__.width);
-					_h = max(_h, yoff + _comp.__group__.height);
+					_w = max(_w, xoff + _comp.get_group_width());
+					_h = max(_h, yoff + _comp.get_group_height());
 				i+=1}
 				
 				//usually internally used to detect if the mouse is anywhere over a folder or window, helps with early outing collission checks
@@ -2191,7 +2208,16 @@ function WWCore() constructor {
 					}
 				}
 			}
-
+			#region jsDoc
+			/// @func    __cleanup__()
+			/// @desc    Used to cleanup anything the component may have created
+			/// @self    WWCore
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __cleanup__ = function(){
+				//empty function to overwrite by others.
+			}
 			#endregion
 		#endregion
 		

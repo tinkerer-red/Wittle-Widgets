@@ -238,7 +238,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 				else {
 					var _loc = value + coverage_size * _amount_of_view;
 					set_value(_loc);
-					trigger_event(self.events.value_changed, value)
+					trigger_event(events.value_changed, value)
 				}
 				
 			}
@@ -257,7 +257,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 				else {
 					var _loc = value - coverage_size * _amount_of_view;
 					set_value(_loc);
-					trigger_event(self.events.value_changed, value)
+					trigger_event(events.value_changed, value)
 				}
 			}
 			

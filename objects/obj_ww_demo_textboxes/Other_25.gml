@@ -7,14 +7,30 @@ __build_ui__ = function() {
         .set_enabled(true);
 
     // Theme
-    var _page_bg = make_color_rgb(16, 16, 18);
-    var _card_bg = make_color_rgb(46, 46, 52);
-    var _card_hdr = make_color_rgb(34, 34, 38);
-    var _textbox_bg = make_color_rgb(24, 24, 26);
+	var _t = wwThemeGet();
+	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
+	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
+	if (_mode == "") { _t = wwThemeSet(wwThemeDark()); }
+	var __paint_color__ = function(_paint, _fallback) {
+		if (_paint == undefined) return _fallback;
+		var _c = variable_struct_get(_paint, "color");
+		return (_c != undefined) ? _c : _fallback;
+	};
+	var _colors = (is_struct(_t)) ? variable_struct_get(_t, "colors") : undefined;
+	var _app = (_colors != undefined) ? variable_struct_get(_colors, "app") : undefined;
+	var _surface = (_colors != undefined) ? variable_struct_get(_colors, "surface") : undefined;
+	var _text = (_colors != undefined) ? variable_struct_get(_colors, "text") : undefined;
+	var _outline = (_colors != undefined) ? variable_struct_get(_colors, "outline") : undefined;
 
-    var _subtitle_color = make_color_rgb(180, 180, 190);
-    var _footer_bg = make_color_rgb(34, 34, 38);
-    var _footer_color = make_color_rgb(200, 200, 210);
+    var _page_bg = __paint_color__((_app != undefined) ? variable_struct_get(_app, "bg") : undefined, make_color_rgb(16, 16, 18));
+    var _card_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel") : undefined, make_color_rgb(46, 46, 52));
+    var _card_hdr = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(34, 34, 38));
+    var _textbox_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "control") : undefined, make_color_rgb(24, 24, 26));
+
+    var _subtitle_color = __paint_color__((_text != undefined) ? variable_struct_get(_text, "dim") : undefined, make_color_rgb(180, 180, 190));
+    var _footer_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(34, 34, 38));
+    var _footer_color = __paint_color__((_text != undefined) ? variable_struct_get(_text, "secondary") : undefined, make_color_rgb(200, 200, 210));
+	var _divider_color = __paint_color__((_outline != undefined) ? variable_struct_get(_outline, "subtle") : undefined, make_color_rgb(60, 60, 68));
 
     // Backdrop
     var _page_backdrop = new WWCore()
@@ -116,7 +132,7 @@ __build_ui__ = function() {
         _pair_x + _half_w + floor(_gap_x * 0.5),
         _inner_y,
         _pair_h + (_label_h + _label_gap),
-        make_color_rgb(60, 60, 68)
+		_divider_color
     );
 
     // Mirror pair with framed boxes

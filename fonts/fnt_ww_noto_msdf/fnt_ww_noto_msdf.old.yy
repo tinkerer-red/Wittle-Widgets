@@ -1,6 +1,6 @@
 {
   "$GMFont":"",
-  "%Name":"fnt_noto_msdf",
+  "%Name":"fnt_ww_noto_msdf",
   "AntiAlias":1,
   "applyKerning":0,
   "ascender":12,
@@ -209,10 +209,10 @@
   "last":0,
   "lineHeight":16,
   "maintainGms1Font":false,
-  "name":"fnt_noto_msdf",
+  "name":"fnt_ww_noto_msdf",
   "parent":{
-    "name":"Assets",
-    "path":"folders/_Libraries/Wittle Widgets/Assets.yy",
+    "name":"Fonts",
+    "path":"folders/_Libraries/Wittle Widgets/Assets/Fonts.yy",
   },
   "pointRounding":0,
   "ranges":[
@@ -225,6 +225,10 @@
   "sdfSpread":8,
   "size":10.0,
   "styleName":"Medium",
+  "tags":[
+    "msdf",
+    "font_size:2",
+  ],
   "textureGroupId":{
     "name":"Default",
     "path":"texturegroups/Default",

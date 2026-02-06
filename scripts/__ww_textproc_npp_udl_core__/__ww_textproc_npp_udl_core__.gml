@@ -21,7 +21,7 @@
 function __ww_textproc_npp_udl_core__(_raw_text, _default_state) {
 	// Prefer the newer buffer+trie scanner when available.
 	// Fallback to the legacy string scanner for older processor structs.
-	if (!is_undefined(self.trie_symbols)) {
+	if (!is_undefined(trie_symbols)) {
 		return __ww_textproc_npp_udl_core__buff__(_raw_text, _default_state);
 	}
 

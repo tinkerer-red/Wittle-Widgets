@@ -107,10 +107,10 @@ function MsdfUpdateAllFonts()
     var _batchBuffer = buffer_create(1024, buffer_grow, 1);
     
     //Start converting fonts...
-    var _i = 0;
+    var _fontIndex = 0;
     repeat(array_length(_msdfFontArray))
     {
-        var _font = _msdfFontArray[_i];
+        var _font = _msdfFontArray[_fontIndex];
         var _fontName = font_get_name(_font);
         var _fontInfo = font_get_info(_font);
         
@@ -127,28 +127,6 @@ function MsdfUpdateAllFonts()
         
         var _fontOriginName = _fontInfo.name;
         __MsdfTrace($"Font name is \"{_fontOriginName}\"");
-        
-        var _cleanFontOriginName = filename_name(_fontOriginName);
-        var _ttfPath = $"{_msdfGenDirectory}{_cleanFontOriginName}.ttf";
-        var _path0 = _ttfPath;
-        if (not file_exists(_ttfPath))
-        {
-            __MsdfTrace($"Could not find .ttf at \"{_ttfPath}\"");
-            
-            _ttfPath = $"{_msdfGenDirectory}{string_replace_all(_cleanFontOriginName, " ", "_")}.ttf";
-            var _path1 = _ttfPath;
-            if (not file_exists(_ttfPath))
-            {
-                _ttfPath = $"{_msdfGenDirectory}{string_replace_all(_cleanFontOriginName, "_", " ")}.ttf";
-                var _path2 = _ttfPath;
-                if (not file_exists(_ttfPath))
-                {
-                    __MsdfError($"Could not find .ttf in \"{_msdfGenDirectory}\". Looked for:\n- {_path0}\n- {_path1}\n- {_path2}\nPlease rename the source .ttf file accordingly.");
-                }
-            }
-        }
-        
-        __MsdfTrace($"Found .ttf at \"{_ttfPath}\"");
         
         var _fontDirectory = $"{_fontsDirectory}{_fontName}/";
         var _yyPath = $"{_fontDirectory}{_fontName}.yy";
@@ -184,6 +162,80 @@ function MsdfUpdateAllFonts()
         
         var _writePxRange = 2*_fontSdfSpread;
         __MsdfTrace($"Equivalent MSDF spread is {_writePxRange}");
+
+        // Resolve the source font file (.ttf/.otf)
+        // 1) Prefer explicitly managed font files in msdf-atlas-gen/ (legacy behavior)
+        // 2) Fallback: support GM's "Copy to project" by searching the font asset folder for a single .ttf/.otf
+        var _cleanFontOriginName = filename_name(_fontOriginName);
+        var _fontSourcePath = "";
+
+        var _name0 = _cleanFontOriginName;
+        var _name1 = string_replace_all(_cleanFontOriginName, " ", "_");
+        var _name2 = string_replace_all(_cleanFontOriginName, "_", " ");
+
+        var _candidates = [];
+        array_push(_candidates, $"{_msdfGenDirectory}{_name0}.ttf");
+        array_push(_candidates, $"{_msdfGenDirectory}{_name1}.ttf");
+        array_push(_candidates, $"{_msdfGenDirectory}{_name2}.ttf");
+        array_push(_candidates, $"{_msdfGenDirectory}{_name0}.otf");
+        array_push(_candidates, $"{_msdfGenDirectory}{_name1}.otf");
+        array_push(_candidates, $"{_msdfGenDirectory}{_name2}.otf");
+
+        var _ci = 0;
+        repeat (array_length(_candidates))
+        {
+            var _p = _candidates[_ci];
+            if (file_exists(_p))
+            {
+                _fontSourcePath = _p;
+                break;
+            }
+            ++_ci;
+        }
+
+        if (_fontSourcePath == "")
+        {
+            var _matches = [];
+
+            var _f = file_find_first(_fontDirectory + "*.ttf", 0);
+            while (_f != "")
+            {
+                array_push(_matches, _fontDirectory + _f);
+                _f = file_find_next();
+            }
+            file_find_close();
+
+            _f = file_find_first(_fontDirectory + "*.otf", 0);
+            while (_f != "")
+            {
+                array_push(_matches, _fontDirectory + _f);
+                _f = file_find_next();
+            }
+            file_find_close();
+
+            if (array_length(_matches) == 1)
+            {
+                _fontSourcePath = _matches[0];
+            }
+            else if (array_length(_matches) > 1)
+            {
+                var _list = "";
+                var _mi = 0;
+                repeat (array_length(_matches))
+                {
+                    _list += "- " + _matches[_mi] + "\n";
+                    ++_mi;
+                }
+                __MsdfError($"Multiple font files found in copy-to-project directory \"{_fontDirectory}\". Please leave only one (.ttf or .otf):\n{_list}");
+            }
+        }
+
+        if (_fontSourcePath == "")
+        {
+            __MsdfError($"Could not find a source font file (.ttf/.otf).\nLooked in:\n- {_msdfGenDirectory} (by font name variants)\n- {_fontDirectory} (copy-to-project: exactly one .ttf/.otf)\nPlease place a .ttf/.otf in one of those locations.");
+        }
+
+        __MsdfTrace($"Found source font at \"{_fontSourcePath}\"");
         
         buffer_seek(_stringBuffer, buffer_seek_start, 0);
         
@@ -191,14 +243,14 @@ function MsdfUpdateAllFonts()
         var _gmGlyphsArray = struct_get_names(_gmGlyphsDict);
         __MsdfTrace($"Found {array_length(_gmGlyphsArray)} glyphs, building hexcode arguments");
         
-        var _i = 0;
+        var _glyphIndex = 0;
         repeat(array_length(_gmGlyphsArray))
         {
-            var _glyphChar = _gmGlyphsArray[_i];
+            var _glyphChar = _gmGlyphsArray[_glyphIndex];
             buffer_write(_stringBuffer, buffer_text, "0x");
             buffer_write(_stringBuffer, buffer_text, string_trim_start(string(ptr(ord(_glyphChar))), _zeroSubstring));
             buffer_write(_stringBuffer, buffer_text, ",");
-            ++_i;
+            ++_glyphIndex;
         }
         
         buffer_poke(_stringBuffer, buffer_tell(_stringBuffer)-1, buffer_u8, 0x00);
@@ -207,7 +259,7 @@ function MsdfUpdateAllFonts()
         __MsdfTrace($"Building batch file");
         buffer_seek(_batchBuffer, buffer_seek_start, 0);
         buffer_write(_batchBuffer, buffer_text, $"pushd \"{filename_dir(_exePath)}\"\r\n");
-        buffer_write(_batchBuffer, buffer_text, $"{_msdfGenExe} -font \"{_ttfPath}\" -size {_writePointSize} -pxrange {_writePxRange} -format png -imageout \"{_imageOutPath}\" -json \"{_jsonOutPath}\" -type mtsdf -yorigin top -chars ");
+        buffer_write(_batchBuffer, buffer_text, $"{_msdfGenExe} -font \"{_fontSourcePath}\" -size {_writePointSize} -pxrange {_writePxRange} -format png -imageout \"{_imageOutPath}\" -json \"{_jsonOutPath}\" -type mtsdf -yorigin top -chars ");
         buffer_copy(_stringBuffer, 0, buffer_tell(_stringBuffer), _batchBuffer, buffer_tell(_batchBuffer));
         buffer_seek(_batchBuffer, buffer_seek_relative, buffer_tell(_stringBuffer));
         
@@ -220,7 +272,7 @@ function MsdfUpdateAllFonts()
         
         if (not file_exists(_batchFilePath))
         {
-            __MsdfError("\"{_batchFilePath}\" failed to save");
+            __MsdfError($"\"{_batchFilePath}\" failed to save");
         }
         
         __MsdfTrace($"Executing batch file");
@@ -236,6 +288,7 @@ function MsdfUpdateAllFonts()
             }
         }
         
+        //kill some time to ensure files are done writing
 		var _time = current_time;
 		while (current_time - _time < 1_000) {
 			var waste_time = true;
@@ -249,7 +302,7 @@ function MsdfUpdateAllFonts()
             __MsdfError($"Expected .json file not found at \"{_jsonOutPath}\"");
         }
         
-		var _msdfJSONString = ""
+        var _msdfJSONString = "";
 		var file = file_text_open_read(_jsonOutPath);
 		while (!file_text_eof(file)) {
 		    _msdfJSONString += file_text_readln(file);
@@ -301,10 +354,10 @@ function MsdfUpdateAllFonts()
         draw_clear_alpha(c_black, 0);
         gpu_set_blendmode_ext(bm_one, bm_zero);
         
-        var _i = 0;
+        var _msdfGlyphIndex = 0;
         repeat(array_length(_msdGlyphArray))
         {
-            var _msdfData    = _msdGlyphArray[_i];
+            var _msdfData    = _msdGlyphArray[_msdfGlyphIndex];
             var _msdfUnicode = _msdfData.unicode;
             var _msdfAtlas   = _msdfData[$ "atlasBounds"];
             var _msdfPlane   = _msdfData[$ "planeBounds"];
@@ -325,8 +378,8 @@ function MsdfUpdateAllFonts()
                                  _msdfAtlas.right - _msdfAtlas.left, _msdfAtlas.bottom - _msdfAtlas.top,
                                  _gmX, _msdfY);
             }
-            
-            ++_i;
+
+            ++_msdfGlyphIndex;
         }
         
         gpu_set_blendmode(bm_normal);
@@ -343,8 +396,8 @@ function MsdfUpdateAllFonts()
         sprite_delete(_sprite);
         
         __MsdfTrace($"Finished converting font \"{font_get_name(_font)}\"");
-    
-        ++_i;
+
+        ++_fontIndex;
     }
     
     //Clean up temporary buffers

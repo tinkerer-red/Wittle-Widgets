@@ -225,7 +225,7 @@ function WWTextBase() : WWCore() constructor {
 					static __args = {};
 					__args.x = get_cursor_x_pos_gui()
 					__args.y = get_cursor_y_pos_gui()
-					trigger_event(self.events.cursor_move, __args)
+					trigger_event(events.cursor_move, __args)
 					
 					return self;
 				}
@@ -252,7 +252,7 @@ function WWTextBase() : WWCore() constructor {
 					static __args = {};
 					__args.x = get_cursor_x_pos_gui()
 					__args.y = get_cursor_y_pos_gui()
-					trigger_event(self.events.cursor_move, __args)
+					trigger_event(events.cursor_move, __args)
 				
 					return self;
 				}
@@ -2831,7 +2831,7 @@ function WWTextInputMulti() : WWTextBase() constructor {
                     draw_text(x, currentY, lines[i]);
                     currentY += 20; // line height
                 }
-                self.render_selection();
+                render_selection();
                 // Optionally render caret on the active line.
             }
 			
@@ -3257,7 +3257,7 @@ function WWCodeEditor() : WWTextInputMulti() constructor {
                     draw_highlighted_text(x, currentY, highlighted);
                     currentY += 20;
                 }
-                self.render_selection();
+                render_selection();
                 // Render caret on the active line.
             }
         #endregion
@@ -3358,10 +3358,10 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
         
 		#region Events
             // Add keyboard event listeners for editing.
-            self.on_key_press(function(_key) {
+            on_key_press(function(_key) {
                 // Handle backspace, character input, etc.
                 // Update textContent and re-render.
-                self.handle_key(_key);
+                handle_key(_key);
             });
         #endregion
         

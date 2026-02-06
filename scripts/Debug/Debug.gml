@@ -2,9 +2,6 @@ function json(_input) {
 	return json_stringify(_input, true)
 }
 
-
-
-
 #macro pprint repeat (__pprint_pre(_GMFILE_, _GMFUNCTION_, string(_GMLINE_))) __pprint
 /// @param ...args
 function __pprint() {

@@ -246,8 +246,8 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					add_event_listener(self.events.pre_step, function(_data) {
-						var _width = floor(window_get_width()-self.x);
+					add_event_listener(events.pre_step, function(_data) {
+						var _width = floor(window_get_width()-x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}
@@ -255,7 +255,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				}
 				
 				//adjust the visuals so all components are simillar
-				add_event_listener(self.events.post_step, function(_data) {
+				add_event_listener(events.post_step, function(_data) {
 					
 					var _image_index = (__is_enabled__) ? __button__.image_index : GUI_IMAGE_DISABLED;
 					_image_index = max(_image_index, __textbox__.__is_focused__)
@@ -294,7 +294,7 @@ function ControlPanelSlider(_label="<Missing Label>", _value, _min, _max, _func)
 				__button__.add_event_listener(__button__.events.released, function(_data) {
 					with (__textbox__) {
 						__is_focused__ = true;
-						trigger_event(self.events.focus);
+						trigger_event(events.focus);
 						
 						var _line_last = curt.length - 1;
 						var _line_last_length = string_length(curt.lines[_line_last]);

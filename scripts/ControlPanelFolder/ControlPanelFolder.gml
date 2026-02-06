@@ -215,8 +215,8 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					add_event_listener(self.events.pre_step, function(_data) {
-						var _width = floor(window_get_width()-self.x);
+					add_event_listener(events.pre_step, function(_data) {
+						var _width = floor(window_get_width()-x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}
@@ -267,7 +267,7 @@ function ControlPanelFolder(_label="<Missing Label>", _func) : GUICompController
 					
 					//force update the children's regions to adapt to the window size
 					var _i=0; repeat(__folder__.__children_count__) {
-						__folder__.__children__[_i].trigger_event(self.events.pre_step);
+						__folder__.__children__[_i].trigger_event(events.pre_step);
 					_i+=1;}//end repeat loop
 					
 					callback();

@@ -28,9 +28,6 @@ function WWCheckbox() : WWButtonSprite() constructor {
 				sprite_checked = _checked_sprite;
 				sprite_unchecked = _unchecked_sprite;
 				
-				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
-				set_sprite(_sprite);
-				
 				return self;
 			}
 			
@@ -43,9 +40,6 @@ function WWCheckbox() : WWButtonSprite() constructor {
 			#endregion
 			static set_value = function(_is_checked) {
 				is_checked = _is_checked;
-				
-				var _sprite = (is_checked) ? sprite_checked : sprite_unchecked;
-				set_sprite(_sprite);
 				
 				return self;
 			}
@@ -83,7 +77,6 @@ function WWCheckbox() : WWButtonSprite() constructor {
 			
 			on_released(function(){
 				is_checked = !is_checked;
-				sprite_index = (is_checked) ? sprite_checked : sprite_unchecked;
 			})
 			
 			
@@ -93,10 +86,11 @@ function WWCheckbox() : WWButtonSprite() constructor {
 			
 			is_checked = false;
 			
-			sprite_checked = s9CheckBoxChecked;
-			sprite_unchecked = s9CheckBoxUnchecked;
+			__theme_kind__ = 1;
 			
-			set_sprite(sprite_unchecked);
+			// Theme-driven by default (user can override via set_checkbox_sprites / set_sprite).
+			sprite_checked = undefined;
+			sprite_unchecked = undefined;
 			
 		#endregion
 	

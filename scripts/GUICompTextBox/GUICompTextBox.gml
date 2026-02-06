@@ -216,8 +216,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 		
 		#region Events
 			
-			self.events.change     = variable_get_hash("change");
-			self.events.submit     = variable_get_hash("submit");
+			events.change     = variable_get_hash("change");
+			events.submit     = variable_get_hash("submit");
 			
 		#endregion
 		
@@ -486,7 +486,7 @@ function GUICompTextbox() : GUICompRegion() constructor {
 				)
 				
 				if (__mouse_on_cc__) {
-					__trigger_event__(self.events.on_hover);
+					__trigger_event__(events.on_hover);
 				}
 				
 				return __mouse_on_cc__;
@@ -582,9 +582,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 							if (mouse_check_button_pressed(keys.mouse_left)) {
 								if (!_mouse_on_comp) {
 									if (__is_on_focus__) {
-										if (__event_exists__(self.events.submit)) {
+										if (__event_exists__(events.submit)) {
 											var _text = __textbox_lines_to_text__(curt.lines);
-											__trigger_event__(self.events.submit, _text);
+											__trigger_event__(events.submit, _text);
 										}
 									}
 									curt.focus = false;
@@ -593,10 +593,10 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								if (curt.accepting_inputs) {
 									__is_on_focus__ = _mouse_on_comp;
 									if (__is_on_focus__){
-										__trigger_event__(self.events.on_focus);
+										__trigger_event__(events.on_focus);
 									}
 									else{
-										__trigger_event__(self.events.on_blur);
+										__trigger_event__(events.on_blur);
 									}
 									
 									draw.display_cursor = (_mouse_on_comp) ? 30 : 0;
@@ -870,8 +870,8 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								}
 								__is_on_focus__ = false;
 								curt.focus = false;
-								__trigger_event__(self.events.submit, _text);
-								__trigger_event__(self.events.on_blur);
+								__trigger_event__(events.submit, _text);
+								__trigger_event__(events.on_blur);
 								break;
 							}
 							
@@ -883,9 +883,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								curt.select = -1;
 								__textbox_break_line__();
 								
-								if (__event_exists__(self.events.change)) {
+								if (__event_exists__(events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									__trigger_event__(events.change, _text);
 								}
 								
 								break;
@@ -1057,9 +1057,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								curt.button_repeat = 40;
 								__textbox_delete_string__(_delete);
 								
-								if (__event_exists__(self.events.change)) {
+								if (__event_exists__(events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									__trigger_event__(events.change, _text);
 								}
 							}
 	
@@ -1070,9 +1070,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									__textbox_delete_string__(_delete);
 									curt.button_repeat = 3;
 									
-									if (__event_exists__(self.events.change)) {
+									if (__event_exists__(events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										__trigger_event__(events.change, _text);
 									}
 								}
 								break;
@@ -1163,9 +1163,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									keys.last_key = keys.x;
 									
-									if (__event_exists__(self.events.change)) {
+									if (__event_exists__(events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										__trigger_event__(events.change, _text);
 									}
 									
 									break;
@@ -1183,9 +1183,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									keys.last_key = keys.v;
 									
-									if (__event_exists__(self.events.change)) {
+									if (__event_exists__(events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										__trigger_event__(events.change, _text);
 									}
 									
 									break;
@@ -1203,9 +1203,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									keys.last_key = keys.z;
 									
-									if (__event_exists__(self.events.change)) {
+									if (__event_exists__(events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										__trigger_event__(events.change, _text);
 									}
 									
 									break;
@@ -1223,9 +1223,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 									
 									keys.last_key = keys.y;
 									
-									if (__event_exists__(self.events.change)) {
+									if (__event_exists__(events.change)) {
 										var _text = __textbox_lines_to_text__(curt.lines)
-										__trigger_event__(self.events.change, _text);
+										__trigger_event__(events.change, _text);
 									}
 									
 									break;
@@ -1284,9 +1284,9 @@ function GUICompTextbox() : GUICompRegion() constructor {
 								
 								__textbox_insert_string__(_keyboard_string);
 								
-								if (__event_exists__(self.events.change)) {
+								if (__event_exists__(events.change)) {
 									var _text = __textbox_lines_to_text__(curt.lines)
-									__trigger_event__(self.events.change, _text);
+									__trigger_event__(events.change, _text);
 								}
 								
 								break;

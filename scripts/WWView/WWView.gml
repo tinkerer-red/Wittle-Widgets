@@ -105,10 +105,10 @@ function WWView() : WWCore() constructor {
 				)
 				
 				if (__mouse_on_comp__) {
-					trigger_event(self.events.mouse_over);
+					trigger_event(events.mouse_over);
 				}
 				else {
-					trigger_event(self.events.mouse_off);
+					trigger_event(events.mouse_off);
 				}
 				
 				return __mouse_on_comp__;
@@ -137,10 +137,10 @@ function WWView() : WWCore() constructor {
 				);
 				
 				if (__mouse_on_group__) {
-					trigger_event(self.events.mouse_over_group);
+					trigger_event(events.mouse_over_group);
 				}
 				else {
-					trigger_event(self.events.mouse_off_group);
+					trigger_event(events.mouse_off_group);
 				}
 				
 				return __mouse_on_group__;

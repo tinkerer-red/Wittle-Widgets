@@ -137,6 +137,7 @@
   "styleName":"Regular",
   "tags":[
     "msdf",
+    "font_size:2",
   ],
   "textureGroupId":{
     "name":"Default",

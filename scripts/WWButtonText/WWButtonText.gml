@@ -85,8 +85,8 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
-				
-				var _slice = sprite_get_nineslice(sprite_index);
+				var _spr = sprite_index ?? wwThemeGet().assets.sprites.button_text;
+				var _slice = sprite_get_nineslice(_spr);
 				var _width  = text_component.width  + (_slice.left + _slice.right);
 				var _height = text_component.height + (_slice.top  + _slice.bottom);
 				
@@ -150,9 +150,11 @@ function WWButtonText() : WWButtonSprite() constructor {
 				click_yoff:2,
 			}
 			
-			set_sprite(s9ButtonText);
+			// Theme-driven sprite: only referenced when sprite_index is undefined.
+			__theme_kind__ = 2;
+			sprite_index = undefined;
 			set_sprite_to_auto_wrap();
-			__set_size__(sprite_get_width(s9ButtonText), sprite_get_height(s9ButtonText))
+			
 			
 		#endregion
 		
@@ -165,7 +167,8 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct} info_struct_with_width_height_and_slice
 			#endregion
 			static get_sprite_to_auto_wrap = function() {
-				var _slice = sprite_get_nineslice(sprite_index);
+				var _spr = sprite_index ?? wwThemeGet().assets.sprites.button_text;
+				var _slice = sprite_get_nineslice(_spr);
 				var _width  = text_component.width  + (_slice.left + _slice.right);
 				var _height = text_component.height + (_slice.top  + _slice.bottom);
 				return {

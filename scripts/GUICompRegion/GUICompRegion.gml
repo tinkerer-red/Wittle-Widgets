@@ -132,8 +132,8 @@ function GUICompRegion() : GUICompController() constructor {
 				var _i = 0; repeat(__children_count__) {
 					
 					_component = __children__[_i];
-					xoff = _component.x-(self.x+scroll.x_off);
-					yoff = _component.y-(self.y+scroll.y_off);
+					xoff = _component.x-(x+scroll.x_off);
+					yoff = _component.y-(y+scroll.y_off);
 					
 					if (_component.__is_controller__)
 					&& (_component.is_open) {
@@ -328,11 +328,11 @@ function GUICompRegion() : GUICompController() constructor {
 		
 		#region Events
 			
-			self.events.scrolled       = variable_get_hash("scrolled"); //if the scroll region has moved it's view in any way
-			self.events.scrolled_up    = variable_get_hash("scrolled_up"); //if the scroll region has scrolled up
-			self.events.scrolled_down  = variable_get_hash("scrolled_down"); //if the scroll region has scrolled down
-			self.events.scrolled_left  = variable_get_hash("scrolled_left"); //if the scroll region has scrolled left
-			self.events.scrolled_right = variable_get_hash("scrolled_right"); //if the scroll region has scrolled right
+			events.scrolled       = variable_get_hash("scrolled"); //if the scroll region has moved it's view in any way
+			events.scrolled_up    = variable_get_hash("scrolled_up"); //if the scroll region has scrolled up
+			events.scrolled_down  = variable_get_hash("scrolled_down"); //if the scroll region has scrolled down
+			events.scrolled_left  = variable_get_hash("scrolled_left"); //if the scroll region has scrolled left
+			events.scrolled_right = variable_get_hash("scrolled_right"); //if the scroll region has scrolled right
 			
 		#endregion
 		
@@ -404,8 +404,8 @@ function GUICompRegion() : GUICompController() constructor {
 						_xx = __get_controller_archor_x__(_comp.__halign__);
 						_yy = __get_controller_archor_y__(_comp.__valign__);
 						
-						_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__ + scroll.x_off;
-						_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__ + scroll.y_off;
+						_comp.x = x + _xx + _comp.x_offset + _comp.__internal_x__ + scroll.x_off;
+						_comp.y = y + _yy + _comp.y_offset + _comp.__internal_y__ + scroll.y_off;
 						
 						//if the component is a controller it's self have it update it's children
 						if (_comp.__is_controller__) {

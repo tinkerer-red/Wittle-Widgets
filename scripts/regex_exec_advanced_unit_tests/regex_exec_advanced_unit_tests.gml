@@ -90,7 +90,7 @@ function standard_collisions() {
 /// @param {Real} [some_data=2] Some optional data.
 function SomeConstructor(some_data = 2) constructor {
 
-    self.some_data = some_data;
+    some_data = some_data;
 
     /// @description Some example function!
     /// @pure
@@ -101,7 +101,7 @@ function SomeConstructor(some_data = 2) constructor {
             return false;
         }
 
-        return real(stuff) == self.some_data;
+        return real(stuff) == some_data;
     };
 
 }

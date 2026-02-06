@@ -1,6 +1,34 @@
 /// obj_ww_demo :: User Event 15
 /// Workbench-only demo.
 
+function __ww_demo_paint_color(_paint, _fallback) {
+	if (_paint == undefined) return _fallback;
+	var _c = variable_struct_get(_paint, "color");
+	return (_c != undefined) ? _c : _fallback;
+}
+
+function __ww_demo_theme_palette() {
+	var _t = wwThemeGet();
+	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
+	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
+	if (_mode == "") {
+		_t = wwThemeSet(wwThemeDark());
+	}
+	var _colors = (is_struct(_t)) ? variable_struct_get(_t, "colors") : undefined;
+	var _app = (_colors != undefined) ? variable_struct_get(_colors, "app") : undefined;
+	var _surface = (_colors != undefined) ? variable_struct_get(_colors, "surface") : undefined;
+	var txt = (_colors != undefined) ? variable_struct_get(_colors, "text") : undefined;
+
+	return {
+		page: __ww_demo_paint_color((_app != undefined) ? variable_struct_get(_app, "bg") : undefined, make_color_rgb(16, 16, 18)),
+		panel: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel") : undefined, make_color_rgb(32, 32, 36)),
+		panel_alt: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(40, 40, 46)),
+		header: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(26, 26, 30)),
+		text: __ww_demo_paint_color((txt != undefined) ? variable_struct_get(txt, "primary") : undefined, make_color_rgb(230, 230, 235)),
+		text_dim: __ww_demo_paint_color((txt != undefined) ? variable_struct_get(txt, "dim") : undefined, make_color_rgb(170, 170, 180)),
+	};
+}
+
 function __ww_workbench_nav_run() {
 	main.select_ctor(ctor);
 }
@@ -207,9 +235,7 @@ function __ww_workbench_make_nav_button(_label_text, _ctor_name, _width) {
 	var _b = new WWButtonText()
 		.set_size(_width, 26)
 		.set_text(_label_text)
-		.set_text_font(fnt_ww_consolas_msdf)
-		.set_text_color(state.theme.text)
-		.set_background_color(state.theme.panel_alt);
+		.set_text_font(fnt_ww_consolas_msdf);
 	var _nav_ctx = new __WWWorkbench_NavCtx(self, _ctor_name);
 	_b.set_callback(_nav_ctx.run);
 	return _b;
@@ -283,14 +309,7 @@ function __WWWorkbenchCtx(_state) constructor {
 }
 
 function build_ui_folder_demo() {
-	var _theme = {
-		page: make_color_rgb(16, 16, 18),
-		panel: make_color_rgb(32, 32, 36),
-		panel_alt: make_color_rgb(40, 40, 46),
-		header: make_color_rgb(26, 26, 30),
-		text: make_color_rgb(230, 230, 235),
-		text_dim: make_color_rgb(170, 170, 180),
-	};
+	var _theme = __ww_demo_theme_palette();
 
 	root = new WWCore()
 		.set_offset(0, 0)

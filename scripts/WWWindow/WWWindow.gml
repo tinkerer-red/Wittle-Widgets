@@ -23,12 +23,12 @@ function WWWindow() : WWCore() constructor {
             static set_size = function(_width, _height) {
                 __size_set__ = true;
                 __set_size__(_width, _height);
-                titleBar.set_size(self.width, 30);
+                titleBar.set_size(width, 30);
                 // If content is set, update its size or reposition if needed.
                 if(content) {
                     // For instance, we might want content to fill the remaining window area.
                     content.set_offset(0, 30);
-                    content.set_size(self.width, self.height - 30);
+                    content.set_size(width, height - 30);
                 }
                 return self;
             }
@@ -55,14 +55,14 @@ function WWWindow() : WWCore() constructor {
             static set_content = function(_content) {
                 // If a previous content exists, remove it.
                 if(content) {
-                    self.remove(content);
+                    remove(content);
                 }
                 content = _content;
                 // Position the content below the titleBar.
                 content.set_offset(0, 30);
                 // Fill the remaining area of the window.
-                content.set_size(self.width, self.height - 30);
-                self.add(content);
+                content.set_size(width, height - 30);
+                add(content);
                 return self;
             }
         #endregion
@@ -71,7 +71,7 @@ function WWWindow() : WWCore() constructor {
         // Create a Title Bar with close, minimize, and maximize buttons, plus a title label.
         titleBar = new WWButton()
             .set_offset(0, 0)
-            .set_size(self.width, 30)
+            .set_size(width, 30)
             .set_background_color(c_dkgray);
         
         // Minimize Button (positioned next to maximize)
@@ -140,19 +140,19 @@ function WWWindow() : WWCore() constructor {
         titleBar.add(minimizeButton);
         titleBar.add(closeButton);
         titleBar.add(titleLabel);
-        self.add(titleBar);
+        add(titleBar);
         #endregion
         
         #region Events
         // Use titleBar's events to handle dragging.
         titleBar.on_pressed(function(_input) {
             // Record initial drag offset.
-            dragOffsetX = device_mouse_x_to_gui(0) - self.x;
-            dragOffsetY = device_mouse_y_to_gui(0) - self.y;
+            dragOffsetX = device_mouse_x_to_gui(0) - x;
+            dragOffsetY = device_mouse_y_to_gui(0) - y;
         });
         titleBar.on_interact(function(_input) {
             // Update window position based on current mouse position.
-            self.set_offset(device_mouse_x_to_gui(0) - dragOffsetX, device_mouse_y_to_gui(0) - dragOffsetY);
+            set_offset(device_mouse_x_to_gui(0) - dragOffsetX, device_mouse_y_to_gui(0) - dragOffsetY);
         });
 		#endregion
         
@@ -162,8 +162,8 @@ function WWWindow() : WWCore() constructor {
         dragOffsetY = 0;
         minimized = false;
         maximized = false;
-        originalSize = { width: self.width, height: self.height };
-        originalOffset = { x: self.x, y: self.y };
+        originalSize = { width: width, height: height };
+        originalOffset = { x: x, y: y };
         // Content variable to hold custom viewport.
         content = undefined;
         #endregion
@@ -176,7 +176,7 @@ function WWWindow() : WWCore() constructor {
             /// @returns {Struct.WWWindow}
             #endregion
             static center = function() {
-            self.set_offset((1280 - self.width) / 2, (720 - self.height) / 2);
+            set_offset((1280 - width) / 2, (720 - height) / 2);
             return self;
             }
         #endregion

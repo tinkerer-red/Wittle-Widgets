@@ -808,7 +808,7 @@ function WWTextField() : WWCore() constructor {
 			});
 			on_mouse_off(function(){
 				if (mouse_check_button_pressed(mb_left)) {
-					trigger_event(self.events.focus_exit);
+					trigger_event(events.focus_exit);
 					__is_focused__ = false;
 				}
 			})
@@ -1467,7 +1467,7 @@ function WWTextField() : WWCore() constructor {
 					return;
 				}
 				trigger_event(events.submit);
-				trigger_event(self.events.focus_exit);
+				trigger_event(events.focus_exit);
 				__is_focused__ = false;
 			});
 			#endregion
@@ -2960,7 +2960,7 @@ function WWTextField() : WWCore() constructor {
 					
 					// Compute target y offset based on page height and direction
 					var _current_y_offset = renderer.get_line_y_offset(_current_line);
-					var _page_height = self.height * 0.75 * abs(_vector);
+					var _page_height = height * 0.75 * abs(_vector);
 					var _target_y_offset = _current_y_offset + (_page_height * _vector);
 
 					var _target_line = _current_line;
@@ -4499,7 +4499,7 @@ function WWTextField() : WWCore() constructor {
 						var _current_line = renderer.get_line_from_index(_cursor_index);
 						var _line_count = renderer.get_line_count();
 						var _current_y_offset = renderer.get_line_y_offset(_current_line);
-						var _page_height = self.height * 0.75 * abs(_vector);
+						var _page_height = height * 0.75 * abs(_vector);
 						var _target_y_offset = _current_y_offset + (_page_height * _vector);
 						var _target_line = _current_line;
 						if (_vector > 0) {

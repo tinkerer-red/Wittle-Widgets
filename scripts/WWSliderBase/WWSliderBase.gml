@@ -37,7 +37,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		static set_value = function(_value) {
 			__set_value__(_value);
 			lerp_target = value;
-			//trigger_event(self.events.value_input, self.value);
+			//trigger_event(events.value_input, value);
 			return self;
 		}
 		#region jsDoc
@@ -50,7 +50,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		static set_normalized_value = function(_value) {
 			__set_normalized_value__(_value);
 			lerp_target = value;
-			//trigger_event(self.events.value_input, self.value);
+			//trigger_event(events.value_input, value);
 			return self;
 		}
 		#region jsDoc
@@ -147,21 +147,21 @@ function WWSliderBase() : WWButtonSprite() constructor {
         
         #region Events
 			
-			self.events.value_input       = variable_get_hash("value_input"); //if a value was input in any way, this will trigger every frame the slider is interacted wtih
-			self.events.value_changed     = variable_get_hash("value_changed"); //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
-			self.events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
-			self.events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
+			events.value_input       = variable_get_hash("value_input"); //if a value was input in any way, this will trigger every frame the slider is interacted wtih
+			events.value_changed     = variable_get_hash("value_changed"); //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
+			events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
+			events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
 			
 			on_post_step(function(_input) {
 				//apply smoothing from target value
 				if (lerp_target != value) {
 					if ( abs(lerp_target - value) < 0.0025 ) {
 						__set_value__(lerp_target);
-						trigger_event(self.events.value_input, self.value);
+						trigger_event(events.value_input, value);
 					}
 					else {
 						__set_value__(value + (lerp_target - value) * 0.175);
-						trigger_event(self.events.value_input, self.value);
+						trigger_event(events.value_input, value);
 					}
 				}
 			})
@@ -178,8 +178,6 @@ function WWSliderBase() : WWButtonSprite() constructor {
 			round_value = false;
 			is_inverted = false;
 			
-			//dont render
-			set_sprite(undefined)
 			visible = false;
 			
 			background = new WWSliderBackgroud()
@@ -318,12 +316,12 @@ function WWSliderBase() : WWButtonSprite() constructor {
 				
 				// trigger events
 				if (__prev_value__ != value) {
-					trigger_event(self.events.value_changed, self.value);
+					trigger_event(events.value_changed, value);
 					if (__prev_value__ < value) {
-						trigger_event(self.events.value_incremented, self.value);
+						trigger_event(events.value_incremented, value);
 					}
 					else {
-						trigger_event(self.events.value_decremented, self.value);
+						trigger_event(events.value_decremented, value);
 					}
 				}
 				
@@ -351,12 +349,12 @@ function WWSliderBase() : WWButtonSprite() constructor {
 				
 				// trigger events
 				if (__prev_value__ != value) {
-					trigger_event(self.events.value_changed, self.value);
+					trigger_event(events.value_changed, value);
 					if (__prev_value__ < value) {
-						trigger_event(self.events.value_incremented, self.value);
+						trigger_event(events.value_incremented, value);
 					}
 					else {
-						trigger_event(self.events.value_decremented, self.value);
+						trigger_event(events.value_decremented, value);
 					}
 				}
 				

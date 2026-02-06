@@ -354,6 +354,7 @@ function ww_inspector_build_workbench_tree(_canvas, _leaf_constructor_name, _ins
 				if (is_undefined(_val)) {
 					switch (_arg_type) {
 						case "Real": _val = 0; break;
+						case "Color": _val = 0; break;
 						case "Bool": _val = false; break;
 						case "String": _val = ""; break;
 						default: _val = ""; break;

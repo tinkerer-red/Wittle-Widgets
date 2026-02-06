@@ -26,27 +26,96 @@ function WWButtonSprite() : WWSprite() constructor {
 		
 		#region Events
 			
-			on_pressed(function(_input){
-				image_index = GUI_IMAGE_PRESSED;
-			})
-			on_held(function(_input){
-				if (__is_hovered__) {
-					image_index = GUI_IMAGE_PRESSED;
+			// Theme-driven draw path: only references theme when values are undefined.
+			on_pre_draw(function(_input) {
+				if (!visible) return;
+				
+				// If user explicitly set a sprite, let base WWSprite draw it.
+				if (sprite_index != undefined) return;
+				
+				__recalc_visual_state__();
+				
+				var _t = wwThemeGet();
+				
+				var _spr;
+				var _bg;
+				
+				switch (__theme_kind__) {
+					case 1:
+						// Checkbox
+						_spr = sprite_index ?? ((is_checked)
+							? (sprite_checked ?? _t.assets.sprites.checkbox_checked)
+							: (sprite_unchecked ?? _t.assets.sprites.checkbox_unchecked));
+						_bg = _t.components.checkbox.bg;
+						break;
+					case 2:
+						// Button (text variant sprite)
+						_spr = sprite_index ?? _t.assets.sprites.button_text;
+						_bg = _t.components.button.bg;
+						break;
+					default:
+						// Button
+						_spr = sprite_index ?? _t.assets.sprites.button;
+						_bg = _t.components.button.bg;
+						break;
 				}
-			})
-			on_hover(function(_input){
-				image_index = GUI_IMAGE_HOVER;
-			})
-			on_hover_exit(function(_input){
-				image_index = GUI_IMAGE_ENABLED;
-			})
+				
+				if (!sprite_exists(_spr)) return;
+				
+				var _paint = _bg.normal;
+				switch (__visual_state__) {
+					case 3: _paint = _bg.disabled; break;
+					case 2: _paint = _bg.active; break;
+					case 1: _paint = _bg.hover; break;
+					case 4: _paint = _bg.focused; break;
+					default: break;
+				}
+				
+				var _blend  = image_blend ?? _paint.color;
+				var _alpha  = image_alpha ?? _paint.alpha;
+				var _xscale = image_xscale ?? 1;
+				var _yscale = image_yscale ?? 1;
+				var _frame  = (image_index ?? 0);
+				if (_frame < 0) _frame = 0;
+				
+				if (_alpha == 0) return;
+				if (_xscale == 0) return;
+				if (_yscale == 0) return;
+				
+				if (_alpha == 1)
+				&& (_blend == c_white)
+				&& (_xscale == 1)
+				&& (_yscale == 1) {
+					draw_sprite_stretched(
+						_spr,
+						_frame,
+						x,
+						y,
+						width,
+						height
+					);
+				}
+				else {
+					draw_sprite_stretched_ext(
+						_spr,
+						_frame,
+						x,
+						y,
+						width * _xscale,
+						height * _yscale,
+						_blend,
+						_alpha
+					);
+				}
+			});
 			
 			
 		#endregion
 		
 		#region Variables
 			
-			set_sprite(sButton); // init the sprite variables
+			__visual_state__ = 0;
+			__theme_kind__ = 0; // 0=button, 1=checkbox, 2=button_text
 			
 		#endregion
 		

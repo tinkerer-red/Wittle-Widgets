@@ -37,14 +37,14 @@ function WWToast() : WWCore() constructor {
         messageText = new WWLabel()
             .set_offset(10, 10)
             .set_text("Toast Message");
-        self.add(messageText);
+        add(messageText);
         #endregion
         
         #region Events
         on_post_step(function(_input) {
             duration -= 1;
             if (duration <= 0) {
-                self.set_enabled(false);
+                set_enabled(false);
             }
         });
         #endregion

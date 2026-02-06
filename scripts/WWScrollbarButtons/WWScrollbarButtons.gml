@@ -22,9 +22,9 @@ function WWScrollbarButtons() : WWCore() constructor {
             static set_size = function(_width, _height) {
                 __size_set__ = true;
                 __set_size__(_width, _height);
-                upButton.set_size(self.width, 30);
-                slider.set_size(self.width, self.height-60);
-                downButton.set_size(self.width, 30);
+                upButton.set_size(width, 30);
+                slider.set_size(width, height-60);
+                downButton.set_size(width, 30);
                 
                 return self;
             }
@@ -195,7 +195,7 @@ function WWScrollbarButtons() : WWCore() constructor {
             // Up Arrow Button
             upButton = new WWButtonSprite()
                 .set_offset(0, 0)
-                .set_size(self.width, 30)
+                .set_size(width, 30)
                 .set_callback(function() {
                     // Decrease the slider's value by a fixed step.
                     slider.set_value(slider.get_value() - 0.05);
@@ -205,38 +205,38 @@ function WWScrollbarButtons() : WWCore() constructor {
             // Its height is the total height minus the up and down button areas.
             slider = new WWSliderVert()
                 .set_offset(0, 30)
-                .set_size(self.width, self.height - 60)
+                .set_size(width, height - 60)
                 .set_value(0.0)
                 .set_callback(function() {
                     // Fire a custom event with the new scroll value.
-                    trigger_event(self.events.scroll_changed, slider.get_value());
+                    trigger_event(events.scroll_changed, slider.get_value());
                 });
             
             // Down Arrow Button
             downButton = new WWButtonSprite()
                 .set_alignment(fa_left, fa_bottom)
                 .set_offset(0, -30)
-                .set_size(self.width, 30)
+                .set_size(width, 30)
                 .set_callback(function() {
                     // Increase the slider's value by a fixed step.
                     slider.set_value(slider.get_value() + 0.05);
                 });
             
-            self.add(upButton);
-            self.add(slider);
-            self.add(downButton);
+            add(upButton);
+            add(slider);
+            add(downButton);
 			//__adopt_children_events__();
         #endregion
         
         #region Events
             // Custom event fired whenever the slider's value changes.
-            self.events.scroll_changed = variable_get_hash("scroll_changed");
+            events.scroll_changed = variable_get_hash("scroll_changed");
         #endregion
         
         #region Variables
             // Full content height and visible area height.
-            canvasHeight = self.height;    // Defaults to window height (can be set via builder)
-            coverageHeight = self.height - 60;  // Visible area = total height minus button areas.
+            canvasHeight = height;    // Defaults to window height (can be set via builder)
+            coverageHeight = height - 60;  // Visible area = total height minus button areas.
 			
 			__user_callback__ = undefined;
 			__default_up_callback__ = upButton.get_callback();

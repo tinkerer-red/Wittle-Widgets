@@ -466,10 +466,10 @@ function WWTextRenderer() : WWCore() constructor {
 
             // Styling
             caption = "";
-            font = fnt_ww_default_small;
+            font = undefined;
             font_fallbacks = [];
-            color = c_white;
-            alpha = 1;
+            color = undefined;
+            alpha = undefined;
 
 
             // Formatting / diagnostics (optional)
@@ -1896,27 +1896,32 @@ function WWTextRenderer() : WWCore() constructor {
                     return;
                 }
 
+				var _t = wwThemeGet();
+				var _font = font ?? _t.typography.text_styles.body.font;
+				var _color = color ?? _t.typography.text_styles.body.color.color;
+				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
+				
                 var _text_value = "";
                 if (!is_undefined(__textbox_parent__)) {
                     _text_value = __textbox_parent__.get_text();
                 }
-
+				
                 if (_text_value == "") {
                     _text_value = caption;
                 }
-
+				
                 __display_text__ = _text_value;
-
+				
 				var _processed_text = _text_value;
 				var _processed_spans = undefined;
 				var _processed_align_runs = undefined;
-
+				
 				if (!is_undefined(__text_processor__)) {
-
+					
 					var _default_state = {
-					    color: color,
-					    alpha: alpha,
-					    font_asset: font,
+					    color: _color,
+					    alpha: _alpha,
+					    font_asset: _font,
 					    style: __WW_Text_Glyph_Style.Regular,
 					    size_mul: 1,
 					    underline: __WW_Text_Glyph_Underline.None,
@@ -1949,9 +1954,9 @@ function WWTextRenderer() : WWCore() constructor {
                     _spans_to_use = [{
                         start_index: 0,
                         end_index: _processed_len,
-                        font_asset: font,
-                        color: color,
-                        alpha: alpha,
+                        font_asset: _font,
+                        color: _color,
+                        alpha: _alpha,
                         style: __WW_Text_Glyph_Style.Regular,
                         underline: __WW_Text_Glyph_Underline.None,
                         strike: __WW_Text_Glyph_Strike.None,
@@ -2442,19 +2447,23 @@ function WWTextRenderer() : WWCore() constructor {
             /// @returns {Undefined}
             #endregion
             static __build_layout__ = function(_str, _spans=undefined) {
-
+				
                 static __empty_arr = [];
 				static __layout_in_buff = buffer_create(0, buffer_grow, 1);
 
                 _spans ??= __empty_arr;
-
+				
                 __layout_reset__(_spans);
 
                 if (_str == "") {
-
                     return;
                 }
-
+				
+				var _t = wwThemeGet();
+				var _font = font ?? _t.typography.text_styles.body.font;
+				var _color = color ?? _t.typography.text_styles.body.color.color;
+				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
+				
                 // Buffer input for fast scanning (UTF-8) + sentinel
                 var _byte_len = string_byte_length(_str);
                 buffer_resize(__layout_in_buff, _byte_len + 8);
@@ -2491,11 +2500,11 @@ function WWTextRenderer() : WWCore() constructor {
                 var _visual_run_index = 0;
                 var _visual_remaining = 0;
 
-                var _visual_color = color;
+                var _visual_color = _color;
                 var _visual_back_color = undefined;
                 var _visual_back_alpha = undefined;
                 var _visual_strike = __WW_Text_Glyph_Strike.None;
-                var _visual_alpha = alpha;
+                var _visual_alpha = _alpha;
                 var _visual_underline = __WW_Text_Glyph_Underline.None;
 
                 // Load first metric run
@@ -2521,13 +2530,13 @@ function WWTextRenderer() : WWCore() constructor {
 
                     _visual_remaining = (_run.end_index - _run.start_index);
 
-                    _visual_color = is_undefined(_run.color) ? color : _run.color;
-                    _visual_alpha = is_undefined(_run.alpha) ? alpha : _run.alpha;
-                    _visual_underline = is_undefined(_run.underline) ? __WW_Text_Glyph_Underline.None : _run.underline;
+                    _visual_color = _run.color ?? _color;
+                    _visual_alpha = _run.alpha ?? _alpha;
+                    _visual_underline = _run.underline ?? __WW_Text_Glyph_Underline.None;
 
-                    _visual_back_color = _run[$ "back_color"];
-                    _visual_back_alpha = _run[$ "back_alpha"];
-                    _visual_strike = _run[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
+                    _visual_back_color = _run.back_color;
+                    _visual_back_alpha = _run.back_alpha;
+                    _visual_strike = _run.strike ?? __WW_Text_Glyph_Strike.None;
                 }
 
                 // ---------------------------------
@@ -2540,15 +2549,24 @@ function WWTextRenderer() : WWCore() constructor {
                 var _active_space_width = 0;
                 var _active_tab_width = 0;
                 var _active_font_height = 1;
-
-                // Select initial font = renderer font
-                if (font_exists(font)) {
-                    draw_set_font(font);
-                    _active_font = font;
+				var _active_font_scale = 1;
+				
+				// Select initial font = renderer font
+                if (font_exists(_font)) {
+                    draw_set_font(_font);
+                    _active_font = _font;
                 } else {
                     _active_font = draw_get_font();
                 }
 
+				var _active_font_data0 = __font_get_render_data__(_active_font);
+                if (_active_font_data0 != undefined) {
+                    _active_font_scale = _active_font_data0.size_mul_default;
+                }
+                else {
+                    _active_font_scale = 1;
+                }
+				
                 _active_space_width = string_width(" ");
                 _active_tab_width = _active_space_width * tab_size_spaces;
                 __space_width__ = _active_space_width;
@@ -2634,7 +2652,14 @@ function WWTextRenderer() : WWCore() constructor {
 				        _active_space_width = string_width(" ");
 				        _active_tab_width = _active_space_width * tab_size_spaces;
 				        _active_font_height = string_height("A");
-
+                        var _active_font_data1 = __font_get_render_data__(_active_font);
+                        if (_active_font_data1 != undefined) {
+                            _active_font_scale = _active_font_data1.size_mul_default;
+                        }
+                        else {
+                            _active_font_scale = 1;
+                        }
+                        
 				        if (_active_font_height <= 0) {
 				            _active_font_height = 1;
 				        }
@@ -2705,27 +2730,32 @@ function WWTextRenderer() : WWCore() constructor {
 				    }
 
                     // Measure advance in "layout units" (scaled width)
+                    var _metric_size_mul_eff = _metric_size_mul * _active_font_scale;
+                    if (_metric_size_mul_eff <= 0) { _metric_size_mul_eff = 1; }
                     var _advance = 0;
 
                     if (_cp == 9) {
 
-				        if (tab_use_stops) {
-				            var _next_stop = ceil((_line_width + 0.001) / _active_tab_width) * _active_tab_width;
-				            _advance = _next_stop - _line_width;
-				        } else {
-				            _advance = _active_tab_width;
-				        }
+                        var _tab_w_scaled = _active_tab_width * _metric_size_mul_eff;
+                        if (_tab_w_scaled <= 0) { _tab_w_scaled = 1; }
+
+                        if (tab_use_stops) {
+                            var _next_stop = ceil((_line_width + 0.001) / _tab_w_scaled) * _tab_w_scaled;
+                            _advance = _next_stop - _line_width;
+                        } else {
+                            _advance = _tab_w_scaled;
+                        }
 
                     } else if (_cp == 32) {
 
-				        _advance = _active_space_width * _metric_size_mul;
+                        _advance = _active_space_width * _metric_size_mul_eff;
 
 				    } else {
                         var _char_val = chr(_cp);
-                        _advance = string_width(_char_val) * _metric_size_mul;
+                        _advance = string_width(_char_val) * _metric_size_mul_eff;
 				    }
 
-				    var _char_height = _active_font_height * _metric_size_mul;
+                    var _char_height = _active_font_height * _metric_size_mul_eff;
 				    if (_char_height > _line_height) {
 				        _line_height = _char_height;
 				    }
@@ -2930,7 +2960,7 @@ function WWTextRenderer() : WWCore() constructor {
                             _visual_strike = _vrn[$ "strike"] ?? __WW_Text_Glyph_Strike.None;
                         }
 
-                        var _want_font2 = font;
+                        var _want_font2 = _font;
                         if (!is_undefined(_metric_font_override) && _metric_font_override != -1) {
                             _want_font2 = _metric_font_override;
                         }
@@ -2941,6 +2971,15 @@ function WWTextRenderer() : WWCore() constructor {
                             _active_space_width = string_width(" ");
                             _active_tab_width = _active_space_width * tab_size_spaces;
                             _active_font_height = string_height("A");
+
+							var _active_font_data2 = __font_get_render_data__(_active_font);
+							if (_active_font_data2 != undefined) {
+							    _active_font_scale = _active_font_data2.size_mul_default;
+							}
+                            else {
+							    _active_font_scale = 1;
+							}
+
                             if (_active_font_height <= 0) {
                                 _active_font_height = 1;
                             }
@@ -2977,23 +3016,34 @@ function WWTextRenderer() : WWCore() constructor {
 
                         var _char_emit = chr(_cpe);
 
+                        var _metric_size_mul_eff2 = _metric_size_mul * _active_font_scale;
+                        if (_metric_size_mul_eff2 <= 0) { _metric_size_mul_eff2 = 1; }
+
                         var _base_wid = 0;
+                        var _advance_scaled2 = 0;
 						if (_cpe == 9) {
+                            var _tab_w_scaled2 = _active_tab_width * _metric_size_mul_eff2;
+                            if (_tab_w_scaled2 <= 0) { _tab_w_scaled2 = 1; }
+
                             if (tab_use_stops) {
-                                var _next_stop2 = ceil((_cursor_x + 0.001) / _active_tab_width) * _active_tab_width;
-                                _base_wid = _next_stop2 - _cursor_x;
+                                var _next_stop2 = ceil((_cursor_x + 0.001) / _tab_w_scaled2) * _tab_w_scaled2;
+                                _advance_scaled2 = _next_stop2 - _cursor_x;
                             } else {
-                                _base_wid = _active_tab_width;
+                                _advance_scaled2 = _tab_w_scaled2;
                             }
+
+                            _base_wid = _advance_scaled2 / _metric_size_mul_eff2;
 						} else if (_cpe == 32) {
                             _base_wid = _active_space_width;
+                            _advance_scaled2 = _base_wid * _metric_size_mul_eff2;
                         } else {
                             _base_wid = string_width(_char_emit);
+                            _advance_scaled2 = _base_wid * _metric_size_mul_eff2;
                         }
 
                         var _base_hei = _active_font_height;
 
-                        var _scaled_hei = _base_hei * _metric_size_mul;
+                        var _scaled_hei = _base_hei * _metric_size_mul_eff2;
                         if (_scaled_hei > _max_height) {
                             _max_height = _scaled_hei;
                         }
@@ -3005,12 +3055,12 @@ function WWTextRenderer() : WWCore() constructor {
                             _emit_index,
                             _cursor_x,
                             _current_y,
-                            _base_wid,
-                            _base_hei,
+                            _advance_scaled2,
+                            _scaled_hei,
                             _span_index
                         );
 
-                        _cursor_x += (_base_wid * _metric_size_mul);
+                        _cursor_x += _advance_scaled2;
 
                         _metric_remaining -= 1;
                         _visual_remaining -= 1;
@@ -3083,7 +3133,7 @@ function WWTextRenderer() : WWCore() constructor {
 			        __font_cache__[$ ("__missing__" + string(_font_asset))] = { missing: true };
 			        return undefined;
 			    }
-
+				
 			    var _tex = font_get_texture(_font_asset);
 			    var _uvs = font_get_uvs(_font_asset);
 
@@ -3091,6 +3141,25 @@ function WWTextRenderer() : WWCore() constructor {
 			    var _sdf_spread = 0;
 			    var _sdf_shader = undefined;
 
+                // Optional per-font default scale via asset tag: font_size:<value>
+                // Example: font_size:2 => render at 1/2 scale (atlas is 2x)
+                var _size_mul_default = 1;
+                var _tags = asset_get_tags(_font_asset);
+                var _ti = 0;
+                repeat (array_length(_tags)) {
+                    var _tag_text = _tags[_ti];
+                    _ti += 1;
+                    if (string_pos("font_size:", _tag_text) == 1) {
+                        // "font_size:" is 10 characters
+                        var _value_text = string_delete(_tag_text, 1, 10);
+                        var _v = real(_value_text);
+                        if (_v > 0) {
+                            _size_mul_default = 1 / _v;
+                        }
+                        break;
+                    }
+                }
+                
 			    if (_sdf_enabled) {
 			        _sdf_spread = _info.sdfSpread;
 			        _sdf_shader = (asset_has_any_tag(_font_asset, "msdf")) ? shd_ww_msdf : shd_ww_sdf;
@@ -3114,9 +3183,10 @@ function WWTextRenderer() : WWCore() constructor {
 			        texel_w: _texel_w,
 			        texel_h: _texel_h,
 
-			        sdf_enabled: _sdf_enabled,
-			        sdf_spread: _sdf_spread,
-			        sdf_shader: _sdf_shader
+                    sdf_enabled: _sdf_enabled,
+                    sdf_spread: _sdf_spread,
+                    sdf_shader: _sdf_shader,
+                    size_mul_default: _size_mul_default
 			    };
 
 			    __font_cache__[$ _font_asset] = _render_data;
@@ -4291,10 +4361,15 @@ function WWTextRenderer() : WWCore() constructor {
             /// @returns {Undefined}
             #endregion
 			static __build_vb__ = function() {
+				var _t = wwThemeGet();
+				var _font = font ?? _t.typography.text_styles.body.font;
+				var _color = color ?? _t.typography.text_styles.body.color.color;
+				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
 
+				
 			    var _old_font = draw_get_font();
-			    if (font_exists(font)) {
-			        draw_set_font(font);
+			    if (font_exists(_font)) {
+			        draw_set_font(_font);
 			    }
 
                 var _glyphs = __layout_glyphs__;
@@ -4492,7 +4567,7 @@ function WWTextRenderer() : WWCore() constructor {
                     __vb_emit_clip__ = undefined;
                 }
 
-			    var _default_font_data = __font_get_render_data__(font);
+			    var _default_font_data = __font_get_render_data__(_font);
 			    if (is_undefined(_default_font_data)) {
 			        if (font_exists(_old_font) && _old_font != draw_get_font()) {
 			            draw_set_font(_old_font);
@@ -4506,9 +4581,12 @@ function WWTextRenderer() : WWCore() constructor {
 			    var _ws_space_marker = whitespace_marker_space;
 			    var _ws_tab_marker = whitespace_marker_tab;
 
+                var _ws_marker_scale = 1;
 			    var _ws_space_width = 0;
 			    if (_use_whitespace) {
-			        _ws_space_width = string_width(_ws_space_marker);
+                    _ws_marker_scale = _default_font_data.size_mul_default;
+                    if (is_undefined(_ws_marker_scale) || _ws_marker_scale <= 0) { _ws_marker_scale = 1; }
+                    _ws_space_width = string_width(_ws_space_marker) * _ws_marker_scale;
 			    }
 
 			    var _ws_batch_buffer = -1;
@@ -4609,15 +4687,15 @@ function WWTextRenderer() : WWCore() constructor {
 			        var _final_alpha = _span.alpha;
 
 			        // Default formatting values when formatting is disabled
-			        var _final_font = font;
+			        var _final_font = _font;
 			        var _final_style = __WW_Text_Glyph_Style.Regular;
 			        var _final_size = 1;
-
+					
 			        var _final_under = __WW_Text_Glyph_Underline.None;
 			        var _final_strike = __WW_Text_Glyph_Strike.None;
-
-			        var _final_back_col = c_white;
-			        var _final_back_alp = 0;
+					
+			        var _final_back_col = _color;
+			        var _final_back_alp = _alpha;
 
 			        if (_use_formatting) {
 			            var _span_font = _span.font_asset;
@@ -4635,11 +4713,23 @@ function WWTextRenderer() : WWCore() constructor {
 			            _final_back_col = _span.back_color;
 			            _final_back_alp = _span.back_alpha;
 			        }
+
+                    // Apply per-font default scale (font_size:<value>) to the span's size multiplier.
+                    var _span_font_scale = 1;
+                    var _span_font_data = __font_get_render_data__(_final_font);
+                    if (!is_undefined(_span_font_data)) {
+                        _span_font_scale = _span_font_data.size_mul_default;
+                        if (is_undefined(_span_font_scale) || _span_font_scale <= 0) { _span_font_scale = 1; }
+                    }
+                    var _final_size_scaled = _final_size * _span_font_scale;
+                    if (_final_size_scaled <= 0) { _final_size_scaled = 1; }
+                    
 			        if (_use_whitespace) {
 
 			            if (_char == " ") {
 
-			                var _cell_w = _wid * _final_size;
+                            // Layout glyph width is already in final scaled pixels.
+                            var _cell_w = _wid;
 
 			                var _mark_x = _pos_x;
 			                if (_cell_w > 0 && _ws_space_width > 0) {
@@ -4654,7 +4744,7 @@ function WWTextRenderer() : WWCore() constructor {
 			                    _pos_y,
 			                    whitespace_color,
 			                    whitespace_alpha,
-			                    1,
+                                _ws_marker_scale,
 			                    __WW_Text_Glyph_Style.Regular
                             );
 
@@ -4676,7 +4766,7 @@ function WWTextRenderer() : WWCore() constructor {
 			                    _pos_y,
 			                    whitespace_color,
 			                    whitespace_alpha,
-			                    1,
+                                _ws_marker_scale,
 			                    __WW_Text_Glyph_Style.Regular
                             );
 
@@ -4691,9 +4781,9 @@ function WWTextRenderer() : WWCore() constructor {
 			        if (_final_back_alp > 0) {
 
 			            var _bg_x0 = _pos_x;
-			            var _bg_x1 = _pos_x + (_wid * _final_size);
+                            var _bg_x1 = _pos_x + _wid;
 			            var _bg_y0 = _pos_y;
-			            var _bg_y1 = _pos_y + (_hei * _final_size);
+                            var _bg_y1 = _pos_y + _hei;
 
 			            if (!_bg_span_state.active) {
 
@@ -4800,7 +4890,7 @@ function WWTextRenderer() : WWCore() constructor {
 			            _pos_y,
 			            _final_color,
 			            _final_alpha,
-			            _final_size,
+                        _final_size_scaled,
 			            _final_style
 			        );
 
@@ -4809,14 +4899,14 @@ function WWTextRenderer() : WWCore() constructor {
                     }
 			        if (_final_under != __WW_Text_Glyph_Underline.None) {
 
-			            var _underline_y = _pos_y + (_hei * _final_size) + underline_y_offset;
+                            var _underline_y = _pos_y + _hei + underline_y_offset;
 
 			            if (!_ul_span_state.active) {
 
 			                _ul_span_state.active = true;
 			                _ul_span_state.under = _final_under;
 			                _ul_span_state.x0 = _pos_x;
-			                _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+                                    _ul_span_state.x1 = _pos_x + _wid;
 			                _ul_span_state.y = _underline_y;
 			                _ul_span_state.col = _final_color;
 			                _ul_span_state.alp = _final_alpha;
@@ -4835,14 +4925,14 @@ function WWTextRenderer() : WWCore() constructor {
 			                    _ul_span_state.active = true;
 			                    _ul_span_state.under = _final_under;
 			                    _ul_span_state.x0 = _pos_x;
-			                    _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+                                        _ul_span_state.x1 = _pos_x + _wid;
 			                    _ul_span_state.y = _underline_y;
 			                    _ul_span_state.col = _final_color;
 			                    _ul_span_state.alp = _final_alpha;
 
 			                } else {
 
-			                    _ul_span_state.x1 = _pos_x + (_wid * _final_size);
+                                        _ul_span_state.x1 = _pos_x + _wid;
 			                }
 			            }
 
@@ -4852,14 +4942,14 @@ function WWTextRenderer() : WWCore() constructor {
 			        }
 			        if (_final_strike != __WW_Text_Glyph_Strike.None) {
 
-			            var _strike_y = _pos_y + floor((_hei * _final_size) * 0.5) + strike_y_offset;
+                            var _strike_y = _pos_y + floor(_hei * 0.5) + strike_y_offset;
 
 			            if (!_st_span_state.active) {
 
 			                _st_span_state.active = true;
 			                _st_span_state.kind = _final_strike;
 			                _st_span_state.x0 = _pos_x;
-			                _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                                    _st_span_state.x1 = _pos_x + _wid;
 			                _st_span_state.y = _strike_y;
 			                _st_span_state.col = _final_color;
 			                _st_span_state.alp = _final_alpha;
@@ -4878,14 +4968,14 @@ function WWTextRenderer() : WWCore() constructor {
 			                    _st_span_state.active = true;
 			                    _st_span_state.kind = _final_strike;
 			                    _st_span_state.x0 = _pos_x;
-			                    _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                                        _st_span_state.x1 = _pos_x + _wid;
 			                    _st_span_state.y = _strike_y;
 			                    _st_span_state.col = _final_color;
 			                    _st_span_state.alp = _final_alpha;
 
 			                } else {
 
-			                    _st_span_state.x1 = _pos_x + (_wid * _final_size);
+                                        _st_span_state.x1 = _pos_x + _wid;
 			                }
 			            }
 

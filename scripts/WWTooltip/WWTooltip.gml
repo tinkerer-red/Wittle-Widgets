@@ -51,9 +51,9 @@ function WWTooltip() : WWLabel() constructor {
             #endregion
             static update_visibility = function() {
             if (tooltipVisible) {
-                self.set_enabled(true);
+                set_enabled(true);
             } else {
-                self.set_enabled(false);
+                set_enabled(false);
             }
             }
         #endregion

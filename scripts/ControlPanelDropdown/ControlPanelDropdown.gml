@@ -165,8 +165,8 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				
 				//adjust the region size based off the window's size
 				if (__CP_ADAPT_TO_WINDOW) {
-					add_event_listener(self.events.pre_step, function(_data) {
-						var _width = floor(window_get_width()-self.x);
+					add_event_listener(events.pre_step, function(_data) {
+						var _width = floor(window_get_width()-x);
 						if (region.get_width() != _width) {
 							set_width(_width)
 						}
@@ -174,7 +174,7 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 				}
 				
 				//adjust the visuals so all components are simillar
-				add_event_listener(self.events.post_step, function(_data) {
+				add_event_listener(events.post_step, function(_data) {
 					
 					var _image_index = (__is_enabled__) ? max(__dropdown__.image_index, __button__.image_index) : GUI_IMAGE_DISABLED;
 					
@@ -216,10 +216,10 @@ function ControlPanelDropdown(_label="<Missing Label>", _arr_of_str, _func) : GU
 					
 					with (__dropdown__){
 						if (is_open) {
-							trigger_event(self.events.opened, {index : current_index, text : text.text});
+							trigger_event(events.opened, {index : current_index, text : text.text});
 						}
 						else {
-							trigger_event(self.events.closed, {index : current_index, text : text.text});
+							trigger_event(events.closed, {index : current_index, text : text.text});
 						}
 					}
 				});

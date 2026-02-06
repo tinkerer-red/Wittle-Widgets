@@ -55,10 +55,10 @@ function GUICompDropdown() : GUICompController() constructor {
 					//run events if needed
 					if (_prev_open != is_open) {
 						if (is_open) {
-							trigger_event(self.events.opened, {index : current_index, text : text.content});
+							trigger_event(events.opened, {index : current_index, text : text.content});
 						}
 						else {
-							trigger_event(self.events.closed, {index : current_index, text : text.content});
+							trigger_event(events.closed, {index : current_index, text : text.content});
 						}
 					}
 					
@@ -383,24 +383,24 @@ function GUICompDropdown() : GUICompController() constructor {
 		
 		#region Events
 			
-			self.events.mouse_over = variable_get_hash("mouse_over"); //triggered when the mouse is over the header
-			self.events.pressed    = variable_get_hash("pressed"); //triggered when mouse first clicks the header
-			self.events.held       = variable_get_hash("held"); //triggered every frame the mouse's click is down on the header
-			self.events.long_press = variable_get_hash("long_press");
-			self.events.released   = variable_get_hash("released"); //triggered when when the mouses click is released from the header
+			events.mouse_over = variable_get_hash("mouse_over"); //triggered when the mouse is over the header
+			events.pressed    = variable_get_hash("pressed"); //triggered when mouse first clicks the header
+			events.held       = variable_get_hash("held"); //triggered every frame the mouse's click is down on the header
+			events.long_press = variable_get_hash("long_press");
+			events.released   = variable_get_hash("released"); //triggered when when the mouses click is released from the header
 			
-			self.events.element_mouse_over   = variable_get_hash("element_mouse_over"); //triggered when the mouse is over an element
-			self.events.element_pressed      = variable_get_hash("element_pressed"); //triggered when mouse first clicks an element
-			self.events.element_held         = variable_get_hash("element_held"); //triggered every frame the mouse's click is down on an element
-			self.events.element_long_pressed = variable_get_hash("element_long_pressed"); //triggered every frame the mouse's click is down on an element
-			self.events.element_released     = variable_get_hash("element_released"); //triggered when when the mouses click is released from an element
+			events.element_mouse_over   = variable_get_hash("element_mouse_over"); //triggered when the mouse is over an element
+			events.element_pressed      = variable_get_hash("element_pressed"); //triggered when mouse first clicks an element
+			events.element_held         = variable_get_hash("element_held"); //triggered every frame the mouse's click is down on an element
+			events.element_long_pressed = variable_get_hash("element_long_pressed"); //triggered every frame the mouse's click is down on an element
+			events.element_released     = variable_get_hash("element_released"); //triggered when when the mouses click is released from an element
 			
-			self.events.opened = variable_get_hash("opened"); //triggered when the dropdown is expanded
-			self.events.closed = variable_get_hash("closed"); //triggered when the dropdown is collapsed
+			events.opened = variable_get_hash("opened"); //triggered when the dropdown is expanded
+			events.closed = variable_get_hash("closed"); //triggered when the dropdown is collapsed
 			
-			self.events.selected = variable_get_hash("selected"); //triggered when an element is selected
-			self.events.changed  = variable_get_hash("changed"); //triggered when a different element then the currently active one is selected (This will be triggered any time set_value is used)
-			self.events.cleared  = variable_get_hash("cleared"); //triggered when the dropdown is cleared (this is done by the developer)
+			events.selected = variable_get_hash("selected"); //triggered when an element is selected
+			events.changed  = variable_get_hash("changed"); //triggered when a different element then the currently active one is selected (This will be triggered any time set_value is used)
+			events.cleared  = variable_get_hash("cleared"); //triggered when the dropdown is cleared (this is done by the developer)
 			
 		#endregion
 		
@@ -607,8 +607,8 @@ function GUICompDropdown() : GUICompController() constructor {
 					var _xx = __get_controller_archor_x__(_comp.__halign__);
 					var _yy = __get_controller_archor_y__(_comp.__valign__);
 					
-					_comp.x = self.x + _xx + _comp.x_offset + _comp.__internal_x__;
-					_comp.y = self.y + _yy + _comp.y_offset + _comp.__internal_y__;
+					_comp.x = x + _xx + _comp.x_offset + _comp.__internal_x__;
+					_comp.y = y + _yy + _comp.y_offset + _comp.__internal_y__;
 					
 					//if the component is a controller it's self have it update it's children
 					if (_comp.__is_controller__) {
@@ -662,19 +662,19 @@ function GUICompDropdown() : GUICompController() constructor {
 			#region Adopt Events
 				
 				__button__.add_event_listener(__button__.events.mouse_over, function() {
-					trigger_event(self.events.mouse_over);
+					trigger_event(events.mouse_over);
 				})
 				__button__.add_event_listener(__button__.events.pressed, function() {
-					trigger_event(self.events.pressed);
+					trigger_event(events.pressed);
 				})
 				__button__.add_event_listener(__button__.events.held, function() {
-					trigger_event(self.events.held);
+					trigger_event(events.held);
 				})
 				__button__.add_event_listener(__button__.events.long_press, function() {
-					trigger_event(self.events.long_press);
+					trigger_event(events.long_press);
 				})
 				__button__.add_event_listener(__button__.events.released, function() {
-					trigger_event(self.events.released);
+					trigger_event(events.released);
 				})
 				
 			#endregion
@@ -683,10 +683,10 @@ function GUICompDropdown() : GUICompController() constructor {
 				set_open(!is_open);
 				
 				if (is_open) {
-					trigger_event(self.events.opened);
+					trigger_event(events.opened);
 				}
 				else {
-					trigger_event(self.events.closed);
+					trigger_event(events.closed);
 				}
 			})
 			
@@ -777,19 +777,19 @@ function GUICompDropdown() : GUICompController() constructor {
 				#region Adopt Events
 					
 					_comp.add_event_listener(_comp.events.mouse_over, function() {
-						trigger_event(self.events.element_mouse_over);
+						trigger_event(events.element_mouse_over);
 					})
 					_comp.add_event_listener(_comp.events.pressed, function() {
-						trigger_event(self.events.element_pressed);
+						trigger_event(events.element_pressed);
 					})
 					_comp.add_event_listener(_comp.events.held, function() {
-						trigger_event(self.events.element_held);
+						trigger_event(events.element_held);
 					})
 					_comp.add_event_listener(_comp.events.long_press, function() {
-						trigger_event(self.events.element_long_pressed);
+						trigger_event(events.element_long_pressed);
 					})
 					_comp.add_event_listener(_comp.events.released, function() {
-						trigger_event(self.events.element_released);
+						trigger_event(events.element_released);
 					})
 					
 				#endregion

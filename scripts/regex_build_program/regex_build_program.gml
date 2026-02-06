@@ -17,7 +17,7 @@
 ///
 ///         Notes:
 ///         - The pattern string is read "as-is". In GML raw string literals, \n is two chars
-///           '\' and 'n'. This builder interprets escapes itself.
+///           '\' and 'n'. This builder interprets escapes it
 ///         - This builder compiles over bytes from buffer_text. Your runner must execute over
 ///           the same byte stream.
 ///

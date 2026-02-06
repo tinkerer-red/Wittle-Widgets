@@ -23,8 +23,8 @@ function WWCore() constructor {
 			static set_position = function(_x, _y) {
 				if (__position_set__ == false) {
 					__position_set__ = true;
-					self.xstart = self.x;
-					self.ystart = self.y;
+					xstart = x;
+					ystart = y;
 				}
 				__set_position__(_x, _y);
 				return self;
@@ -78,7 +78,7 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_width = function(_width) {
-				self.set_size(_width, height)
+				set_size(_width, height)
 				
 				return self;
 			}
@@ -90,7 +90,7 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_height = function(_height) {
-				self.set_size(width, _height)
+				set_size(width, _height)
 				
 				return self;
 			}
@@ -105,6 +105,23 @@ function WWCore() constructor {
 			/// @returns {Struct.WWCore}
 			#endregion
 			static set_sprite = function(_sprite) {
+				var _info = sprite_get_info(_sprite);
+				
+				sprite_index   = _sprite;
+				sprite_height  = _info.height;
+				sprite_width   = _info.width;
+				sprite_xoffset = _info.xoffset;
+				sprite_yoffset = _info.yoffset;
+				
+				//visible = true;
+				
+				//image_alpha  = undefined;
+				//image_angle  = undefined;
+				//image_blend  = undefined;
+				image_index  = 0;
+				image_number = _info.num_subimages;
+				image_speed = (_info.frame_type == spritespeed_framespersecond) ? (_info.frame_speed / game_get_speed(gamespeed_fps)) : _info.frame_speed;
+				
 				__set_sprite__(_sprite);
 				return self;
 			}
@@ -195,10 +212,10 @@ function WWCore() constructor {
 				}
 				
 				if (__is_enabled__) {
-					trigger_event(self.events.enabled);
+					trigger_event(events.enabled);
 				}
 				else {
-					trigger_event(self.events.disabled);
+					trigger_event(events.disabled);
 				}
 				
 				return self;
@@ -216,10 +233,10 @@ function WWCore() constructor {
 				__is_active__ = _is_active;
 				
 				if (__is_active__) {
-					trigger_event(self.events.activated);
+					trigger_event(events.activated);
 				}
 				else {
-					trigger_event(self.events.deactivated);
+					trigger_event(events.deactivated);
 				}
 				
 				return self;
@@ -245,12 +262,12 @@ function WWCore() constructor {
 			static set_focus = function(_focus) {
 			    if (_focus && !__is_focused__) {
 					__is_focused__ = true;
-					trigger_event(self.events.focus_enter);
-					trigger_event(self.events.focus);
+					trigger_event(events.focus_enter);
+					trigger_event(events.focus);
 				}
 			    else if (!_focus && __is_focused__) {
 					__is_focused__ = false;
-					trigger_event(self.events.focus_exit);
+					trigger_event(events.focus_exit);
 				}
 			    return self;
 			}
@@ -264,12 +281,12 @@ function WWCore() constructor {
 			static set_hover = function(_hover) {
 			    if (_hover && !__is_hovered__) {
 					__is_hovered__ = true;
-					trigger_event(self.events.hover_enter);
-					trigger_event(self.events.hover);
+					trigger_event(events.hover_enter);
+					trigger_event(events.hover);
 				}
 			    else if (!_hover && __is_hovered__) {
 					__is_hovered__ = false;
-					trigger_event(self.events.hover_exit);
+					trigger_event(events.hover_exit);
 				}
 			    return self;
 			}
@@ -283,12 +300,12 @@ function WWCore() constructor {
 			static set_interact = function(_interact) {
 			    if (_interact && !__is_interacting__) {
 					__is_interacting__ = true;
-					trigger_event(self.events.interact_enter);
-					trigger_event(self.events.interact);
+					trigger_event(events.interact_enter);
+					trigger_event(events.interact);
 				}
 			    else if (!_interact && __is_interacting__) {
 					__is_interacting__ = false;
-					trigger_event(self.events.interact_exit);
+					trigger_event(events.interact_exit);
 				}
 			    return self;
 			}
@@ -772,38 +789,38 @@ function WWCore() constructor {
 			//each component will have it's own events these will always be listed in this region
 			
 			#region GML Variables
-				self.depth = 0;
+				depth = 0;
 				
-				self.x = 0;
-				self.y = 0;
-				self.width = 0;
-				self.height = 0;
+				x = 0;
+				y = 0;
+				width = 0;
+				height = 0;
 				
-				self.xstart = 0;
-				self.ystart = 0;
+				xstart = 0;
+				ystart = 0;
 				
-				self.xprevious = 0;
-				self.yprevious = 0;
+				xprevious = 0;
+				yprevious = 0;
 				
-				self.x_offset = 0;
-				self.y_offset = 0;
+				x_offset = 0;
+				y_offset = 0;
 				
-				self.sprite_index   = -1;
-				self.sprite_height  = 0;
-				self.sprite_width   = 0;
-				self.sprite_xoffset = 0;
-				self.sprite_yoffset = 0;
+				sprite_index   = undefined;
+				sprite_height  = undefined;
+				sprite_width   = undefined;
+				sprite_xoffset = undefined;
+				sprite_yoffset = undefined;
 				
-				self.visible = true;
+				visible = true;
 				
-				self.image_alpha  = 1;
-				self.image_angle  = 0;
-				self.image_blend  = c_white;
-				self.image_index  = -1;
-				self.image_number = 0;
-				self.image_speed  = 0;
-				self.image_xscale = 1;
-				self.image_yscale = 1;
+				image_alpha  = undefined;
+				image_angle  = undefined;
+				image_blend  = undefined;
+				image_index  = undefined;
+				image_number = undefined;
+				image_speed  = undefined;
+				image_xscale = 1;
+				image_yscale = 1;
 				
 			#endregion
 			
@@ -833,7 +850,7 @@ function WWCore() constructor {
 				
 			    __depth++;
 				
-			    var _event_arr = struct_get_from_hash(self.__event_listeners__, _event_id);
+			    var _event_arr = struct_get_from_hash(__event_listeners__, _event_id);
 			    if (_event_arr != undefined) {
 			        var _size = array_length(_event_arr);
 			        var _i = 0;
@@ -850,7 +867,7 @@ function WWCore() constructor {
 			    if (__depth == 0 && array_length(__queue) > 0) {
 			        while (array_length(__queue) > 0) {
 			            var queued = array_shift(__queue); // Remove the first queued event.
-			            self.trigger_event(queued.event, queued.data);
+			            trigger_event(queued.event, queued.data);
 			        }
 			    }
 			};
@@ -866,15 +883,15 @@ function WWCore() constructor {
 			#endregion
 			static add_event_listener = function(_event_id, _func) {
 				var _hash = _event_id;
-				if (struct_get_from_hash(self.__event_listeners__, _hash) == undefined) {
-					struct_set_from_hash(self.__event_listeners__, _hash, [])
+				if (struct_get_from_hash(__event_listeners__, _hash) == undefined) {
+					struct_set_from_hash(__event_listeners__, _hash, [])
 				}
 				
 				var _uid = __event_listener_uid__;
 				__event_listener_uid__+=1;
-				var _arr = struct_get_from_hash(self.__event_listeners__, _hash)
+				var _arr = struct_get_from_hash(__event_listeners__, _hash)
 				array_push(_arr, {func: _func, UID: _uid});
-				struct_set_from_hash(self.__event_listeners__, _hash, _arr)
+				struct_set_from_hash(__event_listeners__, _hash, _arr)
 				
 				return _uid
 			}
@@ -890,15 +907,15 @@ function WWCore() constructor {
 			#endregion
 			static insert_event_listener = function(_index, _event_id, _func) {
 				var _hash = _event_id;
-				if (struct_get_from_hash(self.__event_listeners__, _hash) == undefined) {
-					struct_set_from_hash(self.__event_listeners__, _hash, [])
+				if (struct_get_from_hash(__event_listeners__, _hash) == undefined) {
+					struct_set_from_hash(__event_listeners__, _hash, [])
 				}
 				
 				var _uid = __event_listener_uid__;
 				__event_listener_uid__+=1;
-				var _arr = struct_get_from_hash(self.__event_listeners__, _hash)
+				var _arr = struct_get_from_hash(__event_listeners__, _hash)
 				array_insert(_arr, _index, {func: _func, UID: _uid});
-				struct_set_from_hash(self.__event_listeners__, _hash, _arr)
+				struct_set_from_hash(__event_listeners__, _hash, _arr)
 				
 				return _uid
 			}
@@ -925,7 +942,7 @@ function WWCore() constructor {
 					
 					if (_j < _size) {
 						array_delete(_event_arr, _i, 1);
-						struct_set_from_hash(self.__event_listeners__, _hash, _event_arr)
+						struct_set_from_hash(__event_listeners__, _hash, _event_arr)
 						return self;
 					}
 					else{
@@ -948,11 +965,11 @@ function WWCore() constructor {
 			/// @func    event_exists()
 			/// @desc    Lightweight check to see if an event exists.
 			/// @self    WWCore
-			/// @param   {Real} event_id : The hash of the event_id, example: `self.event.change`
+			/// @param   {Real} event_id : The hash of the event_id, example: `event.change`
 			/// @returns {Bool}
 			#endregion
 			static event_exists = function(_event_id) {
-				return struct_exists_from_hash(self.__event_listeners__, _event_id)
+				return struct_exists_from_hash(__event_listeners__, _event_id)
 			}
 			#region jsDoc
 			/// @func   event_name(_event_id)
@@ -1387,7 +1404,7 @@ function WWCore() constructor {
 			        var numComponents = array_length(line);
 			        var compWidthScaled = 0;
 			        if (scaleInline) {
-			            compWidthScaled = (self.width - (numComponents - 1) * horizontalSpacing) / numComponents;
+			            compWidthScaled = (width - (numComponents - 1) * horizontalSpacing) / numComponents;
 			        }
 					
 			        // Layout components horizontally in this line.
@@ -1499,8 +1516,8 @@ function WWCore() constructor {
 						var _xx = __get_controller_archor_x__(_comp.__halign__);
 						var _yy = __get_controller_archor_y__(_comp.__valign__);
 						
-						_comp.x = self.x + _xx + _comp.x_offset;
-						_comp.y = self.y + _yy + _comp.y_offset;
+						_comp.x = x + _xx + _comp.x_offset;
+						_comp.y = y + _yy + _comp.y_offset;
 						
 						//if the component is a controller it's self have it update it's children
 						_comp.update_component_positions();
@@ -1546,7 +1563,7 @@ function WWCore() constructor {
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group();
 				
-				trigger_event(self.events.pre_step, _input);
+				trigger_event(events.pre_step, _input);
 				
 				//run the children
 				var _comp, xx, yy;
@@ -1555,7 +1572,7 @@ function WWCore() constructor {
 					_comp.step(_input);
 				}//end repeat loop
 				
-				trigger_event(self.events.post_step, _input);
+				trigger_event(events.post_step, _input);
 			};
 			#region jsDoc
 			/// @func    draw()
@@ -1592,7 +1609,7 @@ function WWCore() constructor {
 				}
 				
 				//if __is_focusable__
-				trigger_event(self.events.pre_draw, _input);
+				trigger_event(events.pre_draw, _input);
 				
 				//run the children
 				var _comp, xx, yy;
@@ -1668,7 +1685,7 @@ function WWCore() constructor {
 					draw_set_alpha(1)
 				}
 				
-				trigger_event(self.events.post_draw, _input);
+				trigger_event(events.post_draw, _input);
 			};
 			
 			#endregion
@@ -1739,23 +1756,23 @@ function WWCore() constructor {
 				
 				var _mouse_on_group = mouse_on_group();
 				if (_mouse_on_group) {
-					trigger_event(self.events.mouse_over_group);
+					trigger_event(events.mouse_over_group);
 				}
 				else {
-					trigger_event(self.events.mouse_off_group);
+					trigger_event(events.mouse_off_group);
 				}
 				
 				var _mouse_on = mouse_on_comp();
 				if (_mouse_on) {
-					trigger_event(self.events.mouse_over);
+					trigger_event(events.mouse_over);
 				}
 				else {
-					trigger_event(self.events.mouse_off);
+					trigger_event(events.mouse_off);
 				}
 				
-				if (__is_hovered__) trigger_event(self.events.hover);
-				if (__is_focused__) trigger_event(self.events.focus);
-				if (__is_interacting__) trigger_event(self.events.interact);
+				if (__is_hovered__) trigger_event(events.hover);
+				if (__is_focused__) trigger_event(events.focus);
+				if (__is_interacting__) trigger_event(events.interact);
 			})
 			on_mouse_over(function(){
 				if (!__is_enabled__) {
@@ -1776,7 +1793,7 @@ function WWCore() constructor {
 				consume_input();
 				
 				if (mouse_check_button_pressed(mb_left)) {
-					trigger_event(self.events.pressed);
+					trigger_event(events.pressed);
 				}
 				
 			})
@@ -1784,13 +1801,13 @@ function WWCore() constructor {
 				set_interact(true);
 				
 				if (current_time - __last_click_time_double__ < 1_000/3) {
-					trigger_event(self.events.triple_click);
+					trigger_event(events.triple_click);
 					return;
 				}
 				
 				if (current_time - __last_click_time_single__ < 1_000/3) {
 					__last_click_time_double__ = current_time;
-					trigger_event(self.events.double_click);
+					trigger_event(events.double_click);
 					return;
 				}
 				
@@ -1805,18 +1822,18 @@ function WWCore() constructor {
 			})
 			on_interact(function(_input) {
 				if (mouse_check_button(mb_left)) {
-				    trigger_event(self.events.held);
+				    trigger_event(events.held);
 						
 				    // Handle long press timing
 				    __click_held_timer__ += 1;
 				    if (current_time-__click_held_timer__ > 1_000/3) {
-				        trigger_event(self.events.long_press);
+				        trigger_event(events.long_press);
 				    }
 				}
 				
 				else if (mouse_check_button_released(mb_left)) {
 				    set_interact(false);
-				    trigger_event(self.events.released);
+				    trigger_event(events.released);
 				}
 					
 			})
@@ -2068,20 +2085,20 @@ function WWCore() constructor {
 				// feather really doesnt want us to write to these variables.
 				// and linux YYC builds throw errors on compile
 				
-				self.sprite_index = _sprite;
+				sprite_index = _sprite;
 				
 				if (!sprite_exists(_sprite)) return self;
 				
-				self.sprite_height  = self.image_yscale * sprite_get_height(_sprite);
-				self.sprite_width   = self.image_xscale * sprite_get_width(_sprite);
-				self.sprite_xoffset = self.image_xscale * sprite_get_xoffset(_sprite);
-				self.sprite_yoffset = self.image_yscale * sprite_get_yoffset(_sprite);
+				sprite_height  = image_yscale * sprite_get_height(_sprite);
+				sprite_width   = image_xscale * sprite_get_width(_sprite);
+				sprite_xoffset = image_xscale * sprite_get_xoffset(_sprite);
+				sprite_yoffset = image_yscale * sprite_get_yoffset(_sprite);
 				
-				self.image_index  = 0;
-				self.image_number = sprite_get_number(_sprite);
-				self.image_speed  = sprite_get_speed(_sprite);
+				image_index  = 0;
+				image_number = sprite_get_number(_sprite);
+				image_speed  = sprite_get_speed(_sprite);
 				
-				self.visible = true;
+				visible = true;
 				
 				return self;
 			}
@@ -2118,12 +2135,12 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __set_position__ = function(_x, _y) {
-				if (_x == self.x && _y == self.y) return self; // Avoid redundant updates
+				if (_x == x && _y == y) return self; // Avoid redundant updates
 				
-				self.xprevious = self.x;
-				self.yprevious = self.y;
-				self.x = _x;
-				self.y = _y;
+				xprevious = x;
+				yprevious = y;
+				x = _x;
+				y = _y;
 				
 				update_component_positions();
 				
@@ -2145,17 +2162,17 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __set_offset__ = function(_x, _y) {
-			    if (_x == self.x_offset && _y == self.y_offset) return self; // Avoid redundant updates
+			    if (_x == x_offset && _y == y_offset) return self; // Avoid redundant updates
 				
-				self.x_offset = _x;
-			    self.y_offset = _y;
+				x_offset = _x;
+			    y_offset = _y;
 				
 			    // Recalculate position based on parent
 			    if (__is_child__) {
-					self.xprevious = self.x;
-					self.yprevious = self.y;
-					self.x = __parent__.x + self.x_offset;
-					self.y = __parent__.y + self.y_offset;
+					xprevious = x;
+					yprevious = y;
+					x = __parent__.x + x_offset;
+					y = __parent__.y + y_offset;
 					
 					update_component_positions();
 					
@@ -2208,6 +2225,14 @@ function WWCore() constructor {
 					}
 				}
 			}
+			static __recalc_visual_state__ = function() {
+				if (!__is_enabled__)    { __visual_state__ = 3; return; }
+				if (__is_interacting__) { __visual_state__ = 2; return; }
+				if (__is_hovered__)     { __visual_state__ = 1; return; }
+				if (__is_focused__)     { __visual_state__ = 4; return; }
+				//else
+				__visual_state__ = 0;
+			};
 			#region jsDoc
 			/// @func    __cleanup__()
 			/// @desc    Used to cleanup anything the component may have created

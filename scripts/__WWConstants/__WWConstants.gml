@@ -30,6 +30,14 @@
 #macro GUI_IMAGE_PRESSED 2
 #macro GUI_IMAGE_DISABLED 3
 
+// Theme-driven visual states (int "enum")
+// These are intended for choosing paints/colors, not for sprite subimages.
+#macro WW_STATE_NORMAL   0
+#macro WW_STATE_HOVER    1
+#macro WW_STATE_ACTIVE   2
+#macro WW_STATE_DISABLED 3
+#macro WW_STATE_FOCUSED  4
+
 function __WWConstants(){
 	static Scribble_Deluxe_Exists = false;
 	try {

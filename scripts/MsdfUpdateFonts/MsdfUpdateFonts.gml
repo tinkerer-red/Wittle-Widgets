@@ -1,5 +1,5 @@
 // Feather disable all
-MsdfUpdateAllFonts()
+
 function MsdfUpdateAllFonts()
 {
     var _time = get_timer();

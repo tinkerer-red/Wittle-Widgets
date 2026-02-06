@@ -23,6 +23,12 @@ text = @'BBCode renderer demo.
 [url]URL styled text[/url]
 [url=https://example.com]URL with target[/url]
 
+Font Awesome icons (BBCode [fa, ...] tag):
+Quoted string names: [fa, "address-book"] [fa, "user"]
+Regular vs solid: [fa, "bell", regular] [fa, "bell", solid]
+Brands: [fa, "github", brands]
+Packed id (>16-bit): [fa, 126980] [fa, 192516]
+
 [code]
 var x = 10;
 var y = x * 2;

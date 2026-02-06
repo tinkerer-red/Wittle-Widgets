@@ -109,6 +109,130 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
             continue;
         }
 
+        // Font Awesome icon emitter: [fa, <real|string>, <real|string optional>]
+        // - arg1: icon name (string) or packed glyph id/codepoint (number)
+        // - arg2: optional style selector when arg1 is a name or raw codepoint
+        //         string: "regular"|"solid"|"brands" (also: r/s/b, far/fas/fab)
+        //         real: 1|2|3
+        // - if arg1 is numeric > 16 bits, arg2 is ignored (packed glyph id)
+        if (WW_FONT_AWESOME_ENABLED) {
+            var _comma_pos_raw = string_pos(",", _tag_raw);
+            if (_comma_pos_raw > 0) {
+                var _fa_head = string_lower(string_trim(string_copy(_tag_raw, 1, _comma_pos_raw - 1)));
+                if (_fa_head == "fa") {
+
+                    var _args_raw = string_copy(_tag_raw, _comma_pos_raw + 1, string_length(_tag_raw) - _comma_pos_raw);
+                    var _comma2 = string_pos(",", _args_raw);
+
+                    var _arg1 = "";
+                    var _arg2 = "";
+                    if (_comma2 > 0) {
+                        _arg1 = string_trim(string_copy(_args_raw, 1, _comma2 - 1));
+                        _arg2 = string_trim(string_copy(_args_raw, _comma2 + 1, string_length(_args_raw) - _comma2));
+                    } else {
+                        _arg1 = string_trim(_args_raw);
+                    }
+
+                    // Strip optional quotes
+                    if (string_length(_arg1) >= 2) {
+                        var _a1c1 = string_char_at(_arg1, 1);
+                        var _a1cN = string_char_at(_arg1, string_length(_arg1));
+                        if ((_a1c1 == "\"" && _a1cN == "\"") || (_a1c1 == "'" && _a1cN == "'")) {
+                            _arg1 = string_copy(_arg1, 2, string_length(_arg1) - 2);
+                        }
+                    }
+                    if (string_length(_arg2) >= 2) {
+                        var _a2c1 = string_char_at(_arg2, 1);
+                        var _a2cN = string_char_at(_arg2, string_length(_arg2));
+                        if ((_a2c1 == "\"" && _a2cN == "\"") || (_a2c1 == "'" && _a2cN == "'")) {
+                            _arg2 = string_copy(_arg2, 2, string_length(_arg2) - 2);
+                        }
+                    }
+
+                    var _packed_fa = -1;
+
+                    // Try name lookup first (handles names like "0", "1", etc.)
+                    _packed_fa = fa_icon_get(_arg1, (_arg2 == "") ? undefined : _arg2);
+
+                    // If not a known name, try numeric forms.
+                    if (_packed_fa < 0) {
+
+                        // Basic numeric check for decimal int/float strings
+                        var _is_num = (string_length(_arg1) > 0);
+                        var _dot = 0;
+                        if (_is_num) {
+                            var _i = 1;
+                            var _nlen = string_length(_arg1);
+                            while (_i <= _nlen) {
+                                var _ch = string_char_at(_arg1, _i);
+                                if (_ch >= "0" && _ch <= "9") {
+                                    // ok
+                                } else if (_ch == ".") {
+                                    _dot += 1;
+                                    if (_dot > 1) { _is_num = false; break; }
+                                } else if ((_ch == "-" || _ch == "+") && _i == 1) {
+                                    // ok
+                                } else {
+                                    _is_num = false;
+                                    break;
+                                }
+                                _i += 1;
+                            }
+                        }
+
+                        if (_is_num) {
+                            var _n = real(_arg1);
+
+                            if (_n > 65535) {
+                                // Packed glyph id (font_id is already in upper 16 bits)
+                                _packed_fa = _n;
+                            } else {
+                                // Raw unicode codepoint; resolve style to pick the font_id
+                                var _font_id = 2; // default: solid
+                                if (_arg2 != "") {
+                                    var _st = string_lower(_arg2);
+                                    if (_st == "regular" || _st == "r" || _st == "far") { _font_id = 1; }
+                                    else if (_st == "solid" || _st == "s" || _st == "fas") { _font_id = 2; }
+                                    else if (_st == "brands" || _st == "brand" || _st == "b" || _st == "fab") { _font_id = 3; }
+                                    else if (real(_arg2) == 1) { _font_id = 1; }
+                                    else if (real(_arg2) == 2) { _font_id = 2; }
+                                    else if (real(_arg2) == 3) { _font_id = 3; }
+                                }
+                                _packed_fa = _n + (_font_id << 16);
+                            }
+                        }
+                    }
+
+                    if (_packed_fa >= 0) {
+                        var _fa_font = fa_get_font(_packed_fa);
+                        if (_fa_font != -1) {
+                            var _fa_chr = chr(fa_get_ord(_packed_fa));
+
+                            // Emit a single-glyph span with a temporary font override.
+                            var _prev_state_fa = __ww_textproc_state_clone__(_ctx.state);
+                            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+                            __ww_textproc_ctx_apply_patch__(_ctx, { font_asset: _fa_font });
+                            _ctx.span_start = _ctx.out_len;
+
+                            __ww_textproc_ctx_append_text__(_ctx, _fa_chr);
+
+                            __ww_textproc_ctx_flush_span__(_ctx, _ctx.out_len);
+                            _ctx.state = _prev_state_fa;
+                            _ctx.span_start = _ctx.out_len;
+
+                            _pos = _close_pos + 1;
+                            continue;
+                        }
+                    }
+
+                    // Failed to resolve -> treat as literal tag
+                    __ww_textproc_ctx_append_text__(_ctx, "[" + _tag_raw + "]");
+                    _pos = _close_pos + 1;
+                    continue;
+                }
+            }
+        }
+
         // Closing tag
         if (string_length(_tag) > 0 && string_char_at(_tag, 1) == "/") {
 

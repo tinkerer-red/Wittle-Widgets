@@ -86,7 +86,7 @@ function WWCheckbox() : WWButtonSprite() constructor {
 			
 			is_checked = false;
 			
-			__theme_kind__ = 1;
+			__theme_kind__ = __WW_Theme_Kind.Checkbox;
 			
 			// Theme-driven by default (user can override via set_checkbox_sprites / set_sprite).
 			sprite_checked = undefined;

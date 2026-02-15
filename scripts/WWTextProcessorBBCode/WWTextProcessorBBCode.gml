@@ -4,7 +4,7 @@
 ///          renderer.set_text_processor(WWTextProcessorBBCode);
 /// @param   {String} _raw_text
 /// @param   {Struct} _default_state
-/// @returns {Struct} { text, spans, align_runs }
+/// @returns {Struct} { text, spans, align_runs, widgets }
 #endregion
 
 function __ww_bbcode_find_u8__(_buff, _start, _endd, _target_u8) {
@@ -51,6 +51,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
     if (is_undefined(_raw_text) || _raw_text == "") {
         var _res_empty = __ww_textproc_ctx_finish__(_ctx);
         _res_empty.align_runs = [];
+        _res_empty.widgets = [];
         return _res_empty;
     }
 
@@ -60,6 +61,9 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
     // Stack entries: { tag_name, prev_state }
     var _state_stack = [];
+
+    // Optional widgets (output index space)
+    var _widgets = [];
 
     // Helper: flush current alignment run up to _ctx.out_len
     // (inline pattern - no closures)
@@ -230,6 +234,123 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
                     _pos = _close_pos + 1;
                     continue;
                 }
+            }
+        }
+
+        // Widgets (self-closing): [slider, value, min, max, step]
+        //                     and: [plot, value]
+        // Emits plain output text but also returns a widget descriptor anchored to that output.
+        var _comma_pos_widgets = string_pos(",", _tag_raw);
+        if (_comma_pos_widgets > 0) {
+
+            var _widget_head = string_lower(string_trim(string_copy(_tag_raw, 1, _comma_pos_widgets - 1)));
+
+            if (_widget_head == "slider") {
+
+                var _parts = string_split(_tag_raw, ",");
+                var _pcount = array_length(_parts);
+
+                var _pi = 0;
+                repeat (_pcount) {
+                    _parts[_pi] = string_trim(_parts[_pi]);
+                    _pi += 1;
+                }
+
+                var _value_text = (_pcount >= 2) ? _parts[1] : "0";
+                var _value = real(_value_text);
+
+                var _min = (_pcount >= 3) ? real(_parts[2]) : 0;
+                var _max = (_pcount >= 4) ? real(_parts[3]) : 1;
+                var _step = (_pcount >= 5) ? real(_parts[4]) : 0.01;
+
+                if (_max < _min) {
+                    var _tmp = _min;
+                    _min = _max;
+                    _max = _tmp;
+                }
+
+                if (_step <= 0) { _step = 0.01; }
+
+                // Anchor at the start of the emitted value.
+                var _start_index_widget = _ctx.out_len;
+                __ww_textproc_ctx_append_text__(_ctx, _value_text);
+
+                array_push(_widgets, {
+                    kind: "inline",
+                    type: "slider",
+                    start_index: _start_index_widget,
+                    value: _value,
+                    min: _min,
+                    max: _max,
+                    step: _step,
+
+                    // Basic default size in pixels; renderer may override height.
+                    width: 96,
+                    height: 0
+                });
+
+                _pos = _close_pos + 1;
+                continue;
+            }
+
+            if (_widget_head == "plot") {
+
+                var _parts2 = string_split(_tag_raw, ",");
+                var _pcount2 = array_length(_parts2);
+
+                var _plot_value_text = "";
+                if (_pcount2 >= 2) {
+                    _plot_value_text = string_trim(_parts2[1]);
+                }
+
+                // Ensure plot occupies its own line: emit a leading newline if needed,
+                // then a space + newline for the plot line itself.
+                if (_ctx.out_len > 0) {
+                    var _chunk_count = array_length(_ctx.out_chunks);
+                    if (_chunk_count > 0) {
+                        var _last_chunk = _ctx.out_chunks[_chunk_count - 1];
+                        var _lc_len = string_length(_last_chunk);
+                        if (_lc_len > 0) {
+                            var _lc_last = string_char_at(_last_chunk, _lc_len);
+                            if (_lc_last != "\n") {
+                                __ww_textproc_ctx_append_text__(_ctx, "\n");
+                            }
+                        }
+                    }
+                }
+
+                var _start_index_plot = _ctx.out_len;
+                __ww_textproc_ctx_append_text__(_ctx, " \n");
+
+                array_push(_widgets, {
+                    kind: "block",
+                    type: "plot",
+                    start_index: _start_index_plot,
+                    value_text: _plot_value_text,
+
+                    // 4 lines tall by default; renderer can translate to pixels.
+                    height_lines: 4,
+                    width: 0,
+                    height: 0
+                });
+
+                // We already emitted a newline as part of the plot placeholder line.
+                // If the source BBCode has a line break immediately after the tag,
+                // consume it to avoid producing an extra blank line.
+                _pos = _close_pos + 1;
+                if (_pos < _in_len) {
+                    var _n0 = buffer_peek(_in_buff, _pos, buffer_u8);
+                    if (_n0 == 13) {
+                        _pos += 1;
+                        if (_pos < _in_len) {
+                            var _n1 = buffer_peek(_in_buff, _pos, buffer_u8);
+                            if (_n1 == 10) { _pos += 1; }
+                        }
+                    } else if (_n0 == 10) {
+                        _pos += 1;
+                    }
+                }
+                continue;
             }
         }
 
@@ -500,5 +621,6 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
 
     var _res = __ww_textproc_ctx_finish__(_ctx);
     _res.align_runs = _align_runs;
+    _res.widgets = _widgets;
     return _res;
 }

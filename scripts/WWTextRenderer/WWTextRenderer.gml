@@ -43,7 +43,7 @@ function WWTextRenderer() : WWCore() constructor {
                 ///         span array for layout/rendering.
                 ///
                 ///         Expected return values:
-                ///         - { text: String, spans: Array }
+                ///         - { text: String, [spans]: Array, [align_runs]: Array, [widgets]: Array }
                 ///         - [String, Array]
                 ///         - String (text only, spans will be defaulted)
                 ///
@@ -458,6 +458,7 @@ function WWTextRenderer() : WWCore() constructor {
             on_post_draw(function(_input) {
                 __draw_text_vb__(x, y, 0, undefined);
 				__draw_carets__();
+				__draw_widgets_debug__();
             });
 			
 		#endregion
@@ -507,6 +508,11 @@ function WWTextRenderer() : WWCore() constructor {
 
             // Debug overlay: progressive/chunk status HUD
             vb_debug_show_progressive = false;
+
+            // Debug overlay: widget rectangles
+            widget_debug_show = false;
+            widget_debug_color_inline = c_aqua;
+            widget_debug_color_block = c_fuchsia;
 
             // Whitespace visualization
             whitespace_visible = false;
@@ -768,6 +774,70 @@ function WWTextRenderer() : WWCore() constructor {
             #region Location Maths
 
                 #region jsDoc
+                /// @func   __layout_get_line_x_min__()
+                /// @ignore
+                /// @desc   Returns the minimum x position for a line in final layout space.
+                ///         This is the shared "x origin" used by caret/hit-test/highlight.
+                ///         It accounts for alignment shifts and leading inline widget reserved
+                ///         space (via widget placements).
+                /// @self   WWTextRenderer
+                /// @param  {Real} line_index
+                /// @returns {Real}
+                #endregion
+                static __layout_get_line_x_min__ = function(_line_index) {
+                    var _line_count = __layout_lines_count__;
+                    if (_line_count <= 0) { return 0; }
+                    if (_line_index < 0) { _line_index = 0; }
+                    if (_line_index >= _line_count) { _line_index = _line_count - 1; }
+
+                    var _lines = __layout_lines__;
+                    var _glyphs = __layout_glyphs__;
+                    var _glyph_count = __layout_glyphs_count__;
+                    if (_glyph_count <= 0) { return 0; }
+
+                    var _lb = _line_index * __WW_Layout_Line.__Size__;
+                    var _start_index = _lines[_lb + __WW_Layout_Line.Start_Index];
+                    var _end_index = _lines[_lb + __WW_Layout_Line.End_Index];
+                    var _line_len = _end_index - _start_index;
+                    if (_line_len <= 0) { return 0; }
+
+                    // Start with first drawable glyph x.
+                    var _x0 = 0;
+                    var _scan = _start_index;
+                    repeat (_line_len) {
+                        if (_scan >= 0 && _scan < _glyph_count) {
+                            var _gb0 = _scan * __WW_Layout_Glyph.__Size__;
+                            var _ch0 = _glyphs[_gb0 + __WW_Layout_Glyph.Char];
+                            if (_ch0 != "\n" && _ch0 != "\r" && _ch0 != "") {
+                                _x0 = _glyphs[_gb0 + __WW_Layout_Glyph.X];
+                                break;
+                            }
+                        }
+                        _scan += 1;
+                    }
+
+                    // Extend left to include any leading inline widget reserved space.
+                    var _pl = __layout_widget_placements__;
+                    if (is_array(_pl) && array_length(_pl) > 0) {
+                        var _pi = 0;
+                        var _pn = array_length(_pl);
+                        repeat (_pn) {
+                            var _p = _pl[_pi];
+                            _pi += 1;
+                            if (is_undefined(_p)) { continue; }
+                            if (variable_struct_get(_p, "kind") != "inline") { continue; }
+                            if (variable_struct_get(_p, "line_index") != _line_index) { continue; }
+                            var _wx = variable_struct_get(_p, "x");
+                            if (!is_undefined(_wx) && _wx < _x0) {
+                                _x0 = _wx;
+                            }
+                        }
+                    }
+
+                    return _x0;
+                };
+
+                #region jsDoc
                 /// @func   get_x_from_index()
                 /// @self   WWTextRenderer
                 /// @param  {Real} index
@@ -778,40 +848,42 @@ function WWTextRenderer() : WWCore() constructor {
 					
                     var _lines = __layout_lines__;
                     var _glyphs = __layout_glyphs__;
+					var _glyph_count = __layout_glyphs_count__;
 					
-					if (array_length(_glyphs) == 0) return 0;
+					if (_glyph_count <= 0) return 0;
+					if (array_length(_lines) == 0) return 0;
 					
                     var _line_index = get_line_from_index(_index);
                     var _line_base = _line_index * __WW_Layout_Line.__Size__;
 					
                     var _start_index = _lines[_line_base + __WW_Layout_Line.Start_Index];
                     var _end_index = _lines[_line_base + __WW_Layout_Line.End_Index];
-                    var _line_width_val = _lines[_line_base + __WW_Layout_Line.Width];
+					var _line_width_val = _lines[_line_base + __WW_Layout_Line.Width];
 					
                     var _line_len = _end_index - _start_index;
                     if (_line_len <= 0) {
                         return 0;
                     }
 					
+					var _line_x0 = __layout_get_line_x_min__(_line_index);
+					
                     if (_index <= _start_index) {
-                        return 0;
+                        return _line_x0;
                     }
                     if (_index >= _end_index) {
-                        return _line_width_val;
+                        return _line_x0 + _line_width_val;
                     }
 					
-                    var _target_index = _index;
-                    var _sum_width = 0;
-					
-                    // Glyph indices are emitted in logical order, so we can walk by index.
-                    var _walk_index = _start_index;
-                    repeat (_target_index - _start_index) {
-                        var _glyph_base = _walk_index * __WW_Layout_Glyph.__Size__;
-                        _sum_width += _glyphs[_glyph_base + __WW_Layout_Glyph.Width];
-                        _walk_index += 1;
+                    // Use the final laid-out x positions (these include alignment + widget shifts).
+					var _gi = _index;
+					if (_gi < 0) { _gi = 0; }
+					if (_gi >= _glyph_count) { _gi = _glyph_count - 1; }
+					var _gb = _gi * __WW_Layout_Glyph.__Size__;
+                    var _ch = _glyphs[_gb + __WW_Layout_Glyph.Char];
+                    if (_ch == "\n" || _ch == "\r" || _ch == "") {
+                        return _line_x0 + _line_width_val;
                     }
-					
-                    return _sum_width;
+                    return _glyphs[_gb + __WW_Layout_Glyph.X];
                 };
 				
                 #region jsDoc
@@ -877,12 +949,20 @@ function WWTextRenderer() : WWCore() constructor {
                     var _start_index = _lines[_line_base + __WW_Layout_Line.Start_Index];
                     var _end_index = _lines[_line_base + __WW_Layout_Line.End_Index];
                     var _line_width_val = _lines[_line_base + __WW_Layout_Line.Width];
+                    var _glyph_count = __layout_glyphs_count__;
+                    if (_glyph_count <= 0) {
+                        return 0;
+                    }
 
-                    if (_target_x <= 0) {
+					var _line_len = _end_index - _start_index;
+					var _line_x0 = __layout_get_line_x_min__(_line_index);
+					var _line_x1 = _line_x0 + _line_width_val;
+
+					if (_target_x <= _line_x0) {
                         return _start_index;
                     }
 
-                    if (_target_x >= _line_width_val) {
+					if (_target_x >= _line_x1) {
 
                         var _is_forced_wrapped = _lines[_line_base + __WW_Layout_Line.Force_Wraped];
                         var _is_last_line = (_line_index == _line_count - 1);
@@ -894,25 +974,30 @@ function WWTextRenderer() : WWCore() constructor {
                         return max(_start_index, _end_index - 1);
                     }
 
+					// Walk glyphs using final x positions (includes inline widget shifts).
                     var _index_result = _end_index;
-                    var _sum_width = 0;
-
-                    var _line_len = _end_index - _start_index;
                     var _walk_index = _start_index;
-
-                    repeat (_line_len) {
+                    repeat (max(0, _line_len)) {
+                        if (_walk_index < 0 || _walk_index >= _glyph_count) {
+                            break;
+                        }
 
                         var _glyph_base = _walk_index * __WW_Layout_Glyph.__Size__;
-                        var _glyph_width = _glyphs[_glyph_base + __WW_Layout_Glyph.Width];
+                        var _ch = _glyphs[_glyph_base + __WW_Layout_Glyph.Char];
+                        if (_ch == "\n" || _ch == "\r" || _ch == "") {
+                            _walk_index += 1;
+                            continue;
+                        }
 
-                        var _mid = _sum_width + (_glyph_width * 0.5);
+						var _gx = _glyphs[_glyph_base + __WW_Layout_Glyph.X];
+                        var _gw = _glyphs[_glyph_base + __WW_Layout_Glyph.Width];
+                        var _mid = _gx + (_gw * 0.5);
 
-                        if (_target_x < _mid) {
+						if (_target_x < _mid) {
                             _index_result = _walk_index;
                             break;
                         }
 
-                        _sum_width += _glyph_width;
                         _index_result = _walk_index + 1;
                         _walk_index += 1;
                     }
@@ -1337,6 +1422,36 @@ function WWTextRenderer() : WWCore() constructor {
                 };
 
             #endregion
+
+            #region Widget getters
+
+                #region jsDoc
+                /// @func   get_widgets()
+                /// @desc   Returns the last widget descriptor array emitted by the current
+                ///         text processor (or [] if none). Widgets are optional and are
+                ///         anchored in processed-text index space.
+                /// @self   WWTextRenderer
+                /// @returns {Array}
+                #endregion
+                static get_widgets = function() {
+                    __ensure_layout__();
+                    return __layout_widgets__;
+                };
+
+                #region jsDoc
+                /// @func   get_widget_placements()
+                /// @desc   Returns computed widget placements in local layout space.
+                ///         Placements do not currently affect text layout; they are intended
+                ///         for overlay rendering / hit testing.
+                /// @self   WWTextRenderer
+                /// @returns {Array}
+                #endregion
+                static get_widget_placements = function() {
+                    __ensure_layout__();
+                    return __layout_widget_placements__;
+                };
+
+            #endregion
         #endregion
 
     #endregion
@@ -1351,6 +1466,10 @@ function WWTextRenderer() : WWCore() constructor {
 
             __content_width__ = 0;
             __content_height__ = 0;
+
+            // Optional widget descriptors/placements emitted by processor
+            __layout_widgets__ = [];
+            __layout_widget_placements__ = [];
 
             // VB cache
             __vb_is_dirty__ = true;
@@ -1915,6 +2034,7 @@ function WWTextRenderer() : WWCore() constructor {
 				var _processed_text = _text_value;
 				var _processed_spans = undefined;
 				var _processed_align_runs = undefined;
+                var _processed_widgets = undefined;
 				
 				if (!is_undefined(__text_processor__)) {
 					
@@ -1935,8 +2055,9 @@ function WWTextRenderer() : WWCore() constructor {
 
 					if (is_struct(_result)) {
 					    _processed_text = _result.text;
-					    _processed_spans = _result.spans;
-						_processed_align_runs = _result.align_runs;
+					    _processed_spans = _result[$ "spans"];
+						_processed_align_runs = _result[$ "align_runs"];
+                        _processed_widgets = _result[$ "widgets"];
 					} else {
 					    throw "return of text processor must be a struct";
 					}
@@ -1944,14 +2065,12 @@ function WWTextRenderer() : WWCore() constructor {
 
 
                 __display_text__ = _processed_text;
-
-                var _spans_to_use = _processed_spans;
-
-                if (!is_array(_spans_to_use)) {
+                
+                if (!is_array(_processed_spans)) {
 
                     var _processed_len = string_length(_processed_text);
 
-                    _spans_to_use = [{
+                    _processed_spans = [{
                         start_index: 0,
                         end_index: _processed_len,
                         font_asset: _font,
@@ -1966,7 +2085,11 @@ function WWTextRenderer() : WWCore() constructor {
                     }];
                 }
 
-                __build_layout__(_processed_text, _spans_to_use);
+                __build_layout__(_processed_text, _processed_spans);
+
+                // Store widgets and apply layout reservation (line heights + line widths)
+                __layout_widgets__ = (is_array(_processed_widgets)) ? _processed_widgets : [];
+                __layout_prepare_widgets__(__layout_widgets__);
 
 				// Apply alignment after layout has finalized line breaks.
 				// If the processor supplies align_runs, we can support multi-align segments
@@ -1979,11 +2102,397 @@ function WWTextRenderer() : WWCore() constructor {
 					}
 				}
 
+                // Apply inline widget x-shifts and build final widget placements (post-alignment)
+                __layout_apply_inline_widgets_and_build_placements__(__layout_widgets__);
+
                 __content_width__ = __layout_content_width__;
                 __content_height__ = __layout_content_height__;
 
                 __is_dirty__ = false;
             };
+
+            #region jsDoc
+            /// @func   __layout_find_line_for_index__()
+            /// @ignore
+            /// @desc   Returns the line index that contains a given processed-text index.
+            /// @self   WWTextRenderer
+            /// @param  {Real} char_index
+            /// @returns {Real}
+            #endregion
+            static __layout_find_line_for_index__ = function(_char_index) {
+                var _lines = __layout_lines__;
+                var _line_count = __layout_lines_count__;
+                if (_line_count <= 0) { return 0; }
+                if (_char_index < 0) { _char_index = 0; }
+                var _li = 0;
+                repeat (_line_count) {
+                    var _lb = _li * __WW_Layout_Line.__Size__;
+                    var _ls = _lines[_lb + __WW_Layout_Line.Start_Index];
+                    var _le = _lines[_lb + __WW_Layout_Line.End_Index];
+                    // End_Index is exclusive throughout the layout system.
+                    // Using <= here incorrectly maps boundary indices (at the start of the next
+                    // line) to the previous line, which breaks widget anchoring and shifting.
+                    if (_char_index >= _ls && _char_index < _le) {
+                        return _li;
+                    }
+                    _li += 1;
+                }
+                return _line_count - 1;
+            };
+
+            #region jsDoc
+            /// @func   __layout_prepare_widgets__()
+            /// @ignore
+            /// @desc   Applies widget effects that must be known before alignment:
+            ///         - block widgets: increase line height + push following lines down
+            ///         - inline widgets: add reserved width to line widths (but do not shift glyph X yet)
+            /// @self   WWTextRenderer
+            /// @param  {Array} widgets
+            /// @returns {Undefined}
+            #endregion
+            static __layout_prepare_widgets__ = function(_widgets) {
+                if (!is_array(_widgets)) { return; }
+                var _widget_count = array_length(_widgets);
+                if (_widget_count <= 0) { return; }
+
+                var _lines = __layout_lines__;
+                var _line_count = __layout_lines_count__;
+                if (_line_count <= 0) { return; }
+
+                var _inline_add = array_create(_line_count, 0);
+                var _block_target_h = array_create(_line_count, 0);
+
+                // Collect per-line desired changes
+                var _wi = 0;
+                repeat (_widget_count) {
+                    var _w = _widgets[_wi];
+                    _wi += 1;
+                    if (!is_struct(_w)) { continue; }
+
+                    var _start_index = variable_struct_get(_w, "start_index");
+                    if (is_undefined(_start_index)) { continue; }
+                    _start_index = real(_start_index);
+                    var _line_index = __layout_find_line_for_index__(_start_index);
+
+                    var _kind = (variable_struct_exists(_w, "kind") ? _w.kind : "inline");
+                    var _want_w = (variable_struct_exists(_w, "width") ? real(_w.width) : 0);
+                    var _want_h = (variable_struct_exists(_w, "height") ? real(_w.height) : 0);
+
+                    var _lb = _line_index * __WW_Layout_Line.__Size__;
+                    var _line_h = _lines[_lb + __WW_Layout_Line.Height];
+
+                    if (_kind == "block") {
+                        if (_want_h <= 0 && variable_struct_exists(_w, "height_lines")) {
+                            var _hl = real(_w.height_lines);
+                            if (_hl > 0) { _want_h = _hl * _line_h; }
+                        }
+                        if (_want_h > _block_target_h[_line_index]) {
+                            _block_target_h[_line_index] = _want_h;
+                        }
+                    } else {
+                        if (_want_w > 0) {
+                            _inline_add[_line_index] += _want_w;
+                        }
+                    }
+                }
+
+                // Apply inline reserved width to line widths
+                var _li = 0;
+                repeat (_line_count) {
+                    var _lb2 = _li * __WW_Layout_Line.__Size__;
+                    _lines[_lb2 + __WW_Layout_Line.Width] = _lines[_lb2 + __WW_Layout_Line.Width] + _inline_add[_li];
+                    _li += 1;
+                }
+
+                // Apply block line height overrides and y-offset pushes
+                var _line_dy = array_create(_line_count, 0);
+                var _acc_y = 0;
+                _li = 0;
+                repeat (_line_count) {
+                    _line_dy[_li] = _acc_y;
+                    var _lb3 = _li * __WW_Layout_Line.__Size__;
+                    _lines[_lb3 + __WW_Layout_Line.Y_Offset] = _lines[_lb3 + __WW_Layout_Line.Y_Offset] + _acc_y;
+
+                    var _old_h = _lines[_lb3 + __WW_Layout_Line.Height];
+                    var _target_h = _block_target_h[_li];
+                    if (_target_h > _old_h) {
+                        _lines[_lb3 + __WW_Layout_Line.Height] = _target_h;
+                        _acc_y += (_target_h - _old_h);
+                    }
+
+                    _li += 1;
+                }
+
+                // Shift glyph Y positions by the line delta
+                var _glyphs = __layout_glyphs__;
+                var _glyph_count = __layout_glyphs_count__;
+                if (_glyph_count > 0) {
+                    var _line_cursor = 0;
+                    var _line_end = _lines[__WW_Layout_Line.End_Index];
+                    var _gi = 0;
+                    repeat (_glyph_count) {
+                        var _gb = _gi * __WW_Layout_Glyph.__Size__;
+                        var _g_index = _glyphs[_gb + __WW_Layout_Glyph.Index];
+                        while (_line_cursor < _line_count - 1 && _g_index >= _line_end) {
+                            _line_cursor += 1;
+                            var _lb4 = _line_cursor * __WW_Layout_Line.__Size__;
+                            _line_end = _lines[_lb4 + __WW_Layout_Line.End_Index];
+                        }
+                        _glyphs[_gb + __WW_Layout_Glyph.Y] = _glyphs[_gb + __WW_Layout_Glyph.Y] + _line_dy[_line_cursor];
+                        _gi += 1;
+                    }
+                }
+
+                // Recompute content bounds from updated line data
+                __layout_content_width__ = 0;
+                __layout_content_height__ = 0;
+                _li = 0;
+                repeat (_line_count) {
+                    var _lb5 = _li * __WW_Layout_Line.__Size__;
+                    var _lw = _lines[_lb5 + __WW_Layout_Line.Width];
+                    var _ly = _lines[_lb5 + __WW_Layout_Line.Y_Offset];
+                    var _lh2 = _lines[_lb5 + __WW_Layout_Line.Height];
+                    if (_lw > __layout_content_width__) { __layout_content_width__ = _lw; }
+                    var _bot = _ly + _lh2;
+                    if (_bot > __layout_content_height__) { __layout_content_height__ = _bot; }
+                    _li += 1;
+                }
+            };
+
+            #region jsDoc
+            /// @func   __layout_apply_inline_widgets_and_build_placements__()
+            /// @ignore
+            /// @desc   Applies inline widget x-shifts (post-alignment) and builds placements.
+            ///         Block widget placements are also emitted here.
+            /// @self   WWTextRenderer
+            /// @param  {Array} widgets
+            /// @returns {Undefined}
+            #endregion
+            static __layout_apply_inline_widgets_and_build_placements__ = function(_widgets) {
+                __layout_widget_placements__ = [];
+                if (!is_array(_widgets)) { return; }
+                var _widget_count = array_length(_widgets);
+                if (_widget_count <= 0) { return; }
+
+                var _lines = __layout_lines__;
+                var _line_count = __layout_lines_count__;
+                if (_line_count <= 0) { return; }
+
+                var _glyphs = __layout_glyphs__;
+                var _glyph_count = __layout_glyphs_count__;
+                if (_glyph_count <= 0) {
+                    // Still emit block placements if possible
+                    var _wi0 = 0;
+                    repeat (_widget_count) {
+                        var _w0 = _widgets[_wi0];
+                        _wi0 += 1;
+                        if (!is_struct(_w0)) { continue; }
+                        var _kind0 = (variable_struct_exists(_w0, "kind") ? _w0.kind : "inline");
+                        if (_kind0 != "block") { continue; }
+                        var _si0 = variable_struct_get(_w0, "start_index");
+                        if (is_undefined(_si0)) { continue; }
+                        var _li0 = __layout_find_line_for_index__(real(_si0));
+                        var _lb0 = _li0 * __WW_Layout_Line.__Size__;
+                        var _y0 = _lines[_lb0 + __WW_Layout_Line.Y_Offset];
+                        var _h0 = (variable_struct_exists(_w0, "height") ? real(_w0.height) : 0);
+                        if (_h0 <= 0 && variable_struct_exists(_w0, "height_lines")) {
+                            var _hl0 = real(_w0.height_lines);
+                            if (_hl0 > 0) { _h0 = _hl0 * _lines[_lb0 + __WW_Layout_Line.Height]; }
+                        }
+                        if (_h0 <= 0) { _h0 = _lines[_lb0 + __WW_Layout_Line.Height]; }
+                        array_push(__layout_widget_placements__, {
+                            widget: _w0,
+                            widget_index: (_wi0 - 1),
+                            kind: "block",
+                            start_index: real(_si0),
+                            line_index: _li0,
+                            x: 0,
+                            y: _y0,
+                            width: (variable_struct_exists(_w0, "width") ? real(_w0.width) : 0),
+                            height: _h0
+                        });
+                    }
+                    return;
+                }
+
+                // Build per-line widget buckets
+                var _inline_by_line = array_create(_line_count);
+                var _li1 = 0;
+                repeat (_line_count) {
+                    _inline_by_line[_li1] = [];
+                    _li1 += 1;
+                }
+
+                var _wi = 0;
+                repeat (_widget_count) {
+                    var _w = _widgets[_wi];
+                    _wi += 1;
+                    if (!is_struct(_w)) { continue; }
+                    var _start_index = variable_struct_get(_w, "start_index");
+                    if (is_undefined(_start_index)) { continue; }
+                    _start_index = real(_start_index);
+                    var _line_index = __layout_find_line_for_index__(_start_index);
+                    var _kind = (variable_struct_exists(_w, "kind") ? _w.kind : "inline");
+
+                    if (_kind == "block") {
+                        var _lb = _line_index * __WW_Layout_Line.__Size__;
+                        var _y = _lines[_lb + __WW_Layout_Line.Y_Offset];
+                        var _line_h = _lines[_lb + __WW_Layout_Line.Height];
+                        var _want_h = (variable_struct_exists(_w, "height") ? real(_w.height) : 0);
+                        if (_want_h <= 0 && variable_struct_exists(_w, "height_lines")) {
+                            var _hl = real(_w.height_lines);
+                            if (_hl > 0) { _want_h = _hl * _line_h; }
+                        }
+                        if (_want_h <= 0) { _want_h = _line_h; }
+                        array_push(__layout_widget_placements__, {
+                            widget: _w,
+                            widget_index: (_wi - 1),
+                            kind: "block",
+                            start_index: _start_index,
+                            line_index: _line_index,
+                            x: 0,
+                            y: _y,
+                            width: (variable_struct_exists(_w, "width") ? real(_w.width) : 0),
+                            height: _want_h
+                        });
+                    } else {
+                        array_push(_inline_by_line[_line_index], {
+                            widget: _w,
+                            widget_index: (_wi - 1),
+                            start_index: _start_index,
+                            width: (variable_struct_exists(_w, "width") ? real(_w.width) : 0),
+                            height: (variable_struct_exists(_w, "height") ? real(_w.height) : 0)
+                        });
+                    }
+                }
+
+                // Compute glyph index ranges per line (single pass)
+                var _line_g0 = array_create(_line_count, 0);
+                var _line_g1 = array_create(_line_count, 0);
+                var _lc = 0;
+                var _line_end = _lines[__WW_Layout_Line.End_Index];
+                _line_g0[0] = 0;
+                var _gi = 0;
+                repeat (_glyph_count) {
+                    var _gb = _gi * __WW_Layout_Glyph.__Size__;
+                    var _g_index = _glyphs[_gb + __WW_Layout_Glyph.Index];
+                    while (_lc < _line_count - 1 && _g_index >= _line_end) {
+                        _line_g1[_lc] = _gi;
+                        _lc += 1;
+                        _line_g0[_lc] = _gi;
+                        var _lb2 = _lc * __WW_Layout_Line.__Size__;
+                        _line_end = _lines[_lb2 + __WW_Layout_Line.End_Index];
+                    }
+                    _gi += 1;
+                }
+                _line_g1[_lc] = _glyph_count;
+                while (_lc < _line_count - 1) {
+                    _lc += 1;
+                    _line_g0[_lc] = _glyph_count;
+                    _line_g1[_lc] = _glyph_count;
+                }
+
+                // Apply inline widgets left-to-right per line
+                var _line_index = 0;
+                repeat (_line_count) {
+                    var _list = _inline_by_line[_line_index];
+                    var _n = array_length(_list);
+                    if (_n > 1) {
+                        // Simple insertion sort by start_index (no closures)
+                        var _i = 1;
+                        while (_i < _n) {
+                            var _key = _list[_i];
+                            var _j = _i - 1;
+                            while (_j >= 0 && _list[_j].start_index > _key.start_index) {
+                                _list[_j + 1] = _list[_j];
+                                _j -= 1;
+                            }
+                            _list[_j + 1] = _key;
+                            _i += 1;
+                        }
+                    }
+
+                    if (_n > 0) {
+                        var _g0 = _line_g0[_line_index];
+                        var _g1 = _line_g1[_line_index];
+                        var _lb3 = _line_index * __WW_Layout_Line.__Size__;
+                        var _y_line = _lines[_lb3 + __WW_Layout_Line.Y_Offset];
+                        var _line_h = _lines[_lb3 + __WW_Layout_Line.Height];
+
+                        var _k = 0;
+                        repeat (_n) {
+                            var _it = _list[_k];
+                            _k += 1;
+                            var _start = _it.start_index;
+                            var _w = _it.widget;
+                            var _shift = _it.width;
+                            if (_shift <= 0) { continue; }
+
+                            // Find first glyph at/after start within this line
+                            var _anchor_g = _g1;
+                            var _scan = _g0;
+                            while (_scan < _g1) {
+                                var _gb2 = _scan * __WW_Layout_Glyph.__Size__;
+                                var _idx2 = _glyphs[_gb2 + __WW_Layout_Glyph.Index];
+                                if (_idx2 >= _start) {
+                                    _anchor_g = _scan;
+                                    break;
+                                }
+                                _scan += 1;
+                            }
+
+                            var _x = 0;
+                            var _y = _y_line;
+                            var _gh = _line_h;
+                            if (_anchor_g < _g1) {
+                                var _gb3 = _anchor_g * __WW_Layout_Glyph.__Size__;
+                                _x = _glyphs[_gb3 + __WW_Layout_Glyph.X];
+                                _y = _glyphs[_gb3 + __WW_Layout_Glyph.Y];
+                                _gh = _glyphs[_gb3 + __WW_Layout_Glyph.Height];
+                            }
+
+                            var _ph = _it.height;
+                            if (_ph <= 0) { _ph = _gh; }
+
+                            array_push(__layout_widget_placements__, {
+                                widget: _w,
+                                widget_index: _it.widget_index,
+                                kind: "inline",
+                                start_index: _start,
+                                line_index: _line_index,
+                                x: _x,
+                                y: _y,
+                                width: _shift,
+                                height: _ph
+                            });
+
+                            // Shift glyphs at/after anchor within this line
+                            _scan = _anchor_g;
+                            while (_scan < _g1) {
+                                var _gb4 = _scan * __WW_Layout_Glyph.__Size__;
+                                var _ch = _glyphs[_gb4 + __WW_Layout_Glyph.Char];
+                                if (_ch != "\n" && _ch != "\r" && _ch != "") {
+                                    _glyphs[_gb4 + __WW_Layout_Glyph.X] = _glyphs[_gb4 + __WW_Layout_Glyph.X] + _shift;
+                                }
+                                _scan += 1;
+                            }
+                        }
+                    }
+
+                    _line_index += 1;
+                }
+            };
+
+            #region jsDoc
+            /// @func   __layout_build_widget_placements__()
+            /// @ignore
+            /// @desc   Computes widget placement rectangles from the current layout.
+            ///         Placements are in local layout space (same as glyph x/y).
+            /// @self   WWTextRenderer
+            /// @param  {Array} widgets
+            /// @returns {Undefined}
+            #endregion
+            // (old overlay-only widget placement builder removed; widgets now participate in layout)
 			
             #region jsDoc
             /// @func   __layout_reset__()
@@ -2004,6 +2513,59 @@ function WWTextRenderer() : WWCore() constructor {
 
                 __layout_content_width__ = 0;
                 __layout_content_height__ = 0;
+
+				__layout_widgets__ = [];
+				__layout_widget_placements__ = [];
+            };
+
+            #region jsDoc
+            /// @func   __draw_widgets_debug__()
+            /// @ignore
+            /// @desc   Draws a simple debug overlay showing widget rectangles.
+            /// @self   WWTextRenderer
+            /// @returns {Undefined}
+            #endregion
+            static __draw_widgets_debug__ = function() {
+                if (!widget_debug_show) { return; }
+                __ensure_layout__();
+                var _pl = __layout_widget_placements__;
+                if (!is_array(_pl) || array_length(_pl) <= 0) { return; }
+
+                var _pre_col = draw_get_color();
+                var _pre_alp = draw_get_alpha();
+                draw_set_alpha(0.8);
+
+                var _wcount = array_length(_pl);
+                var _i = 0;
+                repeat (_wcount) {
+                    var _p = _pl[_i];
+                    _i += 1;
+                    if (is_undefined(_p)) { continue; }
+
+                    var _kind = variable_struct_get(_p, "kind");
+                    if (_kind == "block") { draw_set_color(widget_debug_color_block); }
+                    else { draw_set_color(widget_debug_color_inline); }
+
+                    var _px = x + variable_struct_get(_p, "x");
+                    var _py = y + variable_struct_get(_p, "y");
+                    var _pw = variable_struct_get(_p, "width");
+                    var _ph = variable_struct_get(_p, "height");
+                    if (is_undefined(_pw) || _pw <= 0) {
+                        if (!is_undefined(__textbox_parent__)) {
+                            _pw = __textbox_parent__.width;
+                        } else {
+                            _pw = __layout_content_width__;
+                        }
+                    }
+                    if (is_undefined(_ph) || _ph <= 0) {
+                        _ph = 12;
+                    }
+
+                    draw_rectangle(_px, _py, _px + _pw, _py + _ph, true);
+                }
+
+                draw_set_alpha(_pre_alp);
+                draw_set_color(_pre_col);
             };
 
             #region jsDoc
@@ -5063,14 +5625,25 @@ function WWTextRenderer() : WWCore() constructor {
                                 var _line_w = get_line_width(_line_index);
                                 if (_line_w < 0) { _line_w = 0; }
 
-                                var _range_start = 0;
-                                var _range_end = _line_w;
+                                // Use the same absolute x coordinate space as glyph rendering.
+                                var _ls = get_line_index_start(_line_index);
+                                var _le = get_line_index_end(_line_index);
+                                var _line_x0 = __layout_get_line_x_min__(_line_index);
+
+                                var _range_start = _line_x0;
+                                var _range_end = _line_x0 + _line_w;
 
                                 if (_line_index == _start_line) {
-                                    _range_start = get_x_from_index(_sel_start);
+                                    // If selection starts at the line boundary, keep full-line start (incl. widgets).
+                                    if (_sel_start > _ls) {
+                                        _range_start = get_x_from_index(_sel_start);
+                                    }
                                 }
                                 if (_line_index == _end_line) {
-                                    _range_end = get_x_from_index(_sel_end);
+                                    // If selection ends before the line end, clamp; otherwise keep full-line end.
+                                    if (_sel_end < _le) {
+                                        _range_end = get_x_from_index(_sel_end);
+                                    }
                                 }
 
                                 var _draw_w = _range_end - _range_start;

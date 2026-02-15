@@ -38,6 +38,27 @@
 #macro WW_STATE_DISABLED 3
 #macro WW_STATE_FOCUSED  4
 
+// Debug/fallback: bright magenta (Minecraft-style missing texture indicator)
+#macro WW_COLOR_MISSING_THEME c_fuchsia
+
+#region Theme kind
+
+#region jsDoc
+/// @enum   __WW_Theme_Kind
+/// @desc   Identifies which theme component bucket a control should use when
+///         drawing from the active theme. Used by theme-driven draw paths to
+///         avoid magic numbers.
+#endregion
+enum __WW_Theme_Kind {
+	Button,
+	Checkbox,
+	ButtonText,
+	Slider,
+	__SIZE__
+}
+
+#endregion
+
 function __WWConstants(){
 	static Scribble_Deluxe_Exists = false;
 	try {

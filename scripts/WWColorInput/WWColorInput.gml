@@ -5,8 +5,7 @@
 #endregion
 function WWColorInput() : WWCore() constructor {
 	debug_name = "WWColorInput";
-	var __self__ = self;
-
+	
 	#region Public
 
 		#region Events
@@ -14,7 +13,7 @@ function WWColorInput() : WWCore() constructor {
 		#endregion
 
 		#region Components
-		btn = new WWButtonText().set_text("");
+		btn = new WWButton();
 		add(btn);
 		#endregion
 
@@ -71,8 +70,8 @@ function WWColorInput() : WWCore() constructor {
 		};
 
 		static __get_root__ = function() {
-			var r = __self__;
-			while (!is_undefined(r.__parent__)) {
+			var r = self;
+			while (r.__parent__ != noone) {
 				r = r.__parent__;
 			}
 			return r;
@@ -107,8 +106,8 @@ function WWColorInput() : WWCore() constructor {
 			win.set_content(picker);
 
 			// Position near this control (clamp to 0..1280/720 bounds for now)
-			var _x = clamp(__self__.x, 0, 1280 - win.width);
-			var _y = clamp(__self__.y + __self__.height + 6, 0, 720 - win.height);
+			var _x = clamp(self.x, 0, 1280 - win.width);
+			var _y = clamp(self.y + self.height + 6, 0, 720 - win.height);
 			win.set_offset(_x, _y);
 
 			root.add(win);

@@ -25,8 +25,8 @@
   "nineSlice":null,
   "origin":0,
   "parent":{
-    "name":"Assets",
-    "path":"folders/_Libraries/Wittle Widgets/Assets.yy",
+    "name":"9Slice",
+    "path":"folders/_Libraries/Wittle Widgets/Assets/9Slice.yy",
   },
   "preMultiplyAlpha":false,
   "resourceType":"GMSprite",

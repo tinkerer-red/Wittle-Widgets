@@ -36,43 +36,81 @@ function WWButtonSprite() : WWSprite() constructor {
 				__recalc_visual_state__();
 				
 				var _t = wwThemeGet();
+				var _missing_color = WW_COLOR_MISSING_THEME;
+				var _missing = false;
 				
 				var _spr;
 				var _bg;
 				
 				switch (__theme_kind__) {
-					case 1:
+					case __WW_Theme_Kind.Checkbox:
 						// Checkbox
 						_spr = sprite_index ?? ((is_checked)
 							? (sprite_checked ?? _t.assets.sprites.checkbox_checked)
 							: (sprite_unchecked ?? _t.assets.sprites.checkbox_unchecked));
 						_bg = _t.components.checkbox.bg;
 						break;
-					case 2:
+					case __WW_Theme_Kind.ButtonText:
 						// Button (text variant sprite)
 						_spr = sprite_index ?? _t.assets.sprites.button_text;
 						_bg = _t.components.button.bg;
 						break;
-					default:
+					case __WW_Theme_Kind.Slider:
+						// Slider thumb (uses slider thumb bg paints)
+						_spr = sprite_index ?? (_t.assets.sprites.slider_thumb ?? _t.assets.sprites.button);
+						_bg = _t.components.slider.thumb_bg;
+						break;
+					case __WW_Theme_Kind.Button:
 						// Button
 						_spr = sprite_index ?? _t.assets.sprites.button;
 						_bg = _t.components.button.bg;
 						break;
+					default:
+						//todo:
+						break;
 				}
 				
-				if (!sprite_exists(_spr)) return;
+				// Missing sprite? Draw something obvious instead of silently failing.
+				if (_spr == undefined || !sprite_exists(_spr)) {
+					_missing = true;
+					_spr = _t.assets.sprites.pixel;
+					if (_spr == undefined) _spr = spr_ww_pixel;
+				}
+				if (_spr == undefined || !sprite_exists(_spr)) return;
 				
-				var _paint = _bg.normal;
-				switch (__visual_state__) {
-					case 3: _paint = _bg.disabled; break;
-					case 2: _paint = _bg.active; break;
-					case 1: _paint = _bg.hover; break;
-					case 4: _paint = _bg.focused; break;
-					default: break;
+				// Missing/malformed paints? Use magenta so it stands out.
+				var _paint = { color: _missing_color, alpha: 1 };
+				if (is_struct(_bg)) {
+					_paint = _bg.normal;
+					switch (__visual_state__) {
+						case 3: _paint = _bg.disabled; break;
+						case 2: _paint = _bg.active; break;
+						case 1: _paint = _bg.hover; break;
+						case 4: _paint = _bg.focused; break;
+						default: break;
+					}
+				}
+				if (!is_struct(_paint) || !variable_struct_exists(_paint, "color") || !variable_struct_exists(_paint, "alpha")) {
+					_missing = true;
+					_paint = { color: _missing_color, alpha: 1 };
 				}
 				
-				var _blend  = image_blend ?? _paint.color;
-				var _alpha  = image_alpha ?? _paint.alpha;
+				if (!is_struct(_bg)) {
+					_missing = true;
+				}
+				
+				if (_missing) {
+					_paint = { color: _missing_color, alpha: 1 };
+				}
+				
+				var _blend  = image_blend;
+				var _alpha  = image_alpha;
+				if (_blend == undefined) _blend = _paint.color;
+				if (_alpha == undefined) _alpha = _paint.alpha;
+				if (_missing) {
+					_blend = _missing_color;
+					_alpha = 1;
+				}
 				var _xscale = image_xscale ?? 1;
 				var _yscale = image_yscale ?? 1;
 				var _frame  = (image_index ?? 0);
@@ -115,7 +153,7 @@ function WWButtonSprite() : WWSprite() constructor {
 		#region Variables
 			
 			__visual_state__ = 0;
-			__theme_kind__ = 0; // 0=button, 1=checkbox, 2=button_text
+			__theme_kind__ = __WW_Theme_Kind.Button;
 			
 		#endregion
 		

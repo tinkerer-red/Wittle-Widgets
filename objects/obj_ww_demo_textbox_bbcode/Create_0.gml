@@ -7,6 +7,11 @@ subtitle = "Left is input. Right is BBCode renderer.";
 
 #region text
 text = @'BBCode renderer demo.
+AAAAA
+[slider, 0.555,  0, 1, 0.01]
+BBBBB
+[plot, signal]
+CCCCC
 
 [b]Bold text[/b]
 [i]Italic text[/i]

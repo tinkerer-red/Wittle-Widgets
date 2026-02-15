@@ -151,7 +151,7 @@ function WWButtonText() : WWButtonSprite() constructor {
 			}
 			
 			// Theme-driven sprite: only referenced when sprite_index is undefined.
-			__theme_kind__ = 2;
+			__theme_kind__ = __WW_Theme_Kind.ButtonText;
 			sprite_index = undefined;
 			set_sprite_to_auto_wrap();
 			

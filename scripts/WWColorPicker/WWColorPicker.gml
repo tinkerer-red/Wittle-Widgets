@@ -274,7 +274,7 @@ function WWColorPicker() : WWCore() constructor {
 
 			// Hue ring via triangle strip
 			var _segs = 64;
-			draw_primitive_begin(pr_triangle_strip);
+			draw_primitive_begin(pr_trianglestrip);
 			for (var i = 0; i <= _segs; i += 1) {
 				var a = (i / _segs) * 360.0;
 				var ca = cos(a);
@@ -291,7 +291,7 @@ function WWColorPicker() : WWCore() constructor {
 			draw_rectangle_color(__sq_x__, __sq_y__, __sq_x__ + __sq_s__, __sq_y__ + __sq_s__, c_white, _base, _base, c_white, false);
 
 			// Value overlay (top transparent -> bottom black)
-			draw_primitive_begin(pr_triangle_strip);
+			draw_primitive_begin(pr_trianglestrip);
 			draw_vertex_color(__sq_x__, __sq_y__, c_black, 0);
 			draw_vertex_color(__sq_x__ + __sq_s__, __sq_y__, c_black, 0);
 			draw_vertex_color(__sq_x__, __sq_y__ + __sq_s__, c_black, 1);

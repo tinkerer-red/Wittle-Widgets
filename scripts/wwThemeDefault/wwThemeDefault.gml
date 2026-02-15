@@ -186,15 +186,79 @@ function wwThemeDefault() {
 		assets: {
 			sprites: {
 				pixel: spr_ww_pixel,
-				button: spr_ww_rr9_r4_all,
-				button_text: spr_ww_rr9_r4_all,
-				checkbox: undefined,
-				checkbox_border: undefined,
-				checkbox_checked: s9CheckBoxChecked,
-				checkbox_unchecked: s9CheckBoxUnchecked,
-				radio: undefined,
-				slider_thumb: undefined,
-				scrollbar_arrow: undefined,
+				
+				#region Button
+				button: {
+					background: spr_ww_rr9_r4_all,
+					border: undefined,
+					overlay: undefined,
+				},
+				#endregion
+				
+				#region Button Text
+				button_text: {
+					background: spr_ww_rr9_r4_all,
+					border: undefined,
+					overlay: undefined,
+				},
+				#endregion
+				
+				#region Checkbox
+				checkbox: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+					check: s9CheckBoxChecked,
+					uncheck: undefined,
+				},
+				#endregion
+				
+				#region Radio
+				radio: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+					check: undefined,
+					uncheck: undefined,
+				},
+				#endregion
+				
+				#region Slider
+				slider: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				slider_thumb: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				#endregion
+				
+				#region Scrollbar
+				scrollbar_horz: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				slider_horz_thumb: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				scrollbar_vert: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				slider_vert_thumb: {
+					background: undefined,
+					border: undefined,
+					overlay: undefined,
+				},
+				#endregion
+				
 				close: undefined
 			},
 			icons: {
@@ -326,12 +390,13 @@ function wwThemeDefault() {
 			checkbox: {
 				box_size: 16,
 				radius: "layout.radius.sm",
-				bg: {
-					normal: "colors.surface.control",
-					hover:  "colors.surface.control_alt",
-					active: "colors.surface.control_alt",
-					disabled: "colors.surface.panel"
-				},
+				   bg: {
+					   normal: "colors.surface.control",
+					   hover:  "colors.surface.control_alt",
+					   focused: "colors.surface.control_alt",
+					   active: "colors.surface.control_alt",
+					   disabled: "colors.surface.panel"
+				   },
 				border: "control_states.border",
 				check: { color: "colors.accent.primary", mark: "colors.accent.on_accent" },
 				text: "control_states.text"
@@ -342,12 +407,13 @@ function wwThemeDefault() {
 				thumb: { size: 14, radius: "layout.radius.lg" },
 				track_bg: "colors.outline.subtle",
 				track_fill: "colors.accent.primary",
-				thumb_bg: {
-					normal: "colors.surface.control_alt",
-					hover:  "colors.surface.control_alt",
-					active: "colors.surface.control_alt",
-					disabled: "colors.surface.panel"
-				},
+				   thumb_bg: {
+					   normal: "colors.surface.control_alt",
+					   hover:  "colors.surface.control_alt",
+					   focused: "colors.surface.control_alt",
+					   active: "colors.surface.control_alt",
+					   disabled: "colors.surface.panel"
+				   },
 				thumb_border: "control_states.border"
 			},
 

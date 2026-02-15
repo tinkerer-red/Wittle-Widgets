@@ -254,12 +254,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @returns {Struct} rect_struct_with_left_top_right_bottom
 		#endregion
 		static get_bar_size = function() {
-			return {
-				left: bar.__x__,
-				top: bar.__y__,
-				right: bar.__x__ + bar.width,
-				bottom: bar.__y__ + bar.height,
-			};
+			return bar.get_size();
 		};
 		#region jsDoc
 		/// @func    get_background_size()
@@ -268,12 +263,7 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		/// @returns {Struct} rect_struct_with_left_top_right_bottom
 		#endregion
 		static get_background_size = function() {
-			return {
-				left: background.__x__,
-				top: background.__y__,
-				right: background.__x__ + background.width,
-				bottom: background.__y__ + background.height,
-			};
+			return background.get_size();
 		};
         #region jsDoc
 		/// @func    get_value()
@@ -389,5 +379,6 @@ function WWSliderBar() : WWSprite() constructor {
 #endregion
 function WWSliderThumb() : WWButtonSprite() constructor {
 	debug_name = "WWSliderThumb";
+	__theme_kind__ = __WW_Theme_Kind.Slider;
 }
 

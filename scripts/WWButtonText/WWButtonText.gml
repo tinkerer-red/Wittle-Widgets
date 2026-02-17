@@ -85,7 +85,14 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
-				var _spr = sprite_index ?? wwThemeGet().assets.sprites.button_text;
+				var _theme_spr = wwThemeGet().assets.sprites.button_text;
+				if (is_struct(_theme_spr)) {
+					_theme_spr = _theme_spr.main;
+				}
+				var _spr = sprite_index ?? _theme_spr;
+				if (_spr == undefined || !sprite_exists(_spr)) {
+					_spr = spr_ww_rr9_r4_all;
+				}
 				var _slice = sprite_get_nineslice(_spr);
 				var _width  = text_component.width  + (_slice.left + _slice.right);
 				var _height = text_component.height + (_slice.top  + _slice.bottom);
@@ -167,7 +174,14 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct} info_struct_with_width_height_and_slice
 			#endregion
 			static get_sprite_to_auto_wrap = function() {
-				var _spr = sprite_index ?? wwThemeGet().assets.sprites.button_text;
+				var _theme_spr = wwThemeGet().assets.sprites.button_text;
+				if (is_struct(_theme_spr)) {
+					_theme_spr = _theme_spr.main;
+				}
+				var _spr = sprite_index ?? _theme_spr;
+				if (_spr == undefined || !sprite_exists(_spr)) {
+					_spr = spr_ww_rr9_r4_all;
+				}
 				var _slice = sprite_get_nineslice(_spr);
 				var _width  = text_component.width  + (_slice.left + _slice.right);
 				var _height = text_component.height + (_slice.top  + _slice.bottom);

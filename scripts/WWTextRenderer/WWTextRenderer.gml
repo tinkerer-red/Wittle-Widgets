@@ -2016,9 +2016,16 @@ function WWTextRenderer() : WWCore() constructor {
                 }
 
 				var _t = wwThemeGet();
-				var _font = font ?? _t.typography.text_styles.body.font;
-				var _color = color ?? _t.typography.text_styles.body.color.color;
-				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
+				var _style = struct_get_chained(_t, "typography", "text_styles", "body");
+				var _style_font = (is_struct(_style))
+					? ((_style[$ "font_asset"] != undefined) ? _style[$ "font_asset"] : _style[$ "font"])
+					: undefined;
+				var _style_paint = (is_struct(_style))
+					? ((_style[$ "paint"] != undefined) ? _style[$ "paint"] : _style[$ "color"])
+					: undefined;
+				var _font = font ?? _style_font;
+				var _color = color ?? (is_struct(_style_paint) ? _style_paint.color : c_white);
+				var _alpha = alpha ?? (is_struct(_style_paint) ? _style_paint.alpha : 1);
 				
                 var _text_value = "";
                 if (!is_undefined(__textbox_parent__)) {
@@ -3022,9 +3029,16 @@ function WWTextRenderer() : WWCore() constructor {
                 }
 				
 				var _t = wwThemeGet();
-				var _font = font ?? _t.typography.text_styles.body.font;
-				var _color = color ?? _t.typography.text_styles.body.color.color;
-				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
+				var _style = struct_get_chained(_t, "typography", "text_styles", "body");
+				var _style_font = (is_struct(_style))
+					? ((_style[$ "font_asset"] != undefined) ? _style[$ "font_asset"] : _style[$ "font"])
+					: undefined;
+				var _style_paint = (is_struct(_style))
+					? ((_style[$ "paint"] != undefined) ? _style[$ "paint"] : _style[$ "color"])
+					: undefined;
+				var _font = font ?? _style_font;
+				var _color = color ?? (is_struct(_style_paint) ? _style_paint.color : c_white);
+				var _alpha = alpha ?? (is_struct(_style_paint) ? _style_paint.alpha : 1);
 				
                 // Buffer input for fast scanning (UTF-8) + sentinel
                 var _byte_len = string_byte_length(_str);
@@ -4924,9 +4938,16 @@ function WWTextRenderer() : WWCore() constructor {
             #endregion
 			static __build_vb__ = function() {
 				var _t = wwThemeGet();
-				var _font = font ?? _t.typography.text_styles.body.font;
-				var _color = color ?? _t.typography.text_styles.body.color.color;
-				var _alpha = alpha ?? _t.typography.text_styles.body.color.alpha;
+				var _style = struct_get_chained(_t, "typography", "text_styles", "body");
+				var _style_font = (is_struct(_style))
+					? ((_style[$ "font_asset"] != undefined) ? _style[$ "font_asset"] : _style[$ "font"])
+					: undefined;
+				var _style_paint = (is_struct(_style))
+					? ((_style[$ "paint"] != undefined) ? _style[$ "paint"] : _style[$ "color"])
+					: undefined;
+				var _font = font ?? _style_font;
+				var _color = color ?? (is_struct(_style_paint) ? _style_paint.color : c_white);
+				var _alpha = alpha ?? (is_struct(_style_paint) ? _style_paint.alpha : 1);
 
 				
 			    var _old_font = draw_get_font();

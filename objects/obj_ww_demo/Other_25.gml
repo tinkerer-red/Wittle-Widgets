@@ -231,6 +231,34 @@ function __ww_workbench_copy_code() {
 	clipboard_set_text(state.code_box.get_value());
 }
 
+function __ww_workbench_theme_button_text() {
+	var _t = wwThemeGet();
+	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
+	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
+	if (_mode == "light") { return "Theme: Light"; }
+	return "Theme: Dark";
+}
+
+function __ww_workbench_toggle_theme() {
+	var _t = wwThemeGet();
+	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
+	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
+
+	if (_mode == "light") {
+		wwThemeSet(wwThemeDark());
+	}
+	else {
+		wwThemeSet(wwThemeLight());
+	}
+
+	// Rebuild workbench UI so all colors/styles are re-read from the active theme.
+	if (instance_exists(state.owner_id)) {
+		with (state.owner_id) {
+			event_user(15);
+		}
+	}
+}
+
 function __ww_workbench_make_nav_button(_label_text, _ctor_name, _width) {
 	var _b = new WWButtonText()
 		.set_size(_width, 26)
@@ -304,6 +332,8 @@ function __WWWorkbenchCtx(_state) constructor {
 	select_ctor = method(self, __ww_workbench_select_ctor);
 	reset = method(self, __ww_workbench_reset);
 	copy_code = method(self, __ww_workbench_copy_code);
+	theme_button_text = method(self, __ww_workbench_theme_button_text);
+	toggle_theme = method(self, __ww_workbench_toggle_theme);
 	make_nav_button = method(self, __ww_workbench_make_nav_button);
 	build_nav_list = method(self, __ww_workbench_build_nav_list);
 }
@@ -363,6 +393,7 @@ function build_ui_folder_demo() {
 	root.add(_insp_panel);
 
 	var _state = {
+		owner_id: id,
 		theme: _theme,
 		title_label: _title,
 		constructor_name: "",
@@ -471,7 +502,7 @@ function build_ui_folder_demo() {
 	_nav_search.on_submit(_search_ctx.run);
 
 	var _btn_validate = new WWButtonText()
-		.set_offset(840, 16)
+		.set_offset(700, 16)
 		.set_size(130, 24)
 		.set_text("Validate")
 		.set_text_font(fnt_ww_consolas_msdf);
@@ -479,7 +510,7 @@ function build_ui_folder_demo() {
 	root.add(_btn_validate);
 
 	var _btn_reset = new WWButtonText()
-		.set_offset(980, 16)
+		.set_offset(840, 16)
 		.set_size(120, 24)
 		.set_text("Reset")
 		.set_text_font(fnt_ww_consolas_msdf);
@@ -487,12 +518,20 @@ function build_ui_folder_demo() {
 	root.add(_btn_reset);
 
 	var _btn_copy = new WWButtonText()
-		.set_offset(1110, 16)
-		.set_size(150, 24)
+		.set_offset(970, 16)
+		.set_size(130, 24)
 		.set_text("Copy Code")
 		.set_text_font(fnt_ww_consolas_msdf);
 	_btn_copy.set_callback(_ctx.copy_code);
 	root.add(_btn_copy);
+
+	var _btn_theme = new WWButtonText()
+		.set_offset(1110, 16)
+		.set_size(150, 24)
+		.set_text(_ctx.theme_button_text())
+		.set_text_font(fnt_ww_consolas_msdf);
+	_btn_theme.set_callback(_ctx.toggle_theme);
+	root.add(_btn_theme);
 
 	_ctx.build_nav_list("");
 	root.update_component_positions();

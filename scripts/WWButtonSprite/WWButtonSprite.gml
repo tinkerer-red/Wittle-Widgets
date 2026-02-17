@@ -45,24 +45,47 @@ function WWButtonSprite() : WWSprite() constructor {
 				switch (__theme_kind__) {
 					case __WW_Theme_Kind.Checkbox:
 						// Checkbox
+						var _spr_checkbox = _t.assets.sprites.checkbox;
+						var _spr_checkbox_checked = undefined;
+						var _spr_checkbox_unchecked = undefined;
+						if (is_struct(_spr_checkbox)) {
+							_spr_checkbox_checked = (_spr_checkbox.check != undefined) ? _spr_checkbox.check : _spr_checkbox.main;
+							_spr_checkbox_unchecked = (_spr_checkbox.uncheck != undefined) ? _spr_checkbox.uncheck : _spr_checkbox.main;
+						}
 						_spr = sprite_index ?? ((is_checked)
-							? (sprite_checked ?? _t.assets.sprites.checkbox_checked)
-							: (sprite_unchecked ?? _t.assets.sprites.checkbox_unchecked));
+							? (sprite_checked ?? _spr_checkbox_checked)
+							: (sprite_unchecked ?? _spr_checkbox_unchecked));
 						_bg = _t.components.checkbox.bg;
 						break;
 					case __WW_Theme_Kind.ButtonText:
 						// Button (text variant sprite)
-						_spr = sprite_index ?? _t.assets.sprites.button_text;
+						var _spr_button_text = _t.assets.sprites.button_text;
+						if (is_struct(_spr_button_text)) {
+							_spr_button_text = _spr_button_text.main;
+						}
+						_spr = sprite_index ?? _spr_button_text;
 						_bg = _t.components.button.bg;
 						break;
 					case __WW_Theme_Kind.Slider:
 						// Slider thumb (uses slider thumb bg paints)
-						_spr = sprite_index ?? (_t.assets.sprites.slider_thumb ?? _t.assets.sprites.button);
+						var _spr_slider_thumb = _t.assets.sprites.slider_thumb;
+						if (is_struct(_spr_slider_thumb)) {
+							_spr_slider_thumb = _spr_slider_thumb.main;
+						}
+						var _spr_button = _t.assets.sprites.button;
+						if (is_struct(_spr_button)) {
+							_spr_button = _spr_button.main;
+						}
+						_spr = sprite_index ?? (_spr_slider_thumb ?? _spr_button);
 						_bg = _t.components.slider.thumb_bg;
 						break;
 					case __WW_Theme_Kind.Button:
 						// Button
-						_spr = sprite_index ?? _t.assets.sprites.button;
+						var _spr_theme_button = _t.assets.sprites.button;
+						if (is_struct(_spr_theme_button)) {
+							_spr_theme_button = _spr_theme_button.main;
+						}
+						_spr = sprite_index ?? _spr_theme_button;
 						_bg = _t.components.button.bg;
 						break;
 					default:

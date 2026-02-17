@@ -117,11 +117,11 @@ function wwThemeDefault() {
 
 			// These intentionally reference semantic tokens that each variant must provide.
 			text_styles: {
-				title:    { font: "fonts.ui.strong", size: "xl", color: "colors.text.primary" },
-				subtitle: { font: "fonts.ui.strong", size: "lg", color: "colors.text.primary" },
-				body:     { font: "fonts.ui.regular", size: "md", color: "colors.text.primary" },
-				hint:     { font: "fonts.ui.regular", size: "sm", color: "colors.text.dim" },
-				mono:     { font: "fonts.mono.regular", size: "md", color: "colors.text.primary" }
+				title:    { font_asset: "fonts.ui.strong", size: "xl", paint: "colors.text.primary" },
+				subtitle: { font_asset: "fonts.ui.strong", size: "lg", paint: "colors.text.primary" },
+				body:     { font_asset: "fonts.ui.regular", size: "md", paint: "colors.text.primary" },
+				hint:     { font_asset: "fonts.ui.regular", size: "sm", paint: "colors.text.dim" },
+				mono:     { font_asset: "fonts.mono.regular", size: "md", paint: "colors.text.primary" }
 			}
 		},
 
@@ -186,80 +186,91 @@ function wwThemeDefault() {
 		assets: {
 			sprites: {
 				pixel: spr_ww_pixel,
-				
+
 				#region Button
 				button: {
-					background: spr_ww_rr9_r4_all,
-					border: undefined,
-					overlay: undefined,
+					main: spr_ww_rr9_r4_all,
+					overlay: undefined
 				},
 				#endregion
-				
-				#region Button Text
+
+				#region ButtonText
 				button_text: {
-					background: spr_ww_rr9_r4_all,
-					border: undefined,
-					overlay: undefined,
+					main: spr_ww_rr9_r4_all,
+					overlay: undefined
 				},
 				#endregion
-				
+
 				#region Checkbox
 				checkbox: {
-					background: undefined,
-					border: undefined,
+					main: undefined,
 					overlay: undefined,
 					check: s9CheckBoxChecked,
-					uncheck: undefined,
+					uncheck: undefined
 				},
 				#endregion
-				
+
 				#region Radio
 				radio: {
-					background: undefined,
-					border: undefined,
+					main: undefined,
 					overlay: undefined,
 					check: undefined,
-					uncheck: undefined,
+					uncheck: undefined
 				},
 				#endregion
-				
+
 				#region Slider
 				slider: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+					main: undefined,
+					overlay: undefined
 				},
 				slider_thumb: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+					main: undefined,
+					overlay: undefined
 				},
 				#endregion
-				
+
+				#region Combo
+				combo: {
+					main: undefined,
+					overlay: undefined,
+					dropdown_icon: undefined
+				},
+				#endregion
+
+				#region Dropdown
+				dropdown: {
+					main: undefined,
+					overlay: undefined,
+					item: undefined
+				},
+				#endregion
+
 				#region Scrollbar
 				scrollbar_horz: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+					main: undefined,
+					overlay: undefined
 				},
-				slider_horz_thumb: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+				scrollbar_horz_thumb: {
+					main: undefined,
+					overlay: undefined
 				},
 				scrollbar_vert: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+					main: undefined,
+					overlay: undefined
 				},
-				slider_vert_thumb: {
-					background: undefined,
-					border: undefined,
-					overlay: undefined,
+				scrollbar_vert_thumb: {
+					main: undefined,
+					overlay: undefined
 				},
 				#endregion
-				
-				close: undefined
+
+				#region Close
+				close: {
+					main: undefined,
+					overlay: undefined
+				},
+				#endregion
 			},
 			icons: {
 				warn: undefined,

@@ -29,17 +29,22 @@ function wwThemeBuild(_theme_or_layers = undefined, _opts = undefined) {
 	// 2) clone so we can safely add derived values + resolve references in-place
 	var built = variable_clone(theme);
 
-	// 3) derive missing paints/palette
+	// 3) normalize schema so bake output has a predictable shape.
+	if (opts[$ "normalize_schema"]) {
+		__wwThemeNormalizeSchema(built, opts);
+	}
+
+	// 4) derive missing paints/palette
 	if (opts[$ "derive_missing_colors"]) {
 		__wwThemeDeriveMissing(built, opts);
 	}
 
-	// 4) resolve any dotted-path strings to direct values/struct references
+	// 5) resolve any dotted-path strings to direct values/struct references
 	if (opts[$ "resolve_paths"]) {
 		__wwThemeResolveAll(built, opts[$ "max_resolve_passes"]);
 	}
 
-	// 5) compile typography conveniences (optional)
+	// 6) compile typography conveniences (optional)
 	if (opts[$ "resolve_typography"]) {
 		__wwThemeCompileTypography(built, opts);
 		if (opts[$ "resolve_paths"]) {
@@ -48,7 +53,7 @@ function wwThemeBuild(_theme_or_layers = undefined, _opts = undefined) {
 		}
 	}
 
-	// 6) optional strict check
+	// 7) optional strict check
 	if (opts[$ "strict_no_path_strings"]) {
 		var _left = __wwThemeCountResolvablePathStrings(built);
 		if (_left > 0) {
@@ -63,6 +68,7 @@ function wwThemeBuild(_theme_or_layers = undefined, _opts = undefined) {
 
 function __wwThemeBuildApplyOpts(_opts) {
 	var opts = {
+		normalize_schema: true,
 		derive_missing_colors: true,
 		resolve_paths: true,
 		resolve_typography: true,
@@ -80,6 +86,88 @@ function __wwThemeBuildApplyOpts(_opts) {
 		}
 	}
 	return opts;
+}
+
+function __wwThemeNormalizeSchema(_theme, _opts) {
+	if (!is_struct(_theme)) { return; }
+
+	if (!variable_struct_exists(_theme, "meta") || !is_struct(_theme.meta)) {
+		_theme.meta = {};
+	}
+	if (!variable_struct_exists(_theme, "schema") || !is_struct(_theme.schema)) {
+		_theme.schema = { id: "ww_theme_schema", version: 1 };
+	}
+	if (!variable_struct_exists(_theme.schema, "id")) {
+		_theme.schema.id = "ww_theme_schema";
+	}
+	if (!variable_struct_exists(_theme.schema, "version")) {
+		_theme.schema.version = 1;
+	}
+
+	__wwEnsureStructPath(_theme, "assets");
+	__wwEnsureStructPath(_theme, "assets.sprites");
+	__wwEnsureStructPath(_theme, "assets.icons");
+
+	var _sprites = _theme.assets.sprites;
+
+	// Canonical sprite slots (new naming): each is a struct { main, overlay, ... }.
+	// Keep "pixel" as a direct sprite id token.
+	__wwThemeNormalizeSpriteSlot(_sprites, "button");
+	__wwThemeNormalizeSpriteSlot(_sprites, "button_text");
+	__wwThemeNormalizeSpriteSlot(_sprites, "checkbox");
+	__wwThemeNormalizeSpriteSlot(_sprites, "radio");
+	__wwThemeNormalizeSpriteSlot(_sprites, "slider");
+	__wwThemeNormalizeSpriteSlot(_sprites, "slider_thumb");
+	__wwThemeNormalizeSpriteSlot(_sprites, "combo");
+	__wwThemeNormalizeSpriteSlot(_sprites, "dropdown");
+	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_horz");
+	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_horz_thumb");
+	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_vert");
+	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_vert_thumb");
+	__wwThemeNormalizeSpriteSlot(_sprites, "close");
+
+	// Legacy checkbox keys -> new slot fields.
+	var _checkbox = _sprites.checkbox;
+	if (variable_struct_exists(_sprites, "checkbox_checked") && _checkbox.check == undefined) {
+		_checkbox.check = _sprites.checkbox_checked;
+	}
+	if (variable_struct_exists(_sprites, "checkbox_unchecked") && _checkbox.uncheck == undefined) {
+		_checkbox.uncheck = _sprites.checkbox_unchecked;
+	}
+
+	// Reasonable fallback for checkbox visuals.
+	if (_checkbox.main == undefined) {
+		_checkbox.main = _checkbox.uncheck;
+	}
+	if (_checkbox.uncheck == undefined) {
+		_checkbox.uncheck = _checkbox.main;
+	}
+}
+
+function __wwThemeNormalizeSpriteSlot(_sprites, _slot_name) {
+	if (!is_struct(_sprites)) { return { main: undefined, overlay: undefined }; }
+
+	var _raw = variable_struct_exists(_sprites, _slot_name)
+		? variable_struct_get(_sprites, _slot_name)
+		: undefined;
+
+	if (is_struct(_raw)) {
+		if (!variable_struct_exists(_raw, "main")) {
+			if (variable_struct_exists(_raw, "sprite")) _raw.main = _raw.sprite;
+			else _raw.main = undefined;
+		}
+		if (!variable_struct_exists(_raw, "overlay")) {
+			_raw.overlay = undefined;
+		}
+		return _raw;
+	}
+
+	var _slot = {
+		main: _raw,
+		overlay: undefined
+	};
+	variable_struct_set(_sprites, _slot_name, _slot);
+	return _slot;
 }
 
 function __wwThemeComposeFallback(_layers) {
@@ -162,6 +250,7 @@ function __wwThemeExpandAliasPath(_path) {
 	if (string_pos("text_styles.", _path) == 1) return "typography." + _path;
 	if (string_pos("sizes_px.", _path) == 1) return "typography." + _path;
 	if (string_pos("line_height.", _path) == 1) return "typography." + _path;
+	if (string_pos("styles.", _path) == 1) return "typography.text_styles." + string_delete(_path, 1, 7);
 
 	return _path;
 }
@@ -528,6 +617,37 @@ function __wwThemeCompileTypography(_theme, _opts) {
 		}
 		else if (variable_struct_exists(style, "size") && is_numeric(style.size)) {
 			style.size = round(style.size * scale);
+		}
+
+		// New canonical naming:
+		// - font_asset: resolved GM font
+		// - paint: resolved { color, alpha }
+		// Keep legacy aliases (font/color) mirrored for compatibility.
+		if (variable_struct_exists(style, "font_asset")) {
+			style.font = style.font_asset;
+		}
+		else if (variable_struct_exists(style, "font")) {
+			style.font_asset = style.font;
+		}
+
+		var _paint = undefined;
+		if (variable_struct_exists(style, "paint")) _paint = style.paint;
+		else if (variable_struct_exists(style, "color")) _paint = style.color;
+		_paint = __wwPaintEnsure(_paint);
+		if (is_struct(_paint) && _paint.color == undefined) {
+			var _fallback_paint = __wwThemeGetPaint(_theme, "colors.text.primary");
+			if (is_struct(_fallback_paint)) {
+				_paint = __wwPaintEnsure(_fallback_paint);
+			}
+		}
+		style.paint = _paint;
+		style.color = _paint;
+
+		if (variable_struct_exists(style, "size")) {
+			style.size_px = style.size;
+		}
+		else if (variable_struct_exists(style, "size_px")) {
+			style.size = style.size_px;
 		}
 	}
 }

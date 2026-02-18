@@ -121,6 +121,17 @@ function WWButtonText() : WWButtonSprite() constructor {
 				
 				return self;
 			};
+			#region jsDoc
+			/// @func    set_text_click_offset()
+			/// @desc    Sets the label offset relative to the button. While pressed.
+			/// @self    WWButtonText
+			/// @param   {Real} click_y : Additional Y offset while pressed.
+			/// @returns {Struct.WWButtonText}
+			#endregion
+			static set_text_click_offset = function(_click_y=text.x_offset) {
+				text.click_yoff = _click_y;
+				return self;
+			};
 			
 		#endregion
 		
@@ -153,7 +164,7 @@ function WWButtonText() : WWButtonSprite() constructor {
 			
 			text = {
 				x_offset:0,
-				x_offset:0,
+				y_offset:0,
 				click_yoff:2,
 			}
 			
@@ -256,6 +267,16 @@ function WWButtonText() : WWButtonSprite() constructor {
 					y: text.y_offset,
 					click_y: text.click_yoff,
 				};
+			};
+			
+			#region jsDoc
+			/// @func    get_text_click_offset()
+			/// @desc    Returns the configured label offsets.
+			/// @self    WWButtonText
+			/// @returns {Real} click_y
+			#endregion
+			static get_text_click_offset = function() {
+				return text.click_yoff;
 			};
 			
 			#region GML Events

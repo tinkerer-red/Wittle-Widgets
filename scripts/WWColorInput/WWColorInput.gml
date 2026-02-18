@@ -14,15 +14,67 @@ function WWColorInput() : WWCore() constructor {
 
 		#region Components
 		btn = new WWButton();
+		__picker__ = new WWColorPicker()
+			.on_color_change(function() {
+				__commit_picker_close__();
+			})
+		__picker_window__ = new WWWindow()
+			.set_title("Color")
+			.set_size(560, 360)
+			.set_content(__picker__)
+			.set_open(false)
+		
+		// Picker events (wired once).
+		__picker__.on_color_change(function(_d) {
+			__col__ = _d.color;
+			__alpha__ = _d.alpha;
+			__fire__("picker");
+		});
+		
+		// Defaults
+		set_size(160, 22);
+		set_color(c_white, 1);
+
+		// Swatch drawing overlay on the button
+		btn.on_post_draw(function(_input) {
+			var _pad = 3;
+			var _sx1 = btn.x + _pad;
+			var _sy1 = btn.y + _pad;
+			var _sx2 = btn.x + btn.width - _pad;
+			var _sy2 = btn.y + btn.height - _pad;
+
+			// Checker background for alpha
+			var _cs = 4;
+			for (var yy = _sy1; yy < _sy2; yy += _cs) {
+				for (var xx = _sx1; xx < _sx2; xx += _cs) {
+					var _odd = ((floor((xx - _sx1) / _cs) + floor((yy - _sy1) / _cs)) mod 2) == 1;
+					draw_set_alpha(1);
+					draw_set_color(_odd ? c_gray : c_ltgray);
+					draw_rectangle(xx, yy, min(xx + _cs, _sx2), min(yy + _cs, _sy2), false);
+				}
+			}
+
+			draw_set_alpha(__alpha__);
+			draw_set_color(__col__);
+			draw_rectangle(_sx1, _sy1, _sx2, _sy2, false);
+
+			draw_set_alpha(1);
+			draw_set_color(c_black);
+			draw_rectangle(_sx1, _sy1, _sx2, _sy2, true);
+		});
+
+		btn.set_callback(function() {
+			__open_picker__();
+		});
+		
 		add(btn);
+		add(__picker_window__);
 		#endregion
 
 		#region Variables
 		__col__ = c_white;
 		__alpha__ = 1;
 		__use_alpha__ = true;
-		__picker_window__ = undefined;
-		__picker__ = undefined;
 		__event_data__ = { color: c_white, alpha: 1, source: "" };
 		#endregion
 
@@ -69,89 +121,37 @@ function WWColorInput() : WWCore() constructor {
 			trigger_event(events.color_change, __event_data__);
 		};
 
-		static __get_root__ = function() {
-			var r = self;
-			while (r.__parent__ != noone) {
-				r = r.__parent__;
-			}
-			return r;
+		static __commit_picker_close__ = function() {
+			__col__ = __picker__.get_color();
+			__alpha__ = __picker__.get_alpha();
+			__fire__("close");
 		};
-
+		
 		static __close_picker__ = function() {
-			if (!is_undefined(__picker_window__)) {
-				if (!is_undefined(__picker_window__.__parent__)) {
-					__picker_window__.__parent__.remove(__picker_window__);
-				}
-			}
-			__picker_window__ = undefined;
-			__picker__ = undefined;
+			__picker_window__.set_open(false);
 		};
 
 		static __open_picker__ = function() {
-			__close_picker__();
+			__picker__.set_use_alpha(__use_alpha__);
+			__picker__.set_color(__col__, __alpha__);
+			__picker_window__.set_open(true);
 
-			var root = __get_root__();
-			var win = new WWWindow().set_title("Color");
-			var picker = new WWColorPicker();
-			picker.set_use_alpha(__use_alpha__);
-			picker.set_color(__col__, __alpha__);
-
-			picker.on_color_change(function(_d) {
-				__col__ = _d.color;
-				__alpha__ = _d.alpha;
-				__fire__("picker");
-			});
-
-			win.set_size(420, 260);
-			win.set_content(picker);
-
-			// Position near this control (clamp to 0..1280/720 bounds for now)
-			var _x = clamp(self.x, 0, 1280 - win.width);
-			var _y = clamp(self.y + self.height + 6, 0, 720 - win.height);
-			win.set_offset(_x, _y);
-
-			root.add(win);
-
-			__picker_window__ = win;
-			__picker__ = picker;
+			// Position near this control and clamp to active GUI size.
+			var _gui_w = max(1, display_get_gui_width());
+			var _gui_h = max(1, display_get_gui_height());
+			var _x = clamp(self.x, 0, _gui_w - __picker_window__.width);
+			var _y = clamp(self.y + self.height + 6, 0, _gui_h - __picker_window__.height);
+			if (__picker_window__.__is_child__) {
+				__picker_window__.set_offset(_x - __picker_window__.__parent__.x, _y - __picker_window__.__parent__.y);
+			}
+			else {
+				__picker_window__.set_offset(_x, _y);
+			}
+			__picker_window__.bring_to_front();
 		};
 		#endregion
 
 	#endregion
 
-	// Defaults
-	set_size(160, 22);
-	set_color(c_white, 1);
-
-	// Swatch drawing overlay on the button
-	btn.on_post_draw(function(_input) {
-		var _pad = 3;
-		var _sx1 = btn.x + _pad;
-		var _sy1 = btn.y + _pad;
-		var _sx2 = btn.x + btn.width - _pad;
-		var _sy2 = btn.y + btn.height - _pad;
-
-		// Checker background for alpha
-		var _cs = 4;
-		for (var yy = _sy1; yy < _sy2; yy += _cs) {
-			for (var xx = _sx1; xx < _sx2; xx += _cs) {
-				var _odd = ((floor((xx - _sx1) / _cs) + floor((yy - _sy1) / _cs)) mod 2) == 1;
-				draw_set_alpha(1);
-				draw_set_color(_odd ? c_gray : c_ltgray);
-				draw_rectangle(xx, yy, min(xx + _cs, _sx2), min(yy + _cs, _sy2), false);
-			}
-		}
-
-		draw_set_alpha(__alpha__);
-		draw_set_color(__col__);
-		draw_rectangle(_sx1, _sy1, _sx2, _sy2, false);
-
-		draw_set_alpha(1);
-		draw_set_color(c_black);
-		draw_rectangle(_sx1, _sy1, _sx2, _sy2, true);
-	});
-
-	btn.set_callback(function() {
-		__open_picker__();
-	});
+	
 }

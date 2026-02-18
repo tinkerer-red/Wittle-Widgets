@@ -1,195 +1,264 @@
 #region jsDoc
 /// @func    WWWindow()
-/// @desc    A floating container for dialogs, modals, or application windows with draggable, closable, minimizable, and maximizable functionality.
-///         Additionally, a custom content/viewport can be provided so that a single component may be treated as the canvas.
+/// @desc    Overlay window with draggable header, close button, and scrollable content region.
 /// @returns {Struct.WWWindow}
 #endregion
-function WWWindow() : WWCore() constructor {
-    debug_name = "WWWindow";
-    var __window__ = self;
-    
-    #region Public
-        
-        #region Builder Functions
-            #region jsDoc
-            /// @func    set_size()
-            /// @desc    Sets the component's size (i.e., its interactive boundaries) as specified by the user.
-            ///          This updates the region and marks the size as user–preferred so that future internal updates won't override it.
-            /// @self    WWCore
-            /// @param   {Real} width : The new width.
-            /// @param   {Real} height : The new height.
-            /// @returns {Struct.WWCore}
-            #endregion
-            static set_size = function(_width, _height) {
-                __size_set__ = true;
-                __set_size__(_width, _height);
-                titleBar.set_size(width, 30);
-                // If content is set, update its size or reposition if needed.
-                if(content) {
-                    // For instance, we might want content to fill the remaining window area.
-                    content.set_offset(0, 30);
-                    content.set_size(width, height - 30);
-                }
-                return self;
-            }
-            
-            #region jsDoc
-            /// @func    set_title()
-            /// @desc    Sets the window's title text.
-            /// @self    WWWindow
-            /// @param   {String} title : The title text.
-            /// @returns {Struct.WWWindow}
-            #endregion
-            static set_title = function(_title) {
-                titleLabel.set_text(_title);
-                return self;
-            }
-            
-            #region jsDoc
-            /// @func    set_content()
-            /// @desc    Sets the content (viewport) of the window. This component should be a WWCore (or derivative).
-            /// @self    WWWindow
-            /// @param   {Struct.WWCore} content : The content component.
-            /// @returns {Struct.WWWindow}
-            #endregion
-            static set_content = function(_content) {
-                // If a previous content exists, remove it.
-                if(content) {
-                    remove(content);
-                }
-                content = _content;
-                // Position the content below the titleBar.
-                content.set_offset(0, 30);
-                // Fill the remaining area of the window.
-                content.set_size(width, height - 30);
-                add(content);
-                return self;
-            }
-        #endregion
-        
-        #region Components
-        // Create a Title Bar with close, minimize, and maximize buttons, plus a title label.
-        titleBar = new WWButton()
-            .set_offset(0, 0)
-            .set_size(width, 30)
-            .set_background_color(c_dkgray);
-        
-        // Minimize Button (positioned next to maximize)
-        minimizeButton = new WWButtonText()
-            .set_alignment(fa_right, fa_top)
-            .set_offset(-105, 0)
-            .set_size(30, 30)
-            .set_text("_")
-            .set_callback(function() {
-                if (!minimized) {
-                    // Save current height then minimize.
-                    originalSize.height = __window__.height;
-                    __window__.set_size(__window__.width, titleBar.height);
-                    minimized = true;
-                } else {
-                    // Restore previous height.
-                    __window__.set_size(__window__.width, originalSize.height);
-                    minimized = false;
-                }
-                __window__.update_component_positions();
-            });
-        
-        // Maximize Button (positioned next to minimize)
-        maximizeButton = new WWButtonText()
-            .set_alignment(fa_right, fa_top)
-            .set_offset(-70, 0)
-            .set_size(30, 30)
-            .set_text("[ ]")
-            .set_callback(function() {
-                if (!maximized) {
-                    // Save current size and position.
-                    originalSize = { width: __window__.width, height: __window__.height };
-                    originalOffset = { x: __window__.x, y: __window__.y };
-                    // Maximize to full screen (or desired maximum size).
-                    __window__.set_offset(0, 0);
-                    __window__.set_size(1280, 720);
-                    maximized = true;
-                } else {
-                    // Restore original size and position.
-                    __window__.set_offset(originalOffset.x, originalOffset.y);
-                    __window__.set_size(originalSize.width, originalSize.height);
-                    maximized = false;
-                }
-                __window__.update_component_positions();
-            });
-        
-        // Close Button (positioned at the far right)
-        closeButton = new WWButtonText()
-            .set_alignment(fa_right, fa_top)
-            .set_offset(-35, 0)
-            .set_size(30, 30)
-            .set_text("X")
-            .set_callback(function() {
-                if (!is_undefined(__window__.__parent__)) {
-                    __window__.__parent__.remove(__window__);
-                }
-            });
-        
-        // Title Label
-        titleLabel = new WWLabel()
-            .set_offset(10, 5)
-            .set_text("Window");
-        
-        // Add control buttons and label to the title bar.
-        titleBar.add(maximizeButton);
-        titleBar.add(minimizeButton);
-        titleBar.add(closeButton);
-        titleBar.add(titleLabel);
-        add(titleBar);
-        #endregion
-        
-        #region Events
-        // Use titleBar's events to handle dragging.
-        titleBar.on_pressed(function(_input) {
-            // Record initial drag offset.
-            dragOffsetX = device_mouse_x_to_gui(0) - x;
-            dragOffsetY = device_mouse_y_to_gui(0) - y;
-        });
-        titleBar.on_interact(function(_input) {
-            // Update window position based on current mouse position.
-            set_offset(device_mouse_x_to_gui(0) - dragOffsetX, device_mouse_y_to_gui(0) - dragOffsetY);
-        });
+function WWWindow() : WWOverlay() constructor {
+	debug_name = "WWWindow";
+	
+	#region Public
+		
+		#region Builder Functions
+		static set_size = function(_width, _height) {
+			static __base_set_size__ = WWCore.set_size;
+			__base_set_size__(_width, _height);
+			__refresh_structure__();
+			return self;
+		}
+
+		static set_title = function(_title) {
+			title = string(_title);
+			header.set_text(title);
+			return self;
+		}
+
+		static set_header_height = function(_height) {
+			header_height = max(1, _height);
+			__refresh_structure__();
+			return self;
+		}
+
+		static set_draggable = function(_enabled=true) {
+			draggable = _enabled;
+			return self;
+		}
+
+		static set_close_visible = function(_visible=true) {
+			close_visible = _visible;
+			close_button.set_active(_visible);
+			return self;
+		}
+
+		static set_close_text = function(_text="X") {
+			close_button.set_text(_text);
+			__layout_close_button_text__();
+			return self;
+		}
+
+		static set_open = function(_is_open=true) {
+			var _prev = is_open;
+			is_open = _is_open;
+			if (_prev != _is_open) {
+				if (_is_open) {
+					trigger_event(events.opened);
+				}
+				else {
+					trigger_event(events.closed);
+				}
+			}
+			set_active(_is_open);
+			return self;
+		}
+
+		static set_content = function(_comp) {
+			content_region.clear_children();
+			if (is_struct(_comp)) {
+				content_region.add(_comp);
+				content_region.set_canvas_size_from_children();
+			}
+			return self;
+		}
+
+		static set_scrollbars_enabled = function(_horz=true, _vert=true) {
+			content_region.set_scrollbars_enabled(_horz, _vert);
+			return self;
+		}
+
+		static set_scrollbars_auto_hide = function(_horz=true, _vert=true) {
+			content_region.set_scrollbars_auto_hide(_horz, _vert);
+			return self;
+		}
+
+		static set_scrollbar_thickness = function(_thickness=16) {
+			content_region.set_scrollbar_thickness(_thickness);
+			__refresh_structure__();
+			return self;
+		}
+
+		static set_wheel_scroll_enabled = function(_horz=true, _vert=true) {
+			content_region.set_wheel_scroll_enabled(_horz, _vert);
+			return self;
+		}
+
+		static set_smooth_scrolling = function(_smooth=false) {
+			content_region.set_smooth_scrolling(_smooth);
+			return self;
+		}
 		#endregion
-        
-        #region Variables
-        // State variables for dragging, minimizing, and maximizing.
-        dragOffsetX = 0;
-        dragOffsetY = 0;
-        minimized = false;
-        maximized = false;
-        originalSize = { width: width, height: height };
-        originalOffset = { x: x, y: y };
-        // Content variable to hold custom viewport.
-        content = undefined;
-        #endregion
-        
-        #region Functions
-            #region jsDoc
-            /// @func    center()
-            /// @desc    Centers the window in the default 1280x720 GUI space.
-            /// @self    WWWindow
-            /// @returns {Struct.WWWindow}
-            #endregion
-            static center = function() {
-            set_offset((1280 - width) / 2, (720 - height) / 2);
-            return self;
-            }
-        #endregion
-        
-    #endregion
-        
-    #region Private
-        #region Variables
-        // Private variables can be added here if needed.
-        #endregion
-        
-        #region Functions
-        // Private helper functions can be added here.
-        #endregion
-    #endregion
+		
+		#region Variables
+		// Initialize required state before any child add/layout can run.
+		title = "Window";
+		header_height = 20;
+		draggable = true;
+		close_visible = true;
+		is_open = true;
+		drag_dx = 0;
+		drag_dy = 0;
+		__is_dragging__ = false;
+		close_button_margin = 3;
+		#endregion
+		
+		#region Components
+		header = new WWButtonText()
+			.set_text("Window")
+			.set_size(width, header_height)
+			.set_background_color(make_color_rgb(43, 56, 80))
+			.set_text_click_offset(undefined);
+
+		close_button = new WWButtonText()
+			.set_alignment(fa_right, fa_top)
+			.set_size(header_height, header_height)
+			.set_offset(-20,0)
+			.set_text("X")
+			.set_callback(method(self, function() {
+				set_open(false);
+			}));
+
+		content_region = new WWViewScrollRegion()
+			.set_region_mode(true)
+			.set_scrollbars_auto_hide(true, true)
+			.set_scrollbars_enabled(true, true)
+			.set_size(width, max(1, height - header_height))
+			.set_offset(0, 20)
+			.set_background_color(make_color_rgb(18, 24, 36));
+		
+		static __base_add__ = WWCore.add;
+		__base_add__([header, content_region]);
+		header.add(close_button);
+		
+		#endregion
+
+		#region Events
+		events.opened = variable_get_hash("opened");
+		events.closed = variable_get_hash("closed");
+		static on_opened = function(_func) {
+			add_event_listener(events.opened, _func);
+			return self;
+		}
+		static on_closed = function(_func) {
+			add_event_listener(events.closed, _func);
+			return self;
+		}
+			
+		header.on_interact_enter(function(_input) {
+			if (!draggable) { return; }
+			drag_dx = device_mouse_x_to_gui(0) - x;
+			drag_dy = device_mouse_y_to_gui(0) - y;
+			bring_to_front();
+			__is_dragging__ = true;
+		});
+		header.on_focus(function(_input) {
+			if (!draggable) { return; }
+			if (__is_dragging__) {
+				var _new_x = device_mouse_x_to_gui(0) - drag_dx;
+				var _new_y = device_mouse_y_to_gui(0) - drag_dy;
+				if (__is_child__) {
+					set_offset(_new_x - __parent__.x, _new_y - __parent__.y);
+				}
+				else {
+					set_offset(_new_x, _new_y);
+				}
+			}
+		});
+		header.on_interact_exit(function(_input) {
+			if (!draggable) { return; }
+			__is_dragging__ = false;
+		});
+		
+		#endregion
+		
+		#region Functions
+		static add = function(_comp) {
+			var _result = content_region.add(_comp);
+			content_region.set_canvas_size_from_children();
+			return _result;
+		}
+
+		static insert = function(_a, _b) {
+			var _result = content_region.insert(_a, _b);
+			content_region.set_canvas_size_from_children();
+			return _result;
+		}
+
+		static remove = function(_comp) {
+			if (_comp == header || _comp == content_region) {
+				static __base_remove__ = WWCore.remove;
+				__base_remove__(_comp);
+				return;
+			}
+			content_region.remove(_comp);
+			content_region.set_canvas_size_from_children();
+		}
+
+		static clear_children = function() {
+			content_region.clear_children();
+			content_region.set_canvas_size_from_children();
+			return self;
+		}
+		
+		static center = function(_gui_w=1280, _gui_h=720) {
+			set_offset(floor((_gui_w - width) * 0.5), floor((_gui_h - height) * 0.5));
+			return self;
+		}
+
+		static get_title = function() { return title; };
+		static get_header_height = function() { return header_height; };
+		static get_draggable = function() { return draggable; };
+		static get_close_visible = function() { return close_visible; };
+		static get_open = function() { return is_open; };
+		static get_header = function() { return header; };
+		static get_close_button = function() { return close_button; };
+		static get_content_region = function() { return content_region; };
+		static get_canvas = function() { return content_region.get_canvas(); };
+		#endregion
+
+	#endregion
+
+	#region Private
+		
+		#region Functions
+		
+		static __refresh_structure__ = function() {
+			if (!is_struct(header) || !is_struct(content_region)) return;
+			header.set_size(width, header_height);
+			//close_button.set_offset(-close_button_margin-close_button.width, -close_button.width/2);
+			//__layout_close_button_text__();
+			//
+			content_region.set_offset(0, header_height);
+			content_region.set_size(width, max(1, height - header_height));
+		}
+		
+		static __layout_close_button_text__ = function() {
+			//if (!is_struct(close_button)) return;
+			//if (!variable_struct_exists(close_button, "text_component")) return;
+			//var _txt = close_button.text_component;
+			//if (!is_struct(_txt)) return;
+			//
+			//var _x = floor((close_button.width - _txt.width) * 0.5);
+			//var _y = floor((close_button.height - _txt.height) * 0.5);
+			//close_button.set_text_offsets(_x, _y, _y + 1);
+		}
+		
+		#endregion
+		
+	#endregion
+
+	set_overlay_role(WWOverlayRole.WINDOW);
+	set_size(320, 240);
+	set_title("Window");
+	__refresh_structure__();
+	__layout_close_button_text__();
+	__refresh_structure__();
+	
 }

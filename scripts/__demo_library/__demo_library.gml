@@ -8,19 +8,47 @@
 function ww_inspector_lib() {
 	static __library = {
 		"$$register_order": [],
+		"$$examples": {},
+		"$$paths": {},
 	};
 	return __library;
 };
 
 #region jsDoc
-/// @func    demo_library_register(_constructor, _builder_defs)
-/// @desc    Registers builder definitions for a constructor (no validation).
-/// @param   {Function} _constructor
-/// @param   {Struct}   _builder_defs
+/// @func    demo_library_register(...)
+/// @desc    Registers constructor metadata.
+///          Supported signatures:
+///          - demo_library_register(_constructor, _builder_defs, _examples=undefined)
+///          - demo_library_register(_path, _constructor, _builder_defs, _examples=undefined)
+/// @param   {String|Function} _path_or_constructor
+/// @param   {Function|Struct} _constructor_or_builder_defs
+/// @param   {Struct|Undefined} _builder_defs_or_examples
+/// @param   {Struct|Undefined} _examples
 /// @returns {Undefined}
 #endregion
-function demo_library_register(_constructor, _builder_defs) {
+function demo_library_register(_path_or_constructor, _constructor_or_builder_defs, _builder_defs_or_examples=undefined, _examples=undefined) {
 	static __library = ww_inspector_lib();
+	
+	var _path = "";
+	var _constructor = undefined;
+	var _builder_defs = undefined;
+	var _examples_local = undefined;
+	
+	if (is_string(_path_or_constructor)) {
+		_path = _path_or_constructor;
+		_constructor = _constructor_or_builder_defs;
+		_builder_defs = _builder_defs_or_examples;
+		_examples_local = _examples;
+	}
+	else {
+		_constructor = _path_or_constructor;
+		_builder_defs = _constructor_or_builder_defs;
+		_examples_local = _builder_defs_or_examples;
+	}
+	
+	if (!is_struct(_builder_defs)) {
+		_builder_defs = {};
+	}
 
 	if (!is_callable(_constructor)) {
 		throw "_constructor must be the constructor itself, not a string";
@@ -28,7 +56,66 @@ function demo_library_register(_constructor, _builder_defs) {
 
 	var _constructor_name = script_get_name(_constructor);
 	variable_struct_set(__library, _constructor_name, _builder_defs);
+	
+	var _path_norm = demo_library_path_normalize(_path);
+	var _paths_lib = __library[$ "$$paths"];
+	variable_struct_set(_paths_lib, _constructor_name, _path_norm);
+	
+	if (is_struct(_examples_local)) {
+		var _examples_lib = __library[$ "$$examples"];
+		variable_struct_set(_examples_lib, _constructor_name, _examples_local);
+	}
 	array_push(__library[$ "$$register_order"], _constructor_name)
+};
+
+#region jsDoc
+/// @func    demo_library_path_normalize(_path)
+/// @desc    Normalizes slash-separated tree path text.
+/// @param   {String} _path
+/// @returns {String}
+#endregion
+function demo_library_path_normalize(_path) {
+	if (!is_string(_path)) { return ""; }
+	var _p = string_trim(_path);
+	_p = string_replace_all(_p, "\\", "/");
+	while (string_pos("//", _p) != 0) {
+		_p = string_replace_all(_p, "//", "/");
+	}
+	if (string_length(_p) > 0 && string_char_at(_p, 1) == "/") {
+		_p = string_delete(_p, 1, 1);
+	}
+	if (string_length(_p) > 0 && string_char_at(_p, string_length(_p)) == "/") {
+		_p = string_delete(_p, string_length(_p), 1);
+	}
+	return _p;
+};
+
+#region jsDoc
+/// @func    demo_library_get_examples(_constructor_name)
+/// @desc    Returns optional example definition struct for a constructor.
+/// @param   {String} _constructor_name
+/// @returns {Struct|Undefined}
+#endregion
+function demo_library_get_examples(_constructor_name) {
+	static __library = ww_inspector_lib();
+	var _examples_lib = __library[$ "$$examples"];
+	if (!is_struct(_examples_lib)) { return undefined; }
+	if (!variable_struct_exists(_examples_lib, _constructor_name)) { return undefined; }
+	return variable_struct_get(_examples_lib, _constructor_name);
+};
+
+#region jsDoc
+/// @func    demo_library_get_path(_constructor_name)
+/// @desc    Returns optional tree path string for a constructor.
+/// @param   {String} _constructor_name
+/// @returns {String}
+#endregion
+function demo_library_get_path(_constructor_name) {
+	static __library = ww_inspector_lib();
+	var _paths_lib = __library[$ "$$paths"];
+	if (!is_struct(_paths_lib)) { return ""; }
+	if (!variable_struct_exists(_paths_lib, _constructor_name)) { return ""; }
+	return variable_struct_get(_paths_lib, _constructor_name);
 };
 
 #region jsDoc
@@ -326,7 +413,7 @@ function demo_library_validate_all() {
 
 // build library 
 
-demo_library_register(WWCore, {
+demo_library_register("Core", WWCore, {
 	"set_position": [
 		{ name:"x", type:"Real" },
 		{ name:"y", type:"Real" }
@@ -385,19 +472,95 @@ demo_library_register(WWCore, {
 	"set_interact": [
 		{ name:"_is_interacting", type:"Bool" }
 	]
+}, {
+	"Anchor Matrix": function(_comp, _ctx) {
+		_comp.clear_children();
+		_comp.set_size(640, 360);
+		_comp.set_background_color(make_color_rgb(10, 16, 28));
+		
+		var _title = new WWLabel()
+			.set_text("WWCore Anchor Matrix Test")
+			.set_offset(12, 8);
+		_comp.add(_title);
+		
+		var _panel = new WWCore()
+			.set_offset(12, 56)
+			.set_size(420, 220)
+			.set_background_color(make_color_rgb(24, 36, 58));
+		_comp.add(_panel);
+		
+		var _w = 32;
+		var _h = 24;
+		var _m = 6;
+		var _mid_x = -floor(_w * 0.5);
+		var _mid_y = -floor(_h * 0.5);
+		
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_left,   fa_top).set_offset(_m,             _m).set_text("TL").set_color(make_color_rgb(56, 86, 122)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_center, fa_top).set_offset(_mid_x,         _m).set_text("TC").set_color(make_color_rgb(62, 94, 132)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_right,  fa_top).set_offset(-(_w + _m),     _m).set_text("TR").set_color(make_color_rgb(68, 102, 142)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_left,   fa_middle).set_offset(_m,          _mid_y).set_text("ML").set_color(make_color_rgb(74, 110, 152)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_center, fa_middle).set_offset(_mid_x,      _mid_y).set_text("MC").set_color(make_color_rgb(80, 118, 162)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_right,  fa_middle).set_offset(-(_w + _m),  _mid_y).set_text("MR").set_color(make_color_rgb(86, 126, 172)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_left,   fa_bottom).set_offset(_m,         -(_h + _m)).set_text("BL").set_color(make_color_rgb(92, 134, 182)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_center, fa_bottom).set_offset(_mid_x,     -(_h + _m)).set_text("BC").set_color(make_color_rgb(98, 142, 192)));
+		_panel.add(new WWButtonText().set_size(_w, _h).set_alignment(fa_right,  fa_bottom).set_offset(-(_w + _m), -(_h + _m)).set_text("BR").set_color(make_color_rgb(104, 150, 202)));
+		
+		var _lbl_w = new WWLabel().set_text("Width: 420").set_offset(456, 96);
+		var _lbl_h = new WWLabel().set_text("Height: 220").set_offset(456, 156);
+		
+		var _slider_w = new WWSliderHorz()
+			.set_offset(456, 116)
+			.set_size(164, 18)
+			.set_clamp_values(180, 580)
+			.set_rounding(true)
+			.set_value(420);
+		_slider_w.__debug_enabled__ = true;
+		
+		var _slider_h = new WWSliderHorz()
+			.set_offset(456, 176)
+			.set_size(164, 18)
+			.set_clamp_values(120, 300)
+			.set_rounding(true)
+			.set_value(220);
+		_slider_h.__debug_enabled__ = true;
+		
+		_comp.add([_lbl_w, _slider_w, _lbl_h, _slider_h]);
+		
+		var _bind = {
+			panel : _panel,
+			lbl_w : _lbl_w,
+			lbl_h : _lbl_h,
+			slider_w : _slider_w,
+			slider_h : _slider_h,
+		};
+		
+		_slider_w.on_event(_slider_w.events.value_changed, method(_bind, function(_v) {
+			var _new_w = floor(_v + 0.5);
+			var _new_h = floor(slider_h.get_value() + 0.5);
+			panel.set_size(_new_w, _new_h);
+			lbl_w.set_text($"Width: {_new_w}");
+		}));
+		
+		_slider_h.on_event(_slider_h.events.value_changed, method(_bind, function(_v) {
+			var _new_h = floor(_v + 0.5);
+			var _new_w = floor(slider_w.get_value() + 0.5);
+			panel.set_size(_new_w, _new_h);
+			lbl_h.set_text($"Height: {_new_h}");
+		}));
+	}
 });
-demo_library_register(WWSprite, {
+demo_library_register("Display/Sprites", WWSprite, {
 	"set_sprite": [
 		{ name:"sprite", type:"Asset.GMSprite" },
 	],
 });
 #region Buttons
-demo_library_register(WWButtonSprite, {
+demo_library_register("Inputs/Buttons", WWButtonSprite, {
 	"set_callback": [
 		{ name:"callback", type:"Function" }
 	]
 });
-demo_library_register(WWButtonText, {
+demo_library_register("Inputs/Buttons", WWButtonText, {
 	"set_text": [
 		{ name:"text", type:"String" }
 	],
@@ -423,11 +586,329 @@ demo_library_register(WWButtonText, {
 	],
 	"set_sprite_to_auto_wrap": []
 });
-demo_library_register(WWButton, {
+demo_library_register("Inputs/Buttons", WWButton, {
+});
+#endregion
+#region Dropdowns
+demo_library_register("Inputs/Dropdowns", WWDropdown, {
+	"set_header": [
+		{ name:"header_component", type:"Struct.WWCore" }
+	],
+	"set_header_toggle_enabled": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_item_builder": [
+		{ name:"builder_fn", type:"Function" }
+	],
+	"set_text": [
+		{ name:"text", type:"String" }
+	],
+	"set_open": [
+		{ name:"is_open", type:"Bool" }
+	],
+	"set_value": [
+		{ name:"index", type:"Real" }
+	],
+	"set_dropdown_array": [
+		{ name:"strings_array", type:"Array<String>" }
+	],
+	"set_dropdown_anchor": [
+		{ name:"xoff", type:"Real" },
+		{ name:"yoff", type:"Real|Undefined" }
+	],
+	"set_dropdown_space": [
+		{ name:"space", type:"Enum.WWOverlaySpace" }
+	],
+	"set_dropdown_host": [
+		{ name:"host", type:"Struct.WWCore" }
+	],
+	"set_dropdown_priority": [
+		{ name:"priority", type:"Real" }
+	],
+	"set_row_height": [
+		{ name:"row_height", type:"Real" }
+	],
+	"set_item_enabled": [
+		{ name:"index", type:"Real" },
+		{ name:"is_enabled", type:"Bool" }
+	]
+}, {
+	"Simple Menu": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 24]);
+		_ctx.try_call(_comp, "set_text", ["Choose action..."]);
+		_ctx.try_call(_comp, "set_dropdown_array", [["Open", "Save", "Close"]]);
+	},
+	"Long List": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_row_height", [26]);
+		_ctx.try_call(_comp, "set_dropdown_array", [[
+			"Player Settings",
+			"Graphics Settings",
+			"Audio Settings",
+			"Accessibility",
+			"Controls"
+		]]);
+		_ctx.try_call(_comp, "set_open", [true]);
+	},
+	"Overlay Order Test": function(_comp, _ctx) {
+		// Layout: one dropdown + two buttons below (left created before, right after).
+		// Goal: prove overlay rendering is stable regardless of sibling insertion order.
+		// Buttons intentionally overlap the open menu area but remain partially visible outside it.
+		_ctx.try_call(_comp, "set_size", [180, 24]);
+		_ctx.try_call(_comp, "set_text", ["Overlay order test"]);
+		_ctx.try_call(_comp, "set_dropdown_array", [["First", "Second", "Third", "Fourth", "Fifth", "Sixth"]]);
+		_ctx.try_call(_comp, "set_open", [true]);
+		_ctx.try_call(_comp, "set_row_height", [24]);
+		_ctx.try_call(_comp, "set_dropdown_priority", [4]);
+		_ctx.try_call(_comp, "set_dropdown_space", [WWOverlaySpace.GLOBAL_ROOT]);
+		_ctx.try_call(_comp, "set_offset", [120, 20]);
+		
+		var _host = _ctx.host;
+		if (!is_struct(_host)) { return; }
+		
+		var _left_before = new WWButtonText()
+			.set_size(110, 24)
+			.set_text("Before")
+			.set_offset(60, 78)
+			.set_color(make_color_rgb(70, 48, 54));
+		
+		//var _idx = _host.find(_comp);
+		//if (_idx >= 0) {
+		//	_host.insert(_idx, _left_before); // added before dropdown
+		//}
+		//else {
+			_host.add(_left_before);
+		//}
+		
+		var _right_after = new WWButtonText()
+			.set_size(110, 24)
+			.set_text("After")
+			.set_offset(250, 78)
+			.set_color(make_color_rgb(48, 58, 78));
+		_host.add(_right_after); // added after dropdown
+	},
+	"Custom Header": function(_comp, _ctx) {
+		var _header = new WWInputString().set_size(240, 24).set_value("Type filter...");
+		_ctx.try_call(_comp, "set_size", [240, 24]);
+		_ctx.try_call(_comp, "set_header_toggle_enabled", [false]);
+		_ctx.try_call(_comp, "set_header", [_header]);
+		_ctx.try_call(_comp, "set_dropdown_array", [["Alpha", "Beta", "Gamma"]]);
+		_ctx.try_call(_comp, "set_open", [true]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownBasic, {
+	"set_options": [
+		{ name:"options", type:"Array<String>" }
+	],
+	"add_option": [
+		{ name:"label", type:"String" }
+	]
+}, {
+	"Graphics Quality": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 24]);
+		_ctx.try_call(_comp, "set_text", ["Graphics Quality"]);
+		_ctx.try_call(_comp, "set_options", [["Low", "Medium", "High", "Ultra"]]);
+		_ctx.try_call(_comp, "set_value", [2]);
+	},
+	"Language Picker": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 24]);
+		_ctx.try_call(_comp, "set_text", ["Language"]);
+		_ctx.try_call(_comp, "set_options", [["English", "Spanish", "German", "Japanese"]]);
+	},
+	"Difficulty": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [180, 24]);
+		_ctx.try_call(_comp, "set_text", ["Difficulty"]);
+		_ctx.try_call(_comp, "set_options", [["Story", "Normal", "Hard"]]);
+		_ctx.try_call(_comp, "set_value", [1]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownSelect, {
+	"set_options": [
+		{ name:"options", type:"Array<Any>" }
+	],
+	"add_option": [
+		{ name:"option", type:"Any" },
+		{ name:"value", type:"Any" }
+	],
+	"set_selected_value": [
+		{ name:"value", type:"Any" }
+	]
+}, {
+	"Priority Enum": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 24]);
+		_ctx.try_call(_comp, "set_text", ["Priority"]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"Low", value:100 },
+			{ label:"Normal", value:200 },
+			{ label:"High", value:300 },
+		]]);
+		_ctx.try_call(_comp, "set_selected_value", [200]);
+	},
+	"Resolution IDs": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 24]);
+		_ctx.try_call(_comp, "set_text", ["Resolution"]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"1280x720", value:"res_720p" },
+			{ label:"1920x1080", value:"res_1080p" },
+			{ label:"2560x1440", value:"res_1440p" },
+		]]);
+		_ctx.try_call(_comp, "set_selected_value", ["res_1080p"]);
+	},
+	"Status Codes": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 24]);
+		_ctx.try_call(_comp, "set_text", ["Status"]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"Draft", value:0 },
+			{ label:"Review", value:1 },
+			{ label:"Published", value:2 },
+		]]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownCombo, {
+	"set_text_value": [
+		{ name:"text", type:"String" }
+	],
+	"set_open_on_focus": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_commit_on_submit": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_options": [
+		{ name:"options", type:"Array<Any>" }
+	],
+	"add_option": [
+		{ name:"option", type:"Any" },
+		{ name:"value", type:"Any" }
+	]
+}, {
+	"Item Search": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"Health Potion", value:"item_hp" },
+			{ label:"Mana Potion", value:"item_mp" },
+			{ label:"Iron Sword", value:"item_sword_iron" },
+			{ label:"Oak Shield", value:"item_shield_oak" },
+		]]);
+		_ctx.try_call(_comp, "set_text_value", ["Health Potion"]);
+	},
+	"Tag Picker": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 24]);
+		_ctx.try_call(_comp, "set_open_on_focus", [true]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"UI", value:"ui" },
+			{ label:"Gameplay", value:"gameplay" },
+			{ label:"Audio", value:"audio" },
+			{ label:"Rendering", value:"rendering" },
+		]]);
+	},
+	"Command Palette": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [320, 24]);
+		_ctx.try_call(_comp, "set_options", [[
+			{ label:"Open Project", value:"cmd_open" },
+			{ label:"Save All", value:"cmd_save_all" },
+			{ label:"Run Tests", value:"cmd_test" },
+			{ label:"Build Release", value:"cmd_build_release" },
+		]]);
+		_ctx.try_call(_comp, "set_text_value", [">"]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownMultiSelect, {
+	"set_options": [
+		{ name:"labels", type:"Array<String>" }
+	],
+	"add_option": [
+		{ name:"label", type:"String" },
+		{ name:"selected", type:"Bool" }
+	],
+	"clear_options": [],
+	"set_selected_indices": [
+		{ name:"indices", type:"Array<Real>" }
+	],
+	"set_close_on_toggle": [
+		{ name:"enabled", type:"Bool" }
+	]
+}, {
+	"Inventory Filter": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_options", [["Weapons", "Armor", "Consumables", "Quest"]]);
+		_ctx.try_call(_comp, "set_selected_indices", [[0, 2]]);
+	},
+	"Permissions": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_options", [["Read", "Write", "Execute", "Delete"]]);
+		_ctx.try_call(_comp, "set_selected_indices", [[0, 1]]);
+	},
+	"Notification Channels": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_options", [["Email", "SMS", "In-App", "Push"]]);
+		_ctx.try_call(_comp, "set_selected_indices", [[2, 3]]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownRich, {
+	"set_rich_array": [
+		{ name:"items", type:"Array<Any>" }
+	],
+	"add_rich_item": [
+		{ name:"item", type:"Any" },
+		{ name:"value", type:"Any" },
+		{ name:"component", type:"Struct.WWCore" }
+	],
+	"clear_rich_items": []
+}, {
+	"Status With Icons": function(_comp, _ctx) {
+		var _ok = new WWButtonText().set_text("[OK] Connected");
+		var _warn = new WWButtonText().set_text("[!] Degraded");
+		var _err = new WWButtonText().set_text("[X] Offline");
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "clear_rich_items", []);
+		_ctx.try_call(_comp, "add_rich_item", [{ label:"Connected", value:"ok", component:_ok }]);
+		_ctx.try_call(_comp, "add_rich_item", [{ label:"Degraded", value:"warn", component:_warn }]);
+		_ctx.try_call(_comp, "add_rich_item", [{ label:"Offline", value:"err", component:_err }]);
+	},
+	"Asset Presets": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [280, 24]);
+		_ctx.try_call(_comp, "set_rich_array", [[
+			{ label:"Default Theme", value:"theme_default" },
+			{ label:"High Contrast", value:"theme_hc" },
+			{ label:"Retro CRT", value:"theme_crt" },
+		]]);
+		_ctx.try_call(_comp, "set_value", [1]);
+	},
+	"Build Profiles": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_rich_array", [[
+			{ label:"Debug Local", value:{ mode:"debug", target:"local" } },
+			{ label:"Staging Cloud", value:{ mode:"release", target:"staging" } },
+			{ label:"Production", value:{ mode:"release", target:"prod" } },
+		]]);
+	}
+});
+demo_library_register("Inputs/Dropdowns", WWDropdownDateTime, {
+	"set_mode": [
+		{ name:"mode", type:"String" }
+	],
+	"refresh_options": []
+}, {
+	"Due Date": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_mode", ["date"]);
+		_ctx.try_call(_comp, "set_text", ["Due date"]);
+	},
+	"Reminder Time": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 24]);
+		_ctx.try_call(_comp, "set_mode", ["time"]);
+		_ctx.try_call(_comp, "set_text", ["Reminder time"]);
+	},
+	"Schedule Slot": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [280, 24]);
+		_ctx.try_call(_comp, "set_mode", ["datetime"]);
+		_ctx.try_call(_comp, "set_text", ["Meeting slot"]);
+	}
 });
 #endregion
 #region Checkbox
-demo_library_register(WWCheckbox, {
+demo_library_register("Inputs/Selection", WWCheckbox, {
 	"set_checkbox_sprites": [
 		{ name:"checked_sprite", type:"Asset.GMSprite" },
 		{ name:"unchecked_sprite", type:"Asset.GMSprite" }
@@ -444,17 +925,17 @@ demo_library_register(WWCheckbox, {
 });
 #endregion
 #region Progress Bars
-demo_library_register(WWProgressBarHorz, {
+demo_library_register("Display/Progress", WWProgressBarHorz, {
 });
-demo_library_register(WWProgressBarVert, {
+demo_library_register("Display/Progress", WWProgressBarVert, {
 });
-demo_library_register(WWProgressBar, {
+demo_library_register("Display/Progress", WWProgressBar, {
 });
 #endregion
 #region Rendering
 #endregion
 #region Scrollbars
-demo_library_register(WWScrollbar, {
+demo_library_register("Inputs/Scrollbars", WWScrollbar, {
 	"set_scroll_range": [
 		{ name:"min", type:"Real" },
 		{ name:"max", type:"Real" }
@@ -481,11 +962,11 @@ demo_library_register(WWScrollbar, {
 		{ name:"callback", type:"Function" }
 	]
 });
-demo_library_register(WWScrollbarHorz, {
+demo_library_register("Inputs/Scrollbars", WWScrollbarHorz, {
 });
-demo_library_register(WWScrollbarVert, {
+demo_library_register("Inputs/Scrollbars", WWScrollbarVert, {
 });
-demo_library_register(WWScrollbarButtons, {
+demo_library_register("Inputs/Scrollbars", WWScrollbarButtons, {
 	"set_size": [
 		{ name:"width", type:"Real" },
 		{ name:"height", type:"Real" }
@@ -533,7 +1014,7 @@ demo_library_register(WWScrollbarButtons, {
 });
 #endregion
 #region Sliders
-demo_library_register(WWSliderBase, {
+demo_library_register("Inputs/Sliders", WWSliderBase, {
 	"set_size": [
 		{ name:"width", type:"Real" },
 		{ name:"height", type:"Real" }
@@ -570,24 +1051,24 @@ demo_library_register(WWSliderBase, {
 		{ name:"bottom", type:"Real" }
 	]
 });
-demo_library_register(WWSliderHorz, {
+demo_library_register("Inputs/Sliders", WWSliderHorz, {
 });
-demo_library_register(WWSliderHorzThumb, {
+demo_library_register("Inputs/Sliders", WWSliderHorzThumb, {
 });
-demo_library_register(WWSliderVert, {
+demo_library_register("Inputs/Sliders", WWSliderVert, {
 });
-demo_library_register(WWSliderVertThumb, {
+demo_library_register("Inputs/Sliders", WWSliderVertThumb, {
 });
-demo_library_register(WWSlider, {
+demo_library_register("Inputs/Sliders", WWSlider, {
 });
 #endregion
 #region Viewports
-demo_library_register(WWView, {
+demo_library_register("Layout/Views", WWView, {
 	"set_canvas": [
 		{ name:"canvas", type:"Struct.WWCore" },
 	],
 });
-demo_library_register(WWViewScroll, {
+demo_library_register("Layout/Views", WWViewScroll, {
 	"set_canvas": [
 		{ name:"canvas", type:"Struct.WWCore" },
 	],
@@ -608,7 +1089,7 @@ demo_library_register(WWViewScroll, {
 		{ name:"max_y", type:"Real" },
 	],
 });
-demo_library_register(WWViewScrollAuto, {
+demo_library_register("Layout/Views", WWViewScrollAuto, {
 	"set_scroll_speeds": [
 		{ name:"hspeed", type:"Real" },
 		{ name:"vspeed", type:"Real" },
@@ -625,11 +1106,11 @@ demo_library_register(WWViewScrollAuto, {
 		{ name:"yoff", type:"Real" },
 	],
 });
-demo_library_register(WWViewScrollAutoHorz, {
+demo_library_register("Layout/Views", WWViewScrollAutoHorz, {
 });
-demo_library_register(WWViewScrollAutoVert, {
+demo_library_register("Layout/Views", WWViewScrollAutoVert, {
 });
-demo_library_register(WWViewScrollRegion, {
+demo_library_register("Layout/Views", WWViewScrollRegion, {
 	"set_region_mode": [
 		{ name:"enabled", type:"Bool" },
 	],
@@ -683,9 +1164,239 @@ demo_library_register(WWViewScrollRegion, {
 		{ name:"vert_enabled", type:"Bool" },
 	],
 });
+
+demo_library_register("Layout/Windows", WWWindow, {
+	"set_title": [
+		{ name:"title", type:"String" },
+	],
+	"set_header_height": [
+		{ name:"height", type:"Real" },
+	],
+	"set_draggable": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"set_close_visible": [
+		{ name:"visible", type:"Bool" },
+	],
+	"set_close_text": [
+		{ name:"text", type:"String" },
+	],
+	"set_open": [
+		{ name:"is_open", type:"Bool" },
+	],
+	"set_content": [
+		{ name:"comp", type:"Struct.WWCore" },
+	],
+	"set_scrollbars_enabled": [
+		{ name:"horz", type:"Bool" },
+		{ name:"vert", type:"Bool" },
+	],
+	"set_scrollbars_auto_hide": [
+		{ name:"horz", type:"Bool" },
+		{ name:"vert", type:"Bool" },
+	],
+	"set_scrollbar_thickness": [
+		{ name:"thickness", type:"Real" },
+	],
+	"set_wheel_scroll_enabled": [
+		{ name:"horz", type:"Bool" },
+		{ name:"vert", type:"Bool" },
+	],
+	"set_smooth_scrolling": [
+		{ name:"smooth", type:"Bool" },
+	]
+}, {
+	"Basic Dialog": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Properties"]);
+		_ctx.try_call(_comp, "set_size", [320, 220]);
+		_ctx.try_call(_comp, "set_offset", [140, 70]);
+		_ctx.try_call(_comp, "set_header_height", [28]);
+		_ctx.try_call(_comp, "set_close_text", ["X"]);
+		
+		_comp.clear_children();
+		_comp.add(new WWLabel().set_text("Name"));
+		_comp.add(new WWInputString().set_size(200, 24).set_offset(0, 18));
+		_comp.add(new WWLabel().set_text("Notes").set_offset(0, 50));
+		_comp.add(new WWInputString().set_size(240, 24).set_offset(0, 68));
+		_comp.add(new WWButtonText().set_text("Apply").set_size(90, 24).set_offset(0, 108));
+		_comp.add(new WWButtonText().set_text("Cancel").set_size(90, 24).set_offset(100, 108));
+	},
+	"Scrollable Content": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Event Log"]);
+		_ctx.try_call(_comp, "set_size", [360, 260]);
+		_ctx.try_call(_comp, "set_offset", [120, 48]);
+		_ctx.try_call(_comp, "set_scrollbars_auto_hide", [true, true]);
+		_ctx.try_call(_comp, "set_smooth_scrolling", [true]);
+		_comp.clear_children();
+		
+		var _y = 0;
+		var _i = 0; repeat(20) {
+			_comp.add(
+				new WWButtonText()
+					.set_size(300, 22)
+					.set_offset(0, _y)
+					.set_text($"Log Entry #{_i + 1}")
+			);
+			_y += 24;
+		_i += 1;}
+	},
+	"Overlay Priority": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Primary"]);
+		_ctx.try_call(_comp, "set_size", [280, 180]);
+		_ctx.try_call(_comp, "set_offset", [130, 90]);
+		_ctx.try_call(_comp, "set_overlay_priority", [0]);
+		_ctx.try_call(_comp, "set_overlay_always_on_top", [false]);
+		_comp.clear_children();
+		_comp.add(new WWLabel().set_text("Try dragging both windows.").set_offset(0, 0));
+		_comp.add(new WWLabel().set_text("Secondary is always-on-top.").set_offset(0, 18));
+		
+		var _host = _ctx.host;
+		if (!is_struct(_host)) { return; }
+		
+		var _secondary = new WWWindow()
+			.set_title("Pinned")
+			.set_size(220, 140)
+			.set_offset(340, 130)
+			.set_overlay_priority(5)
+			.set_overlay_always_on_top(true);
+		_secondary.add(new WWLabel().set_text("Always on top").set_offset(0, 0));
+		_secondary.add(new WWButtonText().set_text("Close").set_size(90, 24).set_offset(0, 28).set_callback(function(){ _host.remove(_secondary); }));
+		_host.add(_secondary);
+	}
+});
+demo_library_register("Layout/Windows", WWWindowContext, {
+	"set_auto_close_outside": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"set_auto_close_escape": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"set_anchor": [
+		{ name:"host", type:"Struct.WWCore" },
+		{ name:"xoff", type:"Real" },
+		{ name:"yoff", type:"Real" },
+	],
+	"set_keep_on_screen": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"open_at": [
+		{ name:"x", type:"Real" },
+		{ name:"y", type:"Real" },
+	],
+	"open_anchored": [
+		{ name:"host", type:"Struct.WWCore" },
+		{ name:"xoff", type:"Real" },
+		{ name:"yoff", type:"Real" },
+	],
+	"close_context": []
+}, {
+	"Auto-Close Popup": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Context"]);
+		_ctx.try_call(_comp, "set_size", [260, 120]);
+		_ctx.try_call(_comp, "set_auto_close_outside", [true]);
+		_ctx.try_call(_comp, "set_auto_close_escape", [true]);
+		_comp.clear_children();
+		_comp.add(new WWLabel().set_text("Click outside to close.").set_offset(0, 0));
+		_comp.add(
+			new WWButtonText()
+				.set_text("Close")
+				.set_size(90, 24)
+				.set_offset(0, 26)
+				.set_callback(method({ popup:_comp }, function() { popup.close_context(); }))
+		);
+		_comp.open_at(220, 120);
+	},
+	"Anchored To Button": function(_comp, _ctx) {
+		var _host = _ctx.host;
+		if (!is_struct(_host)) { return; }
+		
+		var _btn = new WWButtonText()
+			.set_text("Open Context")
+			.set_size(130, 24)
+			.set_offset(120, 80);
+		_host.add(_btn);
+		
+		_ctx.try_call(_comp, "set_title", ["Quick Actions"]);
+		_ctx.try_call(_comp, "set_size", [220, 120]);
+		_comp.clear_children();
+		_comp.add(new WWButtonText().set_text("Rename").set_size(180, 22).set_offset(0, 0));
+		_comp.add(new WWButtonText().set_text("Duplicate").set_size(180, 22).set_offset(0, 24));
+		_comp.add(new WWButtonText().set_text("Delete").set_size(180, 22).set_offset(0, 48));
+		
+		_btn.set_callback(method({ popup:_comp, host_btn:_btn }, function() {
+			popup.open_anchored(host_btn, 0, 4);
+		}));
+	}
+});
+demo_library_register("Layout/Windows", WWConfirmDialog, {
+	"set_message": [
+		{ name:"text", type:"String" },
+	],
+	"set_confirm_text": [
+		{ name:"text", type:"String" },
+	],
+	"set_cancel_text": [
+		{ name:"text", type:"String" },
+	],
+	"set_show_cancel": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"open_dialog": []
+}, {
+	"Delete Confirmation": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Delete File"]);
+		_ctx.try_call(_comp, "set_size", [340, 150]);
+		_ctx.try_call(_comp, "set_offset", [180, 100]);
+		_ctx.try_call(_comp, "set_message", ["Delete 'player_save_03.json'?"]);
+		_ctx.try_call(_comp, "set_confirm_text", ["Delete"]);
+		_ctx.try_call(_comp, "set_cancel_text", ["Cancel"]);
+		_ctx.try_call(_comp, "set_show_cancel", [true]);
+		_ctx.try_call(_comp, "open_dialog", []);
+	},
+	"Simple Acknowledge": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Notice"]);
+		_ctx.try_call(_comp, "set_size", [320, 130]);
+		_ctx.try_call(_comp, "set_offset", [200, 120]);
+		_ctx.try_call(_comp, "set_message", ["Settings applied successfully."]);
+		_ctx.try_call(_comp, "set_confirm_text", ["OK"]);
+		_ctx.try_call(_comp, "set_show_cancel", [false]);
+		_ctx.try_call(_comp, "open_dialog", []);
+	}
+});
+demo_library_register("Layout/Windows", WWInputDialog, {
+	"set_prompt": [
+		{ name:"text", type:"String" },
+	],
+	"set_value": [
+		{ name:"value", type:"String" },
+	],
+	"set_placeholder": [
+		{ name:"text", type:"String" },
+	],
+	"submit": []
+}, {
+	"Rename Asset": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Rename"]);
+		_ctx.try_call(_comp, "set_size", [360, 180]);
+		_ctx.try_call(_comp, "set_offset", [180, 90]);
+		_ctx.try_call(_comp, "set_prompt", ["Enter a new asset name"]);
+		_ctx.try_call(_comp, "set_placeholder", ["my_asset_name"]);
+		_ctx.try_call(_comp, "set_value", ["player_controller"]);
+		_ctx.try_call(_comp, "open_dialog", []);
+	},
+	"Create Folder": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["New Folder"]);
+		_ctx.try_call(_comp, "set_size", [340, 170]);
+		_ctx.try_call(_comp, "set_offset", [220, 120]);
+		_ctx.try_call(_comp, "set_prompt", ["Folder name"]);
+		_ctx.try_call(_comp, "set_placeholder", ["Untitled Folder"]);
+		_ctx.try_call(_comp, "set_value", [""]);
+		_ctx.try_call(_comp, "open_dialog", []);
+	}
+});
 #endregion
 #region Text
-demo_library_register(WWTextRenderer, {
+demo_library_register("Text", WWTextRenderer, {
 	"set_caption": [
 		{ name:"text", type:"String" },
 	],
@@ -757,7 +1468,7 @@ demo_library_register(WWTextRenderer, {
 	],
 });
 
-demo_library_register(WWLabelScrolling, {
+demo_library_register("Text/Labels", WWLabelScrolling, {
 	"set_color": [
 		{ name:"color", type:"Color" },
 	],
@@ -774,7 +1485,7 @@ demo_library_register(WWLabelScrolling, {
 		{ name:"alpha", type:"Real" },
 	],
 });
-demo_library_register(WWLabel, {
+demo_library_register("Text/Labels", WWLabel, {
 	"set_color": [
 		{ name:"color", type:"Color" },
 	],
@@ -795,7 +1506,7 @@ demo_library_register(WWLabel, {
 	],
 });
 
-demo_library_register(WWTextField, {
+demo_library_register("Text/Inputs", WWTextField, {
 	"set_text": [
 		{ name:"text", type:"String" },
 	],

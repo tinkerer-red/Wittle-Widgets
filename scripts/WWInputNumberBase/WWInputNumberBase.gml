@@ -30,6 +30,10 @@ function WWInputNumberBase() : WWCore() constructor {
 			__btn_w__ = 18;
 			__suppress__ = false;
 			__parsed_value__ = 0;
+			__repeat_delay_ms__ = 333;
+			__repeat_interval_ms__ = 65;
+			__repeat_dir__ = 0;
+			__repeat_next_ms__ = 0;
 			__event_data__ = { value: 0, source: "", text: "" };
 		#endregion
 
@@ -222,6 +226,11 @@ function WWInputNumberBase() : WWCore() constructor {
 				__event_data__.text = input.get_value();
 				trigger_event(events.value_change, __event_data__);
 			};
+			
+			static __apply_step__ = function(_dir, _source) {
+				set_value(__value__ + (__step__ * _dir));
+				__fire_change__(_source);
+			};
 
 			static __commit_text__ = function(_source) {
 				var _t = input.get_value();
@@ -246,14 +255,40 @@ function WWInputNumberBase() : WWCore() constructor {
 	btn_up.set_text("▲").set_text_font(fnt_ww_consolas_msdf);
 	btn_dn.set_text("▼").set_text_font(fnt_ww_consolas_msdf);
 
-	btn_up.set_callback(function() {
-		set_value(__value__ + __step__);
-		__fire_change__("step_up");
+	btn_up.on_pressed(function() {
+		__apply_step__(1, "step_up");
+		__repeat_dir__ = 1;
+		__repeat_next_ms__ = current_time + __repeat_delay_ms__;
 	});
-	btn_dn.set_callback(function() {
-		set_value(__value__ - __step__);
-		__fire_change__("step_down");
+	btn_dn.on_pressed(function() {
+		__apply_step__(-1, "step_down");
+		__repeat_dir__ = -1;
+		__repeat_next_ms__ = current_time + __repeat_delay_ms__;
 	});
+	
+	btn_up.on_held(function() {
+		if (__repeat_dir__ != 1) { return; }
+		while (current_time >= __repeat_next_ms__) {
+			__apply_step__(1, "step_up_repeat");
+			__repeat_next_ms__ += __repeat_interval_ms__;
+		}
+	});
+	btn_dn.on_held(function() {
+		if (__repeat_dir__ != -1) { return; }
+		while (current_time >= __repeat_next_ms__) {
+			__apply_step__(-1, "step_down_repeat");
+			__repeat_next_ms__ += __repeat_interval_ms__;
+		}
+	});
+	
+	var __stop_repeat__ = function() {
+		__repeat_dir__ = 0;
+		__repeat_next_ms__ = 0;
+	};
+	btn_up.on_released(__stop_repeat__);
+	btn_dn.on_released(__stop_repeat__);
+	btn_up.on_hover_exit(__stop_repeat__);
+	btn_dn.on_hover_exit(__stop_repeat__);
 
 	input.on_submit(function(_data) {
 		if (__suppress__) { exit; }

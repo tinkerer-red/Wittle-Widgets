@@ -26,6 +26,15 @@ function WWButtonSprite() : WWSprite() constructor {
 		
 		#region Events
 			
+			// Button-like controls should cancel a press when cursor leaves.
+			// Keep slider thumb behavior unchanged so drag interactions still work.
+			//on_hover_exit(function() {
+			//	if (__theme_kind__ == __WW_Theme_Kind.Slider) { return; }
+			//	if (__is_interacting__) {
+			//		set_interact(false);
+			//	}
+			//});
+
 			// Theme-driven draw path: only references theme when values are undefined.
 			on_pre_draw(function(_input) {
 				if (!visible) return;

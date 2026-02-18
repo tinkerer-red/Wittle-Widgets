@@ -68,10 +68,10 @@ function WWSprite() : WWCore() constructor {
 				}
 				else {
 					draw_sprite_stretched_ext(
-							_sprite_index, 
+							sprite_index, 
 							_image_index, 
-							_x,
-							_y,
+							x,
+							y,
 							width  * image_xscale,
 							height * image_yscale,
 							image_blend, 

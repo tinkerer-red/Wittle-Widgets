@@ -7,7 +7,7 @@ function WWSliderHorzThumb() : WWSliderHorz() constructor {
     debug_name = "WWSliderHorzThumb";
 
     thumb = new WWSliderThumb()
-        .set_sprite(spr_ww_pixel)
+        .set_sprite(undefined)
         .set_sprite_color(c_white)
         .set_size(16, 16);
 

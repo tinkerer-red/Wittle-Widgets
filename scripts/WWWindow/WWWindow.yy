@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWWindow",
   "parent":{
-    "name":"AI Driven",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/AI Driven.yy",
+    "name":"Windows",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Windows.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

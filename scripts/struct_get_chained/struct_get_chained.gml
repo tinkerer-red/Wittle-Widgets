@@ -9,11 +9,13 @@
 #endregion
 function struct_get_chained(_struct) {
 	var _current = _struct;
-	for(var i = 1; i < argument_count; i++) {
-        if (_current == undefined) return undefined;
+	var i = 1;
+	repeat(argument_count-1) {
+		if (_current == undefined) return undefined;
         _current = _current[$ argument[i]];
-    }
-    return _current;
+		i++;
+	}
+	return _current;
 }
 
 #region jsDoc
@@ -27,9 +29,11 @@ function struct_get_chained(_struct) {
 function struct_get_ext(_struct, _keys) {
 	var _current = _struct;
 	var _length = array_length(_keys);
-	for(var i = 0; i < _length; i++) {
+	var i = 0;
+	repeat(_length) {
         if (_current == undefined) return undefined;
         _current = _current[$ _keys[i]];
+		i++;
     }
     return _current;
 }

@@ -193,7 +193,8 @@ function __ww_workbench_select_ctor(_ctor_name) {
 	state.constructor_name = _ctor_name;
 	state.calls = [];
 	state.code_prefix = "";
-	state.preview_host.clear_children();
+	state.preview_host_workbench.clear_children();
+	state.preview_host_examples.clear_children();
 
 	var _build_out = instantiate(_ctor_name);
 	var _instance = _build_out;
@@ -207,14 +208,17 @@ function __ww_workbench_select_ctor(_ctor_name) {
 
 	state.instance = _instance;
 	if (is_struct(_instance)) {
-		state.preview_host.add(_instance);
+		state.preview_host_workbench.add(_instance);
 		if (variable_struct_exists(_instance, "set_offset")) {
 			_instance.set_offset(20, 20);
 		}
 	}
 	if (is_array(_preview_children) && array_length(_preview_children) != 0) {
-		state.preview_host.add(_preview_children);
+		state.preview_host_workbench.add(_preview_children);
 	}
+
+	rebuild_preview_tabs(_ctor_name);
+	set_preview_tab(0);
 
 	cache_builder_arg_defs(_ctor_name);
 	apply_initial_defaults();
@@ -259,6 +263,148 @@ function __ww_workbench_toggle_theme() {
 	}
 }
 
+function __ww_workbench_preview_tab_run() {
+	main.set_preview_tab(tab_index);
+}
+
+function __ww_workbench_try_call(_instance, _builder_name, _args=[]) {
+	if (!is_struct(_instance)) { return false; }
+	if (!is_string(_builder_name)) { return false; }
+	if (!variable_struct_exists(_instance, _builder_name)) { return false; }
+	return ww_inspector_call_builder(_instance, _builder_name, _args);
+}
+
+function __ww_workbench_make_example_defs(_ctor_name) {
+	var _defs = [];
+	var _examples = demo_library_get_examples(_ctor_name);
+	if (!is_struct(_examples)) { return _defs; }
+	
+	var _names = struct_get_names(_examples);
+	for (var _i = 0; _i < array_length(_names); _i += 1) {
+		var _name = _names[_i];
+		var _fn = variable_struct_get(_examples, _name);
+		if (!is_callable(_fn)) { continue; }
+		array_push(_defs, {
+			name: _name,
+			init: _fn,
+		});
+	}
+	
+	return _defs;
+}
+
+function __ww_workbench_apply_example_variant(_instance, _ctor_name, _variant_def, _host, _host_w, _host_h) {
+	if (!is_struct(_instance)) { exit; }
+	if (!is_struct(_variant_def)) { exit; }
+	if (!variable_struct_exists(_variant_def, "init")) { exit; }
+	var _fn = _variant_def.init;
+	if (!is_callable(_fn)) { exit; }
+	
+	// Always pass a useful context for example initializers.
+	_fn(_instance, {
+		ctor_name: _ctor_name,
+		host: _host,
+		host_width: _host_w,
+		host_height: _host_h,
+		try_call: try_call,
+	});
+}
+
+function __ww_workbench_show_example(_example_index) {
+	if (state.constructor_name == "") { exit; }
+	if (!is_array(state.preview_example_defs)) { exit; }
+	if (_example_index < 0 || _example_index >= array_length(state.preview_example_defs)) { exit; }
+
+	state.preview_host_examples.clear_children();
+	state.preview_example_index = _example_index;
+
+	var _def = state.preview_example_defs[_example_index];
+	state.preview_label.set_text("Preview :: " + _def.name);
+
+	var _build_out = instantiate(state.constructor_name);
+	var _instance = _build_out;
+	var _preview_children = [];
+	if (is_struct(_build_out) && variable_struct_exists(_build_out, "instance")) {
+		_instance = _build_out.instance;
+		if (variable_struct_exists(_build_out, "preview_children")) {
+			_preview_children = _build_out.preview_children;
+		}
+	}
+
+	if (is_struct(_instance)) {
+		state.preview_host_examples.add(_instance);
+		if (variable_struct_exists(_instance, "set_offset")) {
+			_instance.set_offset(20, 20);
+		}
+		apply_example_variant(_instance, state.constructor_name, _def, state.preview_host_examples, state.preview_host_examples.width, state.preview_host_examples.height);
+	}
+	if (is_array(_preview_children) && array_length(_preview_children) != 0) {
+		state.preview_host_examples.add(_preview_children);
+	}
+}
+
+function __ww_workbench_set_preview_tab(_tab_index) {
+	if (!is_array(state.preview_tab_buttons)) { exit; }
+	var _count = array_length(state.preview_tab_buttons);
+	if (_count <= 0) { exit; }
+	_tab_index = clamp(_tab_index, 0, _count - 1);
+	state.preview_selected_tab = _tab_index;
+
+	for (var _i = 0; _i < _count; _i += 1) {
+		var _btn = state.preview_tab_buttons[_i];
+		if (!is_struct(_btn)) { continue; }
+		var _label = _btn.__ww_tab_label__;
+		if (_i == _tab_index) {
+			_btn.set_text("> " + _label);
+		} else {
+			_btn.set_text(_label);
+		}
+	}
+
+	var _is_workbench = (_tab_index == 0);
+	state.preview_host_workbench.set_active(_is_workbench);
+	state.preview_host_examples.set_active(!_is_workbench);
+
+	if (_is_workbench) {
+		state.preview_label.set_text("Preview :: Workbench");
+		return;
+	}
+
+	show_example(_tab_index - 1);
+}
+
+function __ww_workbench_rebuild_preview_tabs(_ctor_name) {
+	state.preview_tabs_bar.clear_children();
+	state.preview_tab_buttons = [];
+	state.preview_example_defs = make_example_defs(_ctor_name);
+	state.preview_example_index = -1;
+
+	var _labels = ["Workbench"];
+	for (var _i = 0; _i < array_length(state.preview_example_defs); _i += 1) {
+		array_push(_labels, state.preview_example_defs[_i].name);
+	}
+
+	var _count = array_length(_labels);
+	if (_count <= 0) { return; }
+	var _gap = 6;
+	var _btn_w = max(80, floor((state.preview_tabs_bar.width - (_gap * (_count - 1))) / _count));
+
+	for (var _ti = 0; _ti < _count; _ti += 1) {
+		var _label = _labels[_ti];
+		var _x = _ti * (_btn_w + _gap);
+		var _btn = new WWButtonText()
+			.set_offset(_x, 0)
+			.set_size(_btn_w, 24)
+			.set_text(_label)
+			.set_text_font(fnt_ww_consolas_msdf);
+		_btn.__ww_tab_label__ = _label;
+		var _ctx = new __WWWorkbench_PreviewTabCtx(self, _ti);
+		_btn.set_callback(_ctx.run);
+		state.preview_tabs_bar.add(_btn);
+		array_push(state.preview_tab_buttons, _btn);
+	}
+}
+
 function __ww_workbench_make_nav_button(_label_text, _ctor_name, _width) {
 	var _b = new WWButtonText()
 		.set_size(_width, 26)
@@ -273,6 +419,8 @@ function __ww_workbench_build_nav_list(_filter_text) {
 	var _canvas = state.nav_canvas;
 	if (!is_struct(_canvas)) { exit; }
 	_canvas.clear_children();
+	var _tree_indent = 12;
+	var _tree_gap = 4;
 
 	var _lib = ww_inspector_lib();
 	var _order = _lib[$ "$$register_order"];
@@ -283,15 +431,53 @@ function __ww_workbench_build_nav_list(_filter_text) {
 		.set_offset(8, 8)
 		.set_size(_canvas.width - 16, 0)
 		.set_text("Components")
-		.set_children_offsets(12, 4)
+		.set_text_font(fnt_ww_consolas_msdf)
+		.set_children_offsets(_tree_indent, _tree_gap)
 		.set_open(true);
 	_canvas.add(_root);
+	
+	var _folder_map = {};
+	variable_struct_set(_folder_map, "__root__", _root);
 
 	for (var _i = 0; _i < array_length(_order); _i += 1) {
 		var _ctor_name = _order[_i];
 		if (!is_string(_ctor_name)) { continue; }
-		if (_filter != "" && string_pos(_filter, string_lower(_ctor_name)) == 0) { continue; }
-		_root.add(make_nav_button(_ctor_name, _ctor_name, _root.width - 24));
+		
+		var _path = demo_library_get_path(_ctor_name);
+		var _filter_blob = string_lower(_ctor_name + " " + _path);
+		if (_filter != "" && string_pos(_filter, _filter_blob) == 0) { continue; }
+		
+		var _parent = _root;
+		if (_path != "") {
+			var _parts = string_split(_path, "/");
+			var _acc = "";
+			for (var _pi = 0; _pi < array_length(_parts); _pi += 1) {
+				var _seg = string_trim(_parts[_pi]);
+				if (_seg == "") { continue; }
+				
+				_acc = (_acc == "") ? _seg : (_acc + "/" + _seg);
+				
+				var _folder = undefined;
+				if (variable_struct_exists(_folder_map, _acc)) {
+					_folder = variable_struct_get(_folder_map, _acc);
+				}
+				else {
+					var _child_w = max(120, _parent.width - _tree_indent);
+					_folder = new WWFolder()
+						.set_size(_child_w, 0)
+						.set_text(_seg)
+						.set_text_font(fnt_ww_consolas_msdf)
+						.set_children_offsets(_tree_indent, _tree_gap)
+						.set_open(true);
+					_parent.add(_folder);
+					variable_struct_set(_folder_map, _acc, _folder);
+				}
+				
+				_parent = _folder;
+			}
+		}
+		
+		_parent.add(make_nav_button(_ctor_name, _ctor_name, max(120, _parent.width - _tree_indent)));
 	}
 
 	_root.update_component_positions();
@@ -300,6 +486,183 @@ function __ww_workbench_build_nav_list(_filter_text) {
 	_canvas.__update_group_region__();
 	state.nav_region.set_canvas_size_from_children();
 	state.nav_region.set_scroll_offset(0, 0);
+}
+
+function __ww_workbench_apply_layout(_gui_w, _gui_h) {
+	var _theme = state.theme;
+	var _margin = 10;
+	var _pad = 10;
+	var _header_h = 44;
+	var _safe_w = max(640, _gui_w);
+	var _safe_h = max(360, _gui_h);
+
+	state.root
+		.set_offset(0, 0)
+		.set_size(_safe_w, _safe_h)
+		.set_background_color(_theme.page);
+
+	state.page_fill
+		.set_offset(0, 0)
+		.set_size(_safe_w, _safe_h)
+		.set_background_color(_theme.page);
+
+	var _header_x = _margin;
+	var _header_y = _margin;
+	var _header_w = max(220, _safe_w - (_margin * 2));
+
+	state.header_panel
+		.set_offset(_header_x, _header_y)
+		.set_size(_header_w, _header_h)
+		.set_background_color(_theme.header);
+
+	var _btn_gap = 10;
+	var _btn_y = _header_y + 6;
+	var _right = _header_x + _header_w - 10;
+	var _x_theme = _right - state.btn_theme.width;
+	var _x_copy = _x_theme - _btn_gap - state.btn_copy.width;
+	var _x_reset = _x_copy - _btn_gap - state.btn_reset.width;
+	var _x_validate = _x_reset - _btn_gap - state.btn_validate.width;
+
+	state.btn_validate.set_offset(_x_validate, _btn_y);
+	state.btn_reset.set_offset(_x_reset, _btn_y);
+	state.btn_copy.set_offset(_x_copy, _btn_y);
+	state.btn_theme
+		.set_offset(_x_theme, _btn_y)
+		.set_text(theme_button_text());
+
+	var _title_x = _header_x + 14;
+	var _title_w = max(120, _x_validate - _title_x - 10);
+	state.title_label
+		.set_offset(_title_x, _header_y + 12)
+		.set_size(_title_w, 20)
+		.set_text_color(_theme.text);
+
+	var _body_y = _header_y + _header_h + _pad;
+	var _body_h = max(120, (_safe_h - _margin) - _body_y);
+	var _body_inner_h = max(40, _body_h - 20);
+
+	var _avail_w = _safe_w - (_margin * 2);
+	var _min_content_w = 260;
+	var _min_nav_w = 180;
+	var _min_insp_w = 220;
+	var _nav_w = clamp(round(_avail_w * 0.20), _min_nav_w, 320);
+	var _insp_w = clamp(round(_avail_w * 0.26), _min_insp_w, 420);
+	var _content_w = _avail_w - _nav_w - _insp_w - (_pad * 2);
+	if (_content_w < _min_content_w) {
+		var _deficit = _min_content_w - _content_w;
+		var _take_insp = min(_deficit, max(0, _insp_w - _min_insp_w));
+		_insp_w -= _take_insp;
+		_deficit -= _take_insp;
+		var _take_nav = min(_deficit, max(0, _nav_w - _min_nav_w));
+		_nav_w -= _take_nav;
+		_content_w = _avail_w - _nav_w - _insp_w - (_pad * 2);
+	}
+	_content_w = max(220, _content_w);
+
+	var _nav_x = _margin;
+	var _content_x = _nav_x + _nav_w + _pad;
+	var _insp_x = _content_x + _content_w + _pad;
+
+	state.nav_panel
+		.set_offset(_nav_x, _body_y)
+		.set_size(_nav_w, _body_h)
+		.set_background_color(_theme.panel);
+	state.content_panel
+		.set_offset(_content_x, _body_y)
+		.set_size(_content_w, _body_h)
+		.set_background_color(_theme.panel);
+	state.insp_panel
+		.set_offset(_insp_x, _body_y)
+		.set_size(_insp_w, _body_h)
+		.set_background_color(_theme.panel);
+
+	state.nav_search
+		.set_offset(10, 10)
+		.set_size(_nav_w - 20, 24)
+		.set_background_color(_theme.panel_alt);
+	state.nav_search.get_field()
+		.set_background_color(_theme.panel_alt)
+		.set_text_color(_theme.text)
+		.set_caption("Search components...");
+
+	state.nav_region
+		.set_offset(10, 42)
+		.set_size(_nav_w - 30, _body_h - 52);
+	state.nav_canvas.set_size(_nav_w - 30, state.nav_canvas.height);
+
+	state.insp_label
+		.set_offset(10, 10)
+		.set_size(_insp_w - 20, 18)
+		.set_text_color(_theme.text_dim);
+	state.inspector_region
+		.set_offset(10, 32)
+		.set_size(_insp_w - 30, _body_h - 42);
+	state.inspector_canvas.set_size(_insp_w - 30, state.inspector_canvas.height);
+
+	var _content_inner_w = _content_w - 20;
+	var _preview_h = clamp(round(_body_inner_h * 0.55), 180, max(180, _body_inner_h - 120));
+	var _code_h = max(80, _body_inner_h - _preview_h - _pad);
+
+	state.preview_panel
+		.set_offset(10, 10)
+		.set_size(_content_inner_w, _preview_h)
+		.set_background_color(_theme.panel_alt);
+	state.preview_label
+		.set_offset(10, 10)
+		.set_size(_content_inner_w - 20, 18)
+		.set_text_color(_theme.text_dim);
+	state.preview_tabs_bar
+		.set_offset(10, 30)
+		.set_size(_content_inner_w - 20, 24)
+		.set_background_color(_theme.panel);
+	state.preview_host_workbench
+		.set_offset(10, 58)
+		.set_size(_content_inner_w - 20, _preview_h - 68)
+		.set_background_color(_theme.page);
+	state.preview_host_examples
+		.set_offset(10, 58)
+		.set_size(_content_inner_w - 20, _preview_h - 68)
+		.set_background_color(_theme.page);
+
+	state.code_panel
+		.set_offset(10, 10 + _preview_h + _pad)
+		.set_size(_content_inner_w, _code_h)
+		.set_background_color(_theme.panel_alt);
+	state.code_label
+		.set_offset(10, 10)
+		.set_size(_content_inner_w - 20, 18)
+		.set_text_color(_theme.text_dim);
+	state.code_box
+		.set_offset(10, 32)
+		.set_size(_content_inner_w - 20, _code_h - 42);
+}
+
+function __ww_workbench_refresh_layout(_force = false) {
+	var _gw = display_get_gui_width();
+	var _gh = display_get_gui_height();
+	if (!_force && _gw == state.gui_w && _gh == state.gui_h) { exit; }
+
+	state.gui_w = _gw;
+	state.gui_h = _gh;
+
+	apply_layout(_gw, _gh);
+
+	if (state.constructor_name != "" && is_struct(state.instance)) {
+		build_inspector(state.constructor_name, state.instance);
+	}
+
+	var _filter = "";
+	if (is_struct(state.nav_search)) {
+		_filter = state.nav_search.get_value();
+	}
+	build_nav_list(_filter);
+	if (state.constructor_name != "") {
+		rebuild_preview_tabs(state.constructor_name);
+		set_preview_tab(state.preview_selected_tab);
+	}
+
+	state.root.update_component_positions();
+	state.root.__update_group_region__();
 }
 
 function __WWWorkbench_NavCtx(_main, _ctor_name) constructor {
@@ -312,6 +675,12 @@ function __WWWorkbench_SearchCtx(_main, _input) constructor {
 	main = _main;
 	input = _input;
 	run = method(self, __ww_workbench_search_run);
+}
+
+function __WWWorkbench_PreviewTabCtx(_main, _tab_index) constructor {
+	main = _main;
+	tab_index = _tab_index;
+	run = method(self, __ww_workbench_preview_tab_run);
 }
 
 function __WWWorkbenchCtx(_state) constructor {
@@ -334,8 +703,16 @@ function __WWWorkbenchCtx(_state) constructor {
 	copy_code = method(self, __ww_workbench_copy_code);
 	theme_button_text = method(self, __ww_workbench_theme_button_text);
 	toggle_theme = method(self, __ww_workbench_toggle_theme);
+	try_call = method(self, __ww_workbench_try_call);
+	make_example_defs = method(self, __ww_workbench_make_example_defs);
+	apply_example_variant = method(self, __ww_workbench_apply_example_variant);
+	show_example = method(self, __ww_workbench_show_example);
+	set_preview_tab = method(self, __ww_workbench_set_preview_tab);
+	rebuild_preview_tabs = method(self, __ww_workbench_rebuild_preview_tabs);
 	make_nav_button = method(self, __ww_workbench_make_nav_button);
 	build_nav_list = method(self, __ww_workbench_build_nav_list);
+	apply_layout = method(self, __ww_workbench_apply_layout);
+	refresh_layout = method(self, __ww_workbench_refresh_layout);
 }
 
 function build_ui_folder_demo() {
@@ -343,14 +720,15 @@ function build_ui_folder_demo() {
 
 	root = new WWCore()
 		.set_offset(0, 0)
-		.set_size(1280, 720)
-		.set_background_color(c_black)
+		.set_size(max(1, display_get_gui_width()), max(1, display_get_gui_height()))
+		.set_background_color(_theme.page)
 		.set_enabled(true);
 
-	root.add(new WWCore()
-		.set_offset(10, 10)
-		.set_size(1260, 700)
-		.set_background_color(_theme.page));
+	var _page_fill = new WWCore()
+		.set_offset(0, 0)
+		.set_size(max(1, display_get_gui_width()), max(1, display_get_gui_height()))
+		.set_background_color(_theme.page);
+	root.add(_page_fill);
 
 	var _pad = 10;
 	var _header_h = 44;
@@ -362,10 +740,11 @@ function build_ui_folder_demo() {
 	var _body_y = 10 + _header_h + _pad;
 	var _body_h = 700 - _header_h - _pad;
 
-	root.add(new WWCore()
+	var _header_panel = new WWCore()
 		.set_offset(10, 10)
 		.set_size(1260, _header_h)
-		.set_background_color(_theme.header));
+		.set_background_color(_theme.header);
+	root.add(_header_panel);
 
 	var _title = new WWLabel()
 		.set_offset(24, 22)
@@ -394,6 +773,23 @@ function build_ui_folder_demo() {
 
 	var _state = {
 		owner_id: id,
+		gui_w: -1,
+		gui_h: -1,
+		root: root,
+		page_fill: _page_fill,
+		header_panel: _header_panel,
+		nav_panel: _nav_panel,
+		content_panel: _content_panel,
+		insp_panel: _insp_panel,
+		preview_panel: undefined,
+		preview_label: undefined,
+		code_panel: undefined,
+		code_label: undefined,
+		insp_label: undefined,
+		btn_validate: undefined,
+		btn_reset: undefined,
+		btn_copy: undefined,
+		btn_theme: undefined,
 		theme: _theme,
 		title_label: _title,
 		constructor_name: "",
@@ -402,7 +798,13 @@ function build_ui_folder_demo() {
 		builder_arg_defs: {},
 		code_prefix: "",
 		var_name: "_comp",
-		preview_host: undefined,
+		preview_tabs_bar: undefined,
+		preview_tab_buttons: [],
+		preview_selected_tab: 0,
+		preview_example_defs: [],
+		preview_example_index: -1,
+		preview_host_workbench: undefined,
+		preview_host_examples: undefined,
 		inspector_region: undefined,
 		inspector_canvas: undefined,
 		code_box: undefined,
@@ -419,31 +821,52 @@ function build_ui_folder_demo() {
 		.set_size(_content_w - 20, _preview_h)
 		.set_background_color(_theme.panel_alt);
 	_content_panel.add(_preview_panel);
+	_state.preview_panel = _preview_panel;
 
-	_preview_panel.add(new WWLabel()
+	var _preview_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_preview_panel.width - 20, 18)
 		.set_text("Preview")
-		.set_text_color(_theme.text_dim));
+		.set_text_color(_theme.text_dim);
+	_preview_panel.add(_preview_label);
+	_state.preview_label = _preview_label;
 
-	var _preview_host = new WWCore()
-		.set_offset(10, 32)
-		.set_size(_preview_panel.width - 20, _preview_panel.height - 42)
+	var _preview_tabs = new WWCore()
+		.set_offset(10, 30)
+		.set_size(_preview_panel.width - 20, 24)
+		.set_background_color(_theme.panel);
+	_preview_panel.add(_preview_tabs);
+	_state.preview_tabs_bar = _preview_tabs;
+
+	var _preview_host_workbench = new WWCore()
+		.set_offset(10, 58)
+		.set_size(_preview_panel.width - 20, _preview_panel.height - 68)
 		.set_background_color(_theme.page);
-	_preview_panel.add(_preview_host);
-	_state.preview_host = _preview_host;
+	_preview_panel.add(_preview_host_workbench);
+	_state.preview_host_workbench = _preview_host_workbench;
+
+	var _preview_host_examples = new WWCore()
+		.set_offset(10, 58)
+		.set_size(_preview_panel.width - 20, _preview_panel.height - 68)
+		.set_background_color(_theme.page);
+	_preview_panel.add(_preview_host_examples);
+	_state.preview_host_examples = _preview_host_examples;
+	_preview_host_examples.set_active(false);
 
 	var _code_panel = new WWCore()
 		.set_offset(10, 10 + _preview_h + _pad)
 		.set_size(_content_w - 20, _code_h)
 		.set_background_color(_theme.panel_alt);
 	_content_panel.add(_code_panel);
+	_state.code_panel = _code_panel;
 
-	_code_panel.add(new WWLabel()
+	var _code_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_code_panel.width - 20, 18)
 		.set_text("Generated GML")
-		.set_text_color(_theme.text_dim));
+		.set_text_color(_theme.text_dim);
+	_code_panel.add(_code_label);
+	_state.code_label = _code_label;
 
 	var _code_box = new WWTextInputMultiLine()
 		.set_offset(10, 32)
@@ -456,11 +879,13 @@ function build_ui_folder_demo() {
 	_code_panel.add(_code_box);
 	_state.code_box = _code_box;
 
-	_insp_panel.add(new WWLabel()
+	var _insp_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_insp_w - 20, 18)
 		.set_text("Inspector")
-		.set_text_color(_theme.text_dim));
+		.set_text_color(_theme.text_dim);
+	_insp_panel.add(_insp_label);
+	_state.insp_label = _insp_label;
 
 	var _insp_canvas = new WWCore().set_offset(0, 0).set_size(_insp_w - 30, 0);
 	var _insp_region = new WWViewScrollRegion().set_region_mode(true);
@@ -508,6 +933,7 @@ function build_ui_folder_demo() {
 		.set_text_font(fnt_ww_consolas_msdf);
 	_btn_validate.set_callback(_ctx.validate);
 	root.add(_btn_validate);
+	_state.btn_validate = _btn_validate;
 
 	var _btn_reset = new WWButtonText()
 		.set_offset(840, 16)
@@ -516,6 +942,7 @@ function build_ui_folder_demo() {
 		.set_text_font(fnt_ww_consolas_msdf);
 	_btn_reset.set_callback(_ctx.reset);
 	root.add(_btn_reset);
+	_state.btn_reset = _btn_reset;
 
 	var _btn_copy = new WWButtonText()
 		.set_offset(970, 16)
@@ -524,6 +951,7 @@ function build_ui_folder_demo() {
 		.set_text_font(fnt_ww_consolas_msdf);
 	_btn_copy.set_callback(_ctx.copy_code);
 	root.add(_btn_copy);
+	_state.btn_copy = _btn_copy;
 
 	var _btn_theme = new WWButtonText()
 		.set_offset(1110, 16)
@@ -532,8 +960,11 @@ function build_ui_folder_demo() {
 		.set_text_font(fnt_ww_consolas_msdf);
 	_btn_theme.set_callback(_ctx.toggle_theme);
 	root.add(_btn_theme);
+	_state.btn_theme = _btn_theme;
 
 	_ctx.build_nav_list("");
+	workbench_ctx = _ctx;
+	_ctx.refresh_layout(true);
 	root.update_component_positions();
 	root.__update_group_region__();
 

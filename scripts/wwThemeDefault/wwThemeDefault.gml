@@ -221,11 +221,15 @@ function wwThemeDefault() {
 
 				#region Slider
 				slider: {
-					main: undefined,
+					main: spr_ww_slider_background,
+					overlay: undefined
+				},
+				slider_bar: {
+					main: spr_ww_slider_bar,
 					overlay: undefined
 				},
 				slider_thumb: {
-					main: undefined,
+					main: spr_ww_slider_thumb,
 					overlay: undefined
 				},
 				#endregion

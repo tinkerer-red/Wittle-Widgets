@@ -11,10 +11,15 @@ function WWColorPicker() : WWCore() constructor {
 
 		#region Events
 		events.color_change = variable_get_hash("color_change");
+		static on_color_change = function(_func) {
+			add_event_listener(events.color_change, _func);
+			return self;
+		}
+		
 		#endregion
 
 		#region Components
-		wheel = new WWCore();
+		wheel = new WWCore().set_focusable(true);
 
 		lbl_rgb = new WWLabel().set_text("RGB").set_text_color(c_white);
 		lbl_r = new WWLabel().set_text("R").set_text_color(c_white);
@@ -72,6 +77,7 @@ function WWColorPicker() : WWCore() constructor {
 		__sq_x__ = 0;
 		__sq_y__ = 0;
 		__sq_s__ = 0;
+		__drag_mode__ = 0; // 0=none, 1=hue ring, 2=sv square
 		#endregion
 
 		#region Builder Functions
@@ -183,71 +189,73 @@ function WWColorPicker() : WWCore() constructor {
 		static __layout__ = function() {
 			set_background_color(c_dkgray);
 
-			var _pad = 8;
-			var _wheel_sz = min(190, height - _pad * 2);
+			var _pad = 10;
+			var _right_min_w = 180;
+			var _wheel_sz = min(height - _pad * 2, width - (_pad * 3) - _right_min_w);
+			_wheel_sz = clamp(_wheel_sz, 140, 220);
 			wheel.set_offset(_pad, _pad);
 			wheel.set_size(_wheel_sz, _wheel_sz);
 
-			var _rx = _pad + _wheel_sz + 10;
-			var _rw = max(10, width - _rx - _pad);
+			var _rx = _pad + _wheel_sz + _pad;
+			var _rw = max(_right_min_w, width - _rx - _pad);
 
 			// Right-side layout constants
-			var _row_h = 22;
-			var _gap = 6;
-			var _lbl_w = 14;
-			var _in_w = max(60, _rw - _lbl_w - 6);
+			var _row_h = 20;
+			var _gap = 4;
+			var _lbl_w = 18;
+			var _in_w = max(80, _rw - _lbl_w - 8);
 
-			btn_mode.set_offset(_rx + _rw - 60, _pad - 2);
-			btn_mode.set_size(60, 22);
+			btn_mode.set_offset(_rx + _rw - 64, _pad);
+			btn_mode.set_size(64, 20);
 
-			var _y = _pad + 18;
+			var _y = _pad + 24;
 			lbl_rgb.set_offset(_rx, _y);
-			_y += 18;
+			_y += 16;
 
 			lbl_r.set_offset(_rx, _y + 2);
-			in_r.set_offset(_rx + _lbl_w + 6, _y);
+			in_r.set_offset(_rx + _lbl_w + 8, _y);
 			in_r.set_size(_in_w, _row_h);
 			_y += _row_h + _gap;
 
 			lbl_g.set_offset(_rx, _y + 2);
-			in_g.set_offset(_rx + _lbl_w + 6, _y);
+			in_g.set_offset(_rx + _lbl_w + 8, _y);
 			in_g.set_size(_in_w, _row_h);
 			_y += _row_h + _gap;
 
 			lbl_b.set_offset(_rx, _y + 2);
-			in_b.set_offset(_rx + _lbl_w + 6, _y);
+			in_b.set_offset(_rx + _lbl_w + 8, _y);
 			in_b.set_size(_in_w, _row_h);
-			_y += _row_h + _gap;
+			_y += _row_h + _gap + 2;
 
 			// Divider between RGB and HSV (only when HSV shown)
 			div_1.set_offset(_rx, _y);
 			div_1.set_size(_rw, 1);
-			_y += 8;
+			_y += 6;
 
 			lbl_hsv.set_offset(_rx, _y);
-			_y += 18;
+			_y += 16;
 
 			lbl_h.set_offset(_rx, _y + 2);
-			in_h.set_offset(_rx + _lbl_w + 6, _y);
+			in_h.set_offset(_rx + _lbl_w + 8, _y);
 			in_h.set_size(_in_w, _row_h);
 			_y += _row_h + _gap;
 
 			lbl_s.set_offset(_rx, _y + 2);
-			in_s.set_offset(_rx + _lbl_w + 6, _y);
+			in_s.set_offset(_rx + _lbl_w + 8, _y);
 			in_s.set_size(_in_w, _row_h);
 			_y += _row_h + _gap;
 
 			lbl_v.set_offset(_rx, _y + 2);
-			in_v.set_offset(_rx + _lbl_w + 6, _y);
+			in_v.set_offset(_rx + _lbl_w + 8, _y);
 			in_v.set_size(_in_w, _row_h);
-			_y += _row_h + _gap;
+			_y += _row_h + _gap + 2;
 
 			div_2.set_offset(_rx, _y);
 			div_2.set_size(_rw, 1);
-			_y += 8;
+			_y += 6;
 
 			lbl_a.set_offset(_rx, _y + 2);
-			in_a.set_offset(_rx + _lbl_w + 6, _y);
+			in_a.set_offset(_rx + _lbl_w + 8, _y);
 			in_a.set_size(_in_w, _row_h);
 		};
 
@@ -257,11 +265,14 @@ function WWColorPicker() : WWCore() constructor {
 			__wheel_outer__ = min(wheel.width, wheel.height) * 0.5 - 2;
 			__wheel_inner__ = max(6, __wheel_outer__ - 18);
 
-			__sq_s__ = __wheel_inner__ * sqrt(2);
+			// Keep the SV square slightly inset from the inner ring so it never overlaps.
+			var _square_inset = 3;
+			__sq_s__ = max(8, (__wheel_inner__ - _square_inset) * sqrt(2));
 			__sq_s__ = min(__sq_s__, wheel.width - 12);
 			__sq_s__ = min(__sq_s__, wheel.height - 12);
-			__sq_x__ = __wheel_cx__ - __sq_s__ * 0.5;
-			__sq_y__ = __wheel_cy__ - __sq_s__ * 0.5;
+			__sq_s__ = floor(__sq_s__);
+			__sq_x__ = floor(__wheel_cx__ - __sq_s__ * 0.5);
+			__sq_y__ = floor(__wheel_cy__ - __sq_s__ * 0.5);
 		};
 
 		static __hue_color__ = function(_deg) {
@@ -272,74 +283,72 @@ function WWColorPicker() : WWCore() constructor {
 		static __draw_wheel__ = function() {
 			__update_wheel_geometry__();
 
-			// Hue ring via triangle strip
-			var _segs = 64;
-			draw_primitive_begin(pr_trianglestrip);
-			for (var i = 0; i <= _segs; i += 1) {
-				var a = (i / _segs) * 360.0;
-				var ca = cos(a);
-				var sa = sin(a);
-				var col = __hue_color__(a);
-				draw_vertex_color(__wheel_cx__ + ca * __wheel_outer__, __wheel_cy__ + sa * __wheel_outer__, col, 1);
-				draw_vertex_color(__wheel_cx__ + ca * __wheel_inner__, __wheel_cy__ + sa * __wheel_inner__, col, 1);
+			// Hue ring built from fixed 10-degree wedges (36 segments).
+			var _segs = 36;
+			for (var _i = 0; _i < _segs; _i += 1) {
+				var _a0 = _i * (360.0 / _segs);
+				var _a1 = (_i + 1) * (360.0 / _segs);
+
+				var _c0 = __hue_color__(_a0);
+				var _c1 = __hue_color__(_a1);
+
+				var _x0o = __wheel_cx__ + lengthdir_x(__wheel_outer__, _a0);
+				var _y0o = __wheel_cy__ + lengthdir_y(__wheel_outer__, _a0);
+				var _x1o = __wheel_cx__ + lengthdir_x(__wheel_outer__, _a1);
+				var _y1o = __wheel_cy__ + lengthdir_y(__wheel_outer__, _a1);
+
+				var _x0i = __wheel_cx__ + lengthdir_x(__wheel_inner__, _a0);
+				var _y0i = __wheel_cy__ + lengthdir_y(__wheel_inner__, _a0);
+				var _x1i = __wheel_cx__ + lengthdir_x(__wheel_inner__, _a1);
+				var _y1i = __wheel_cy__ + lengthdir_y(__wheel_inner__, _a1);
+
+				draw_triangle_color(_x0i, _y0i, _x0o, _y0o, _x1o, _y1o, _c0, _c0, _c1, false);
+				draw_triangle_color(_x0i, _y0i, _x1o, _y1o, _x1i, _y1i, _c0, _c1, _c1, false);
 			}
-			draw_primitive_end();
 
 			// SV square
 			var _base = __hue_color__(__h__);
+			var _sq_x2 = __sq_x__ + __sq_s__ - 1;
+			var _sq_y2 = __sq_y__ + __sq_s__ - 1;
 			draw_set_alpha(1);
-			draw_rectangle_color(__sq_x__, __sq_y__, __sq_x__ + __sq_s__, __sq_y__ + __sq_s__, c_white, _base, _base, c_white, false);
+			draw_rectangle_color(__sq_x__, __sq_y__, _sq_x2, _sq_y2, c_white, _base, _base, c_white, false);
 
 			// Value overlay (top transparent -> bottom black)
 			draw_primitive_begin(pr_trianglestrip);
 			draw_vertex_color(__sq_x__, __sq_y__, c_black, 0);
-			draw_vertex_color(__sq_x__ + __sq_s__, __sq_y__, c_black, 0);
-			draw_vertex_color(__sq_x__, __sq_y__ + __sq_s__, c_black, 1);
-			draw_vertex_color(__sq_x__ + __sq_s__, __sq_y__ + __sq_s__, c_black, 1);
+			draw_vertex_color(_sq_x2, __sq_y__, c_black, 0);
+			draw_vertex_color(__sq_x__, _sq_y2, c_black, 1);
+			draw_vertex_color(_sq_x2, _sq_y2, c_black, 1);
 			draw_primitive_end();
 
 			// Selection markers
 			// Hue marker on ring
 			var _ha = __h__;
-			var _hx = __wheel_cx__ + cos(_ha) * ((__wheel_outer__ + __wheel_inner__) * 0.5);
-			var _hy = __wheel_cy__ + sin(_ha) * ((__wheel_outer__ + __wheel_inner__) * 0.5);
+			var _hr = (__wheel_outer__ + __wheel_inner__) * 0.5;
+			var _hx = __wheel_cx__ + lengthdir_x(_hr, _ha);
+			var _hy = __wheel_cy__ + lengthdir_y(_hr, _ha);
 			draw_set_alpha(1);
 			draw_set_color(c_black);
-			draw_circle(_hx, _hy, 4, false);
+			draw_circle(_hx, _hy, 5, false);
 			draw_set_color(c_white);
-			draw_circle(_hx, _hy, 3, false);
+			draw_circle(_hx, _hy, 4, false);
 
 			// SV marker in square
-			var _sx = __sq_x__ + __s__ * __sq_s__;
-			var _sy = __sq_y__ + (1.0 - __v__) * __sq_s__;
+			var _sq_span = max(1, __sq_s__ - 1);
+			var _sx = __sq_x__ + __s__ * _sq_span;
+			var _sy = __sq_y__ + (1.0 - __v__) * _sq_span;
 			draw_set_color(c_black);
-			draw_circle(_sx, _sy, 4, false);
+			draw_circle(_sx, _sy, 5, false);
 			draw_set_color(c_white);
-			draw_circle(_sx, _sy, 3, false);
+			draw_circle(_sx, _sy, 4, false);
 		};
 
 		static __wheel_apply_mouse__ = function() {
 			__update_wheel_geometry__();
 			var mx = device_mouse_x_to_gui(0);
 			var my = device_mouse_y_to_gui(0);
-			var dx = mx - __wheel_cx__;
-			var dy = my - __wheel_cy__;
-			var dist = sqrt(dx * dx + dy * dy);
-
-			var _did = false;
-
-			// Hue ring
-			if (dist >= __wheel_inner__ && dist <= __wheel_outer__) {
-				var ang = arctan2(dy, dx);
-				__h__ = (ang + 360.0) mod 360.0;
-				_did = true;
-			}
-			// SV square
-			else if (mx >= __sq_x__ && mx <= __sq_x__ + __sq_s__ && my >= __sq_y__ && my <= __sq_y__ + __sq_s__) {
-				__s__ = clamp((mx - __sq_x__) / __sq_s__, 0, 1);
-				__v__ = clamp(1.0 - ((my - __sq_y__) / __sq_s__), 0, 1);
-				_did = true;
-			}
+			var _mode = __wheel_hit_mode__(mx, my);
+			var _did = __wheel_apply_mouse_mode__(_mode, mx, my);
 
 			if (_did) {
 				__sync_color_from_hsv__();
@@ -347,13 +356,64 @@ function WWColorPicker() : WWCore() constructor {
 				__fire__("wheel");
 			}
 		};
+		
+		static __wheel_hit_mode__ = function(_mx, _my) {
+			__update_wheel_geometry__();
+			var _dist = point_distance(__wheel_cx__, __wheel_cy__, _mx, _my);
+			if (_dist >= (__wheel_inner__ - 2) && _dist <= (__wheel_outer__ + 2)) {
+				return 1;
+			}
+			if (_mx >= __sq_x__ && _mx <= (__sq_x__ + __sq_s__ - 1) && _my >= __sq_y__ && _my <= (__sq_y__ + __sq_s__ - 1)) {
+				return 2;
+			}
+			return 0;
+		};
+		
+		static __wheel_apply_mouse_mode__ = function(_mode, _mx, _my) {
+			var _old_h = __h__;
+			var _old_s = __s__;
+			var _old_v = __v__;
+			switch (_mode) {
+				case 1:
+					// Hue ring mode: once captured, update hue from angle anywhere mouse moves.
+					__h__ = (point_direction(__wheel_cx__, __wheel_cy__, _mx, _my) + 360.0) mod 360.0;
+					break;
+				case 2:
+					// SV mode: once captured, clamp pointer to square bounds for precision drags off-control.
+					var _sq_span = max(1, __sq_s__ - 1);
+					var _cx = clamp(_mx, __sq_x__, __sq_x__ + _sq_span);
+					var _cy = clamp(_my, __sq_y__, __sq_y__ + _sq_span);
+					__s__ = clamp((_cx - __sq_x__) / _sq_span, 0, 1);
+					__v__ = clamp(1.0 - ((_cy - __sq_y__) / _sq_span), 0, 1);
+					break;
+			}
+			return (_old_h != __h__) || (_old_s != __s__) || (_old_v != __v__);
+		};
+		
+		static __apply_rgb_inputs__ = function() {
+			if (__suppress__) { return; }
+			__col__ = make_color_rgb(in_r.get_value(), in_g.get_value(), in_b.get_value());
+			__sync_from_color__();
+			__sync_inputs__();
+			__fire__("rgb");
+		};
+		
+		static __apply_hsv_inputs__ = function() {
+			if (__suppress__) { return; }
+			__h__ = clamp(in_h.get_value(), 0, 360);
+			__s__ = clamp(in_s.get_value() / 100.0, 0, 1);
+			__v__ = clamp(in_v.get_value() / 100.0, 0, 1);
+			__sync_color_from_hsv__();
+			__sync_inputs__();
+			__fire__("hsv");
+		};
 
 		#endregion
 
 	#endregion
 
 	// Defaults
-	set_size(380, 230);
+	set_size(500, 300);
 	set_more(true);
 	set_use_alpha(true);
 	set_color(c_white, 1);
@@ -363,10 +423,26 @@ function WWColorPicker() : WWCore() constructor {
 		__draw_wheel__();
 	});
 	wheel.on_pressed(function(_input) {
-		__wheel_apply_mouse__();
+		__drag_mode__ = __wheel_hit_mode__(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0));
+		if (__drag_mode__ > 0) {
+			if (__wheel_apply_mouse_mode__(__drag_mode__, device_mouse_x_to_gui(0), device_mouse_y_to_gui(0))) {
+				__sync_color_from_hsv__();
+				__sync_inputs__();
+				__fire__("wheel");
+			}
+		}
 	});
 	wheel.on_held(function(_input) {
-		__wheel_apply_mouse__();
+		if (__drag_mode__ > 0) {
+			if (__wheel_apply_mouse_mode__(__drag_mode__, device_mouse_x_to_gui(0), device_mouse_y_to_gui(0))) {
+				__sync_color_from_hsv__();
+				__sync_inputs__();
+				__fire__("wheel");
+			}
+		}
+	});
+	wheel.on_released(function(_input) {
+		__drag_mode__ = 0;
 	});
 
 	// Mode toggle
@@ -375,29 +451,25 @@ function WWColorPicker() : WWCore() constructor {
 	});
 
 	// Numeric wiring
-	var __on_rgb__ = function(_d) {
-		if (__suppress__) { exit; }
-		__col__ = make_color_rgb(in_r.get_value(), in_g.get_value(), in_b.get_value());
-		__sync_from_color__();
-		__sync_inputs__();
-		__fire__("rgb");
-	};
-	in_r.on_value_change(__on_rgb__);
-	in_g.on_value_change(__on_rgb__);
-	in_b.on_value_change(__on_rgb__);
+	in_r.on_value_change(function(_d) { __apply_rgb_inputs__(); });
+	in_g.on_value_change(function(_d) { __apply_rgb_inputs__(); });
+	in_b.on_value_change(function(_d) { __apply_rgb_inputs__(); });
+	in_r.get_input().on_change(function(_d) { __apply_rgb_inputs__(); });
+	in_g.get_input().on_change(function(_d) { __apply_rgb_inputs__(); });
+	in_b.get_input().on_change(function(_d) { __apply_rgb_inputs__(); });
+	in_r.get_input().on_submit(function(_d) { __apply_rgb_inputs__(); });
+	in_g.get_input().on_submit(function(_d) { __apply_rgb_inputs__(); });
+	in_b.get_input().on_submit(function(_d) { __apply_rgb_inputs__(); });
 
-	var __on_hsv__ = function(_d) {
-		if (__suppress__) { exit; }
-		__h__ = clamp(in_h.get_value(), 0, 360);
-		__s__ = clamp(in_s.get_value() / 100.0, 0, 1);
-		__v__ = clamp(in_v.get_value() / 100.0, 0, 1);
-		__sync_color_from_hsv__();
-		__sync_inputs__();
-		__fire__("hsv");
-	};
-	in_h.on_value_change(__on_hsv__);
-	in_s.on_value_change(__on_hsv__);
-	in_v.on_value_change(__on_hsv__);
+	in_h.on_value_change(function(_d) { __apply_hsv_inputs__(); });
+	in_s.on_value_change(function(_d) { __apply_hsv_inputs__(); });
+	in_v.on_value_change(function(_d) { __apply_hsv_inputs__(); });
+	in_h.get_input().on_change(function(_d) { __apply_hsv_inputs__(); });
+	in_s.get_input().on_change(function(_d) { __apply_hsv_inputs__(); });
+	in_v.get_input().on_change(function(_d) { __apply_hsv_inputs__(); });
+	in_h.get_input().on_submit(function(_d) { __apply_hsv_inputs__(); });
+	in_s.get_input().on_submit(function(_d) { __apply_hsv_inputs__(); });
+	in_v.get_input().on_submit(function(_d) { __apply_hsv_inputs__(); });
 
 	in_a.on_value_change(function(_d) {
 		if (__suppress__) { exit; }

@@ -181,11 +181,11 @@ function WWSliderBase() : WWButtonSprite() constructor {
 			visible = false;
 			
 			background = new WWSliderBackgroud()
-				.set_sprite(spr_ww_pixel)
-				.set_sprite_color(c_grey)
+				.set_sprite(__slider_theme_sprite__("slider", spr_ww_slider_background))
+				.set_sprite_color(__slider_theme_paint_color__("track_bg", c_grey))
 			bar = new WWSliderBar()
-				.set_sprite(spr_ww_pixel)
-				.set_sprite_color(c_orange)
+				.set_sprite(__slider_theme_sprite__("slider_bar", spr_ww_slider_bar))
+				.set_sprite_color(__slider_theme_paint_color__("track_fill", c_orange))
 			
 			add([background, bar]);
         #endregion
@@ -288,6 +288,33 @@ function WWSliderBase() : WWButtonSprite() constructor {
 		#endregion
 		
 		#region Functions
+			static __slider_theme_sprite__ = function(_slot, _fallback) {
+				var _t = wwThemeGet();
+				if (!is_struct(_t)) return _fallback;
+				if (!is_struct(_t.assets) || !is_struct(_t.assets.sprites)) return _fallback;
+				if (!variable_struct_exists(_t.assets.sprites, _slot)) return _fallback;
+				var _v = variable_struct_get(_t.assets.sprites, _slot);
+				if (is_struct(_v) && variable_struct_exists(_v, "main")) {
+					_v = _v.main;
+				}
+				if (_v == undefined) return _fallback;
+				return _v;
+			};
+			
+			static __slider_theme_paint_color__ = function(_paint_key, _fallback) {
+				var _t = wwThemeGet();
+				if (!is_struct(_t)) return _fallback;
+				if (!is_struct(_t.components)) return _fallback;
+				if (!is_struct(_t.components.slider)) return _fallback;
+				if (!variable_struct_exists(_t.components.slider, _paint_key)) return _fallback;
+				var _paint = variable_struct_get(_t.components.slider, _paint_key);
+				if (is_struct(_paint) && variable_struct_exists(_paint, "color")) {
+					return _paint.color;
+				}
+				if (is_numeric(_paint)) return _paint;
+				return _fallback;
+			};
+			
 			#region jsDoc
 			/// @func    __set_value__()
 			/// @desc    Sets the slider value, applying clamp + rounding, and triggers value change events.

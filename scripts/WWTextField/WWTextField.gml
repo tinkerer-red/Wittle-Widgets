@@ -4222,6 +4222,15 @@ function WWTextField() : WWCore() constructor {
 				/// @returns {Undefined}
 				#endregion
 				static __history_update_latest_cursor__ = function() {
+					var _count = array_length(__historic_records__);
+					if (_count <= 0) {
+						__history_add_record__();
+						return;
+					}
+					if (__historic_records_loc__ < 0 || __historic_records_loc__ >= _count) {
+						__historic_records_loc__ = _count - 1;
+					}
+
 					var _record = __historic_records__[__historic_records_loc__];
 					_record.cursors = __cursors_clone__();
 					_record.cursor_active = __cursor_active__;

@@ -237,6 +237,7 @@ function WWFolder() : WWButtonText() constructor {
 
 				update_component_positions();
 				__update_group_region__();
+				__notify_parent_folder_reflow__();
 			}
 
 			#region jsDoc

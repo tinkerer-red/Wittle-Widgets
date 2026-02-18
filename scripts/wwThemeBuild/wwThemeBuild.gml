@@ -117,6 +117,7 @@ function __wwThemeNormalizeSchema(_theme, _opts) {
 	__wwThemeNormalizeSpriteSlot(_sprites, "checkbox");
 	__wwThemeNormalizeSpriteSlot(_sprites, "radio");
 	__wwThemeNormalizeSpriteSlot(_sprites, "slider");
+	__wwThemeNormalizeSpriteSlot(_sprites, "slider_bar");
 	__wwThemeNormalizeSpriteSlot(_sprites, "slider_thumb");
 	__wwThemeNormalizeSpriteSlot(_sprites, "combo");
 	__wwThemeNormalizeSpriteSlot(_sprites, "dropdown");

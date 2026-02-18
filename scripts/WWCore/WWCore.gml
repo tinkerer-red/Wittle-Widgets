@@ -231,6 +231,8 @@ function WWCore() constructor {
 				if (__is_active__ == _is_active) return self;
 				
 				__is_active__ = _is_active;
+				__overlay_mark_subtree_dirty__();
+				__overlay_sync_subtree__();
 				
 				if (__is_active__) {
 					trigger_event(events.activated);
@@ -253,6 +255,25 @@ function WWCore() constructor {
 				return self;
 			}
 			#region jsDoc
+			/// @func    set_overlay_host_enabled()
+			/// @desc    Enables this component as a local overlay host.
+			/// @self    WWCore
+			/// @param   {Bool} enabled : True to allow LOCAL_HOST overlays to resolve here.
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_overlay_host_enabled = function(_enabled=true) {
+				__overlay_host_enabled__ = _enabled;
+				if (_enabled) {
+					__overlay_ensure_manager__();
+				}
+				else if (is_struct(__overlay_manager__)) {
+					__overlay_manager__.dirty = true;
+				}
+				__overlay_mark_subtree_dirty__();
+				__overlay_sync_subtree__();
+				return self;
+			}
+			#region jsDoc
 			/// @func    set_focus()
 			/// @desc    Sets the focus state for this component.
 			/// @self    WWCore
@@ -262,6 +283,10 @@ function WWCore() constructor {
 			static set_focus = function(_focus) {
 			    if (_focus && !__is_focused__) {
 					__is_focused__ = true;
+					if (__overlay_component__) {
+						__overlay_last_focus_time__ = current_time;
+						bring_to_front();
+					}
 					trigger_event(events.focus_enter);
 					trigger_event(events.focus);
 				}
@@ -842,13 +867,26 @@ function WWCore() constructor {
 			    static __depth = 0;
 			    static __queue = [];
 				
+				// if the event doesnt exist for some reason throw a warning message and continue
+				var _event_arr = struct_get_from_hash(__event_listeners__, _event_id);
+			    if (_event_arr == undefined) {
+					if (!code_is_compiled() && !struct_exists_from_hash(events, _event_id)) {
+						show_debug_message($"Event hash '{_event_id}' not registered for component '{debug_name}'.\n{json_stringify(debug_get_callstack(5), true)}")
+					}
+					
+					return;
+				}
+					
+				
 			    // If we're in the middle of an event chain, queue this trigger rather than running it immediately.
 			    if (__depth > 0) {
-			        array_push(__queue, { event: _event_id, data: _data });
+					var _this = self;
+			        array_push(__queue, { event: _event_id, data: _data, this: _this });
 			        return;
 			    }
 				
 			    __depth++;
+				_depth = __depth;
 				
 			    var _event_arr = struct_get_from_hash(__event_listeners__, _event_id);
 			    if (_event_arr != undefined) {
@@ -867,7 +905,7 @@ function WWCore() constructor {
 			    if (__depth == 0 && array_length(__queue) > 0) {
 			        while (array_length(__queue) > 0) {
 			            var queued = array_shift(__queue); // Remove the first queued event.
-			            trigger_event(queued.event, queued.data);
+			            with (queued.this) trigger_event(queued.event, queued.data);
 			        }
 			    }
 			};
@@ -1320,6 +1358,41 @@ function WWCore() constructor {
 				__user_input__.consumed = true;
 			}
 			
+			#region Overlay Functions
+			static bring_to_front = function() {
+				if (!__overlay_component__) return self;
+				if (!__overlay_registered__) {
+					__overlay_sync__();
+				}
+				if (is_struct(__overlay_manager_owner__)) {
+					var _mgr = __overlay_manager_owner__.__overlay_ensure_manager__();
+					_mgr.seq_counter += 1;
+					__overlay_order_seq__ = _mgr.seq_counter;
+					_mgr.dirty = true;
+				}
+				return self;
+			}
+			
+			static send_to_back = function() {
+				if (!__overlay_component__) return self;
+				__overlay_last_focus_time__ = -1;
+				__overlay_order_seq__ = -1;
+				if (is_struct(__overlay_manager_owner__)) {
+					__overlay_manager_owner__.__overlay_ensure_manager__().dirty = true;
+				}
+				return self;
+			}
+			
+			// Hoisted overlay methods; WWOverlay can override these.
+			static overlay_step = function(_input=undefined) {
+				step(_input);
+			}
+			
+			static overlay_draw = function(_input=undefined, _debug=false) {
+				draw(_input, _debug);
+			}
+			#endregion
+			
 			#endregion
 			
 			#region Sub Component Functions
@@ -1337,8 +1410,9 @@ function WWCore() constructor {
 				var _arr = (is_array(_comp)) ? _comp : [_comp];
 				
 				if (argument_count > 1) {
-					for(var _i=1; _i<argument_count; _i++) {
+					var _i=1; repeat(argument_count-1) {
 						array_push(_arr, argument[_i])
+						_i++
 					}
 				}
 				
@@ -1477,6 +1551,15 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static remove_index = function(_index) {
+				if ((_index < 0) || (_index >= __children_count__)) return;
+				var _comp = __children__[_index];
+				_comp.__overlay_unregister_subtree__();
+				
+				_comp.__is_child__ = false;
+				_comp.__parent__ = noone;
+				_comp.__root_canvas__ = _comp;
+				_comp.__propagate_root_canvas__(_comp);
+				
 				//remove the component
 				array_delete(__children__, _index, 1);
 				__children_count__--;
@@ -1534,10 +1617,16 @@ function WWCore() constructor {
 			#endregion
 			static clear_children = function() {
 				var _i=0; repeat(__children_count__) {
-					__children__[_i].__cleanup__();
-					delete __children__[_i]
+					var _comp = __children__[_i];
+					_comp.__overlay_unregister_subtree__();
+					_comp.__is_child__ = false;
+					_comp.__parent__ = noone;
+					_comp.__root_canvas__ = _comp;
+					_comp.__propagate_root_canvas__(_comp);
+					_comp.__cleanup__();
+					delete _comp
 				_i+=1;}//end repeat loop
-				array_delete(__children__, 0, __children_count__);
+				array_resize(__children__, 0)
 				__children_count__ = 0;
 				__is_empty__ = true;
 			}
@@ -1563,12 +1652,15 @@ function WWCore() constructor {
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group();
 				
+				__overlay_step_pass__(_input);
+				
 				trigger_event(events.pre_step, _input);
 				
 				//run the children
 				var _comp, xx, yy;
 				var _i=__children_count__; repeat(__children_count__) { _i--;
 					_comp = __children__[_i];
+					if (_comp.__overlay_component__ && _comp.__overlay_registered__) continue;
 					_comp.step(_input);
 				}//end repeat loop
 				
@@ -1615,6 +1707,7 @@ function WWCore() constructor {
 				var _comp, xx, yy;
 				var _i=0; repeat(__children_count__) {
 					_comp = __children__[_i];
+					if (_comp.__overlay_component__ && _comp.__overlay_registered__) { _i+=1; continue; }
 					_comp.draw(_input, _debug);
 				_i+=1;}//end repeat loop
 				
@@ -1685,6 +1778,8 @@ function WWCore() constructor {
 					draw_set_alpha(1)
 				}
 				
+				__overlay_draw_pass__(_input, _debug);
+				
 				trigger_event(events.post_draw, _input);
 			};
 			
@@ -1712,6 +1807,8 @@ function WWCore() constructor {
 			__halign__ = fa_left;
 			__valign__ = fa_top;
 			
+			__root_canvas__ = self; // The root component, this will be updated when components are added to one another. Primarily used when we need a popup or overlay
+			
 			#region Event Variables
 			__event_listeners__ = {}; //the struct which will contain all of the event listener functions to be called when an event is triggered
 			__event_listener_uid__ = 0; // a unique identifier for event listeners
@@ -1737,6 +1834,20 @@ function WWCore() constructor {
 			__is_child__ = false; // if the component is a child of another component
 			__parent__ = noone; // a reference to the parent controller
 			__group__ = {width : 0, height : 0};
+			__overlay_host_enabled__ = false;
+			__overlay_manager__ = undefined;
+			__overlay_component__ = false;
+			__overlay_enabled__ = true;
+			__overlay_role__ = 0;
+			__overlay_priority__ = 0;
+			__overlay_always_on_top__ = false;
+			__overlay_last_focus_time__ = -1;
+			__overlay_order_seq__ = 0;
+			__overlay_registered__ = false;
+			__overlay_sync_dirty__ = false;
+			__overlay_space__ = 0;
+			__overlay_host__ = noone;
+			__overlay_manager_owner__ = noone;
 			#endregion
 			#region Misc
 			__position_set__ = false;
@@ -1831,9 +1942,16 @@ function WWCore() constructor {
 				    }
 				}
 				
-				else if (mouse_check_button_released(mb_left)) {
+				else {
+					// Always clear interact once the button is no longer held.
+					// This prevents visual "stuck pressed" states if a release edge is missed.
+					var _did_release = mouse_check_button_released(mb_left);
 				    set_interact(false);
-				    trigger_event(events.released);
+				    if (_did_release) {
+						if (mouse_on_comp()) {
+				    		trigger_event(events.released);
+						}
+				    }
 				}
 					
 			})
@@ -1887,14 +2005,17 @@ function WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __include_children__ = function(_arr, _index) {
-				var _size, _i, _comp;
+				var _size, _i, _comp, _new_root;
 				
 				_size = array_length(_arr);
 				_i=0; repeat(_size) {
 					_comp = _arr[_i];
-					
 					_comp.__is_child__ = true;
 					_comp.__parent__ = self;
+					_new_root = (__root_canvas__ == undefined) ? self : __root_canvas__;
+					_comp.__root_canvas__ = _new_root;
+					_comp.__propagate_root_canvas__(_new_root);
+					_comp.__overlay_mark_subtree_dirty__();
 					
 					if (_index < 0) {
 						array_push(__children__, _comp);
@@ -1911,6 +2032,8 @@ function WWCore() constructor {
 					if (!_comp.__offset_set__) {
 						_comp.__set_offset__(_comp.x-x, _comp.y-y);
 					}
+					
+					_comp.__overlay_sync_subtree__();
 					
 				_i+=1;}//end repeat loop
 				
@@ -2029,6 +2152,252 @@ function WWCore() constructor {
 				}
 			}
 			#endregion
+			#region Overlay Internals
+			static __overlay_ensure_manager__ = function() {
+				if (!is_struct(__overlay_manager__)) {
+					__overlay_manager__ = {
+						entries : [],
+						dirty : false,
+						seq_counter : 0,
+						exec_step : [],
+						exec_step_count : 0,
+						exec_draw : [],
+						exec_draw_count : 0,
+					};
+				}
+				return __overlay_manager__;
+			}
+			
+			static __overlay_is_effectively_active__ = function() {
+				var _node = self;
+				while (is_struct(_node)) {
+					if (!_node.__is_active__) return false;
+					if (!_node.__is_child__) break;
+					_node = _node.__parent__;
+				}
+				return true;
+			}
+			
+			static __resolve_overlay_host__ = function() {
+				if (!__overlay_component__) return noone;
+				
+				// LOCAL_HOST
+				if (__overlay_space__ == 1) {
+					if (is_struct(__overlay_host__)) {
+						if (__overlay_host__.__comp_id__ != __comp_id__
+						&& __overlay_host__.__overlay_host_enabled__) {
+							return __overlay_host__;
+						}
+					}
+					
+					var _node = __parent__;
+					while (is_struct(_node)) {
+						if (_node.__overlay_host_enabled__) return _node;
+						if (!_node.__is_child__) break;
+						_node = _node.__parent__;
+					}
+				}
+				
+				return __root_canvas__;
+			}
+			
+			static __overlay_sync__ = function() {
+				if (!__overlay_component__) return;
+				if (__overlay_registered__ && !__overlay_sync_dirty__) return;
+				
+				static __overlay_local_unregister__ = function() {
+					var _mgr_owner = __overlay_manager_owner__;
+					if (is_struct(_mgr_owner) && is_struct(_mgr_owner.__overlay_manager__)) {
+						var _entries = _mgr_owner.__overlay_manager__.entries;
+						var _j = array_length(_entries);
+						repeat(array_length(_entries)) { _j--;
+							var _entry = _entries[_j];
+							if (_entry.__comp_id__ != __comp_id__) continue;
+							array_delete(_entries, _j, 1);
+							_mgr_owner.__overlay_manager__.dirty = true;
+						}
+					}
+					__overlay_registered__ = false;
+					__overlay_manager_owner__ = noone;
+					__overlay_sync_dirty__ = true;
+				}
+				
+				if (!__overlay_enabled__)
+				|| (!__is_child__)
+				|| (!__overlay_is_effectively_active__()) {
+					__overlay_local_unregister__();
+					__overlay_sync_dirty__ = false;
+					return;
+				}
+				
+				var _target = __resolve_overlay_host__();
+				if (!is_struct(_target)) {
+					__overlay_local_unregister__();
+					__overlay_sync_dirty__ = false;
+					return;
+				}
+				
+				if (__overlay_registered__ && is_struct(__overlay_manager_owner__)) {
+					if (__overlay_manager_owner__.__comp_id__ == _target.__comp_id__) {
+						_target.__overlay_ensure_manager__().dirty = true;
+						__overlay_sync_dirty__ = false;
+						return;
+					}
+				}
+				
+				__overlay_local_unregister__();
+				
+				var _manager = _target.__overlay_ensure_manager__();
+				if (__overlay_order_seq__ == 0) {
+					_manager.seq_counter += 1;
+					__overlay_order_seq__ = _manager.seq_counter;
+				}
+				array_push(_manager.entries, self);
+				__overlay_registered__ = true;
+				__overlay_manager_owner__ = _target;
+				__overlay_sync_dirty__ = false;
+				_manager.dirty = true;
+			}
+			
+			static __overlay_compare_data__ = function(_a, _b) {
+				var _atop = (_a.__overlay_always_on_top__) ? 1 : 0;
+				var _btop = (_b.__overlay_always_on_top__) ? 1 : 0;
+				if (_atop != _btop) return _atop - _btop;
+				
+				var _abase = 100;
+				switch(_a.__overlay_role__) {
+					case 1: _abase = 200; break; // OVERLAY
+					case 2: _abase = 300; break; // POPUP
+					case 3: _abase = 300; break; // DROPDOWN
+					case 4: _abase = 400; break; // CONTEXT_MENU
+					case 5: _abase = 500; break; // TOOLTIP
+				}
+				var _bbase = 100;
+				switch(_b.__overlay_role__) {
+					case 1: _bbase = 200; break;
+					case 2: _bbase = 300; break;
+					case 3: _bbase = 300; break;
+					case 4: _bbase = 400; break;
+					case 5: _bbase = 500; break;
+				}
+				var _ap = _abase + _a.__overlay_priority__;
+				var _bp = _bbase + _b.__overlay_priority__;
+				if (_ap != _bp) return _ap - _bp;
+				
+				if (_a.__overlay_last_focus_time__ != _b.__overlay_last_focus_time__) return _a.__overlay_last_focus_time__ - _b.__overlay_last_focus_time__;
+				if (_a.__overlay_order_seq__ != _b.__overlay_order_seq__) return _a.__overlay_order_seq__ - _b.__overlay_order_seq__;
+				
+				return _a.__comp_id__ - _b.__comp_id__;
+			}
+			
+			static __overlay_rebuild_exec__ = function() {
+				if (!is_struct(__overlay_manager__)) return;
+				if (!__overlay_manager__.dirty) return;
+				array_sort(__overlay_manager__.entries, __overlay_compare_data__);
+				
+				__overlay_manager__.exec_step_count = 0;
+				__overlay_manager__.exec_draw_count = 0;
+				var _entries = __overlay_manager__.entries;
+				var _size = array_length(_entries);
+				var _i=0; repeat(_size) {
+					var _comp = _entries[_i];
+					__overlay_manager__.exec_step[__overlay_manager__.exec_step_count] = _comp;
+					__overlay_manager__.exec_step_count += 1;
+					__overlay_manager__.exec_draw[__overlay_manager__.exec_draw_count] = _comp;
+					__overlay_manager__.exec_draw_count += 1;
+				_i+=1;}
+				__overlay_manager__.dirty = false;
+			}
+			
+			static __overlay_step_pass__ = function(_input) {
+				if (!is_struct(__overlay_manager__)) return;
+				__overlay_rebuild_exec__();
+				var _i=__overlay_manager__.exec_step_count;
+				repeat(__overlay_manager__.exec_step_count) { _i--;
+					__overlay_manager__.exec_step[_i].overlay_step(_input);
+				}
+			}
+			
+			static __overlay_draw_pass__ = function(_input, _debug=false) {
+				if (!is_struct(__overlay_manager__)) return;
+				__overlay_rebuild_exec__();
+				
+				var _use_clip = (__overlay_host_enabled__ && __is_child__);
+				if (_use_clip) __apply_clipping_region__();
+				
+				var _i=0; repeat(__overlay_manager__.exec_draw_count) {
+					__overlay_manager__.exec_draw[_i].overlay_draw(_input, _debug);
+				_i+=1;}
+				
+				if (_use_clip) __restore_clipping_region__();
+			}
+			
+			static __propagate_root_canvas__ = function(_new_root) {
+				var _stack = [self];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					_node.__root_canvas__ = _new_root;
+					if (_node.__overlay_component__) {
+						_node.__overlay_sync_dirty__ = true;
+					}
+					var _i=0; repeat(_node.__children_count__) {
+						array_push(_stack, _node.__children__[_i]);
+					_i+=1;}
+				}
+			}
+			
+			static __overlay_mark_subtree_dirty__ = function() {
+				var _stack = [self];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					if (_node.__overlay_component__) {
+						_node.__overlay_sync_dirty__ = true;
+					}
+					var _i=0; repeat(_node.__children_count__) {
+						array_push(_stack, _node.__children__[_i]);
+					_i+=1;}
+				}
+			}
+			
+			static __overlay_sync_subtree__ = function() {
+				var _stack = [self];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					_node.__overlay_sync__();
+					var _i=0; repeat(_node.__children_count__) {
+						array_push(_stack, _node.__children__[_i]);
+					_i+=1;}
+				}
+			}
+			
+			static __overlay_unregister_subtree__ = function() {
+				var _stack = [self];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					if (_node.__overlay_component__) {
+						var _mgr_owner = _node.__overlay_manager_owner__;
+						if (is_struct(_mgr_owner) && is_struct(_mgr_owner.__overlay_manager__)) {
+							var _entries = _mgr_owner.__overlay_manager__.entries;
+							var _j = array_length(_entries);
+							repeat(array_length(_entries)) { _j--;
+								var _entry = _entries[_j];
+								if (_entry.__comp_id__ != _node.__comp_id__) continue;
+								array_delete(_entries, _j, 1);
+								_mgr_owner.__overlay_manager__.dirty = true;
+							}
+						}
+						
+						_node.__overlay_registered__ = false;
+						_node.__overlay_manager_owner__ = noone;
+						_node.__overlay_sync_dirty__ = true;
+					}
+					
+					var _i=0; repeat(_node.__children_count__) {
+						array_push(_stack, _node.__children__[_i]);
+					_i+=1;}
+				}
+			}
+			#endregion
 			#region Render Clipping
 			#region jsDoc
 			/// @func    __apply_clipping_region__()
@@ -2116,6 +2485,7 @@ function WWCore() constructor {
 				height = _height;
 				
 				//update click regions
+				update_component_positions();
 				__update_group_region__();
 				if (__is_child__) {
 					__parent__.__update_group_region__()
@@ -2199,7 +2569,7 @@ function WWCore() constructor {
 						 return floor(width/2 + 0.5);
 					}
 					case fa_right:{
-						 return width;
+						return width;
 					}
 				}
 			}

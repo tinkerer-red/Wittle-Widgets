@@ -145,7 +145,7 @@ function WWButtonText() : WWButtonSprite() constructor {
 		#region Events
 			
 			on_held(function(_input) {
-				if (__is_hovered__) {
+				if (__is_pointer_over__) {
 					text_component.__set_offset__(text.x_offset, text.click_yoff);
 				}
 				//else {

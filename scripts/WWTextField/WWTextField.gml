@@ -799,17 +799,16 @@ function WWTextField() : WWCore() constructor {
 					if (keyboard_check(vk_control)) _mode = 1;
 					else if (keyboard_check(vk_alt)) _mode = 2;
 					// Also grab focus when box-select begins.
-					if (!__is_focused__) {
+					if (!__is_input_consumer__) {
 						trigger_event(events.select);
-						__is_focused__ = true;
+						set_focus(true);
 					}
 					__box_select_begin__(_mode, _mxr, _myr);
 				}
 			});
 			on_mouse_off(function(){
 				if (mouse_check_button_pressed(mb_left)) {
-					trigger_event(events.focus_exit);
-					__is_focused__ = false;
+					set_focus(false);
 				}
 			})
 			on_focus_exit(function(_input) {
@@ -1467,8 +1466,7 @@ function WWTextField() : WWCore() constructor {
 					return;
 				}
 				trigger_event(events.submit);
-				trigger_event(events.focus_exit);
-				__is_focused__ = false;
+				set_focus(false);
 			});
 			#endregion
 			

@@ -526,7 +526,7 @@ function WWTextBase() : WWCore() constructor {
 			    }
 				
 			    // Draw the cursor on top.
-				if (__is_focused__) {
+				if (__is_input_consumer__) {
 					__draw_cursor__(x, y);
 				}
 			});
@@ -1213,7 +1213,7 @@ function WWTextBase() : WWCore() constructor {
 			#endregion
 			static __draw_cursor__ = function(_x, _y) {
 			    // Only draw the cursor if the component is focused.
-			    if (!__is_focused__) return;
+			    if (!__is_input_consumer__) return;
 				
 			    // Compute the cursor's pixel x coordinate.
 			    var current_line = __lines__[cursor_y_pos];

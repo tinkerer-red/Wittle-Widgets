@@ -125,7 +125,10 @@ function WWTextCursor() : WWCore() constructor {
 				var _is_focused = true;
 				if (__textbox_parent__ != undefined) {
 					_is_focused = true;
-					if (__textbox_parent__.__is_focused__ != undefined) {
+					if (__textbox_parent__.__is_input_consumer__ != undefined) {
+						_is_focused = __textbox_parent__.__is_input_consumer__;
+					}
+					else if (__textbox_parent__.__is_focused__ != undefined) {
 						_is_focused = __textbox_parent__.__is_focused__;
 					}
 					else if (__textbox_parent__.is_focused != undefined) {

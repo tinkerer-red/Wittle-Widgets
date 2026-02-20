@@ -233,7 +233,7 @@ function WWButtonIconText() : WWButtonText() constructor {
 	#endregion
 
 	on_held(function(_input) {
-		if (!__is_hovered__ || !icon_enabled) return;
+		if (!__is_pointer_over__ || !icon_enabled) return;
 		icon_component.__set_offset__(__icon_base_x__, __icon_base_y__ + (__user_text_click_y__ - __user_text_offset_y__));
 	});
 

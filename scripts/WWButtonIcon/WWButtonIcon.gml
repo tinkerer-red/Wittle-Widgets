@@ -160,7 +160,7 @@ function WWButtonIcon() : WWButtonSprite() constructor {
 	#endregion
 
 	on_held(function(_input) {
-		if (!__is_hovered__) return;
+		if (!__is_pointer_over__) return;
 		__layout_icon__();
 		icon.__set_offset__(icon.x_offset, icon.y_offset + icon_click_offset);
 	});

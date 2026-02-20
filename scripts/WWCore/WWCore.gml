@@ -184,6 +184,8 @@ function WWCore() constructor {
 					set_focus(false);
 					set_hover(false);
 					set_interact(false);
+					set_pressed(false);
+					set_pointer_consumer(false);
 				}
 				return self;
 			};
@@ -277,21 +279,36 @@ function WWCore() constructor {
 			/// @param   {Bool} focus : True to focus; false to unfocus.
 			/// @returns {Struct.WWCore}
 			#endregion
-			static set_focus = function(_focus) {
-			    if (_focus && !__is_focused__) {
-					__is_focused__ = true;
-					if (__overlay_component__) {
-						__overlay_last_focus_time__ = current_time;
-						bring_to_front();
-					}
+			static set_nav_target = function(_is_nav_target) {
+				_is_nav_target = !!_is_nav_target;
+				__is_nav_target__ = _is_nav_target;
+				if (_is_nav_target && __overlay_component__) {
+					__overlay_last_focus_time__ = current_time;
+					bring_to_front();
+				}
+				return self;
+			}
+			static set_input_consumer = function(_is_input_consumer) {
+				_is_input_consumer = !!_is_input_consumer;
+				if (_is_input_consumer && !__is_input_consumer__) {
+					__is_input_consumer__ = true;
 					trigger_event(events.focus_enter);
 					trigger_event(events.focus);
 				}
-			    else if (!_focus && __is_focused__) {
-					__is_focused__ = false;
+				else if (!_is_input_consumer && __is_input_consumer__) {
+					__is_input_consumer__ = false;
 					trigger_event(events.focus_exit);
 				}
-			    return self;
+				else {
+					__is_input_consumer__ = _is_input_consumer;
+				}
+				__sync_legacy_input_flags__();
+				return self;
+			}
+			static set_focus = function(_focus) {
+				set_nav_target(_focus);
+				set_input_consumer(_focus);
+				return self;
 			}
 			#region jsDoc
 			/// @func    set_hover()
@@ -300,19 +317,25 @@ function WWCore() constructor {
 			/// @param   {Bool} hover : True to hover; false to unhover.
 			/// @returns {Struct.WWCore}
 			#endregion
-			static set_hover = function(_hover) {
-			    if (_hover && !__is_hovered__) {
-					__is_hovered__ = true;
+			static set_pointer_over = function(_is_pointer_over) {
+				_is_pointer_over = !!_is_pointer_over;
+			    if (_is_pointer_over && !__is_pointer_over__) {
+					__is_pointer_over__ = true;
 					trigger_event(events.hover_enter);
 					trigger_event(events.hover);
 				}
-			    else if (!_hover && __is_hovered__) {
-					__is_hovered__ = false;
+			    else if (!_is_pointer_over && __is_pointer_over__) {
+					__is_pointer_over__ = false;
 					trigger_event(events.hover_exit);
 				}
 				else {
-					__is_hovered__ = _hover;
+					__is_pointer_over__ = _is_pointer_over;
 				}
+				__sync_legacy_input_flags__();
+			    return self;
+			}
+			static set_hover = function(_hover) {
+				set_pointer_over(_hover);
 			    return self;
 			}
 			#region jsDoc
@@ -322,19 +345,49 @@ function WWCore() constructor {
 			/// @param   {Bool} interact : True while interacting; false to stop.
 			/// @returns {Struct.WWCore}
 			#endregion
-			static set_interact = function(_interact) {
-			    if (_interact && !__is_interacting__) {
-					__is_interacting__ = true;
+			static set_engaged = function(_is_engaged) {
+				_is_engaged = !!_is_engaged;
+			    if (_is_engaged && !__is_engaged__) {
+					__is_engaged__ = true;
 					trigger_event(events.interact_enter);
 					trigger_event(events.interact);
 				}
-			    else if (!_interact && __is_interacting__) {
-					__is_interacting__ = false;
+			    else if (!_is_engaged && __is_engaged__) {
+					__is_engaged__ = false;
 					trigger_event(events.interact_exit);
 				}
 				else {
-					__is_interacting__ = _interact;
+					__is_engaged__ = _is_engaged;
 				}
+				if (!_is_engaged) {
+					__is_pressed__ = false;
+				}
+				__sync_legacy_input_flags__();
+			    return self;
+			}
+			static set_interact = function(_interact) {
+				set_engaged(_interact);
+				return self;
+			}
+			static set_pointer_consumer = function(_is_pointer_consumer) {
+				__is_pointer_consumer__ = !!_is_pointer_consumer;
+				return self;
+			}
+			static set_pressed = function(_is_pressed) {
+				__is_pressed__ = !!_is_pressed;
+				return self;
+			}
+			static set_last_input_modality = function(_modality) {
+				var _last_input_modality = string_lower(string(_modality));
+				switch (_last_input_modality) {
+					case "mouse":
+					case "keyboard":
+					case "controller":
+					case "touch":
+					break;
+					default: _last_input_modality = "unknown"; break;
+				}
+				__last_input_modality__ = _last_input_modality;
 			    return self;
 			}
 			
@@ -779,9 +832,10 @@ function WWCore() constructor {
 			/// @param   {Struct} input : The input struct (should contain keyboard state).
 			/// @returns {Undefined}
 			#endregion
-            static handle_keyboard_navigation = function(_input) {
+			static handle_keyboard_navigation = function(_input) {
                 // Example pseudo-code for key checking; replace with your own input functions.
                 if (keyboard_check_pressed(vk_tab)) {
+					set_last_input_modality("keyboard");
                     if (keyboard_check(vk_shift)) {
                         navigate_focus("prev");
                     }
@@ -791,18 +845,22 @@ function WWCore() constructor {
                     _input.consumed = true;
                 }
                 if (keyboard_check_pressed(vk_left)) {
+					set_last_input_modality("keyboard");
                     navigate_focus("left");
                     _input.consumed = true;
                 }
                 if (keyboard_check_pressed(vk_right)) {
+					set_last_input_modality("keyboard");
                     navigate_focus("right");
                     _input.consumed = true;
                 }
                 if (keyboard_check_pressed(vk_up)) {
+					set_last_input_modality("keyboard");
                     navigate_focus("up");
                     _input.consumed = true;
                 }
                 if (keyboard_check_pressed(vk_down)) {
+					set_last_input_modality("keyboard");
                     navigate_focus("down");
                     _input.consumed = true;
                 }
@@ -1359,6 +1417,7 @@ function WWCore() constructor {
 			#endregion
 			static consume_input = function() {
 				__user_input__.consumed = true;
+				__is_pointer_consumer__ = true;
 			}
 			
 			#region Overlay Functions
@@ -1787,9 +1846,13 @@ function WWCore() constructor {
 					
 					draw_text(x, y, string_join("\n",
 						$"__is_enabled__ = {__is_enabled__};",
-						$"__is_interacting__ = {__is_interacting__};",
-						$"__is_hovered__ = {__is_hovered__};",
-						$"__is_focused__ = {__is_focused__};",
+						$"__is_engaged__ = {__is_engaged__};",
+						$"__is_pointer_over__ = {__is_pointer_over__};",
+						$"__is_nav_target__ = {__is_nav_target__};",
+						$"__is_input_consumer__ = {__is_input_consumer__};",
+						$"__is_pointer_consumer__ = {__is_pointer_consumer__};",
+						$"__is_pressed__ = {__is_pressed__};",
+						$"__last_input_modality__ = {__last_input_modality__};",
 						$"__visual_state__ = {__visual_state__};",
 						"",
 						$"WW_STATE_DISABLED = {WW_STATE_DISABLED};",
@@ -1845,9 +1908,17 @@ function WWCore() constructor {
 			__click_held_timer__ = 0; //long press timer
 			__last_click_time_single__ = 0; //timer to measure the distance from a single click to a double
 			__last_click_time_double__ = 0; //timer to measure the distance from a double click to a triple
-			__is_interacting__ = false; // is currently being interacted with, to prevent draging a slider and clicking a button at the same time
-			__is_focused__ = false; // is currently the component capturing the input, and accepting keyboard inputs
-			__is_hovered__ = false; // is currently consuming the input through depth order (the mouse projected down onto this component, instead of others)
+			__is_pointer_over__ = false; // pointer is currently over this component
+			__is_nav_target__ = false; // keyboard/controller navigation has targeted this component
+			__is_input_consumer__ = false; // component is the active consumer of typed/button input
+			__is_engaged__ = false; // active interaction in progress (held, dragging, scrubbing, etc)
+			__is_pointer_consumer__ = false; // pointer input was consumed by this component this step
+			__last_input_modality__ = "unknown"; // mouse | keyboard | controller | touch | unknown
+			__is_pressed__ = false; // pointer/button is currently pressed on this component
+			// Legacy private aliases kept for WW migration compatibility.
+			__is_interacting__ = false;
+			__is_focused__ = false;
+			__is_hovered__ = false;
 			#endregion
 			#region Sub Component Variables
 			__is_empty__ = true;
@@ -1883,6 +1954,8 @@ function WWCore() constructor {
 		#region Functions
 			#region Input Priv Functions
 			on_post_step(function(){
+				__is_pointer_consumer__ = false;
+
 				if (!__is_enabled__) {
 					return;
 				}
@@ -1903,9 +1976,9 @@ function WWCore() constructor {
 					trigger_event(events.mouse_off);
 				}
 				
-				if (__is_hovered__) trigger_event(events.hover);
-				if (__is_focused__) trigger_event(events.focus);
-				if (__is_interacting__) trigger_event(events.interact);
+				if (__is_pointer_over__) trigger_event(events.hover);
+				if (__is_input_consumer__) trigger_event(events.focus);
+				if (__is_engaged__) trigger_event(events.interact);
 			})
 			on_mouse_over(function(){
 				if (!__is_enabled__) {
@@ -1934,6 +2007,8 @@ function WWCore() constructor {
 				
 			})
 			on_pressed(function(){
+				set_last_input_modality("mouse");
+				set_pressed(true);
 				set_interact(true);
 				
 				if (current_time - __last_click_time_double__ < 1_000/3) {
@@ -1958,6 +2033,7 @@ function WWCore() constructor {
 			})
 			on_interact(function(_input) {
 				if (!__is_enabled__ || !__is_focusable__) {
+					set_pressed(false);
 					return;
 				}
 				
@@ -1974,6 +2050,7 @@ function WWCore() constructor {
 					// Always clear interact once the button is no longer held.
 					// This prevents visual "stuck pressed" states if a release edge is missed.
 					var _did_release = mouse_check_button_released(mb_left);
+					set_pressed(false);
 				    set_interact(false);
 				    if (_did_release) {
 						if (mouse_on_comp()) {
@@ -2627,17 +2704,22 @@ function WWCore() constructor {
 				if (!__is_enabled__)    { 
 					__visual_state__ = WW_STATE_DISABLED; return; 
 					}
-				if (__is_interacting__) { 
+				if (__is_engaged__) { 
 					__visual_state__ = WW_STATE_ACTIVE; return; 
 					}
-				if (__is_hovered__)     { 
+				if (__is_pointer_over__)     { 
 					__visual_state__ = WW_STATE_HOVER; return; 
 					}
-				if (__is_focused__)     { 
+				if (__is_nav_target__ || __is_input_consumer__)     { 
 					__visual_state__ = WW_STATE_FOCUSED; return; 
 					}
 				//else
 				__visual_state__ = WW_STATE_NORMAL;
+			};
+			static __sync_legacy_input_flags__ = function() {
+				__is_interacting__ = __is_engaged__;
+				__is_focused__ = __is_input_consumer__;
+				__is_hovered__ = __is_pointer_over__;
 			};
 			#region jsDoc
 			/// @func    __cleanup__()

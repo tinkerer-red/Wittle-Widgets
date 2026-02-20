@@ -597,8 +597,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			on_mouse_off(function(){
 				if (mouse_check_button_pressed(mb_left)) {
-					trigger_event(self.events.focus_exit);
-					__is_focused__ = false;
+					set_focus(false);
 				}
 			})
 			on_focus_exit(function(_input) {

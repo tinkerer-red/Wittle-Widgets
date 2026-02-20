@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWSprite",
   "parent":{
-    "name":"Finished Components",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components.yy",
+    "name":"Rendering",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Rendering.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

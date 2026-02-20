@@ -10,402 +10,386 @@ function WWSliderBase() : WWButtonSprite() constructor {
     #region Public
 
         #region Builder Functions
-		
-		#region jsDoc
-		/// @func    set_size()
-		/// @desc    Sets the slider size. Also sizes the background if it has not been manually sized.
-		/// @self    WWSliderBase
-		/// @param   {Real} width : Width of the slider.
-		/// @param   {Real} height : Height of the slider.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_size = function(_width, _height) {
-			static __set_size = WWCore.set_size;
-			__set_size(_width, _height)
-			if (!background.__size_set__) {
-				background.__set_size__(_width, _height);
-			}
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_value()
-		/// @desc    Sets the slider value (clamped to min/max).
-		/// @self    WWSliderBase
-		/// @param   {Real} value : Value to set.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_value = function(_value) {
-			__set_value__(_value);
-			lerp_target = value;
-			//trigger_event(events.value_input, value);
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_normalized_value()
-		/// @desc    Sets the slider value using a normalized 0..1 input.
-		/// @self    WWSliderBase
-		/// @param   {Real} value : Normalized value (0..1).
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_normalized_value = function(_value) {
-			__set_normalized_value__(_value);
-			lerp_target = value;
-			//trigger_event(events.value_input, value);
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_clamp_values()
-		/// @desc    Sets the slider min and max values.
-		/// @self    WWSliderBase
-		/// @param   {Real} min : Minimum value.
-		/// @param   {Real} max : Maximum value.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_clamp_values = function(_min=0, _max=10) {
-			min_value = _min;
-			max_value = _max;
-			
-			lerp_target = clamp(lerp_target, min_value, max_value);
-			__set_value__(value);
-				
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_rounding()
-		/// @desc    Enables or disables rounding (useful for integer sliders).
-		/// @self    WWSliderBase
-		/// @param   {Bool} round : True to round, false to keep fractional values.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_rounding = function(_round=false) {
-				
-			round_value = _round
-			set_value(value);
-				
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_lerp_target()
-		/// @desc    Sets the smoothing target value (the slider eases toward this value).
-		/// @self    WWSliderBase
-		/// @param   {Real} lerp_target : Target value to ease toward.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_lerp_target = function(_lerp_target) {
-			
-			lerp_target = clamp(_lerp_target, min_value, max_value);
-			
-			if (round_value) {
-				lerp_target = floor(lerp_target + 0.5);
-			}
-			
-			return self;
-		}
-		
-		#region jsDoc
-		/// @func    set_inverted()
-		/// @desc    Flips the bar growth direction.
-		/// @self    WWSliderBase
-		/// @param   {Bool} invert : True to invert direction.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_inverted = function(_invert) {
-			is_inverted = _invert;
-			return self;
-		}
-		
-		#region jsDoc
-		/// @func    set_bar_size()
-		/// @desc    Sets the bar component region relative to the slider.
-		/// @self    WWSliderBase
-		/// @param   {Real} left : Left.
-		/// @param   {Real} top : Top.
-		/// @param   {Real} right : Right.
-		/// @param   {Real} bottom : Bottom.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_bar_size = function(_left, _top, _right, _bottom) {
-			bar.set_size(_left, _top, _right, _bottom)
-			return self;
-		}
-		#region jsDoc
-		/// @func    set_background_size()
-		/// @desc    Sets the background component region relative to the slider.
-		/// @self    WWSliderBase
-		/// @param   {Real} left : Left.
-		/// @param   {Real} top : Top.
-		/// @param   {Real} right : Right.
-		/// @param   {Real} bottom : Bottom.
-		/// @returns {Struct.WWSliderBase}
-		#endregion
-		static set_background_size = function(_left, _top, _right, _bottom) {
-			background.set_size(_left, _top, _right, _bottom)
-			return self;
-		}
-		
-		#endregion
-        
-        #region Events
-			
-			events.value_input       = variable_get_hash("value_input"); //if a value was input in any way, this will trigger every frame the slider is interacted wtih
-			events.value_changed     = variable_get_hash("value_changed"); //if a value was changed in any way, this will trigger only when the previous frame's value does not equal the current frames value
-			events.value_incremented = variable_get_hash("value_incremented"); //if a value was incremented, this will trigger only when the previous frame's value is less than the current frames value
-			events.value_decremented = variable_get_hash("value_decremented"); //if a value was decremented, this will trigger only when the previous frame's value greater than the current frames value
-			
-			on_post_step(function(_input) {
-				//apply smoothing from target value
-				if (lerp_target != value) {
-					if ( abs(lerp_target - value) < 0.0025 ) {
-						__set_value__(lerp_target);
-						trigger_event(events.value_input, value);
-					}
-					else {
-						__set_value__(value + (lerp_target - value) * 0.175);
-						trigger_event(events.value_input, value);
-					}
-				}
-			})
-			
+            #region jsDoc
+            /// @func    set_size()
+            /// @desc    Sets the slider size.
+            /// @self    WWSliderBase
+            /// @param   {Real} width : Width of the slider.
+            /// @param   {Real} height : Height of the slider.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_size = function(_width, _height) {
+                static __set_size = WWCore.set_size;
+                __set_size(_width, _height);
+
+                if (!__bg_rect_user_set__) {
+                    __bg_rect__.left = 0;
+                    __bg_rect__.top = 0;
+                    __bg_rect__.right = width;
+                    __bg_rect__.bottom = height;
+                }
+                if (!__bar_rect_user_set__) {
+                    __bar_rect__.left = 0;
+                    __bar_rect__.top = 0;
+                    __bar_rect__.right = width;
+                    __bar_rect__.bottom = height;
+                }
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_value()
+            /// @desc    Sets the slider value (clamped to min/max).
+            /// @self    WWSliderBase
+            /// @param   {Real} value : Value to set.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_value = function(_value) {
+                __set_value__(_value);
+                lerp_target = value;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_normalized_value()
+            /// @desc    Sets the slider value using a normalized 0..1 input.
+            /// @self    WWSliderBase
+            /// @param   {Real} value : Normalized value (0..1).
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_normalized_value = function(_value) {
+                __set_normalized_value__(_value);
+                lerp_target = value;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_clamp_values()
+            /// @desc    Sets the slider min and max values.
+            /// @self    WWSliderBase
+            /// @param   {Real} min : Minimum value.
+            /// @param   {Real} max : Maximum value.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_clamp_values = function(_min=0, _max=10) {
+                min_value = _min;
+                max_value = _max;
+
+                lerp_target = clamp(lerp_target, min_value, max_value);
+                __set_value__(value);
+
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_rounding()
+            /// @desc    Enables or disables rounding (useful for integer sliders).
+            /// @self    WWSliderBase
+            /// @param   {Bool} round : True to round, false to keep fractional values.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_rounding = function(_round=false) {
+                round_value = _round;
+                set_value(value);
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_lerp_target()
+            /// @desc    Sets the smoothing target value (the slider eases toward this value).
+            /// @self    WWSliderBase
+            /// @param   {Real} lerp_target : Target value to ease toward.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_lerp_target = function(_lerp_target) {
+                lerp_target = clamp(_lerp_target, min_value, max_value);
+                if (round_value) {
+                    lerp_target = floor(lerp_target + 0.5);
+                }
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_inverted()
+            /// @desc    Flips the bar growth direction.
+            /// @self    WWSliderBase
+            /// @param   {Bool} invert : True to invert direction.
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_inverted = function(_invert) {
+                is_inverted = _invert;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_bar_size()
+            /// @desc    Sets the fill bar region relative to the slider.
+            ///          Supports set_bar_size(width, height) and set_bar_size(left, top, right, bottom).
+            /// @self    WWSliderBase
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_bar_size = function(_left, _top, _right=undefined, _bottom=undefined) {
+                if (is_undefined(_right) || is_undefined(_bottom)) {
+                    __bar_rect__.left = 0;
+                    __bar_rect__.top = 0;
+                    __bar_rect__.right = _left;
+                    __bar_rect__.bottom = _top;
+                }
+                else {
+                    __bar_rect__.left = _left;
+                    __bar_rect__.top = _top;
+                    __bar_rect__.right = _right;
+                    __bar_rect__.bottom = _bottom;
+                }
+                __bar_rect_user_set__ = true;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_background_size()
+            /// @desc    Sets the background region relative to the slider.
+            ///          Supports set_background_size(width, height) and set_background_size(left, top, right, bottom).
+            /// @self    WWSliderBase
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_background_size = function(_left, _top, _right=undefined, _bottom=undefined) {
+                if (is_undefined(_right) || is_undefined(_bottom)) {
+                    __bg_rect__.left = 0;
+                    __bg_rect__.top = 0;
+                    __bg_rect__.right = _left;
+                    __bg_rect__.bottom = _top;
+                }
+                else {
+                    __bg_rect__.left = _left;
+                    __bg_rect__.top = _top;
+                    __bg_rect__.right = _right;
+                    __bg_rect__.bottom = _bottom;
+                }
+                __bg_rect_user_set__ = true;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_show_track()
+            /// @desc    Shows/hides the slider track (background sprite).
+            /// @self    WWSliderBase
+            /// @param   {Bool} enabled
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_show_track = function(_enabled=true) {
+                __show_track__ = _enabled;
+                set_sprite_alpha(_enabled ? undefined : 0);
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_show_fill()
+            /// @desc    Shows/hides the slider fill bar.
+            /// @self    WWSliderBase
+            /// @param   {Bool} enabled
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_show_fill = function(_enabled=true) {
+                __show_fill__ = _enabled;
+                return self;
+            };
+
+            #region jsDoc
+            /// @func    set_show_bar()
+            /// @desc    Shows/hides all bar visuals (track + fill).
+            /// @self    WWSliderBase
+            /// @param   {Bool} enabled
+            /// @returns {Struct.WWSliderBase}
+            #endregion
+            static set_show_bar = function(_enabled=true) {
+                set_show_track(_enabled);
+                set_show_fill(_enabled);
+                return self;
+            };
         #endregion
-        
+
+        #region Events
+            events.value_input       = variable_get_hash("value_input");
+            events.value_changed     = variable_get_hash("value_changed");
+            events.value_incremented = variable_get_hash("value_incremented");
+            events.value_decremented = variable_get_hash("value_decremented");
+
+            on_post_step(function(_input) {
+                if (lerp_target != value) {
+                    if (abs(lerp_target - value) < 0.0025) {
+                        __set_value__(lerp_target);
+                        trigger_event(events.value_input, value);
+                    }
+                    else {
+                        __set_value__(value + (lerp_target - value) * 0.175);
+                        trigger_event(events.value_input, value);
+                    }
+                }
+            });
+
+            on_pre_draw(function(_input) {
+                __draw_bar__();
+            });
+        #endregion
+
         #region Variables
-			
-			min_value = 0;
-			max_value = 1;
-			value = 0.5;
-			lerp_target = value;
-			normalized_value = (0.5-min_value) / (max_value-min_value);
-			round_value = false;
-			is_inverted = false;
-			
-			visible = false;
-			
-			background = new WWSliderBackgroud()
-				.set_sprite(__slider_theme_sprite__("slider", spr_ww_slider_background))
-				.set_sprite_color(__slider_theme_paint_color__("track_bg", c_grey))
-			bar = new WWSliderBar()
-				.set_sprite(__slider_theme_sprite__("slider_bar", spr_ww_slider_bar))
-				.set_sprite_color(__slider_theme_paint_color__("track_fill", c_orange))
-			
-			add([background, bar]);
+            min_value = 0;
+            max_value = 1;
+            value = 0.5;
+            lerp_target = value;
+            normalized_value = 0.5;
+            round_value = false;
+            is_inverted = false;
+
+            __bar_rect__ = { left: 0, top: 0, right: width, bottom: height };
+            __bg_rect__ = { left: 0, top: 0, right: width, bottom: height };
+            __bar_rect_user_set__ = false;
+            __bg_rect_user_set__ = false;
+            __show_track__ = true;
+            __show_fill__ = true;
+
+            __bar_sprite__ = undefined;
+            __bar_color__ = undefined;
+            __bar_alpha__ = undefined;
+
+            __theme_sprite_key_main__ = "slider.sprite.track.main";
+            __theme_sprite_key_state_prefix__ = "slider.sprite.track";
+            __theme_color_prefix__ = "slider.color.track";
+            __theme_alpha_prefix__ = "slider.alpha.track";
         #endregion
 
         #region Functions
-        
-		#region jsDoc
-		/// @func    get_size()
-		/// @desc    Returns the slider size.
-		/// @self    WWSliderBase
-		/// @returns {Struct} size_struct_with_width_height
-		#endregion
-		static get_size = function() {
-			static _core_get_size = WWCore.get_size;
-			return _core_get_size();
-		};
-		#region jsDoc
-		/// @func    get_normalized_value()
-		/// @desc    Returns the current normalized value (0..1).
-		/// @self    WWSliderBase
-		/// @returns {Real} normalized_value
-		#endregion
-		static get_normalized_value = function() {
-			return normalized_value;
-		};
-		#region jsDoc
-		/// @func    get_clamp_values()
-		/// @desc    Returns the slider min and max values.
-		/// @self    WWSliderBase
-		/// @returns {Struct} clamp_struct_with_min_max
-		#endregion
-		static get_clamp_values = function() {
-			return { min: min_value, max: max_value };
-		};
-		#region jsDoc
-		/// @func    get_rounding()
-		/// @desc    Returns whether rounding is enabled.
-		/// @self    WWSliderBase
-		/// @returns {Bool} is_enabled
-		#endregion
-		static get_rounding = function() {
-			return round_value;
-		};
-		#region jsDoc
-		/// @func    get_lerp_target()
-		/// @desc    Returns the current smoothing target value.
-		/// @self    WWSliderBase
-		/// @returns {Real} lerp_target_value
-		#endregion
-		static get_lerp_target = function() {
-			return lerp_target;
-		};
-		#region jsDoc
-		/// @func    get_inverted()
-		/// @desc    Returns whether the slider direction is inverted.
-		/// @self    WWSliderBase
-		/// @returns {Bool} is_inverted
-		#endregion
-		static get_inverted = function() {
-			return is_inverted;
-		};
-		#region jsDoc
-		/// @func    get_bar_size()
-		/// @desc    Returns the bar component region.
-		/// @self    WWSliderBase
-		/// @returns {Struct} rect_struct_with_left_top_right_bottom
-		#endregion
-		static get_bar_size = function() {
-			return bar.get_size();
-		};
-		#region jsDoc
-		/// @func    get_background_size()
-		/// @desc    Returns the background component region.
-		/// @self    WWSliderBase
-		/// @returns {Struct} rect_struct_with_left_top_right_bottom
-		#endregion
-		static get_background_size = function() {
-			return background.get_size();
-		};
-        #region jsDoc
-		/// @func    get_value()
-		/// @desc    Returns the value of the component.
-		/// @self    WWSliderBase
-		/// @returns {Real}
-		#endregion
-		static get_value = function() {
-			return value;
-		}
-		
+            static get_size = function() {
+                static _core_get_size = WWCore.get_size;
+                return _core_get_size();
+            };
+
+            static get_normalized_value = function() { return normalized_value; };
+            static get_clamp_values = function() { return { min: min_value, max: max_value }; };
+            static get_rounding = function() { return round_value; };
+            static get_lerp_target = function() { return lerp_target; };
+            static get_inverted = function() { return is_inverted; };
+            static get_value = function() { return value; };
+            static get_show_track = function() { return __show_track__; };
+            static get_show_fill = function() { return __show_fill__; };
+            static get_show_bar = function() { return __show_track__ && __show_fill__; };
+
+            static get_bar_size = function() {
+                return {
+                    left: __bar_rect__.left,
+                    top: __bar_rect__.top,
+                    right: __bar_rect__.right,
+                    bottom: __bar_rect__.bottom,
+                };
+            };
+
+            static get_background_size = function() {
+                return {
+                    left: __bg_rect__.left,
+                    top: __bg_rect__.top,
+                    right: __bg_rect__.right,
+                    bottom: __bg_rect__.bottom,
+                };
+            };
         #endregion
 
     #endregion
-	
-	#region Private
-		
-		#region Variables
-			
-			__prev_value__ = value;
-			
-		#endregion
-		
-		#region Functions
-			static __slider_theme_sprite__ = function(_slot, _fallback) {
-				var _t = wwThemeGet();
-				if (!is_struct(_t)) return _fallback;
-				if (!is_struct(_t.assets) || !is_struct(_t.assets.sprites)) return _fallback;
-				if (!variable_struct_exists(_t.assets.sprites, _slot)) return _fallback;
-				var _v = variable_struct_get(_t.assets.sprites, _slot);
-				if (is_struct(_v) && variable_struct_exists(_v, "main")) {
-					_v = _v.main;
-				}
-				if (_v == undefined) return _fallback;
-				return _v;
-			};
-			
-			static __slider_theme_paint_color__ = function(_paint_key, _fallback) {
-				var _t = wwThemeGet();
-				if (!is_struct(_t)) return _fallback;
-				if (!is_struct(_t.components)) return _fallback;
-				if (!is_struct(_t.components.slider)) return _fallback;
-				if (!variable_struct_exists(_t.components.slider, _paint_key)) return _fallback;
-				var _paint = variable_struct_get(_t.components.slider, _paint_key);
-				if (is_struct(_paint) && variable_struct_exists(_paint, "color")) {
-					return _paint.color;
-				}
-				if (is_numeric(_paint)) return _paint;
-				return _fallback;
-			};
-			
-			#region jsDoc
-			/// @func    __set_value__()
-			/// @desc    Sets the slider value, applying clamp + rounding, and triggers value change events.
-			/// @self    WWSliderBase
-			/// @param   {Real} value : New raw value.
-			/// @returns {Undefined}
-			/// @ignore
-			#endregion
-			static __set_value__ = function(_value) {
-				value = clamp(_value, min_value, max_value);
-				
-				if (round_value) {
-					value = floor(value + 0.5);
-				}
-				normalized_value = (value-min_value) / (max_value-min_value);
-				
-				// trigger events
-				if (__prev_value__ != value) {
-					trigger_event(events.value_changed, value);
-					if (__prev_value__ < value) {
-						trigger_event(events.value_incremented, value);
-					}
-					else {
-						trigger_event(events.value_decremented, value);
-					}
-				}
-				
-				__prev_value__ = value;
-			}
-			
-			#region jsDoc
-			/// @func    __set_normalized_value__()
-			/// @desc    Sets the slider value from a normalized 0..1 input, applying clamp + rounding, and triggers value change events.
-			/// @self    WWSliderBase
-			/// @param   {Real} value : New normalized value (0..1).
-			/// @returns {Undefined}
-			/// @ignore
-			#endregion
-			static __set_normalized_value__ = function(_value) {
-				__prev_value__ = value;
-				
-				normalized_value = clamp(_value, 0, 1);
-				
-				value = lerp(min_value, max_value, normalized_value)
-				if (round_value) {
-					value = floor(value + 0.5);
-				}
-				normalized_value = (value-min_value) / (max_value-min_value);
-				
-				// trigger events
-				if (__prev_value__ != value) {
-					trigger_event(events.value_changed, value);
-					if (__prev_value__ < value) {
-						trigger_event(events.value_incremented, value);
-					}
-					else {
-						trigger_event(events.value_decremented, value);
-					}
-				}
-				
-				__prev_value__ = value;
-			}
-			
-		#endregion
-		
-	#endregion
-	
-}
-#region jsDoc
-/// @func    WWSliderBackgroud()
-/// @desc    The bar used inside of sliders
-/// @returns {Struct.WWSliderBackgroud}
-#endregion
-function WWSliderBackgroud() : WWSprite() constructor {
-	debug_name = "WWSliderBackgroud";
-}
-#region jsDoc
-/// @func    WWSliderBar()
-/// @desc    The bar used inside of sliders
-/// @returns {Struct.WWSliderBar}
-#endregion
-function WWSliderBar() : WWSprite() constructor {
-	debug_name = "WWSliderBar";
-}
-#region jsDoc
-/// @func    WWSliderThumb()
-/// @desc    The bar used inside of sliders
-/// @returns {Struct.WWSliderThumb}
-#endregion
-function WWSliderThumb() : WWButtonSprite() constructor {
-	debug_name = "WWSliderThumb";
-	__theme_kind__ = __WW_Theme_Kind.Slider;
-}
 
+    #region Private
+        #region Variables
+            __prev_value__ = value;
+        #endregion
+
+        #region Functions
+            static __draw_bar__ = function() {
+                if (!__show_fill__) return;
+                var _w = __bar_rect__.right - __bar_rect__.left;
+                var _h = __bar_rect__.bottom - __bar_rect__.top;
+                if (_w <= 0 || _h <= 0) return;
+
+                var _spr = __bar_sprite__;
+                if (_spr == undefined || !sprite_exists(_spr)) {
+					_spr = wwThemeGetSprite(
+						"slider.sprite.fill.idle",
+						"slider.sprite.fill.main",
+						"slider.sprite.fill"
+					);
+                }
+                if (_spr == undefined || !sprite_exists(_spr)) return;
+
+                var _col = __bar_color__;
+				if (_col == undefined) _col = wwThemeGetColor(
+					"slider.color.fill.idle",
+					"slider.color.fill.main",
+					"slider.color.fill"
+				);
+				var _alp = __bar_alpha__;
+				if (_alp == undefined) _alp = wwThemeGetAlpha(
+					"slider.alpha.fill.idle",
+					"slider.alpha.fill.main",
+					"slider.alpha.fill"
+				);
+
+                draw_sprite_stretched_ext(
+                    _spr,
+                    0,
+                    x + __bar_rect__.left,
+                    y + __bar_rect__.top,
+                    _w,
+                    _h,
+                    _col,
+                    _alp
+                );
+            };
+
+            static __set_value__ = function(_value) {
+                value = clamp(_value, min_value, max_value);
+
+                if (round_value) {
+                    value = floor(value + 0.5);
+                }
+
+                var _den = (max_value - min_value);
+                normalized_value = (_den == 0) ? 0 : ((value - min_value) / _den);
+
+                if (__prev_value__ != value) {
+                    trigger_event(events.value_changed, value);
+                    if (__prev_value__ < value) {
+                        trigger_event(events.value_incremented, value);
+                    }
+                    else {
+                        trigger_event(events.value_decremented, value);
+                    }
+                }
+
+                __prev_value__ = value;
+            };
+
+            static __set_normalized_value__ = function(_value) {
+                __prev_value__ = value;
+
+                normalized_value = clamp(_value, 0, 1);
+                value = lerp(min_value, max_value, normalized_value);
+
+                if (round_value) {
+                    value = floor(value + 0.5);
+                }
+
+                var _den = (max_value - min_value);
+                normalized_value = (_den == 0) ? 0 : ((value - min_value) / _den);
+
+                if (__prev_value__ != value) {
+                    trigger_event(events.value_changed, value);
+                    if (__prev_value__ < value) {
+                        trigger_event(events.value_incremented, value);
+                    }
+                    else {
+                        trigger_event(events.value_decremented, value);
+                    }
+                }
+
+                __prev_value__ = value;
+            };
+        #endregion
+    #endregion
+}

@@ -13,8 +13,8 @@ function WWInputNumberBase() : WWCore() constructor {
 
 		#region Components
 			input = new WWTextInputSingleLine();
-			btn_up = new WWButtonText();
-			btn_dn = new WWButtonText();
+			btn_up = new WWButtonIcon();
+			btn_dn = new WWButtonIcon();
 			add([input, btn_up, btn_dn]);
 		#endregion
 
@@ -70,10 +70,6 @@ function WWInputNumberBase() : WWCore() constructor {
 				btn_up.set_size(_btn_w, _half);
 				btn_dn.set_offset(_inp_w, _half);
 				btn_dn.set_size(_btn_w, _height - _half);
-
-				// Keep button labels centered-ish.
-				btn_up.set_text_offsets(0, -2, 0);
-				btn_dn.set_text_offsets(0, -2, 0);
 
 				return self;
 			};
@@ -252,8 +248,8 @@ function WWInputNumberBase() : WWCore() constructor {
 
 	// Defaults / setup
 	input.set_size(160 - __btn_w__, 22);
-	btn_up.set_text("▲").set_text_font(fnt_ww_consolas_msdf);
-	btn_dn.set_text("▼").set_text_font(fnt_ww_consolas_msdf);
+	btn_up.set_keep_square(false).set_icon_padding(2);
+	btn_dn.set_keep_square(false).set_icon_padding(2);
 
 	btn_up.on_pressed(function() {
 		__apply_step__(1, "step_up");

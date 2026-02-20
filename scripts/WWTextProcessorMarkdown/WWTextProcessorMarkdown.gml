@@ -423,6 +423,7 @@ function WWTextProcessorMarkdown__legacy__(_raw_text, _default_state) {
     if (variable_struct_exists(_default_state, "markdown_quote_alpha")) { _markdown_quote_alpha = _default_state.markdown_quote_alpha; }
 
     if (variable_struct_exists(_default_state, "markdown_code_font")) { _markdown_code_font = _default_state.markdown_code_font; }
+    else if (variable_struct_exists(_default_state, "code_font")) { _markdown_code_font = _default_state.code_font; }
 
     if (variable_struct_exists(_default_state, "markdown_hs_size")) { _markdown_hs_size = _default_state.markdown_hs_size; }
     if (variable_struct_exists(_default_state, "markdown_h1_size")) { _markdown_h1_size = _default_state.markdown_h1_size; }
@@ -1165,6 +1166,7 @@ function WWTextProcessorMarkdown(_raw_text, _default_state) {
     if (variable_struct_exists(_default_state, "markdown_quote_alpha")) { _markdown_quote_alpha = _default_state.markdown_quote_alpha; }
 
     if (variable_struct_exists(_default_state, "markdown_code_font")) { _markdown_code_font = _default_state.markdown_code_font; }
+    else if (variable_struct_exists(_default_state, "code_font")) { _markdown_code_font = _default_state.code_font; }
 
     if (variable_struct_exists(_default_state, "markdown_hs_size")) { _markdown_hs_size = _default_state.markdown_hs_size; }
     if (variable_struct_exists(_default_state, "markdown_h1_size")) { _markdown_h1_size = _default_state.markdown_h1_size; }

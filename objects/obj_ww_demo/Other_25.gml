@@ -1,31 +1,14 @@
 /// obj_ww_demo :: User Event 15
 /// Workbench-only demo.
 
-function __ww_demo_paint_color(_paint, _fallback) {
-	if (_paint == undefined) return _fallback;
-	var _c = variable_struct_get(_paint, "color");
-	return (_c != undefined) ? _c : _fallback;
-}
-
 function __ww_demo_theme_palette() {
-	var _t = wwThemeGet();
-	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
-	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
-	if (_mode == "") {
-		_t = wwThemeSet(wwThemeDark());
-	}
-	var _colors = (is_struct(_t)) ? variable_struct_get(_t, "colors") : undefined;
-	var _app = (_colors != undefined) ? variable_struct_get(_colors, "app") : undefined;
-	var _surface = (_colors != undefined) ? variable_struct_get(_colors, "surface") : undefined;
-	var txt = (_colors != undefined) ? variable_struct_get(_colors, "text") : undefined;
-
 	return {
-		page: __ww_demo_paint_color((_app != undefined) ? variable_struct_get(_app, "bg") : undefined, make_color_rgb(16, 16, 18)),
-		panel: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel") : undefined, make_color_rgb(32, 32, 36)),
-		panel_alt: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(40, 40, 46)),
-		header: __ww_demo_paint_color((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(26, 26, 30)),
-		text: __ww_demo_paint_color((txt != undefined) ? variable_struct_get(txt, "primary") : undefined, make_color_rgb(230, 230, 235)),
-		text_dim: __ww_demo_paint_color((txt != undefined) ? variable_struct_get(txt, "dim") : undefined, make_color_rgb(170, 170, 180)),
+		page: wwThemeGetColor("colors.app.bg.color"),
+		panel: wwThemeGetColor("colors.surface.panel.color"),
+		panel_alt: wwThemeGetColor("colors.surface.panel_alt.color"),
+		header: wwThemeGetColor("colors.surface.panel_alt.color"),
+		text: wwThemeGetColor("colors.text.primary.color"),
+		text_dim: wwThemeGetColor("colors.text.dim.color"),
 	};
 }
 
@@ -147,7 +130,7 @@ function __ww_workbench_build_inspector(_ctor_name, _instance) {
 
 function __ww_workbench_build_special_instance(_ctor_name) {
 	if (_ctor_name == "WWViewScrollRegion") {
-		var _canvas = new WWCore().set_offset(0, 0).set_size(520, 800);
+		var _canvas = new WWContainer().set_offset(0, 0).set_size(520, 800);
 		var _view = new WWViewScrollRegion().set_region_mode(true);
 		var _sbv2 = new WWScrollbarVert();
 		_view.scrollbar_vert = _sbv2;
@@ -159,8 +142,7 @@ function __ww_workbench_build_special_instance(_ctor_name) {
 			_canvas.add(new WWLabel()
 				.set_offset(12, 12 + _i * 22)
 				.set_size(500, 20)
-				.set_text("Item " + string(_i + 1))
-				.set_text_color(c_white));
+				.set_text("Item " + string(_i + 1)));
 		}
 		_view.set_canvas_size_from_children();
 		return { instance: _view, preview_children: [_sbv2] };
@@ -235,25 +217,37 @@ function __ww_workbench_copy_code() {
 	clipboard_set_text(state.code_box.get_value());
 }
 
-function __ww_workbench_theme_button_text() {
-	var _t = wwThemeGet();
-	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
-	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
-	if (_mode == "light") { return "Theme: Light"; }
-	return "Theme: Dark";
-}
-
-function __ww_workbench_toggle_theme() {
-	var _t = wwThemeGet();
-	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
-	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
-
-	if (_mode == "light") {
-		wwThemeSet(wwThemeDark());
+function __ww_workbench_apply_theme_choice(_theme_id) {
+	if (!is_string(_theme_id) || _theme_id == "") {
+		_theme_id = "dark";
 	}
-	else {
-		wwThemeSet(wwThemeLight());
+
+	var _next = undefined;
+
+	switch (_theme_id) {
+		case "mono":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMono()]);
+			break;
+		case "duo":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuo()]);
+			break;
+		case "trio":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeTrio()]);
+			break;
+		case "quad":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeQuad()]);
+			break;
+		case "light":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeLayerLight()]);
+			break;
+		case "dark":
+		default:
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeLayerDark()]);
+			break;
 	}
+
+	wwThemeSet(_next);
+	global.ww_demo_theme_choice = _theme_id;
 
 	// Rebuild workbench UI so all colors/styles are re-read from the active theme.
 	if (instance_exists(state.owner_id)) {
@@ -265,6 +259,11 @@ function __ww_workbench_toggle_theme() {
 
 function __ww_workbench_preview_tab_run() {
 	main.set_preview_tab(tab_index);
+}
+
+function __ww_workbench_theme_select_run() {
+	var _theme_id = dropdown.get_selected_value();
+	main.apply_theme_choice(_theme_id);
 }
 
 function __ww_workbench_try_call(_instance, _builder_name, _args=[]) {
@@ -395,8 +394,7 @@ function __ww_workbench_rebuild_preview_tabs(_ctor_name) {
 		var _btn = new WWButtonText()
 			.set_offset(_x, 0)
 			.set_size(_btn_w, 24)
-			.set_text(_label)
-			.set_text_font(fnt_ww_consolas_msdf);
+			.set_text(_label);
 		_btn.__ww_tab_label__ = _label;
 		var _ctx = new __WWWorkbench_PreviewTabCtx(self, _ti);
 		_btn.set_callback(_ctx.run);
@@ -408,8 +406,7 @@ function __ww_workbench_rebuild_preview_tabs(_ctor_name) {
 function __ww_workbench_make_nav_button(_label_text, _ctor_name, _width) {
 	var _b = new WWButtonText()
 		.set_size(_width, 26)
-		.set_text(_label_text)
-		.set_text_font(fnt_ww_consolas_msdf);
+		.set_text(_label_text);
 	var _nav_ctx = new __WWWorkbench_NavCtx(self, _ctor_name);
 	_b.set_callback(_nav_ctx.run);
 	return _b;
@@ -431,7 +428,6 @@ function __ww_workbench_build_nav_list(_filter_text) {
 		.set_offset(8, 8)
 		.set_size(_canvas.width - 16, 0)
 		.set_text("Components")
-		.set_text_font(fnt_ww_consolas_msdf)
 		.set_children_offsets(_tree_indent, _tree_gap)
 		.set_open(true);
 	_canvas.add(_root);
@@ -466,7 +462,6 @@ function __ww_workbench_build_nav_list(_filter_text) {
 					_folder = new WWFolder()
 						.set_size(_child_w, 0)
 						.set_text(_seg)
-						.set_text_font(fnt_ww_consolas_msdf)
 						.set_children_offsets(_tree_indent, _tree_gap)
 						.set_open(true);
 					_parent.add(_folder);
@@ -489,7 +484,6 @@ function __ww_workbench_build_nav_list(_filter_text) {
 }
 
 function __ww_workbench_apply_layout(_gui_w, _gui_h) {
-	var _theme = state.theme;
 	var _margin = 10;
 	var _pad = 10;
 	var _header_h = 44;
@@ -498,13 +492,11 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 
 	state.root
 		.set_offset(0, 0)
-		.set_size(_safe_w, _safe_h)
-		.set_background_color(_theme.page);
+		.set_size(_safe_w, _safe_h);
 
 	state.page_fill
 		.set_offset(0, 0)
-		.set_size(_safe_w, _safe_h)
-		.set_background_color(_theme.page);
+		.set_size(_safe_w, _safe_h);
 
 	var _header_x = _margin;
 	var _header_y = _margin;
@@ -512,13 +504,12 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 
 	state.header_panel
 		.set_offset(_header_x, _header_y)
-		.set_size(_header_w, _header_h)
-		.set_background_color(_theme.header);
+		.set_size(_header_w, _header_h);
 
 	var _btn_gap = 10;
 	var _btn_y = _header_y + 6;
 	var _right = _header_x + _header_w - 10;
-	var _x_theme = _right - state.btn_theme.width;
+	var _x_theme = _right - state.theme_dropdown.width;
 	var _x_copy = _x_theme - _btn_gap - state.btn_copy.width;
 	var _x_reset = _x_copy - _btn_gap - state.btn_reset.width;
 	var _x_validate = _x_reset - _btn_gap - state.btn_validate.width;
@@ -526,16 +517,13 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 	state.btn_validate.set_offset(_x_validate, _btn_y);
 	state.btn_reset.set_offset(_x_reset, _btn_y);
 	state.btn_copy.set_offset(_x_copy, _btn_y);
-	state.btn_theme
-		.set_offset(_x_theme, _btn_y)
-		.set_text(theme_button_text());
+	state.theme_dropdown.set_offset(_x_theme, _btn_y);
 
 	var _title_x = _header_x + 14;
 	var _title_w = max(120, _x_validate - _title_x - 10);
 	state.title_label
 		.set_offset(_title_x, _header_y + 12)
-		.set_size(_title_w, 20)
-		.set_text_color(_theme.text);
+		.set_size(_title_w, 20);
 
 	var _body_y = _header_y + _header_h + _pad;
 	var _body_h = max(120, (_safe_h - _margin) - _body_y);
@@ -565,24 +553,18 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 
 	state.nav_panel
 		.set_offset(_nav_x, _body_y)
-		.set_size(_nav_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_nav_w, _body_h);
 	state.content_panel
 		.set_offset(_content_x, _body_y)
-		.set_size(_content_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_content_w, _body_h);
 	state.insp_panel
 		.set_offset(_insp_x, _body_y)
-		.set_size(_insp_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_insp_w, _body_h);
 
 	state.nav_search
 		.set_offset(10, 10)
-		.set_size(_nav_w - 20, 24)
-		.set_background_color(_theme.panel_alt);
+		.set_size(_nav_w - 20, 24);
 	state.nav_search.get_field()
-		.set_background_color(_theme.panel_alt)
-		.set_text_color(_theme.text)
 		.set_caption("Search components...");
 
 	state.nav_region
@@ -592,8 +574,7 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 
 	state.insp_label
 		.set_offset(10, 10)
-		.set_size(_insp_w - 20, 18)
-		.set_text_color(_theme.text_dim);
+		.set_size(_insp_w - 20, 18);
 	state.inspector_region
 		.set_offset(10, 32)
 		.set_size(_insp_w - 30, _body_h - 42);
@@ -605,33 +586,26 @@ function __ww_workbench_apply_layout(_gui_w, _gui_h) {
 
 	state.preview_panel
 		.set_offset(10, 10)
-		.set_size(_content_inner_w, _preview_h)
-		.set_background_color(_theme.panel_alt);
+		.set_size(_content_inner_w, _preview_h);
 	state.preview_label
 		.set_offset(10, 10)
-		.set_size(_content_inner_w - 20, 18)
-		.set_text_color(_theme.text_dim);
+		.set_size(_content_inner_w - 20, 18);
 	state.preview_tabs_bar
 		.set_offset(10, 30)
-		.set_size(_content_inner_w - 20, 24)
-		.set_background_color(_theme.panel);
+		.set_size(_content_inner_w - 20, 24);
 	state.preview_host_workbench
 		.set_offset(10, 58)
-		.set_size(_content_inner_w - 20, _preview_h - 68)
-		.set_background_color(_theme.page);
+		.set_size(_content_inner_w - 20, _preview_h - 68);
 	state.preview_host_examples
 		.set_offset(10, 58)
-		.set_size(_content_inner_w - 20, _preview_h - 68)
-		.set_background_color(_theme.page);
+		.set_size(_content_inner_w - 20, _preview_h - 68);
 
 	state.code_panel
 		.set_offset(10, 10 + _preview_h + _pad)
-		.set_size(_content_inner_w, _code_h)
-		.set_background_color(_theme.panel_alt);
+		.set_size(_content_inner_w, _code_h);
 	state.code_label
 		.set_offset(10, 10)
-		.set_size(_content_inner_w - 20, 18)
-		.set_text_color(_theme.text_dim);
+		.set_size(_content_inner_w - 20, 18);
 	state.code_box
 		.set_offset(10, 32)
 		.set_size(_content_inner_w - 20, _code_h - 42);
@@ -683,6 +657,12 @@ function __WWWorkbench_PreviewTabCtx(_main, _tab_index) constructor {
 	run = method(self, __ww_workbench_preview_tab_run);
 }
 
+function __WWWorkbench_ThemeSelectCtx(_main, _dropdown) constructor {
+	main = _main;
+	dropdown = _dropdown;
+	run = method(self, __ww_workbench_theme_select_run);
+}
+
 function __WWWorkbenchCtx(_state) constructor {
 	state = _state;
 	preview_default_w = 240;
@@ -701,8 +681,7 @@ function __WWWorkbenchCtx(_state) constructor {
 	select_ctor = method(self, __ww_workbench_select_ctor);
 	reset = method(self, __ww_workbench_reset);
 	copy_code = method(self, __ww_workbench_copy_code);
-	theme_button_text = method(self, __ww_workbench_theme_button_text);
-	toggle_theme = method(self, __ww_workbench_toggle_theme);
+	apply_theme_choice = method(self, __ww_workbench_apply_theme_choice);
 	try_call = method(self, __ww_workbench_try_call);
 	make_example_defs = method(self, __ww_workbench_make_example_defs);
 	apply_example_variant = method(self, __ww_workbench_apply_example_variant);
@@ -716,18 +695,14 @@ function __WWWorkbenchCtx(_state) constructor {
 }
 
 function build_ui_folder_demo() {
-	var _theme = __ww_demo_theme_palette();
-
-	root = new WWCore()
+	root = new WWCanvas()
 		.set_offset(0, 0)
 		.set_size(max(1, display_get_gui_width()), max(1, display_get_gui_height()))
-		.set_background_color(_theme.page)
 		.set_enabled(true);
 
-	var _page_fill = new WWCore()
+	var _page_fill = new WWCanvas()
 		.set_offset(0, 0)
-		.set_size(max(1, display_get_gui_width()), max(1, display_get_gui_height()))
-		.set_background_color(_theme.page);
+		.set_size(max(1, display_get_gui_width()), max(1, display_get_gui_height()));
 	root.add(_page_fill);
 
 	var _pad = 10;
@@ -740,35 +715,30 @@ function build_ui_folder_demo() {
 	var _body_y = 10 + _header_h + _pad;
 	var _body_h = 700 - _header_h - _pad;
 
-	var _header_panel = new WWCore()
+	var _header_panel = new WWFrame()
 		.set_offset(10, 10)
-		.set_size(1260, _header_h)
-		.set_background_color(_theme.header);
+		.set_size(1260, _header_h);
 	root.add(_header_panel);
 
 	var _title = new WWLabel()
 		.set_offset(24, 22)
 		.set_size(700, 20)
-		.set_text("WW Workbench")
-		.set_text_color(_theme.text);
+		.set_text("WW Workbench");
 	root.add(_title);
 
-	var _nav_panel = new WWCore()
+	var _nav_panel = new WWPanel()
 		.set_offset(10, _body_y)
-		.set_size(_nav_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_nav_w, _body_h);
 	root.add(_nav_panel);
 
-	var _content_panel = new WWCore()
+	var _content_panel = new WWPanel()
 		.set_offset(_content_x, _body_y)
-		.set_size(_content_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_content_w, _body_h);
 	root.add(_content_panel);
 
-	var _insp_panel = new WWCore()
+	var _insp_panel = new WWPanel()
 		.set_offset(_insp_x, _body_y)
-		.set_size(_insp_w, _body_h)
-		.set_background_color(_theme.panel);
+		.set_size(_insp_w, _body_h);
 	root.add(_insp_panel);
 
 	var _state = {
@@ -789,8 +759,8 @@ function build_ui_folder_demo() {
 		btn_validate: undefined,
 		btn_reset: undefined,
 		btn_copy: undefined,
-		btn_theme: undefined,
-		theme: _theme,
+		theme_dropdown: undefined,
+		theme: global.ww_theme,
 		title_label: _title,
 		constructor_name: "",
 		instance: undefined,
@@ -816,55 +786,48 @@ function build_ui_folder_demo() {
 	var _preview_h = 380;
 	var _code_h = _body_h - _preview_h - _pad;
 
-	var _preview_panel = new WWCore()
+	var _preview_panel = new WWInset()
 		.set_offset(10, 10)
-		.set_size(_content_w - 20, _preview_h)
-		.set_background_color(_theme.panel_alt);
+		.set_size(_content_w - 20, _preview_h);
 	_content_panel.add(_preview_panel);
 	_state.preview_panel = _preview_panel;
 
 	var _preview_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_preview_panel.width - 20, 18)
-		.set_text("Preview")
-		.set_text_color(_theme.text_dim);
+		.set_text("Preview");
 	_preview_panel.add(_preview_label);
 	_state.preview_label = _preview_label;
 
-	var _preview_tabs = new WWCore()
+	var _preview_tabs = new WWContainer()
 		.set_offset(10, 30)
-		.set_size(_preview_panel.width - 20, 24)
-		.set_background_color(_theme.panel);
+		.set_size(_preview_panel.width - 20, 24);
 	_preview_panel.add(_preview_tabs);
 	_state.preview_tabs_bar = _preview_tabs;
 
-	var _preview_host_workbench = new WWCore()
+	var _preview_host_workbench = new WWCanvas()
 		.set_offset(10, 58)
-		.set_size(_preview_panel.width - 20, _preview_panel.height - 68)
-		.set_background_color(_theme.page);
+		.set_size(_preview_panel.width - 20, _preview_panel.height - 68);
 	_preview_panel.add(_preview_host_workbench);
 	_state.preview_host_workbench = _preview_host_workbench;
 
-	var _preview_host_examples = new WWCore()
+	var _preview_host_examples = new WWCanvas()
 		.set_offset(10, 58)
-		.set_size(_preview_panel.width - 20, _preview_panel.height - 68)
-		.set_background_color(_theme.page);
+		.set_size(_preview_panel.width - 20, _preview_panel.height - 68);
 	_preview_panel.add(_preview_host_examples);
 	_state.preview_host_examples = _preview_host_examples;
 	_preview_host_examples.set_active(false);
 
-	var _code_panel = new WWCore()
+	var _code_panel = new WWInset()
 		.set_offset(10, 10 + _preview_h + _pad)
-		.set_size(_content_w - 20, _code_h)
-		.set_background_color(_theme.panel_alt);
+		.set_size(_content_w - 20, _code_h);
 	_content_panel.add(_code_panel);
 	_state.code_panel = _code_panel;
 
 	var _code_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_code_panel.width - 20, 18)
-		.set_text("Generated GML")
-		.set_text_color(_theme.text_dim);
+		.set_text("Generated GML");
 	_code_panel.add(_code_label);
 	_state.code_label = _code_label;
 
@@ -872,7 +835,6 @@ function build_ui_folder_demo() {
 		.set_offset(10, 32)
 		.set_size(_code_panel.width - 20, _code_panel.height - 42)
 		.set_read_only(true);
-	_code_box.get_field().set_text_font(fnt_ww_consolas_msdf);
 	_code_box.get_field().set_wrap_enabled(false);
 	_code_box.get_region().set_scrollbars_enabled(true, true);
 	_code_box.get_region().set_scrollbars_auto_hide(false, false);
@@ -882,18 +844,16 @@ function build_ui_folder_demo() {
 	var _insp_label = new WWLabel()
 		.set_offset(10, 10)
 		.set_size(_insp_w - 20, 18)
-		.set_text("Inspector")
-		.set_text_color(_theme.text_dim);
+		.set_text("Inspector");
 	_insp_panel.add(_insp_label);
 	_state.insp_label = _insp_label;
 
-	var _insp_canvas = new WWCore().set_offset(0, 0).set_size(_insp_w - 30, 0);
+	var _insp_canvas = new WWContainer().set_offset(0, 0).set_size(_insp_w - 30, 0);
 	var _insp_region = new WWViewScrollRegion().set_region_mode(true);
 	var _sbv = new WWScrollbarVert();
 	_insp_region.scrollbar_vert = _sbv;
 	_insp_region.set_scrollbars_enabled(false, true);
 	_insp_region.set_scrollbars_auto_hide(true, true);
-	_insp_region.set_scrollbar_thickness(14);
 	_insp_region.set_offset(10, 32);
 	_insp_region.set_size(_insp_w - 30, _body_h - 42);
 	_insp_region.set_canvas(_insp_canvas);
@@ -908,13 +868,12 @@ function build_ui_folder_demo() {
 	_nav_panel.add(_nav_search);
 	_state.nav_search = _nav_search;
 
-	var _nav_canvas = new WWCore().set_offset(0, 0).set_size(_nav_w - 30, 0);
+	var _nav_canvas = new WWContainer().set_offset(0, 0).set_size(_nav_w - 30, 0);
 	var _nav_region = new WWViewScrollRegion().set_region_mode(true);
 	var _nav_sbv = new WWScrollbarVert();
 	_nav_region.scrollbar_vert = _nav_sbv;
 	_nav_region.set_scrollbars_enabled(false, true);
 	_nav_region.set_scrollbars_auto_hide(true, true);
-	_nav_region.set_scrollbar_thickness(14);
 	_nav_region.set_offset(10, 42);
 	_nav_region.set_size(_nav_w - 30, _body_h - 52);
 	_nav_region.set_canvas(_nav_canvas);
@@ -929,8 +888,7 @@ function build_ui_folder_demo() {
 	var _btn_validate = new WWButtonText()
 		.set_offset(700, 16)
 		.set_size(130, 24)
-		.set_text("Validate")
-		.set_text_font(fnt_ww_consolas_msdf);
+		.set_text("Validate");
 	_btn_validate.set_callback(_ctx.validate);
 	root.add(_btn_validate);
 	_state.btn_validate = _btn_validate;
@@ -938,8 +896,7 @@ function build_ui_folder_demo() {
 	var _btn_reset = new WWButtonText()
 		.set_offset(840, 16)
 		.set_size(120, 24)
-		.set_text("Reset")
-		.set_text_font(fnt_ww_consolas_msdf);
+		.set_text("Reset");
 	_btn_reset.set_callback(_ctx.reset);
 	root.add(_btn_reset);
 	_state.btn_reset = _btn_reset;
@@ -947,20 +904,29 @@ function build_ui_folder_demo() {
 	var _btn_copy = new WWButtonText()
 		.set_offset(970, 16)
 		.set_size(130, 24)
-		.set_text("Copy Code")
-		.set_text_font(fnt_ww_consolas_msdf);
+		.set_text("Copy Code");
 	_btn_copy.set_callback(_ctx.copy_code);
 	root.add(_btn_copy);
 	_state.btn_copy = _btn_copy;
 
-	var _btn_theme = new WWButtonText()
+	var _theme_choice = variable_global_exists("ww_demo_theme_choice") ? global.ww_demo_theme_choice : "dark";
+	var _theme_dropdown = new WWDropdownSelect()
 		.set_offset(1110, 16)
 		.set_size(150, 24)
-		.set_text(_ctx.theme_button_text())
-		.set_text_font(fnt_ww_consolas_msdf);
-	_btn_theme.set_callback(_ctx.toggle_theme);
-	root.add(_btn_theme);
-	_state.btn_theme = _btn_theme;
+		.set_text("Theme...")
+		.set_options([
+			{ label: "Theme: Dark", value: "dark" },
+			{ label: "Theme: Light", value: "light" },
+			{ label: "Theme: Mono", value: "mono" },
+			{ label: "Theme: Duo", value: "duo" },
+			{ label: "Theme: Palette", value: "trio" },
+			{ label: "Theme: Components", value: "quad" }
+		])
+		.set_selected_value(_theme_choice);
+	var _theme_ctx = new __WWWorkbench_ThemeSelectCtx(_ctx, _theme_dropdown);
+	_theme_dropdown.on_event(_theme_dropdown.events.changed, _theme_ctx.run);
+	root.add(_theme_dropdown);
+	_state.theme_dropdown = _theme_dropdown;
 
 	_ctx.build_nav_list("");
 	workbench_ctx = _ctx;

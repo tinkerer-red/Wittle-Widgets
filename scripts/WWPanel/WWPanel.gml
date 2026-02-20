@@ -1,56 +1,14 @@
 #region jsDoc
 /// @func    WWPanel()
-/// @desc    A generic container that groups and organizes related UI elements.
+/// @desc    General-purpose themed panel for grouping content.
+///          Typical use: section blocks, settings groups, and card-like areas.
+///          Theme values are compiled by `wwThemeBuild`:
+///          - `panel.color.main.*` from surface/control paints
+///          - `panel.color.border.*` from outline/accent paints
 /// @returns {Struct.WWPanel}
 #endregion
-function WWPanel() : WWCore() constructor {
-    debug_name = "WWPanel";
-    
-    #region Public
-        
-        #region Builder Functions
-		#region jsDoc
-		/// @func    set_border_color()
-		/// @desc    Sets the border color for this panel.
-		/// @self    WWPanel
-		/// @param   {Real} color : The border color.
-		/// @returns {Struct.WWPanel}
-		#endregion
-        static set_border_color = function(_color) {
-            borderColor = _color;
-            return self;
-        }
-        #endregion
-        
-        #region Components
-        // No extra sub-components by default.
-        #endregion
-        
-        #region Events
-        // Inherits base events.
-        #endregion
-        
-        #region Variables
-        borderColor = c_black;
-        #endregion
-        
-        #region Functions
-        on_pre_draw(function(_input) {
-            // Draw a border
-            draw_set_color(borderColor);
-            draw_rectangle(x, y, x + width, y + height, false);
-        })
-        #endregion
-        
-    #endregion
-    
-    #region Private
-        
-        #region Variables
-        #endregion
-        
-        #region Functions
-        #endregion
-        
-    #endregion
+function WWPanel() : WWCanvas() constructor {
+	debug_name = "WWPanel";
+	set_theme_role("panel");
+	__draw_border__ = true;
 }

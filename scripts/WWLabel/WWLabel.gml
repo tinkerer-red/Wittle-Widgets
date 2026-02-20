@@ -72,18 +72,34 @@ function WWLabel() : WWTextRenderer() constructor {
             /// @returns {Struct.WWLabel}
             #endregion
             static set_text_processor = function(_proc_or_name) {
+				static __base_set_text_processor__ = WWTextRenderer.set_text_processor;
+				static __base_clear_text_processor__ = WWTextRenderer.clear_text_processor;
+				
+				var _proc = _proc_or_name;
 				if (is_string(_proc_or_name)) {
-					var _name = string_lower(_proc_or_name);
+					var _name = string_lower(string_trim(_proc_or_name));
 					switch (_name) {
-					    case "bbcode":   set_text_processor(_proc_or_name); break;
-					    case "md":
-						case "markdown": set_text_processor(_proc_or_name); break;
-					    case "css":      set_text_processor(_proc_or_name); break;
-					    default: clear_text_processor(); break;
+						case "bbcode":
+							_proc = asset_get_index("WWTextProcessorBBCode");
+							break;
+						case "md":
+						case "markdown":
+							_proc = asset_get_index("WWTextProcessorMarkdown");
+							break;
+						case "css":
+							_proc = asset_get_index("WWTextProcessorCss");
+							break;
+						default:
+							_proc = undefined;
+							break;
 					}
 				}
+				
+				if (is_callable(_proc)) {
+					__base_set_text_processor__(_proc);
+				}
 				else {
-					set_text_processor(_proc_or_name);
+					__base_clear_text_processor__();
 				}
 
                 __label_update_size__();

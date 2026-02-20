@@ -160,7 +160,6 @@ function GUICompDropdown() : GUICompController() constructor {
 					/// image_index[2] = mouse down; actively being pressed;
 					/// image_index[3] = disabled; not allowed to interact with;
 					
-					__button__.set_sprite(_sprite);
 					
 					sprite_header = _sprite;
 					
@@ -656,7 +655,6 @@ function GUICompDropdown() : GUICompController() constructor {
 			__default_text__ = text.content;
 			
 			__button__ = new WWButtonText()
-					.set_sprite(sprite_header)
 					.set_alignment(fa_left, fa_top)
 			
 			#region Adopt Events
@@ -799,7 +797,6 @@ function GUICompDropdown() : GUICompController() constructor {
 		
 	#endregion
 	
-	set_sprite(s9DropDown);
 	set_sprite_to_auto_wrap();
 }
 

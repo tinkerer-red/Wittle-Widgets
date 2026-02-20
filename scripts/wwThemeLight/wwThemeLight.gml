@@ -87,5 +87,105 @@ function wwThemeLight() {
 		overlay: { modal_shade: { color: #000000, alpha: 0.30 } }
 	};
 
+	// Component-level scrollbar paints (used by direct theme keys).
+	theme.scrollbar = {
+		color: {
+			thumb: {
+				idle: #8EA0B8,
+				hover: #6B7C96,
+				active: #445A7A,
+				focused: #6B7C96,
+				disabled: #B7C1D3
+			},
+			tray: {
+				idle: #E8EEF7
+			},
+			gutter: {
+				idle: #E8EEF7
+			},
+			trough: {
+				idle: #E8EEF7
+			},
+			button: {
+				up: {
+					idle: #D2DAE6,
+					hover: #B6C2D3,
+					active: #8EA0B8,
+					focused: #B6C2D3,
+					disabled: #E8EEF7
+				},
+				down: {
+					idle: #D2DAE6,
+					hover: #B6C2D3,
+					active: #8EA0B8,
+					focused: #B6C2D3,
+					disabled: #E8EEF7
+				},
+				left: {
+					idle: #D2DAE6,
+					hover: #B6C2D3,
+					active: #8EA0B8,
+					focused: #B6C2D3,
+					disabled: #E8EEF7
+				},
+				right: {
+					idle: #D2DAE6,
+					hover: #B6C2D3,
+					active: #8EA0B8,
+					focused: #B6C2D3,
+					disabled: #E8EEF7
+				}
+			}
+		},
+		alpha: {
+			thumb: {
+				idle: 0.90,
+				hover: 1.00,
+				active: 1.00,
+				focused: 1.00,
+				disabled: 0.55
+			},
+			tray: {
+				idle: 1.00
+			},
+			gutter: {
+				idle: 1.00
+			},
+			trough: {
+				idle: 1.00
+			},
+			button: {
+				up: {
+					idle: 1.00,
+					hover: 1.00,
+					active: 1.00,
+					focused: 1.00,
+					disabled: 0.55
+				},
+				down: {
+					idle: 1.00,
+					hover: 1.00,
+					active: 1.00,
+					focused: 1.00,
+					disabled: 0.55
+				},
+				left: {
+					idle: 1.00,
+					hover: 1.00,
+					active: 1.00,
+					focused: 1.00,
+					disabled: 0.55
+				},
+				right: {
+					idle: 1.00,
+					hover: 1.00,
+					active: 1.00,
+					focused: 1.00,
+					disabled: 0.55
+				}
+			}
+		}
+	};
+
 	return theme;
 }

@@ -55,12 +55,13 @@ function WWDropdownCombo() : WWDropdownSelect() constructor {
 			__input_header__ = new WWInputString()
 				.set_size(140, 24);
 			__header_chevron__ = new WWLabel()
-				.set_text("v")
-				.set_text_color(c_white);
+				.set_text("v");
 			__header_divider__ = new WWCore()
-				.set_size(1, 14)
-				.set_background_color(make_color_rgb(96, 96, 104));
+				.set_size(1, 14);
 			__header_chrome_width__ = 20;
+			__theme_header_bg__ = undefined;
+			__theme_divider_col__ = undefined;
+			__theme_input_text__ = undefined;
 		#endregion
 		
 		#region Functions
@@ -71,6 +72,19 @@ function WWDropdownCombo() : WWDropdownSelect() constructor {
 			__header_divider__.set_offset(max(0, _w - __header_chrome_width__), max(0, floor((_h - __header_divider__.height) * 0.5)));
 			__header_chevron__.set_offset(max(0, _w - __header_chrome_width__ + 6), max(0, floor((_h - __header_chevron__.height) * 0.5)));
 		}
+
+		static __apply_theme_header_chrome__ = function() {
+			var _header_bg = wwThemeGetColor("colors.surface.control.color");
+			var _divider_col = wwThemeGetColor("colors.outline.normal.color");
+			var _input_text = wwThemeGetColor("colors.text.primary.color");
+
+			if (_header_bg != undefined) __theme_header_bg__ = _header_bg;
+			if (_divider_col != undefined) __theme_divider_col__ = _divider_col;
+			if (_input_text != undefined) __theme_input_text__ = _input_text;
+
+			// Intentionally avoid force-setting visuals here.
+			// Components should render from theme defaults/fallbacks.
+		}
 		#endregion
 	#endregion
 	
@@ -80,13 +94,11 @@ function WWDropdownCombo() : WWDropdownSelect() constructor {
 	set_text("Select...");
 	
 	// Light visual affordance so combo reads like a dropdown, not a plain text box.
-	__input_header__.set_background_color(make_color_rgb(42, 42, 48));
-	__input_header__.get_region().set_background_color(make_color_rgb(42, 42, 48));
-	__input_header__.get_field().set_background_color(make_color_rgb(42, 42, 48));
-	__input_header__.get_field().set_text_color(c_white);
+	__apply_theme_header_chrome__();
 	__sync_header_chrome__();
 	
 	on_pre_step(function(_input) {
+		__apply_theme_header_chrome__();
 		if (!mouse_check_button_pressed(mb_left)) return;
 		if (__input_header__.mouse_on_group()) {
 			set_open(true);

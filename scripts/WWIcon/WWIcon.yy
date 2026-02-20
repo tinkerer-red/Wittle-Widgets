@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWIcon",
   "parent":{
-    "name":"AI Driven",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/AI Driven.yy",
+    "name":"Rendering",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Rendering.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

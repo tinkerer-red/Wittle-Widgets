@@ -103,7 +103,6 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 			__button__ = new WWButtonText()
 				.set_offset(0,0)
 				.set_text("")
-				.set_sprite(s9CPButton)
 				.set_text_alignment(fa_left, fa_top)
 				.set_alignment(fa_left, fa_top)
 			
@@ -126,8 +125,6 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 				.set_scrollbar_sizes(0, 0)
 				.set_text(string(_value))
 				.set_text_font(__CP_FONT)
-				.set_text_color(c_white)
-				.set_background_color(#2B2D31)
 				.set_highlight_color(#800000)
 				.set_max_length(20)
 				.set_char_enforcement("0123456789.-")
@@ -203,24 +200,20 @@ function ControlPanelReal(_label="<Missing Label>", _value, _func) : GUICompCont
 					
 					switch (_image_index) {
 						case GUI_IMAGE_ENABLED : {
-							__scrolling_text__.set_text_color(__button__.text.color.idle);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.set_scroll_looping(true, false)
 							__scrolling_text__.reset_scrolling();
 						break;}
 						case GUI_IMAGE_HOVER: {
-							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_PRESSED: {
-							__scrolling_text__.set_text_color(__button__.text.color.hover);
 							__scrolling_text__.set_text_offsets(0, __button__.text.click_yoff);
 							__scrolling_text__.set_scroll_pause(false);
 						break;}
 						case GUI_IMAGE_DISABLED: {
-							__scrolling_text__.set_text_color(__button__.text.color.disable);
 							__scrolling_text__.set_text_offsets(0, 0);
 							__scrolling_text__.set_scroll_pause(true);
 							__scrolling_text__.reset_scrolling();

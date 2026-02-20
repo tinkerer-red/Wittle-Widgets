@@ -1,80 +1,134 @@
 #macro __WW_THEME_PATH_NOT_FOUND -987654321
 
 function wwThemeBuild(_theme_or_layers = undefined, _opts = undefined) {
-	/// Builds a "compiled" theme struct for fast access.
-	///
-	/// - Accepts either a single theme struct or an array of layers.
-	/// - If an array is provided, layers are composed in order (later overrides earlier).
-	/// - Produces a NEW struct where any dotted-path strings that point into the theme
-	///   are replaced by direct struct/value references.
-	/// - Optionally derives missing colors/palette entries (YUI-inspired).
-	///
-	/// NOTE: Regular strings like IDs/names remain strings. Only resolvable dotted-path
-	/// references are replaced.
+	/// Stage builder:
+	/// 01 derive -> 02 palette -> 03 tokens -> 04 components -> 05 states
+	/// Returns nested built theme. Use wwThemeCompile() for runtime flat map.
+	var _opts_norm = __wwThemeBuildApplyOpts(_opts);
+	var _source = undefined;
 
-	var opts = __wwThemeBuildApplyOpts(_opts);
-
-	// 1) compose layers (if needed)
-	var theme;
 	if (_theme_or_layers == undefined) {
-		theme = wwThemeDefault();
+		_source = wwThemeDefault();
 	}
 	else if (is_array(_theme_or_layers)) {
-		theme = wwThemeCompose(_theme_or_layers);
+		var _layers = [];
+		if (_opts_norm[$ "use_default_base"]) {
+			array_push(_layers, wwThemeDefault());
+		}
+		var _src_count = array_length(_theme_or_layers);
+		for (var _li = 0; _li < _src_count; _li++) {
+			array_push(_layers, _theme_or_layers[_li]);
+		}
+		_source = wwThemeCompose(_layers);
 	}
 	else {
-		theme = _theme_or_layers;
-	}
-
-	// 2) clone so we can safely add derived values + resolve references in-place
-	var built = variable_clone(theme);
-
-	// 3) normalize schema so bake output has a predictable shape.
-	if (opts[$ "normalize_schema"]) {
-		__wwThemeNormalizeSchema(built, opts);
-	}
-
-	// 4) derive missing paints/palette
-	if (opts[$ "derive_missing_colors"]) {
-		__wwThemeDeriveMissing(built, opts);
-	}
-
-	// 5) resolve any dotted-path strings to direct values/struct references
-	if (opts[$ "resolve_paths"]) {
-		__wwThemeResolveAll(built, opts[$ "max_resolve_passes"]);
-	}
-
-	// 6) compile typography conveniences (optional)
-	if (opts[$ "resolve_typography"]) {
-		__wwThemeCompileTypography(built, opts);
-		if (opts[$ "resolve_paths"]) {
-			// Typography compilation can introduce/retain references; resolve once more.
-			__wwThemeResolveAll(built, 2);
+		if (_opts_norm[$ "use_default_base"]) {
+			_source = wwThemeCompose([wwThemeDefault(), _theme_or_layers]);
+		}
+		else {
+			_source = _theme_or_layers;
 		}
 	}
 
-	// 7) optional strict check
-	if (opts[$ "strict_no_path_strings"]) {
-		var _left = __wwThemeCountResolvablePathStrings(built);
-		if (_left > 0) {
-			show_debug_message("wwThemeBuild strict: unresolved path strings remaining: " + string(_left));
+	var _out = {};
+
+	__wwThemeBuild01Derive(_source, _out);
+	__wwThemeBuild02Palette(_source, _out);
+	__wwThemeBuild03Tokens(_source, _out);
+	__wwThemeBuild04Components(_source, _out);
+	__wwThemeBuild05States(_source, _out);
+
+	return _out;
+}
+
+function wwThemeCompile(_theme) {
+	/// Flattens a built theme into a leaf-only key/value map for runtime fetches.
+	var _flat = {};
+	if (!is_struct(_theme)) return _flat;
+	var _visit_key = "__ww_compile_visit__";
+	var _visit_token = string(current_time) + "_" + string(irandom(1000000000));
+	var _stack = [{ node: _theme, path: "", enter: true }];
+	var _marked = [];
+	var _had_cycle = false;
+	var _cycle_path = "";
+	while (array_length(_stack) > 0) {
+		var _idx = array_length(_stack) - 1;
+		var _record = _stack[_idx];
+		array_resize(_stack, _idx);
+
+		var _node = _record.node;
+		var _path = _record.path;
+		var _enter = _record.enter;
+
+		if (is_struct(_node)) {
+			if (_enter) {
+				if (variable_struct_exists(_node, _visit_key) && variable_struct_get(_node, _visit_key) == _visit_token) {
+					_had_cycle = true;
+					_cycle_path = _path;
+					break;
+				}
+
+				variable_struct_set(_node, _visit_key, _visit_token);
+				array_push(_marked, _node);
+
+				// Exit marker pass for unmarking after children.
+				array_push(_stack, { node: _node, path: _path, enter: false });
+
+				var _names = variable_struct_get_names(_node);
+				for (var _i = 0; _i < array_length(_names); _i++) {
+					var _k = _names[_i];
+					if (_k == _visit_key) continue;
+
+					var _child = variable_struct_get(_node, _k);
+					var _next = (_path == "") ? string(_k) : (_path + "." + string(_k));
+					array_push(_stack, { node: _child, path: _next, enter: true });
+				}
+			}
+			else {
+				if (variable_struct_exists(_node, _visit_key)) {
+					variable_struct_remove(_node, _visit_key);
+				}
+			}
+			continue;
+		}
+
+		if (_enter) {
+			if (is_array(_node)) continue;
+			if (_path == "" || _node == undefined) continue;
+
+			variable_struct_set(_flat, _path, _node);
 		}
 	}
 
-	return built;
+	// Ensure temporary marker cleanup even after early cycle break.
+	for (var _m = 0; _m < array_length(_marked); _m++) {
+		var _marked_node = _marked[_m];
+		if (is_struct(_marked_node) && variable_struct_exists(_marked_node, _visit_key)) {
+			variable_struct_remove(_marked_node, _visit_key);
+		}
+	}
+
+	if (_had_cycle) {
+		show_error("wwThemeCompile: recursive struct reference detected at path '" + _cycle_path + "'.", true);
+	}
+
+	__wwThemeAddIdleAliases(_flat);
+
+	if (!variable_struct_exists(_flat, "fallback.sprite")) variable_struct_set(_flat, "fallback.sprite", spr_ww_pixel);
+	if (!variable_struct_exists(_flat, "fallback.color")) variable_struct_set(_flat, "fallback.color", #FF00FF);
+	if (!variable_struct_exists(_flat, "fallback.alpha")) variable_struct_set(_flat, "fallback.alpha", 1);
+	if (!variable_struct_exists(_flat, "fallback.size")) variable_struct_set(_flat, "fallback.size", 0);
+	if (!variable_struct_exists(_flat, "fallback.icon")) variable_struct_set(_flat, "fallback.icon", -1);
+	if (!variable_struct_exists(_flat, "fallback.font")) variable_struct_set(_flat, "fallback.font", fnt_ww_default_small_msdf);
+
+	return _flat;
 }
 
 #region Helpers
 
 function __wwThemeBuildApplyOpts(_opts) {
 	var opts = {
-		normalize_schema: true,
-		derive_missing_colors: true,
-		resolve_paths: true,
-		resolve_typography: true,
-		apply_text_scale: true,
-		max_resolve_passes: 6,
-		strict_no_path_strings: false,
+		use_default_base: true,
 		mode_override: undefined
 	};
 	if (is_struct(_opts)) {
@@ -88,87 +142,33 @@ function __wwThemeBuildApplyOpts(_opts) {
 	return opts;
 }
 
-function __wwThemeNormalizeSchema(_theme, _opts) {
-	if (!is_struct(_theme)) { return; }
+function __wwThemeEnsureRequiredFallbacks(_theme) {
+	if (!is_struct(_theme)) return;
 
-	if (!variable_struct_exists(_theme, "meta") || !is_struct(_theme.meta)) {
-		_theme.meta = {};
-	}
-	if (!variable_struct_exists(_theme, "schema") || !is_struct(_theme.schema)) {
-		_theme.schema = { id: "ww_theme_schema", version: 1 };
-	}
-	if (!variable_struct_exists(_theme.schema, "id")) {
-		_theme.schema.id = "ww_theme_schema";
-	}
-	if (!variable_struct_exists(_theme.schema, "version")) {
-		_theme.schema.version = 1;
+	__wwEnsureStructPath(_theme, "fallback");
+	var _fallback = _theme.fallback;
+
+	if (!variable_struct_exists(_fallback, "sprite") || _fallback.sprite == undefined) {
+		var _spr = spr_ww_pixel;
+		_fallback.sprite = _spr;
 	}
 
-	__wwEnsureStructPath(_theme, "assets");
-	__wwEnsureStructPath(_theme, "assets.sprites");
-	__wwEnsureStructPath(_theme, "assets.icons");
-
-	var _sprites = _theme.assets.sprites;
-
-	// Canonical sprite slots (new naming): each is a struct { main, overlay, ... }.
-	// Keep "pixel" as a direct sprite id token.
-	__wwThemeNormalizeSpriteSlot(_sprites, "button");
-	__wwThemeNormalizeSpriteSlot(_sprites, "button_text");
-	__wwThemeNormalizeSpriteSlot(_sprites, "checkbox");
-	__wwThemeNormalizeSpriteSlot(_sprites, "radio");
-	__wwThemeNormalizeSpriteSlot(_sprites, "slider");
-	__wwThemeNormalizeSpriteSlot(_sprites, "slider_bar");
-	__wwThemeNormalizeSpriteSlot(_sprites, "slider_thumb");
-	__wwThemeNormalizeSpriteSlot(_sprites, "combo");
-	__wwThemeNormalizeSpriteSlot(_sprites, "dropdown");
-	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_horz");
-	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_horz_thumb");
-	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_vert");
-	__wwThemeNormalizeSpriteSlot(_sprites, "scrollbar_vert_thumb");
-	__wwThemeNormalizeSpriteSlot(_sprites, "close");
-
-	// Legacy checkbox keys -> new slot fields.
-	var _checkbox = _sprites.checkbox;
-	if (variable_struct_exists(_sprites, "checkbox_checked") && _checkbox.check == undefined) {
-		_checkbox.check = _sprites.checkbox_checked;
+	if (!variable_struct_exists(_fallback, "color") || _fallback.color == undefined) {
+		_fallback.color = #FF00FF;
 	}
-	if (variable_struct_exists(_sprites, "checkbox_unchecked") && _checkbox.uncheck == undefined) {
-		_checkbox.uncheck = _sprites.checkbox_unchecked;
+	if (!variable_struct_exists(_fallback, "alpha") || _fallback.alpha == undefined) {
+		_fallback.alpha = 1;
 	}
-
-	// Reasonable fallback for checkbox visuals.
-	if (_checkbox.main == undefined) {
-		_checkbox.main = _checkbox.uncheck;
+	if (!variable_struct_exists(_fallback, "size") || _fallback.size == undefined) {
+		_fallback.size = 0;
 	}
-	if (_checkbox.uncheck == undefined) {
-		_checkbox.uncheck = _checkbox.main;
+	if (!variable_struct_exists(_fallback, "icon") || _fallback.icon == undefined) {
+		_fallback.icon = -1;
 	}
-}
-
-function __wwThemeNormalizeSpriteSlot(_sprites, _slot_name) {
-	if (!is_struct(_sprites)) { return { main: undefined, overlay: undefined }; }
-
-	var _raw = variable_struct_exists(_sprites, _slot_name)
-		? variable_struct_get(_sprites, _slot_name)
-		: undefined;
-
-	if (is_struct(_raw)) {
-		if (!variable_struct_exists(_raw, "main")) {
-			if (variable_struct_exists(_raw, "sprite")) _raw.main = _raw.sprite;
-			else _raw.main = undefined;
-		}
-		if (!variable_struct_exists(_raw, "overlay")) {
-			_raw.overlay = undefined;
-		}
-		return _raw;
+	if (!variable_struct_exists(_fallback, "font") || _fallback.font == undefined) {
+		var _font = fnt_ww_default_small_msdf;
+		_fallback.font = _font;
 	}
-
-	var _slot = {
-		main: _raw,
-		overlay: undefined
-	};
-	variable_struct_set(_sprites, _slot_name, _slot);
-	return _slot;
 }
 
 function __wwThemeComposeFallback(_layers) {
@@ -179,81 +179,6 @@ function __wwThemeComposeFallback(_layers) {
 		_out = wwThemeMerge(_out, _layers[i]);
 	}
 	return _out;
-}
-
-function __wwThemeResolveAll(_root, _max_passes) {
-	_max_passes = max(1, _max_passes);
-	for (var pass = 0; pass < _max_passes; pass++) {
-		var changed = __wwThemeResolveNode(_root, _root);
-		if (changed <= 0) { break; }
-	}
-}
-
-function __wwThemeResolveNode(_root, _node) {
-	var changed = 0;
-	if (is_struct(_node)) {
-		var keys = variable_struct_get_names(_node);
-		var n = array_length(keys);
-		for (var i = 0; i < n; i++) {
-			var k = keys[i];
-			var v = variable_struct_get(_node, k);
-			var nv = __wwThemeMaybeResolvePathValue(_root, v);
-			if (nv != v) {
-				variable_struct_set(_node, k, nv);
-				changed += 1;
-				v = nv;
-			}
-			changed += __wwThemeResolveNode(_root, v);
-		}
-		return changed;
-	}
-	if (is_array(_node)) {
-		var n = array_length(_node);
-		for (var i = 0; i < n; i++) {
-			var v = _node[i];
-			var nv = __wwThemeMaybeResolvePathValue(_root, v);
-			if (nv != v) {
-				_node[i] = nv;
-				changed += 1;
-				v = nv;
-			}
-			changed += __wwThemeResolveNode(_root, v);
-		}
-	}
-	return changed;
-}
-
-function __wwThemeMaybeResolvePathValue(_root, _value) {
-	if (!is_string(_value)) { return _value; }
-	if (string_pos(".", _value) <= 0) { return _value; }
-
-	// Only treat as a theme-path if it resolves.
-	var resolved = __wwThemePathGet(_root, _value);
-	if (resolved != __WW_THEME_PATH_NOT_FOUND) { return resolved; }
-
-	// Shorthand aliases (keep theme definitions clean/readable).
-	// e.g. "fonts.ui.strong" -> "typography.fonts.ui.strong"
-	var alias = __wwThemeExpandAliasPath(_value);
-	if (alias != _value) {
-		resolved = __wwThemePathGet(_root, alias);
-		if (resolved != __WW_THEME_PATH_NOT_FOUND) { return resolved; }
-	}
-
-	return _value;
-}
-
-function __wwThemeExpandAliasPath(_path) {
-	// Expand common shorthand roots used in theme definitions.
-	// If no alias matches, returns the original string.
-	if (!is_string(_path)) return _path;
-
-	if (string_pos("fonts.", _path) == 1) return "typography." + _path;
-	if (string_pos("text_styles.", _path) == 1) return "typography." + _path;
-	if (string_pos("sizes_px.", _path) == 1) return "typography." + _path;
-	if (string_pos("line_height.", _path) == 1) return "typography." + _path;
-	if (string_pos("styles.", _path) == 1) return "typography.text_styles." + string_delete(_path, 1, 7);
-
-	return _path;
 }
 
 function __wwThemePathGet(_root, _path) {
@@ -274,35 +199,6 @@ function __wwThemePathGet(_root, _path) {
 		cur = variable_struct_get(cur, part);
 	}
 	return cur;
-}
-
-function __wwThemeCountResolvablePathStrings(_root) {
-	return __wwThemeCountResolvablePathStringsNode(_root, _root);
-}
-
-function __wwThemeCountResolvablePathStringsNode(_root, _node) {
-	var count = 0;
-	if (is_struct(_node)) {
-		var keys = variable_struct_get_names(_node);
-		var n = array_length(keys);
-		for (var i = 0; i < n; i++) {
-			var v = variable_struct_get(_node, keys[i]);
-			if (is_string(v) && string_pos(".", v) > 0) {
-				if (__wwThemePathGet(_root, v) != __WW_THEME_PATH_NOT_FOUND) {
-					count += 1;
-				}
-			}
-			count += __wwThemeCountResolvablePathStringsNode(_root, v);
-		}
-		return count;
-	}
-	if (is_array(_node)) {
-		var n = array_length(_node);
-		for (var i = 0; i < n; i++) {
-			count += __wwThemeCountResolvablePathStringsNode(_root, _node[i]);
-		}
-	}
-	return count;
 }
 
 function __wwThemeDeriveMissing(_theme, _opts) {
@@ -590,67 +486,106 @@ function __wwColorShiftHue(_source_color, _hue_color, _luma_factor) {
 	return __wwColorSetLuma(_hue_color, target_luma);
 }
 
-function __wwThemeCompileTypography(_theme, _opts) {
-	if (!variable_struct_exists(_theme, "typography") || !is_struct(_theme.typography)) return;
-	var t = _theme.typography;
-	if (!variable_struct_exists(t, "text_styles") || !is_struct(t.text_styles)) return;
+function __wwThemeSetPath(_root, _path, _value) {
+	if (!is_struct(_root) || !is_string(_path) || _path == "") return false;
 
-	var scale = 1.0;
-	if (_opts[$ "apply_text_scale"] && variable_struct_exists(_theme, "scale") && is_struct(_theme.scale) && variable_struct_exists(_theme.scale, "text")) {
-		scale = _theme.scale.text;
+	var _parts = __wwSplitPath(_path);
+	var _n = array_length(_parts);
+	if (_n <= 0) return false;
+
+	var _cur = _root;
+	for (var _i = 0; _i < _n - 1; _i++) {
+		var _part = _parts[_i];
+		if (!variable_struct_exists(_cur, _part) || !is_struct(variable_struct_get(_cur, _part))) {
+			variable_struct_set(_cur, _part, {});
+		}
+		_cur = variable_struct_get(_cur, _part);
 	}
 
-	// Normalize sizes: if size is a key like "md", replace with px value.
-	var sizes = (variable_struct_exists(t, "sizes_px") && is_struct(t.sizes_px)) ? t.sizes_px : undefined;
+	variable_struct_set(_cur, _parts[_n - 1], _value);
+	return true;
+}
 
-	var style_keys = variable_struct_get_names(t.text_styles);
-	var n = array_length(style_keys);
-	for (var i = 0; i < n; i++) {
-		var key = style_keys[i];
-		var style = variable_struct_get(t.text_styles, key);
-		if (!is_struct(style)) continue;
+function __wwThemeAddIdleAliases(_flat) {
+	if (!is_struct(_flat)) return;
 
-		// Resolve "size" symbolic tokens.
-		if (sizes != undefined && variable_struct_exists(style, "size") && is_string(style.size)) {
-			if (variable_struct_exists(sizes, style.size)) {
-				style.size = round(variable_struct_get(sizes, style.size) * scale);
-			}
-		}
-		else if (variable_struct_exists(style, "size") && is_numeric(style.size)) {
-			style.size = round(style.size * scale);
-		}
+	var _keys = variable_struct_get_names(_flat);
+	var _n = array_length(_keys);
+	for (var _i = 0; _i < _n; _i++) {
+		var _key = _keys[_i];
+		if (!is_string(_key) || _key == "") continue;
+		if (string_pos("__meta__", _key) == 1) continue;
 
-		// New canonical naming:
-		// - font_asset: resolved GM font
-		// - paint: resolved { color, alpha }
-		// Keep legacy aliases (font/color) mirrored for compatibility.
-		if (variable_struct_exists(style, "font_asset")) {
-			style.font = style.font_asset;
-		}
-		else if (variable_struct_exists(style, "font")) {
-			style.font_asset = style.font;
-		}
+		var _value = variable_struct_get(_flat, _key);
+		if (is_struct(_value) || is_array(_value)) continue;
 
-		var _paint = undefined;
-		if (variable_struct_exists(style, "paint")) _paint = style.paint;
-		else if (variable_struct_exists(style, "color")) _paint = style.color;
-		_paint = __wwPaintEnsure(_paint);
-		if (is_struct(_paint) && _paint.color == undefined) {
-			var _fallback_paint = __wwThemeGetPaint(_theme, "colors.text.primary");
-			if (is_struct(_fallback_paint)) {
-				_paint = __wwPaintEnsure(_fallback_paint);
-			}
-		}
-		style.paint = _paint;
-		style.color = _paint;
+		var _last = __wwThemePathLastSegment(_key);
+		if (__wwThemeIsStateSegment(_last)) continue;
 
-		if (variable_struct_exists(style, "size")) {
-			style.size_px = style.size;
-		}
-		else if (variable_struct_exists(style, "size_px")) {
-			style.size = style.size_px;
+		if (!__wwThemePathSupportsIdleAlias(_key)) continue;
+
+		var _idle_key = _key + ".idle";
+		if (!variable_struct_exists(_flat, _idle_key)) {
+			variable_struct_set(_flat, _idle_key, _value);
 		}
 	}
+}
+
+function __wwThemePathLastSegment(_path) {
+	if (!is_string(_path) || _path == "") return "";
+
+	var _len = string_length(_path);
+	for (var _i = _len; _i >= 1; _i--) {
+		if (string_char_at(_path, _i) == ".") {
+			return string_copy(_path, _i + 1, _len - _i);
+		}
+	}
+	return _path;
+}
+
+function __wwThemeIsStateSegment(_segment) {
+	if (!is_string(_segment) || _segment == "") return false;
+
+	switch (_segment) {
+		case "idle":
+		case "hover":
+		case "active":
+		case "focused":
+		case "disabled":
+		case "checked":
+		case "unchecked":
+		case "selected":
+		case "warning":
+		case "error":
+			return true;
+	}
+	return false;
+}
+
+function __wwThemePathSupportsIdleAlias(_path) {
+	if (!is_string(_path) || _path == "") return false;
+
+	var _parts = __wwSplitPath(_path);
+	var _count = array_length(_parts);
+	if (_count < 3) return false;
+
+	var _root = _parts[0];
+	if (_root == "fallback"
+	|| _root == "meta"
+	|| _root == "schema"
+	|| _root == "palette"
+	|| _root == "colors"
+	|| _root == "compiled") {
+		return false;
+	}
+
+	var _type = _parts[1];
+	return (_type == "sprite"
+		|| _type == "color"
+		|| _type == "alpha"
+		|| _type == "size"
+		|| _type == "font"
+		|| _type == "icon");
 }
 
 #endregion

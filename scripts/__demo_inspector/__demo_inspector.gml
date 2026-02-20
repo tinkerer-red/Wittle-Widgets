@@ -364,8 +364,7 @@ function ww_inspector_build_workbench_tree(_canvas, _leaf_constructor_name, _ins
 
 				var _row = new WWCore()
 					//.set_offset(0, 0)
-					.set_size(_bf.width - 16, 26)
-					.set_background_color(_theme.panel_alt);
+					.set_size(_bf.width - 16, 26);
 				_bf.add(_row);
 				if (_debug_builder) {
 					//_row.set_debug(true);
@@ -384,8 +383,7 @@ function ww_inspector_build_workbench_tree(_canvas, _leaf_constructor_name, _ins
 				var _lbl = new WWLabel()
 					.set_offset(6, 4)
 					.set_size(120, 18)
-					.set_text(string(_arg_name))
-					.set_text_color(_theme.text_dim);
+					.set_text(string(_arg_name));
 				_row.add(_lbl);
 				if (_debug_builder) {
 					//_lbl.set_debug(true);
@@ -461,7 +459,6 @@ function ww_inspector_build_workbench_tree(_canvas, _leaf_constructor_name, _ins
 						var _in = new WWColorInput()
 							.set_offset(_x, _y)
 							.set_size(_in_w, 22)
-							.set_color(real(_val), 1)
 							.set_use_alpha(false);
 						var _ctx = { on_apply: _on_apply, builder: _builder_name, args: _current, index: _ai, input: _in };
 						_in.on_color_change(method(_ctx, function(_d) {
@@ -582,9 +579,7 @@ function ww_inspector_build_tree_ui(_root_container, _sections, _theme) {
 
 			var _row = new WWLabel()
 				.set_size(300, 20)
-				.set_text(_signature)
-				.set_text_color(_theme.text_dim)
-				.set_background_color(_theme.panel_alt);
+				.set_text(_signature);
 
 			_folder.add(_row);
 

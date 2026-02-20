@@ -3,40 +3,23 @@ __build_ui__ = function() {
     var _root = new WWCore()
         .set_offset(0, 0)
         .set_size(1280, 720)
-        .set_background_color(c_black)
         .set_enabled(true);
 
     // Theme
-	var _t = wwThemeGet();
-	var _meta = (is_struct(_t)) ? variable_struct_get(_t, "meta") : undefined;
-	var _mode = (_meta != undefined) ? variable_struct_get(_meta, "mode") : "";
-	if (_mode == "") { _t = wwThemeSet(wwThemeDark()); }
-	var __paint_color__ = function(_paint, _fallback) {
-		if (_paint == undefined) return _fallback;
-		var _c = variable_struct_get(_paint, "color");
-		return (_c != undefined) ? _c : _fallback;
-	};
-	var _colors = (is_struct(_t)) ? variable_struct_get(_t, "colors") : undefined;
-	var _app = (_colors != undefined) ? variable_struct_get(_colors, "app") : undefined;
-	var _surface = (_colors != undefined) ? variable_struct_get(_colors, "surface") : undefined;
-	var _text = (_colors != undefined) ? variable_struct_get(_colors, "text") : undefined;
-	var _outline = (_colors != undefined) ? variable_struct_get(_colors, "outline") : undefined;
+    var _page_bg = wwThemeGetColor("colors.app.bg.color");
+    var _card_bg = wwThemeGetColor("colors.surface.panel.color");
+    var _card_hdr = wwThemeGetColor("colors.surface.panel_alt.color");
+    var _textbox_bg = wwThemeGetColor("colors.surface.control.color");
 
-    var _page_bg = __paint_color__((_app != undefined) ? variable_struct_get(_app, "bg") : undefined, make_color_rgb(16, 16, 18));
-    var _card_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel") : undefined, make_color_rgb(46, 46, 52));
-    var _card_hdr = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(34, 34, 38));
-    var _textbox_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "control") : undefined, make_color_rgb(24, 24, 26));
-
-    var _subtitle_color = __paint_color__((_text != undefined) ? variable_struct_get(_text, "dim") : undefined, make_color_rgb(180, 180, 190));
-    var _footer_bg = __paint_color__((_surface != undefined) ? variable_struct_get(_surface, "panel_alt") : undefined, make_color_rgb(34, 34, 38));
-    var _footer_color = __paint_color__((_text != undefined) ? variable_struct_get(_text, "secondary") : undefined, make_color_rgb(200, 200, 210));
-	var _divider_color = __paint_color__((_outline != undefined) ? variable_struct_get(_outline, "subtle") : undefined, make_color_rgb(60, 60, 68));
+    var _subtitle_color = wwThemeGetColor("colors.text.dim.color");
+    var _footer_bg = wwThemeGetColor("colors.surface.panel_alt.color");
+    var _footer_color = wwThemeGetColor("colors.text.secondary.color");
+	var _divider_color = wwThemeGetColor("colors.outline.subtle.color");
 
     // Backdrop
     var _page_backdrop = new WWCore()
         .set_offset(12, 12)
-        .set_size(1256, 696)
-        .set_background_color(_page_bg);
+        .set_size(1256, 696);
     _root.add(_page_backdrop);
 
     // Header bar
@@ -47,8 +30,7 @@ __build_ui__ = function() {
 
     var _header_back = new WWCore()
         .set_offset(_header_x, _header_y)
-        .set_size(_header_w, _header_h)
-        .set_background_color(_card_hdr);
+        .set_size(_header_w, _header_h);
     _root.add(_header_back);
 
     // Title and subtitle (slightly nicer spacing)
@@ -58,17 +40,14 @@ __build_ui__ = function() {
     var _title_label = new WWLabel()
         .set_offset(_header_x + 12, _header_y + 6)
         .set_size(_header_w - 340, 24)
-        .set_text(_title_text)
-        .set_text_color(c_white)
-        .set_text_font(fnt_ww_default_big);
+        .set_text(_title_text);
     _root.add(_title_label);
 
     if (!is_undefined(subtitle)) {
         var _subtitle_label = new WWLabel()
             .set_offset(_header_x + 12, _header_y + 30)
             .set_size(_header_w - 340, 18)
-            .set_text(subtitle)
-            .set_text_color(_subtitle_color);
+            .set_text(subtitle);
         _root.add(_subtitle_label);
     }
 
@@ -83,8 +62,7 @@ __build_ui__ = function() {
 
     var _content_card = new WWCore()
         .set_offset(_card_x, _card_y)
-        .set_size(_card_w, _card_h)
-        .set_background_color(_card_bg);
+        .set_size(_card_w, _card_h);
     _root.add(_content_card);
 
     // Inner layout
@@ -110,15 +88,13 @@ __build_ui__ = function() {
     var _label_left = new WWLabel()
         .set_offset(_inner_x, _inner_y)
         .set_size(_half_w, _label_h)
-        .set_text(_left_label_text)
-        .set_text_color(_subtitle_color);
+        .set_text(_left_label_text);
     _root.add(_label_left);
 
     var _label_right = new WWLabel()
         .set_offset(_inner_x + _half_w + _gap_x, _inner_y)
         .set_size(_half_w, _label_h)
-        .set_text(_right_label_text)
-        .set_text_color(_subtitle_color);
+        .set_text(_right_label_text);
     _root.add(_label_right);
 
     // Pair area (below labels)
@@ -212,8 +188,7 @@ __build_vertical_divider__ = function(_root, _x, _y, _h, _color) {
 
     var _divider = new WWCore()
         .set_offset(_x, _y)
-        .set_size(1, _h)
-        .set_background_color(_color);
+        .set_size(1, _h);
 
     _root.add(_divider);
 };
@@ -242,15 +217,13 @@ __build_mirror_pair__ = function(
     // Left frame
     var _left_frame = new WWCore()
         .set_offset(_base_x, _base_y)
-        .set_size(_box_w, _box_h)
-        .set_background_color(_frame_color);
+        .set_size(_box_w, _box_h);
     _root.add(_left_frame);
 
     // Right frame
     var _right_frame = new WWCore()
         .set_offset(_base_x + _box_w + _gap_x, _base_y)
-        .set_size(_box_w, _box_h)
-        .set_background_color(_frame_color);
+        .set_size(_box_w, _box_h);
     _root.add(_right_frame);
 
     // Each textbox gets its own scroll region
@@ -266,7 +239,6 @@ __build_mirror_pair__ = function(
         .set_region_mode(true)
         .set_scrollbars_enabled(false, true)
         .set_scrollbars_auto_hide(true, true)
-        .set_scrollbar_thickness(12)
         .set_wheel_step(32)
         .set_smooth_scrolling(true)
         .set_canvas(_left_canvas);
@@ -280,11 +252,7 @@ __build_mirror_pair__ = function(
     var _left_box = new WWTextField()
         .set_offset(0, 0)
         .set_size(_viewport_w, _viewport_h)
-        .set_background_color(_textbox_bg)
         .set_text(_text_value)
-        .set_text_color(c_white)
-        .set_highlight_color(#78848A)
-        .set_cursor_color(c_white)
         .set_wrap_enabled(true)
         .set_read_only(false);
     _left_canvas.add(_left_box);
@@ -298,7 +266,6 @@ __build_mirror_pair__ = function(
         .set_region_mode(true)
         .set_scrollbars_enabled(false, true)
         .set_scrollbars_auto_hide(true, true)
-        .set_scrollbar_thickness(12)
         .set_wheel_step(32)
         .set_smooth_scrolling(true)
         .set_canvas(_right_canvas);
@@ -312,11 +279,7 @@ __build_mirror_pair__ = function(
     var _right_box = new WWTextField()
         .set_offset(0, 0)
         .set_size(_viewport_w, _viewport_h)
-        .set_background_color(_textbox_bg)
         .set_text(_text_value)
-        .set_text_color(c_white)
-        .set_highlight_color(_preview_highlight)
-        .set_cursor_color(_preview_cursor)
         .set_wrap_enabled(true)
         .set_read_only(true);
     _right_canvas.add(_right_box);

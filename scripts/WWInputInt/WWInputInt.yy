@@ -5,8 +5,8 @@
   "isDnD":false,
   "name":"WWInputInt",
   "parent":{
-    "name":"AI Driven",
-    "path":"folders/_Libraries/Wittle Widgets/_Components/AI Driven.yy",
+    "name":"Input Fields",
+    "path":"folders/_Libraries/Wittle Widgets/_Components/Finished Components/Input Fields.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

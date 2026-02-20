@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"WWScrollbarButtons",
+  "%Name":"WWScrollbarButtonsVert",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"WWScrollbarButtons",
+  "name":"WWScrollbarButtonsVert",
   "parent":{
     "name":"AI Driven",
     "path":"folders/_Libraries/Wittle Widgets/_Components/AI Driven.yy",

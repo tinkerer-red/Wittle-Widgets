@@ -765,10 +765,10 @@ function WWViewScrollRegion() : WWCore() constructor {
 				// Lazy wire: if you assign scrollbar_horz/scrollbar_vert directly,
 				// they will still drive scrolling without needing a set/get wrapper.
 				if (scrollbar_horz != undefined) {
-					scrollbar_horz.set_callback(method({ this: self }, function() { with (this) __on_scrollbar_horz__(); }));
+					scrollbar_horz.set_callback(method(self, __on_scrollbar_horz__));
 				}
 				if (scrollbar_vert != undefined) {
-					scrollbar_vert.set_callback(method({ this: self }, function() { with (this) __on_scrollbar_vert__(); }));
+					scrollbar_vert.set_callback(method(self, __on_scrollbar_vert__));
 				}
 
 				__syncing_scrollbars__ = true;

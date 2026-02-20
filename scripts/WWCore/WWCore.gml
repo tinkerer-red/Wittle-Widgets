@@ -115,9 +115,6 @@ function WWCore() constructor {
 				
 				//visible = true;
 				
-				//image_alpha  = undefined;
-				//image_angle  = undefined;
-				//image_blend  = undefined;
 				image_index  = 0;
 				image_number = _info.num_subimages;
 				image_speed = (_info.frame_type == spritespeed_framespersecond) ? (_info.frame_speed / game_get_speed(gamespeed_fps)) : _info.frame_speed;
@@ -313,6 +310,9 @@ function WWCore() constructor {
 					__is_hovered__ = false;
 					trigger_event(events.hover_exit);
 				}
+				else {
+					__is_hovered__ = _hover;
+				}
 			    return self;
 			}
 			#region jsDoc
@@ -331,6 +331,9 @@ function WWCore() constructor {
 			    else if (!_interact && __is_interacting__) {
 					__is_interacting__ = false;
 					trigger_event(events.interact_exit);
+				}
+				else {
+					__is_interacting__ = _interact;
 				}
 			    return self;
 			}
@@ -1658,7 +1661,9 @@ function WWCore() constructor {
 				
 				//run the children
 				var _comp, xx, yy;
-				var _i=__children_count__; repeat(__children_count__) { _i--;
+				var _count = __children_count__;
+				var _i=_count; repeat(_count) { _i--;
+					if (_i >= __children_count__) { continue; }
 					_comp = __children__[_i];
 					if (_comp.__overlay_component__ && _comp.__overlay_registered__) continue;
 					_comp.step(_input);
@@ -1705,7 +1710,9 @@ function WWCore() constructor {
 				
 				//run the children
 				var _comp, xx, yy;
-				var _i=0; repeat(__children_count__) {
+				var _count = __children_count__;
+				var _i=0; repeat(_count) {
+					if (_i >= __children_count__) { break; }
 					_comp = __children__[_i];
 					if (_comp.__overlay_component__ && _comp.__overlay_registered__) { _i+=1; continue; }
 					_comp.draw(_input, _debug);
@@ -1774,8 +1781,23 @@ function WWCore() constructor {
 						y+__group__.height
 					)
 					#endregion
+					
 					//draw_text(x,y, $"__mouse_on_group__ :: {__mouse_on_group__}\n__mouse_on_comp__ :: {__mouse_on_comp__}")
 					draw_set_alpha(1)
+					
+					draw_text(x, y, string_join("\n",
+						$"__is_enabled__ = {__is_enabled__};",
+						$"__is_interacting__ = {__is_interacting__};",
+						$"__is_hovered__ = {__is_hovered__};",
+						$"__is_focused__ = {__is_focused__};",
+						$"__visual_state__ = {__visual_state__};",
+						"",
+						$"WW_STATE_DISABLED = {WW_STATE_DISABLED};",
+						$"WW_STATE_ACTIVE = {WW_STATE_ACTIVE};",
+						$"WW_STATE_HOVER = {WW_STATE_HOVER};",
+						$"WW_STATE_FOCUSED = {WW_STATE_FOCUSED};",
+						$"WW_STATE_NORMAL = {WW_STATE_NORMAL};",
+					))
 				}
 				
 				__overlay_draw_pass__(_input, _debug);
@@ -1895,6 +1917,9 @@ function WWCore() constructor {
 			})
 			on_mouse_off(function(){
 				set_hover(false);
+				if (mouse_check_button_pressed(mb_left) || mouse_check_button_released(mb_left)) {
+					set_focus(false);
+				}
 			})
 			on_hover(function(){
 				if (!__is_enabled__ || !__is_focusable__) {
@@ -1932,6 +1957,10 @@ function WWCore() constructor {
 				set_focus(true);
 			})
 			on_interact(function(_input) {
+				if (!__is_enabled__ || !__is_focusable__) {
+					return;
+				}
+				
 				if (mouse_check_button(mb_left)) {
 				    trigger_event(events.held);
 						
@@ -1941,7 +1970,6 @@ function WWCore() constructor {
 				        trigger_event(events.long_press);
 				    }
 				}
-				
 				else {
 					// Always clear interact once the button is no longer held.
 					// This prevents visual "stuck pressed" states if a release edge is missed.
@@ -2596,12 +2624,20 @@ function WWCore() constructor {
 				}
 			}
 			static __recalc_visual_state__ = function() {
-				if (!__is_enabled__)    { __visual_state__ = 3; return; }
-				if (__is_interacting__) { __visual_state__ = 2; return; }
-				if (__is_hovered__)     { __visual_state__ = 1; return; }
-				if (__is_focused__)     { __visual_state__ = 4; return; }
+				if (!__is_enabled__)    { 
+					__visual_state__ = WW_STATE_DISABLED; return; 
+					}
+				if (__is_interacting__) { 
+					__visual_state__ = WW_STATE_ACTIVE; return; 
+					}
+				if (__is_hovered__)     { 
+					__visual_state__ = WW_STATE_HOVER; return; 
+					}
+				if (__is_focused__)     { 
+					__visual_state__ = WW_STATE_FOCUSED; return; 
+					}
 				//else
-				__visual_state__ = 0;
+				__visual_state__ = WW_STATE_NORMAL;
 			};
 			#region jsDoc
 			/// @func    __cleanup__()

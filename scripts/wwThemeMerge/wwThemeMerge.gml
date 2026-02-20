@@ -77,3 +77,85 @@ function __wwThemeMergeInto(_dst, _src, _path) {
 	}
 }
 
+function wwThemeLayerRoundedRectangles() {
+	/// Overlay-only layer: swaps in rounded-rectangle component sprite hooks.
+	return {
+		meta: {
+			id: "ww_layer_rounded_rectangles",
+			name: "Rounded Rectangles Layer",
+			tags: ["layer", "rounded"]
+		},
+		button: {
+			sprite: {
+				main: spr_ww_rr9_r4_all
+			}
+		},
+		button_text: {
+			sprite: {
+				main: spr_ww_rr9_r4_all
+			}
+		},
+		slider: {
+			sprite: {
+				track: { main: spr_ww_slider_background },
+				fill: { main: spr_ww_slider_bar },
+				thumb: { main: spr_ww_slider_thumb }
+			}
+		},
+		scrollbar: {
+			sprite: {
+				button: {
+					up: { main: spr_ww_rr9_r2_top },
+					down: { main: spr_ww_rr9_r2_bottom },
+					left: { main: spr_ww_rr9_r2_left },
+					right: { main: spr_ww_rr9_r2_right }
+				},
+				tray: { main: spr_ww_pixel },
+				gutter: { main: spr_ww_pixel },
+				trough: { main: spr_ww_pixel },
+				thumb: { main: spr_ww_rr9_r2_all }
+			}
+		}
+	};
+}
+
+function wwThemePresetLightRounded() {
+	return wwThemeCompose([
+		wwThemeDefault(),
+		wwThemeLayerRoundedRectangles(),
+		wwThemeLayerLight()
+	]);
+}
+
+function wwThemePresetDarkRounded() {
+	return wwThemeCompose([
+		wwThemeDefault(),
+		wwThemeLayerRoundedRectangles(),
+		wwThemeLayerDark()
+	]);
+}
+
+function wwThemeLayerDark() {
+	/// Overlay-only dark layer (no asset overrides).
+	var _dark = wwThemeDark();
+	return {
+		meta: _dark.meta,
+		derive: _dark.derive,
+		palette: _dark.palette,
+		colors: _dark.colors,
+		scrollbar: _dark.scrollbar
+	};
+}
+
+function wwThemeLayerLight() {
+	/// Overlay-only light layer (no asset overrides).
+	var _light = wwThemeLight();
+	return {
+		meta: _light.meta,
+		derive: _light.derive,
+		palette: _light.palette,
+		colors: _light.colors,
+		scrollbar: _light.scrollbar
+	};
+}
+

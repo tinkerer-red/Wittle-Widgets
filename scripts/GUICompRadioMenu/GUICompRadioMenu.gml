@@ -111,7 +111,6 @@ function GUICompRadioOption() : WWCore() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite = function(_sprite) {
-				button.set_sprite(_sprite);
 				return self;
 			}
 			#region jsDoc
@@ -133,7 +132,6 @@ function GUICompRadioOption() : WWCore() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite_color = function(_col) {
-				button.set_sprite_color(_col);
 				return self;
 			}
 			#region jsDoc
@@ -144,7 +142,6 @@ function GUICompRadioOption() : WWCore() constructor {
 			/// @returns {Struct.GUICompCore}
 			#endregion
 			static set_sprite_alpha = function(_alpha) {
-				button.set_sprite_alpha(_alpha);
 				return self;
 			}
 			#endregion

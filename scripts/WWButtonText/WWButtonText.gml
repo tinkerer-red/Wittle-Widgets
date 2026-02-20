@@ -85,10 +85,10 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct.WWButtonText}
 			#endregion
 			static set_sprite_to_auto_wrap = function() {
-				var _theme_spr = wwThemeGet().assets.sprites.button_text;
-				if (is_struct(_theme_spr)) {
-					_theme_spr = _theme_spr.main;
-				}
+				var _theme_spr = wwThemeGetSprite(
+					"button_text.sprite.main.idle",
+					"button_text.sprite.main"
+				);
 				var _spr = sprite_index ?? _theme_spr;
 				if (_spr == undefined || !sprite_exists(_spr)) {
 					_spr = spr_ww_rr9_r4_all;
@@ -169,7 +169,10 @@ function WWButtonText() : WWButtonSprite() constructor {
 			}
 			
 			// Theme-driven sprite: only referenced when sprite_index is undefined.
-			__theme_kind__ = __WW_Theme_Kind.ButtonText;
+			__theme_sprite_key_main__ = "button_text.sprite.main";
+			__theme_sprite_key_state_prefix__ = "button_text.sprite.main";
+			__theme_color_prefix__ = "button_text.color.main";
+			__theme_alpha_prefix__ = "button_text.alpha.main";
 			sprite_index = undefined;
 			set_sprite_to_auto_wrap();
 			
@@ -185,10 +188,10 @@ function WWButtonText() : WWButtonSprite() constructor {
 			/// @returns {Struct} info_struct_with_width_height_and_slice
 			#endregion
 			static get_sprite_to_auto_wrap = function() {
-				var _theme_spr = wwThemeGet().assets.sprites.button_text;
-				if (is_struct(_theme_spr)) {
-					_theme_spr = _theme_spr.main;
-				}
+				var _theme_spr = wwThemeGetSprite(
+					"button_text.sprite.main.idle",
+					"button_text.sprite.main"
+				);
 				var _spr = sprite_index ?? _theme_spr;
 				if (_spr == undefined || !sprite_exists(_spr)) {
 					_spr = spr_ww_rr9_r4_all;

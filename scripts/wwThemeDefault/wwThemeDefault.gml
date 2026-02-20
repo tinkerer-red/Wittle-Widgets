@@ -91,7 +91,18 @@ function wwThemeDefault() {
 			version: 1
 		},
 
-		// Global scaling knobs (fast “whole UI” retune)
+		// Global typed fallbacks (always required at runtime).
+		// Builder enforces these even if overlays omit them.
+		fallback: {
+			sprite: spr_ww_pixel,
+			color: #FF00FF,
+			alpha: 1,
+			size: 0,
+			icon: -1,
+			font: fnt_ww_default_small_msdf
+		},
+
+		// Global scaling knobs (fast "whole UI" retune)
 		scale: {
 			ui: 1.0,
 			text: 1.0,
@@ -105,23 +116,20 @@ function wwThemeDefault() {
 			dpi_scale: 1.0
 		},
 
-		// Typography + YUI-style text_styles (centralize font+color combos)
-		typography: {
-			fonts: {
-				ui:   { regular: fnt_ww_default_small_msdf, strong: fnt_ww_default_small_msdf, italic: fnt_ww_default_small_msdf },
-				mono: { regular: fnt_ww_consolas_msdf }
+		// Component-first text renderer defaults.
+		text_renderer: {
+			font: {
+				main: fnt_ww_default_small_msdf,
+				code: fnt_ww_consolas_10
 			},
-
-			sizes_px: { xs: 10, sm: 12, md: 14, lg: 18, xl: 24 },
-			line_height: { tight: 1.05, normal: 1.20, roomy: 1.35 },
-
-			// These intentionally reference semantic tokens that each variant must provide.
-			text_styles: {
-				title:    { font_asset: "fonts.ui.strong", size: "xl", paint: "colors.text.primary" },
-				subtitle: { font_asset: "fonts.ui.strong", size: "lg", paint: "colors.text.primary" },
-				body:     { font_asset: "fonts.ui.regular", size: "md", paint: "colors.text.primary" },
-				hint:     { font_asset: "fonts.ui.regular", size: "sm", paint: "colors.text.dim" },
-				mono:     { font_asset: "fonts.mono.regular", size: "md", paint: "colors.text.primary" }
+			color: {
+				main: undefined,
+				dim: undefined,
+				disabled: undefined
+			},
+			alpha: {
+				main: 1,
+				disabled: 0.45
 			}
 		},
 
@@ -182,108 +190,6 @@ function wwThemeDefault() {
 			}
 		},
 
-		// Asset hooks (EMU macros + textured skins) — shared placeholders.
-		assets: {
-			sprites: {
-				pixel: spr_ww_pixel,
-
-				#region Button
-				button: {
-					main: spr_ww_rr9_r4_all,
-					overlay: undefined
-				},
-				#endregion
-
-				#region ButtonText
-				button_text: {
-					main: spr_ww_rr9_r4_all,
-					overlay: undefined
-				},
-				#endregion
-
-				#region Checkbox
-				checkbox: {
-					main: undefined,
-					overlay: undefined,
-					check: s9CheckBoxChecked,
-					uncheck: undefined
-				},
-				#endregion
-
-				#region Radio
-				radio: {
-					main: undefined,
-					overlay: undefined,
-					check: undefined,
-					uncheck: undefined
-				},
-				#endregion
-
-				#region Slider
-				slider: {
-					main: spr_ww_slider_background,
-					overlay: undefined
-				},
-				slider_bar: {
-					main: spr_ww_slider_bar,
-					overlay: undefined
-				},
-				slider_thumb: {
-					main: spr_ww_slider_thumb,
-					overlay: undefined
-				},
-				#endregion
-
-				#region Combo
-				combo: {
-					main: undefined,
-					overlay: undefined,
-					dropdown_icon: undefined
-				},
-				#endregion
-
-				#region Dropdown
-				dropdown: {
-					main: undefined,
-					overlay: undefined,
-					item: undefined
-				},
-				#endregion
-
-				#region Scrollbar
-				scrollbar_horz: {
-					main: undefined,
-					overlay: undefined
-				},
-				scrollbar_horz_thumb: {
-					main: undefined,
-					overlay: undefined
-				},
-				scrollbar_vert: {
-					main: undefined,
-					overlay: undefined
-				},
-				scrollbar_vert_thumb: {
-					main: undefined,
-					overlay: undefined
-				},
-				#endregion
-
-				#region Close
-				close: {
-					main: undefined,
-					overlay: undefined
-				},
-				#endregion
-			},
-			icons: {
-				warn: undefined,
-				error: undefined,
-				info: undefined,
-				chevron: undefined
-			}
-		},
-
 		skin: {
 			enabled: false,
 			frames: {
@@ -291,7 +197,7 @@ function wwThemeDefault() {
 					texture: "",
 					nine_slice: { left: 3, top: 3, right: 3, bottom: 3 },
 					tint: {
-						normal: { color: #FFFFFF, alpha: 1 },
+						idle: { color: #FFFFFF, alpha: 1 },
 						hover: { color: #FFFFFF, alpha: 1 },
 						down: { color: #FFFFFF, alpha: 1 },
 						disabled: { color: #FFFFFF, alpha: 0.50 }
@@ -300,13 +206,13 @@ function wwThemeDefault() {
 				panel: {
 					texture: "",
 					nine_slice: { left: 3, top: 3, right: 3, bottom: 3 },
-					tint: { normal: { color: #FFFFFF, alpha: 1 } }
+					tint: { idle: { color: #FFFFFF, alpha: 1 } }
 				},
 				scrollbar_thumb: {
 					texture: "",
 					nine_slice: { left: 3, top: 3, right: 3, bottom: 3 },
 					tint: {
-						normal: { color: #FFFFFF, alpha: 1 },
+						idle: { color: #FFFFFF, alpha: 1 },
 						hover: { color: #FFFFFF, alpha: 1 },
 						down: { color: #FFFFFF, alpha: 1 }
 					}
@@ -314,23 +220,23 @@ function wwThemeDefault() {
 			}
 		},
 
-		// Shared “state model” for controls (mirrors GMUI’s explicit state coverage)
+		// Shared "state model" for controls (mirrors GMUI's explicit state coverage)
 		control_states: {
 			bg: {
-				normal:   "colors.surface.control",
+				idle:     "colors.surface.control",
 				hover:    "colors.surface.control_alt",
 				active:   "colors.surface.control_alt",
 				disabled: "colors.surface.panel"
 			},
 			border: {
-				normal:   "colors.outline.subtle",
+				idle:     "colors.outline.subtle",
 				hover:    "colors.accent.primary",
 				active:   "colors.accent.primary",
 				focused:  "colors.accent.primary",
 				disabled: "colors.outline.subtle"
 			},
 			text: {
-				normal:   "colors.text.primary",
+				idle:     "colors.text.primary",
 				disabled: "colors.text.disabled"
 			}
 		},
@@ -351,21 +257,21 @@ function wwThemeDefault() {
 				radius: "layout.radius.md",
 
 				bg: {
-					normal:   "colors.surface.control",
+					idle:     "colors.surface.control",
 					hover:    "colors.surface.control_alt",
 					focused:  "colors.surface.control_alt",
 					active:   "colors.surface.control_alt",
 					disabled: "colors.surface.panel"
 				},
 				border: {
-					normal:   "colors.outline.subtle",
+					idle:     "colors.outline.subtle",
 					hover:    "colors.accent.primary",
 					active:   "colors.accent.primary",
 					focused:  "colors.accent.primary",
 					disabled: "colors.outline.subtle"
 				},
 				text: {
-					normal:   "colors.text.primary",
+					idle:     "colors.text.primary",
 					hover:    "colors.text.primary",
 					focused:  "colors.text.primary",
 					active:   "colors.text.primary",
@@ -382,17 +288,17 @@ function wwThemeDefault() {
 				radius: "layout.radius.md",
 
 				bg: {
-					normal:   "colors.surface.control",
+					idle:     "colors.surface.control",
 					disabled: "colors.surface.panel"
 				},
 				border: {
-					normal:   "colors.outline.subtle",
+					idle:     "colors.outline.subtle",
 					focused:  "colors.accent.primary",
 					invalid:  "colors.state.danger_fg"
 				},
 
 				text: {
-					normal: "colors.text.primary",
+					idle: "colors.text.primary",
 					placeholder: "colors.text.dim",
 					disabled: "colors.text.disabled"
 				},
@@ -406,7 +312,7 @@ function wwThemeDefault() {
 				box_size: 16,
 				radius: "layout.radius.sm",
 				   bg: {
-					   normal: "colors.surface.control",
+					   idle: "colors.surface.control",
 					   hover:  "colors.surface.control_alt",
 					   focused: "colors.surface.control_alt",
 					   active: "colors.surface.control_alt",
@@ -423,7 +329,7 @@ function wwThemeDefault() {
 				track_bg: "colors.outline.subtle",
 				track_fill: "colors.accent.primary",
 				   thumb_bg: {
-					   normal: "colors.surface.control_alt",
+					   idle: "colors.surface.control_alt",
 					   hover:  "colors.surface.control_alt",
 					   focused: "colors.surface.control_alt",
 					   active: "colors.surface.control_alt",
@@ -436,7 +342,7 @@ function wwThemeDefault() {
 				thickness: 10,
 				thumb_min_len: 18,
 				bg: "colors.surface.panel_alt",
-				thumb: { normal: { color: #55627A, alpha: 0.50 }, hover: { color: #8A96AD, alpha: 0.67 }, active: { color: #B3BDD1, alpha: 0.80 } },
+				thumb: { idle: { color: #55627A, alpha: 0.50 }, hover: { color: #8A96AD, alpha: 0.67 }, active: { color: #B3BDD1, alpha: 0.80 } },
 				increments: "interaction.scroll"
 			},
 			

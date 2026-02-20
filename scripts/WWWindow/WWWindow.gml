@@ -107,13 +107,16 @@ function WWWindow() : WWOverlay() constructor {
 		drag_dy = 0;
 		__is_dragging__ = false;
 		close_button_margin = 3;
+		__fa_close_ready__ = false;
 		#endregion
+		
+		var __window_header_bg__ = wwThemeGetColor("colors.surface.control_alt.color");
+		var __window_content_bg__ = wwThemeGetColor("colors.surface.panel.color");
 		
 		#region Components
 		header = new WWButtonText()
 			.set_text("Window")
 			.set_size(width, header_height)
-			.set_background_color(make_color_rgb(43, 56, 80))
 			.set_text_click_offset(undefined);
 
 		close_button = new WWButtonText()
@@ -130,8 +133,7 @@ function WWWindow() : WWOverlay() constructor {
 			.set_scrollbars_auto_hide(true, true)
 			.set_scrollbars_enabled(true, true)
 			.set_size(width, max(1, height - header_height))
-			.set_offset(0, 20)
-			.set_background_color(make_color_rgb(18, 24, 36));
+			.set_offset(0, 20);
 		
 		static __base_add__ = WWCore.add;
 		__base_add__([header, content_region]);
@@ -228,6 +230,29 @@ function WWWindow() : WWOverlay() constructor {
 	#region Private
 		
 		#region Functions
+		static __compute_fa_ready__ = function() {
+			if (!WW_FONT_AWESOME_ENABLED) return false;
+			var _has_proc = asset_get_index("WWTextProcessorBBCode") != -1;
+			var _has_fa_icon_get = asset_get_index("fa_icon_get") != -1;
+			var _has_fa_get_font = asset_get_index("fa_get_font") != -1;
+			var _has_fa_get_ord = asset_get_index("fa_get_ord") != -1;
+			var _fa_font_asset = asset_get_index("fnt_fa_solid");
+			var _has_fa_font = (_fa_font_asset != -1) && font_exists(_fa_font_asset);
+			return _has_proc && _has_fa_icon_get && _has_fa_get_font && _has_fa_get_ord && _has_fa_font;
+		};
+		
+		static __configure_close_button_icon__ = function() {
+			if (__fa_close_ready__) {
+				close_button
+					.set_text_processor("bbcode")
+					.set_text("[fa,xmark,solid]");
+			}
+			else {
+				close_button
+					.set_text_processor(undefined)
+					.set_text("X");
+			}
+		};
 		
 		static __refresh_structure__ = function() {
 			if (!is_struct(header) || !is_struct(content_region)) return;
@@ -255,6 +280,8 @@ function WWWindow() : WWOverlay() constructor {
 	#endregion
 
 	set_overlay_role(WWOverlayRole.WINDOW);
+	__fa_close_ready__ = __compute_fa_ready__();
+	__configure_close_button_icon__();
 	set_size(320, 240);
 	set_title("Window");
 	__refresh_structure__();

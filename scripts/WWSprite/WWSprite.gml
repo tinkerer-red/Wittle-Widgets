@@ -33,6 +33,15 @@ function WWSprite() : WWCore() constructor {
 				return self;
 			}
 			
+			#region jsDoc
+			/// @func    set_color()
+			/// @desc    Sets the color of the component.
+			/// @self    WWSprite
+			/// @param   {Real} col : The color the component will use.
+			/// @returns {Struct.WWSprite}
+			#endregion
+			static set_color = set_sprite_color;
+			
 		#endregion
 		
 		#region Events
@@ -40,23 +49,25 @@ function WWSprite() : WWCore() constructor {
 			on_pre_draw(function(_input) {
 				if (undefined == sprite_index) return;
 				if (undefined == visible) return;
-				if (undefined == image_alpha) return;
-				if (undefined == image_xscale) return;
-				if (undefined == image_yscale) return;
 				
 				if (!sprite_exists(sprite_index)) return;
 				if (!visible) return;
-				if (image_alpha == 0) return;
-				if (image_xscale == 0) return;
-				if (image_yscale == 0) return;
+				
+				var _alpha = image_alpha ?? 1;
+				var _xscale = image_xscale ?? 1;
+				var _yscale = image_yscale ?? 1;
+				var _blend = image_blend ?? c_white;
+				if (_alpha == 0) return;
+				if (_xscale == 0) return;
+				if (_yscale == 0) return;
 				
 				var _image_index = (__is_enabled__) ? image_index : GUI_IMAGE_DISABLED;
 				
 				//draw the nineslice
-				if (image_alpha == 1)
-				&& (image_blend == c_white)
-				&& (image_xscale == 1)
-				&& (image_yscale == 1) {
+				if (_alpha == 1)
+				&& (_blend == c_white)
+				&& (_xscale == 1)
+				&& (_yscale == 1) {
 					draw_sprite_stretched(
 							sprite_index,
 							_image_index,
@@ -72,10 +83,10 @@ function WWSprite() : WWCore() constructor {
 							_image_index, 
 							x,
 							y,
-							width  * image_xscale,
-							height * image_yscale,
-							image_blend, 
-							image_alpha
+							width  * _xscale,
+							height * _yscale,
+							_blend, 
+							_alpha
 					);
 				}
 				

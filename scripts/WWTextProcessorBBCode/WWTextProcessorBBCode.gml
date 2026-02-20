@@ -65,6 +65,15 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
     // Optional widgets (output index space)
     var _widgets = [];
 
+    var _bbcode_code_font = fnt_ww_consolas_10;
+    if (_default_state != undefined) {
+        if (variable_struct_exists(_default_state, "bbcode_code_font")) {
+            _bbcode_code_font = _default_state.bbcode_code_font;
+        } else if (variable_struct_exists(_default_state, "code_font")) {
+            _bbcode_code_font = _default_state.code_font;
+        }
+    }
+
     // Helper: flush current alignment run up to _ctx.out_len
     // (inline pattern - no closures)
     // NOTE: caller must ensure _ctx.out_len > _align_start
@@ -532,7 +541,7 @@ function WWTextProcessorBBCode(_raw_text, _default_state) {
                 });
             } else if (_tag == "code") {
                 __ww_textproc_ctx_apply_patch__(_ctx, {
-                    font_asset: fnt_ww_consolas_10,
+                    font_asset: _bbcode_code_font,
                     color: make_color_rgb(220, 220, 230)
                 });
             } else if (_tag == "left" || _tag == "center" || _tag == "right") {

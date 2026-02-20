@@ -289,7 +289,7 @@ function WWTextInput() : WWCore() constructor {
 				/// @func    get_scrollbar_thumb_horz()
 				/// @desc    Returns the horizontal scrollbar's thumb (for reskinning).
 				/// @self    WWTextInput
-				/// @returns {Struct.WWSliderThumb}
+				/// @returns {Struct.WWButtonSprite}
 				#endregion
 				static get_scrollbar_thumb_horz = function() {
 					return (__sb_horz__ != undefined) ? __sb_horz__.get_thumb() : undefined;
@@ -299,7 +299,7 @@ function WWTextInput() : WWCore() constructor {
 				/// @func    get_scrollbar_thumb_vert()
 				/// @desc    Returns the vertical scrollbar's thumb (for reskinning).
 				/// @self    WWTextInput
-				/// @returns {Struct.WWSliderThumb}
+				/// @returns {Struct.WWButtonSprite}
 				#endregion
 				static get_scrollbar_thumb_vert = function() {
 					return (__sb_vert__ != undefined) ? __sb_vert__.get_thumb() : undefined;

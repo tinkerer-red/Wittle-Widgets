@@ -21,27 +21,27 @@ function WWColorPicker() : WWCore() constructor {
 		#region Components
 		wheel = new WWCore().set_focusable(true);
 
-		lbl_rgb = new WWLabel().set_text("RGB").set_text_color(c_white);
-		lbl_r = new WWLabel().set_text("R").set_text_color(c_white);
-		lbl_g = new WWLabel().set_text("G").set_text_color(c_white);
-		lbl_b = new WWLabel().set_text("B").set_text_color(c_white);
+		lbl_rgb = new WWLabel().set_text("RGB");
+		lbl_r = new WWLabel().set_text("R");
+		lbl_g = new WWLabel().set_text("G");
+		lbl_b = new WWLabel().set_text("B");
 		in_r = new WWInputInt().set_min(0).set_max(255);
 		in_g = new WWInputInt().set_min(0).set_max(255);
 		in_b = new WWInputInt().set_min(0).set_max(255);
 
-		div_1 = new WWCore().set_background_color(c_gray);
+		div_1 = new WWCore();
 
-		lbl_hsv = new WWLabel().set_text("HSV").set_text_color(c_white);
-		lbl_h = new WWLabel().set_text("H").set_text_color(c_white);
-		lbl_s = new WWLabel().set_text("S").set_text_color(c_white);
-		lbl_v = new WWLabel().set_text("V").set_text_color(c_white);
+		lbl_hsv = new WWLabel().set_text("HSV");
+		lbl_h = new WWLabel().set_text("H");
+		lbl_s = new WWLabel().set_text("S");
+		lbl_v = new WWLabel().set_text("V");
 		in_h = new WWInputReal().set_min(0).set_max(360).set_decimals(1).set_step(1);
 		in_s = new WWInputReal().set_min(0).set_max(100).set_decimals(1).set_step(1);
 		in_v = new WWInputReal().set_min(0).set_max(100).set_decimals(1).set_step(1);
 
-		div_2 = new WWCore().set_background_color(c_gray);
+		div_2 = new WWCore();
 
-		lbl_a = new WWLabel().set_text("A").set_text_color(c_white);
+		lbl_a = new WWLabel().set_text("A");
 		in_a = new WWInputReal().set_min(0).set_max(1).set_decimals(2).set_step(0.05);
 
 		btn_mode = new WWButtonText().set_text("More");
@@ -187,8 +187,6 @@ function WWColorPicker() : WWCore() constructor {
 		};
 
 		static __layout__ = function() {
-			set_background_color(c_dkgray);
-
 			var _pad = 10;
 			var _right_min_w = 180;
 			var _wheel_sz = min(height - _pad * 2, width - (_pad * 3) - _right_min_w);
@@ -416,7 +414,7 @@ function WWColorPicker() : WWCore() constructor {
 	set_size(500, 300);
 	set_more(true);
 	set_use_alpha(true);
-	set_color(c_white, 1);
+	set_color(c_white);
 
 	// Wheel draw + interaction
 	wheel.on_pre_draw(function(_input) {

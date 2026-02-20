@@ -412,7 +412,6 @@ function demo_library_validate_all() {
 
 
 // build library 
-
 demo_library_register("Core", WWCore, {
 	"set_position": [
 		{ name:"x", type:"Real" },
@@ -587,6 +586,282 @@ demo_library_register("Inputs/Buttons", WWButtonText, {
 	"set_sprite_to_auto_wrap": []
 });
 demo_library_register("Inputs/Buttons", WWButton, {
+});
+demo_library_register("Display/Sprites", WWIcon, {
+	"set_icon_sprite": [
+		{ name:"sprite", type:"Asset.GMSprite" },
+		{ name:"subimg", type:"Real" }
+	],
+	"set_icon_fa": [
+		{ name:"icon", type:"String|Real" },
+		{ name:"style", type:"String" }
+	],
+	"set_icon_fa_packed": [
+		{ name:"packed", type:"Real" }
+	],
+	"clear_icon": [],
+	"set_fallback_text": [
+		{ name:"text", type:"String" }
+	],
+	"set_icon_scale": [
+		{ name:"scale", type:"Real" }
+	],
+	"set_keep_aspect": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_allow_upscale": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_icon_insets": [
+		{ name:"left", type:"Real" },
+		{ name:"top", type:"Real" },
+		{ name:"right", type:"Real" },
+		{ name:"bottom", type:"Real" }
+	],
+	"set_icon_padding": [
+		{ name:"pad", type:"Real" }
+	],
+	"set_icon_color": [
+		{ name:"color", type:"Color" },
+		{ name:"alpha", type:"Real" }
+	],
+	"set_auto_icon_paint": [
+		{ name:"enabled", type:"Bool" }
+	]
+}, {
+	"Font Awesome": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [40, 40]);
+		_ctx.try_call(_comp, "set_icon_fa", ["folder-open", "solid"]);
+		_ctx.try_call(_comp, "set_icon_padding", [4]);
+	},
+	"Sprite Icon": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [40, 40]);
+		_ctx.try_call(_comp, "set_icon_sprite", [spr_ww_slider_thumb, 0]);
+		_ctx.try_call(_comp, "set_icon_padding", [4]);
+	},
+	"Tint + Inset": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [52, 36]);
+		_ctx.try_call(_comp, "set_icon_fa", ["triangle-exclamation", "solid"]);
+		_ctx.try_call(_comp, "set_icon_insets", [8, 4, 8, 4]);
+		_ctx.try_call(_comp, "set_icon_color", [make_color_rgb(240, 205, 90), 1]);
+	}
+});
+demo_library_register("Inputs/Buttons", WWButtonIcon, {
+	"set_square_size": [
+		{ name:"size", type:"Real" }
+	],
+	"set_keep_square": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_icon_sprite": [
+		{ name:"sprite", type:"Asset.GMSprite" },
+		{ name:"subimg", type:"Real" }
+	],
+	"set_icon_fa": [
+		{ name:"icon", type:"String|Real" },
+		{ name:"style", type:"String" }
+	],
+	"set_icon_fa_packed": [
+		{ name:"packed", type:"Real" }
+	],
+	"clear_icon": [],
+	"set_icon_padding": [
+		{ name:"pad", type:"Real" }
+	],
+	"set_icon_scale": [
+		{ name:"scale", type:"Real" }
+	],
+	"set_icon_keep_aspect": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_icon_allow_upscale": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_icon_color": [
+		{ name:"color", type:"Color" },
+		{ name:"alpha", type:"Real" }
+	],
+	"set_auto_icon_paint": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_fallback_text": [
+		{ name:"text", type:"String" }
+	]
+}, {
+	"Up Button": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_square_size", [24]);
+		_ctx.try_call(_comp, "set_icon_fa", ["arrow-up", "solid"]);
+		_ctx.try_call(_comp, "set_fallback_text", ["^"]);
+		_comp.__debug_enabled__=true;
+	},
+	"Refresh Button": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_square_size", [24]);
+		_ctx.try_call(_comp, "set_icon_fa", ["arrow-rotate-right", "solid"]);
+		_ctx.try_call(_comp, "set_fallback_text", ["R"]);
+	},
+	"Sprite Icon Button": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_square_size", [24]);
+		_ctx.try_call(_comp, "set_icon_sprite", [spr_ww_slider_thumb, 0]);
+		_ctx.try_call(_comp, "set_icon_padding", [2]);
+	}
+});
+demo_library_register("Inputs/Buttons", WWButtonIconText, {
+	"set_text": [
+		{ name:"text", type:"String" }
+	],
+	"set_text_font": [
+		{ name:"font", type:"Asset.GMFont" }
+	],
+	"set_text_color": [
+		{ name:"color", type:"Color" }
+	],
+	"set_text_alpha": [
+		{ name:"alpha", type:"Real" }
+	],
+	"set_text_processor": [
+		{ name:"proc_or_name", type:"Any" }
+	],
+	"set_color": [
+		{ name:"color", type:"Color" },
+	],
+	"set_text_offsets": [
+		{ name:"x", type:"Real" },
+		{ name:"y", type:"Real" },
+		{ name:"click_y", type:"Real" }
+	],
+	"set_text_click_offset": [
+		{ name:"click_y", type:"Real" }
+	],
+	"set_sprite_to_auto_wrap": [],
+	"set_icon_side": [
+		{ name:"side", type:"String" }
+	],
+	"set_icon_gap": [
+		{ name:"gap", type:"Real" }
+	],
+	"set_icon_padding": [
+		{ name:"pad", type:"Real" }
+	],
+	"set_icon_size": [
+		{ name:"size", type:"Real" }
+	],
+	"set_icon_sprite": [
+		{ name:"sprite", type:"Asset.GMSprite" },
+		{ name:"subimg", type:"Real" }
+	],
+	"set_icon_fa": [
+		{ name:"icon", type:"String|Real" },
+		{ name:"style", type:"String" }
+	],
+	"set_icon_fa_packed": [
+		{ name:"packed", type:"Real" }
+	],
+	"clear_icon": []
+}, {
+	"FA Left (Auto Wrap)": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_text", ["Open Folder"]);
+		_ctx.try_call(_comp, "set_icon_fa", ["folder-open", "solid"]);
+		_ctx.try_call(_comp, "set_icon_side", ["left"]);
+		_ctx.try_call(_comp, "set_icon_gap", [0]);
+		_ctx.try_call(_comp, "set_icon_padding", [0]);
+		_ctx.try_call(_comp, "set_sprite_to_auto_wrap", []);
+	},
+	"FA Right + Gap": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_text", ["Next"]);
+		_ctx.try_call(_comp, "set_icon_fa", ["arrow-right", "solid"]);
+		_ctx.try_call(_comp, "set_icon_side", ["right"]);
+		_ctx.try_call(_comp, "set_icon_gap", [6]);
+		_ctx.try_call(_comp, "set_icon_padding", [1]);
+		_ctx.try_call(_comp, "set_sprite_to_auto_wrap", []);
+	},
+	"Sprite Icon": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_text", ["Thumb Action"]);
+		_ctx.try_call(_comp, "set_icon_sprite", [spr_ww_slider_thumb, 0]);
+		_ctx.try_call(_comp, "set_icon_side", ["left"]);
+		_ctx.try_call(_comp, "set_icon_gap", [4]);
+		_ctx.try_call(_comp, "set_sprite_to_auto_wrap", []);
+	},
+	"Manual Size + Text Offset": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_text", ["Apply"]);
+		_ctx.try_call(_comp, "set_icon_fa", ["check", "solid"]);
+		_ctx.try_call(_comp, "set_icon_side", ["left"]);
+		_ctx.try_call(_comp, "set_icon_size", [14]);
+		_ctx.try_call(_comp, "set_icon_padding", [3]);
+		_ctx.try_call(_comp, "set_size", [140, 26]);
+		_ctx.try_call(_comp, "set_text_offsets", [2, 0, 2]);
+	},
+	"No Icon (Text Only)": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "clear_icon", []);
+		_ctx.try_call(_comp, "set_text", ["Text Only"]);
+		_ctx.try_call(_comp, "set_sprite_to_auto_wrap", []);
+	}
+});
+#endregion
+#region File Browser Components
+demo_library_register("Layout/Windows/File Browser", WWSearchInput, {
+	"set_value": [
+		{ name:"value", type:"String" }
+	],
+	"set_placeholder": [
+		{ name:"text", type:"String" }
+	],
+	"set_action_mode": [
+		{ name:"mode", type:"String" }
+	]
+}, {
+	"Find Files": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 22]);
+		_ctx.try_call(_comp, "set_placeholder", ["Search files..."]);
+		_ctx.try_call(_comp, "set_value", ["*.log"]);
+		_ctx.try_call(_comp, "set_action_mode", ["clear"]);
+	},
+	"Focus Action": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 22]);
+		_ctx.try_call(_comp, "set_placeholder", ["Type to filter"]);
+		_ctx.try_call(_comp, "set_value", [""]);
+		_ctx.try_call(_comp, "set_action_mode", ["focus"]);
+	}
+});
+demo_library_register("Layout/Windows/File Browser", WWFileExplorer, {
+	"set_path": [
+		{ name:"path", type:"String" }
+	],
+	"set_search_query": [
+		{ name:"query", type:"String" }
+	],
+	"set_extension_filter": [
+		{ name:"filter", type:"String" }
+	],
+	"set_allow_multi_select": [
+		{ name:"allow", type:"Bool" }
+	],
+	"set_folder_select_enabled": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_drives": [
+		{ name:"drives", type:"Array<String>" }
+	],
+	"refresh": [],
+	"go_parent": []
+}, {
+	"Default Explorer": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [620, 320]);
+		_ctx.try_call(_comp, "set_search_query", [""]);
+		_ctx.try_call(_comp, "set_extension_filter", ["*.*"]);
+		_ctx.try_call(_comp, "set_allow_multi_select", [false]);
+	},
+	"Filter .gml": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [620, 320]);
+		_ctx.try_call(_comp, "set_search_query", ["*.gml"]);
+		_ctx.try_call(_comp, "set_extension_filter", [".gml"]);
+		_ctx.try_call(_comp, "set_allow_multi_select", [true]);
+	},
+	"Folder Selection": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [620, 320]);
+		_ctx.try_call(_comp, "set_folder_select_enabled", [true]);
+		_ctx.try_call(_comp, "set_allow_multi_select", [true]);
+		_ctx.try_call(_comp, "set_search_query", [""]);
+	}
 });
 #endregion
 #region Dropdowns
@@ -936,15 +1211,36 @@ demo_library_register("Display/Progress", WWProgressBar, {
 #endregion
 #region Scrollbars
 demo_library_register("Inputs/Scrollbars", WWScrollbar, {
-	"set_scroll_range": [
+	"set_value": [
+		{ name:"value", type:"Real" }
+	],
+	"set_normalized_value": [
+		{ name:"value", type:"Real" }
+	],
+	"set_clamp_values": [
 		{ name:"min", type:"Real" },
 		{ name:"max", type:"Real" }
 	],
-	"set_scroll_value": [
-		{ name:"value", type:"Real" }
+	"set_rounding": [
+		{ name:"round", type:"Bool" }
 	],
-	"set_scroll_step": [
-		{ name:"step", type:"Real" }
+	"set_lerp_target": [
+		{ name:"lerp_target", type:"Real" }
+	],
+	"set_inverted": [
+		{ name:"invert", type:"Bool" }
+	],
+	"set_bar_size": [
+		{ name:"left", type:"Real" },
+		{ name:"top", type:"Real" },
+		{ name:"right", type:"Real" },
+		{ name:"bottom", type:"Real" }
+	],
+	"set_background_size": [
+		{ name:"left", type:"Real" },
+		{ name:"top", type:"Real" },
+		{ name:"right", type:"Real" },
+		{ name:"bottom", type:"Real" }
 	],
 	"set_canvas_size": [
 		{ name:"size", type:"Real" }
@@ -956,26 +1252,91 @@ demo_library_register("Inputs/Scrollbars", WWScrollbar, {
 		{ name:"enabled", type:"Bool" }
 	],
 	"set_thumb": [
-		{ name:"thumb", type:"Struct.WWSliderThumb" }
-	],
-	"set_on_change": [
-		{ name:"callback", type:"Function" }
+		{ name:"thumb", type:"Struct.WWButtonSprite" }
 	]
+}, {
+	"Basic": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 18]);
+		_ctx.try_call(_comp, "set_canvas_size", [1200]);
+		_ctx.try_call(_comp, "set_coverage_size", [320]);
+		_ctx.try_call(_comp, "set_value", [120]);
+	},
+	"Smooth Scrolling": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 18]);
+		_ctx.try_call(_comp, "set_canvas_size", [1800]);
+		_ctx.try_call(_comp, "set_coverage_size", [280]);
+		_ctx.try_call(_comp, "set_smooth_scrolling", [true]);
+		_ctx.try_call(_comp, "set_value", [420]);
+	},
+	"Custom Thumb": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [220, 20]);
+		_ctx.try_call(_comp, "set_canvas_size", [900]);
+		_ctx.try_call(_comp, "set_coverage_size", [180]);
+		var _thumb = new WWButtonSprite().set_sprite(spr_ww_slider_thumb).set_size(18, 18);
+		_thumb.__theme_kind__ = __WW_Theme_Kind.Slider;
+		_ctx.try_call(_comp, "set_thumb", [_thumb]);
+		_ctx.try_call(_comp, "set_value", [260]);
+	}
 });
 demo_library_register("Inputs/Scrollbars", WWScrollbarHorz, {
+}, {
+	"Basic Horizontal": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 18]);
+		_ctx.try_call(_comp, "set_canvas_size", [2000]);
+		_ctx.try_call(_comp, "set_coverage_size", [520]);
+		_ctx.try_call(_comp, "set_value", [180]);
+	},
+	"Smooth Horizontal": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [280, 18]);
+		_ctx.try_call(_comp, "set_canvas_size", [2600]);
+		_ctx.try_call(_comp, "set_coverage_size", [420]);
+		_ctx.try_call(_comp, "set_smooth_scrolling", [true]);
+		_ctx.try_call(_comp, "set_value", [320]);
+	},
+	"Inverted Horizontal": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [260, 18]);
+		_ctx.try_call(_comp, "set_canvas_size", [1400]);
+		_ctx.try_call(_comp, "set_coverage_size", [350]);
+		_ctx.try_call(_comp, "set_inverted", [true]);
+		_ctx.try_call(_comp, "set_value", [240]);
+	}
 });
 demo_library_register("Inputs/Scrollbars", WWScrollbarVert, {
+}, {
+	"Basic Vertical": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [18, 220]);
+		_ctx.try_call(_comp, "set_canvas_size", [1800]);
+		_ctx.try_call(_comp, "set_coverage_size", [460]);
+		_ctx.try_call(_comp, "set_value", [210]);
+	},
+	"Smooth Vertical": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [18, 240]);
+		_ctx.try_call(_comp, "set_canvas_size", [2200]);
+		_ctx.try_call(_comp, "set_coverage_size", [420]);
+		_ctx.try_call(_comp, "set_smooth_scrolling", [true]);
+		_ctx.try_call(_comp, "set_value", [380]);
+	},
+	"Inverted Vertical": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [18, 230]);
+		_ctx.try_call(_comp, "set_canvas_size", [1500]);
+		_ctx.try_call(_comp, "set_coverage_size", [360]);
+		_ctx.try_call(_comp, "set_inverted", [true]);
+		_ctx.try_call(_comp, "set_value", [260]);
+	}
 });
-demo_library_register("Inputs/Scrollbars", WWScrollbarButtons, {
+demo_library_register("Inputs/Scrollbars", WWScrollbarButtonsVert, {
 	"set_size": [
 		{ name:"width", type:"Real" },
 		{ name:"height", type:"Real" }
 	],
+	"set_button_size": [
+		{ name:"size", type:"Real" }
+	],
 	"set_canvas_size": [
-		{ name:"height", type:"Real" }
+		{ name:"size", type:"Real" }
 	],
 	"set_coverage_size": [
-		{ name:"height", type:"Real" }
+		{ name:"size", type:"Real" }
 	],
 	"set_callback": [
 		{ name:"callback", type:"Function" }
@@ -1010,7 +1371,123 @@ demo_library_register("Inputs/Scrollbars", WWScrollbarButtons, {
 		{ name:"top", type:"Real" },
 		{ name:"right", type:"Real" },
 		{ name:"bottom", type:"Real" }
+	],
+	"set_show_track": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_show_fill": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_show_bar": [
+		{ name:"enabled", type:"Bool" }
 	]
+}, {
+	"Vertical Default": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [16, 128]);
+		_ctx.try_call(_comp, "set_show_track", [true]);
+		_ctx.try_call(_comp, "set_show_fill", [false]);
+		_ctx.try_call(_comp, "set_button_size", [10]);
+		_ctx.try_call(_comp, "set_inverted", [true]);
+	},
+	"Basic Buttons": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [22, 220]);
+		_ctx.try_call(_comp, "set_canvas_size", [1800]);
+		_ctx.try_call(_comp, "set_coverage_size", [460]);
+		_ctx.try_call(_comp, "set_value", [140]);
+	},
+	"Smooth + Fine Step": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [22, 240]);
+		_ctx.try_call(_comp, "set_canvas_size", [2400]);
+		_ctx.try_call(_comp, "set_coverage_size", [420]);
+		_ctx.try_call(_comp, "set_lerp_target", [280]);
+		_ctx.try_call(_comp, "set_value", [280]);
+	},
+	"Inverted Buttons": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [22, 230]);
+		_ctx.try_call(_comp, "set_canvas_size", [1600]);
+		_ctx.try_call(_comp, "set_coverage_size", [360]);
+		_ctx.try_call(_comp, "set_inverted", [true]);
+		_ctx.try_call(_comp, "set_value", [220]);
+	}
+});
+demo_library_register("Inputs/Scrollbars", WWScrollbarButtonsHorz, {
+	"set_size": [
+		{ name:"width", type:"Real" },
+		{ name:"height", type:"Real" }
+	],
+	"set_button_size": [
+		{ name:"size", type:"Real" }
+	],
+	"set_canvas_size": [
+		{ name:"size", type:"Real" }
+	],
+	"set_coverage_size": [
+		{ name:"size", type:"Real" }
+	],
+	"set_callback": [
+		{ name:"callback", type:"Function" }
+	],
+	"set_value": [
+		{ name:"value", type:"Real" }
+	],
+	"set_normalized_value": [
+		{ name:"value", type:"Real" }
+	],
+	"set_clamp_values": [
+		{ name:"min", type:"Real" },
+		{ name:"max", type:"Real" }
+	],
+	"set_rounding": [
+		{ name:"round", type:"Bool" }
+	],
+	"set_lerp_target": [
+		{ name:"lerp_target", type:"Real" }
+	],
+	"set_inverted": [
+		{ name:"invert", type:"Bool" }
+	],
+	"set_bar_size": [
+		{ name:"left", type:"Real" },
+		{ name:"top", type:"Real" },
+		{ name:"right", type:"Real" },
+		{ name:"bottom", type:"Real" }
+	],
+	"set_background_size": [
+		{ name:"left", type:"Real" },
+		{ name:"top", type:"Real" },
+		{ name:"right", type:"Real" },
+		{ name:"bottom", type:"Real" }
+	],
+	"set_show_track": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_show_fill": [
+		{ name:"enabled", type:"Bool" }
+	],
+	"set_show_bar": [
+		{ name:"enabled", type:"Bool" }
+	]
+}, {
+	"Horizontal Default": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [128, 16]);
+		_ctx.try_call(_comp, "set_show_track", [true]);
+		_ctx.try_call(_comp, "set_show_fill", [false]);
+		_ctx.try_call(_comp, "set_button_size", [10]);
+		_ctx.try_call(_comp, "set_inverted", [false]);
+	},
+	"Basic Buttons": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 22]);
+		_ctx.try_call(_comp, "set_canvas_size", [1800]);
+		_ctx.try_call(_comp, "set_coverage_size", [460]);
+		_ctx.try_call(_comp, "set_value", [140]);
+	},
+	"Inverted Buttons": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_size", [240, 22]);
+		_ctx.try_call(_comp, "set_canvas_size", [1600]);
+		_ctx.try_call(_comp, "set_coverage_size", [360]);
+		_ctx.try_call(_comp, "set_inverted", [true]);
+		_ctx.try_call(_comp, "set_value", [220]);
+	}
 });
 #endregion
 #region Sliders
@@ -1392,6 +1869,62 @@ demo_library_register("Layout/Windows", WWInputDialog, {
 		_ctx.try_call(_comp, "set_placeholder", ["Untitled Folder"]);
 		_ctx.try_call(_comp, "set_value", [""]);
 		_ctx.try_call(_comp, "open_dialog", []);
+	}
+});
+demo_library_register("Layout/Windows", WWFileBrowser, {
+	"set_select_mode": [
+		{ name:"mode", type:"Enum.WWFileBrowserSelectMode" },
+	],
+	"set_intent": [
+		{ name:"intent", type:"Enum.WWFileBrowserIntent" },
+	],
+	"set_path": [
+		{ name:"path", type:"String" },
+	],
+	"set_search_query": [
+		{ name:"query", type:"String" },
+	],
+	"set_extension_filters": [
+		{ name:"filters", type:"Array<String>" },
+	],
+	"set_extension_filter_index": [
+		{ name:"index", type:"Real" },
+	],
+	"set_drives": [
+		{ name:"drives", type:"Array<String>" },
+	],
+	"set_append_extension": [
+		{ name:"enabled", type:"Bool" },
+	],
+	"refresh": [],
+	"go_to": [
+		{ name:"path", type:"String" },
+	],
+	"go_parent": [],
+	"confirm": [],
+	"cancel": []
+}, {
+	"Open File": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Open File"]);
+		_ctx.try_call(_comp, "set_intent", [WWFileBrowserIntent.OPEN_FILE]);
+		_ctx.try_call(_comp, "set_select_mode", [WWFileBrowserSelectMode.FILE_SINGLE]);
+		_ctx.try_call(_comp, "set_extension_filters", [["*.*", ".txt", ".json", ".gml"]]);
+		_ctx.try_call(_comp, "set_size", [760, 520]);
+	},
+	"Save As": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Save As"]);
+		_ctx.try_call(_comp, "set_intent", [WWFileBrowserIntent.SAVE_FILE]);
+		_ctx.try_call(_comp, "set_select_mode", [WWFileBrowserSelectMode.FILE_SINGLE]);
+		_ctx.try_call(_comp, "set_append_extension", [true]);
+		_ctx.try_call(_comp, "set_extension_filters", [["*.*", ".txt", ".json", ".ini"]]);
+		_ctx.try_call(_comp, "set_size", [760, 520]);
+	},
+	"Select Folder": function(_comp, _ctx) {
+		_ctx.try_call(_comp, "set_title", ["Select Folder"]);
+		_ctx.try_call(_comp, "set_intent", [WWFileBrowserIntent.SELECT_FOLDER]);
+		_ctx.try_call(_comp, "set_select_mode", [WWFileBrowserSelectMode.FOLDER_SINGLE]);
+		_ctx.try_call(_comp, "set_extension_filters", [["*.*"]]);
+		_ctx.try_call(_comp, "set_size", [760, 520]);
 	}
 });
 #endregion

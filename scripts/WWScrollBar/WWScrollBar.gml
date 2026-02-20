@@ -5,6 +5,12 @@
 #endregion
 function WWScrollbar() : WWSliderBase() constructor {
     debug_name = "WWScrollbar";
+
+	// Scrollbar surface (track/tray) should resolve from scrollbar keyspace, not slider/button.
+	__theme_sprite_key_main__ = "scrollbar.sprite.tray.main";
+	__theme_sprite_key_state_prefix__ = "scrollbar.sprite.tray";
+	__theme_color_prefix__ = "scrollbar.color.tray";
+	__theme_alpha_prefix__ = "scrollbar.alpha.tray";
 	
     #region Public
 
@@ -74,7 +80,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			/// @desc    Replaces the internal thumb component used for dragging the scrollbar.
 			///          The new thumb is added as a child and wired to the drag behavior.
 			/// @self    WWScrollbar
-			/// @param   {Struct.WWSliderThumb} thumb : The new thumb component.
+			/// @param   {Struct.WWButtonSprite} thumb : The new thumb component.
 			/// @returns {Struct.WWScrollbar}
 			#endregion
 			static set_thumb = function(_thumb) {
@@ -86,6 +92,10 @@ function WWScrollbar() : WWSliderBase() constructor {
 				
 				thumb = _thumb;
 				add(thumb);
+				thumb.__theme_sprite_key_main__ = "scrollbar.sprite.thumb.main";
+				thumb.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.thumb";
+				thumb.__theme_color_prefix__ = "scrollbar.color.thumb";
+				thumb.__theme_alpha_prefix__ = "scrollbar.alpha.thumb";
 				
 				// Keep default sizing behavior: if the bar was sized and the thumb wasn't user-sized,
 				// match the bar thickness.
@@ -125,10 +135,12 @@ function WWScrollbar() : WWSliderBase() constructor {
 	        max_scroll = 0;
 	        smooth_scrolling = false;
 			
-	        // 📌 Create Thumb
-	        thumb = new WWSliderThumb()
-	            .set_sprite(spr_ww_pixel)
-	            .set_sprite_color(c_white);
+	        // Create Thumb
+	        thumb = new WWButtonSprite();
+			thumb.__theme_sprite_key_main__ = "scrollbar.sprite.thumb.main";
+			thumb.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.thumb";
+			thumb.__theme_color_prefix__ = "scrollbar.color.thumb";
+			thumb.__theme_alpha_prefix__ = "scrollbar.alpha.thumb";
 	        add(thumb);
 			
 	    #endregion
@@ -186,9 +198,9 @@ function WWScrollbar() : WWSliderBase() constructor {
 			
 			#region jsDoc
 			/// @func    get_thumb()
-			/// @desc    Returns the internal thumb component (WWSliderThumb).
+			/// @desc    Returns the internal thumb component.
 			/// @self    WWScrollbar
-			/// @returns {Struct.WWSliderThumb}
+			/// @returns {Struct.WWButtonSprite}
 			#endregion
 			static get_thumb = function() {
 				return thumb;
@@ -277,6 +289,10 @@ function WWScrollbar() : WWSliderBase() constructor {
 			/// @ignore
 			#endregion
             static __adjust_thumb_size__ = function() {
+				if (canvas_size <= 0 || coverage_size <= 0) {
+					__set_thumb_size__(10);
+					return;
+				}
                 var _ratio = coverage_size / canvas_size;
                 var _thumb_size = __get_available_size__() * _ratio;
                 _thumb_size = max(_thumb_size, 10); // Ensure minimum thumb size

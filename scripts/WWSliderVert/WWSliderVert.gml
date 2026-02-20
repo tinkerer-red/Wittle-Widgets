@@ -7,6 +7,7 @@ function WWSliderVert() : WWSliderBase() constructor {
 	debug_name = "WWSliderVert";
 	
 	on_interact(function(_input) {
+		if (height == 0) return;
 		var _norm_val;
 		if (is_inverted) {
             _norm_val = (device_mouse_y_to_gui(0) - y) / height;
@@ -18,12 +19,12 @@ function WWSliderVert() : WWSliderBase() constructor {
 				
 		set_normalized_value(_norm_val);
     });
-	on_pre_draw(function(_input) {
+	on_post_step(function(_input) {
 		var _bar_height = height * normalized_value;
 		if (is_inverted) {
-            bar.set_size(width, _bar_height);
+            set_bar_size(width, _bar_height);
         } else {
-            bar.set_size(0, height - _bar_height, width, height);
+            set_bar_size(0, height - _bar_height, width, height);
         }
     });
 }

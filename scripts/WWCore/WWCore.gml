@@ -435,6 +435,9 @@ function WWCore() constructor {
 			static handle_keyboard_submit_override = function(_input) {
 				return false;
 			}
+			static handle_keyboard_cancel_override = function(_input) {
+				return false;
+			}
 			
 		#endregion
 		
@@ -862,9 +865,20 @@ function WWCore() constructor {
 						var _current_index_submit = _root.__focus_registry_find_current_index__(_entries_submit, _count_submit);
 						if (_current_index_submit >= 0) {
 							var _current_submit = _entries_submit[_current_index_submit];
-							if (_current_submit.handle_keyboard_submit_override(_input)) {
+							var _submit_handled = _current_submit.handle_keyboard_submit_override(_input);
+							var _submit_handler_comp = _current_submit;
+							if (!_submit_handled) {
+								var _submit_owner = __resolve_dropdown_owner_for_nav__(_current_submit);
+								if (is_struct(_submit_owner) && _submit_owner.__comp_id__ != _current_submit.__comp_id__) {
+									_submit_handled = _submit_owner.handle_keyboard_submit_override(_input);
+									if (_submit_handled) {
+										_submit_handler_comp = _submit_owner;
+									}
+								}
+							}
+							if (_submit_handled) {
 								set_last_input_modality(_nav_modality);
-								_current_submit.set_last_input_modality(_nav_modality);
+								_submit_handler_comp.set_last_input_modality(_nav_modality);
 								_input.nav.consumed = true;
 								return;
 							}
@@ -876,6 +890,35 @@ function WWCore() constructor {
 									_input.nav.consumed = true;
 									return;
 								}
+							}
+						}
+					}
+				}
+				
+				if (_input.nav.cancel.pressed || _input.nav.cancel.repeat) {
+					var _registry_cancel = _root.__focus_registry_get_entries__();
+					var _entries_cancel = _registry_cancel.entries;
+					var _count_cancel = array_length(_entries_cancel);
+					if (_count_cancel > 0) {
+						var _current_index_cancel = _root.__focus_registry_find_current_index__(_entries_cancel, _count_cancel);
+						if (_current_index_cancel >= 0) {
+							var _current_cancel = _entries_cancel[_current_index_cancel];
+							var _cancel_handled = _current_cancel.handle_keyboard_cancel_override(_input);
+							var _cancel_handler_comp = _current_cancel;
+							if (!_cancel_handled) {
+								var _cancel_owner = __resolve_dropdown_owner_for_nav__(_current_cancel);
+								if (is_struct(_cancel_owner) && _cancel_owner.__comp_id__ != _current_cancel.__comp_id__) {
+									_cancel_handled = _cancel_owner.handle_keyboard_cancel_override(_input);
+									if (_cancel_handled) {
+										_cancel_handler_comp = _cancel_owner;
+									}
+								}
+							}
+							if (_cancel_handled) {
+								set_last_input_modality(_nav_modality);
+								_cancel_handler_comp.set_last_input_modality(_nav_modality);
+								_input.nav.consumed = true;
+								return;
 							}
 						}
 					}
@@ -3250,6 +3293,21 @@ function WWCore() constructor {
 				if (is_struct(_result)) return _result;
 				if (is_bool(_result) && _result) return _comp;
 				return undefined;
+			}
+			static __resolve_dropdown_owner_for_nav__ = function(_comp) {
+				if (!is_struct(_comp)) return noone;
+				var _node = _comp;
+				repeat (16) {
+					if (variable_struct_exists(_node, "__dropdown_owner__")) {
+						var _owner = _node.__dropdown_owner__;
+						if (is_struct(_owner)) return _owner;
+					}
+					if (!variable_struct_exists(_node, "__parent__")) break;
+					var _parent = _node.__parent__;
+					if (!is_struct(_parent)) break;
+					_node = _parent;
+				}
+				return noone;
 			}
 			static __focus_registry_should_auto_consume_on_nav_target__ = function(_comp) {
 				if (!is_struct(_comp)) return true;

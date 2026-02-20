@@ -167,6 +167,7 @@ function WWDropdown() : WWCore() constructor {
 				__menu_overlay__.add(_comp);
 				array_push(__items__, _comp);
 				_comp.__dropdown_item_index__ = __items_count__;
+				__bind_item_nav_overrides__(_comp);
 				__items_count__ += 1;
 			}
 			
@@ -268,6 +269,17 @@ function WWDropdown() : WWCore() constructor {
 				__refresh_dropdown_layout__();
 				__base_update__();
 			}
+			static handle_keyboard_submit_override = function(_input) {
+				if (is_open) {
+					if (__keyboard_select_current_nav_item__()) {
+						return true;
+					}
+				}
+				return __keyboard_open_and_focus_first_item__(_input);
+			}
+			static handle_keyboard_cancel_override = function(_input) {
+				return __keyboard_close_and_focus_header__(_input);
+			}
 		#endregion
 	#endregion
 	
@@ -279,6 +291,31 @@ function WWDropdown() : WWCore() constructor {
 		#region Functions
 		static __bind_header_events__ = function() {
 			if (!is_struct(__header_component__)) return;
+			__header_component__.__dropdown_owner__ = self;
+			if (variable_struct_exists(__header_component__, "text_component")) {
+				var _header_text = __header_component__.text_component;
+				if (is_struct(_header_text) && is_callable(_header_text.set_focusable)) {
+					_header_text.set_focusable(false);
+				}
+			}
+			__header_component__.handle_keyboard_submit_override = function(_input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return false;
+				return _owner.__keyboard_open_and_focus_first_item__(_input);
+			}
+			__header_component__.handle_keyboard_cancel_override = function(_input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return false;
+				return _owner.__keyboard_close_and_focus_header__(_input);
+			}
+			__header_component__.handle_keyboard_nav_override = function(_direction) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return undefined;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return undefined;
+				return _owner.__keyboard_nav_override_from__(self, _direction);
+			}
 			if (variable_struct_exists(__header_component__, "on_released")) {
 				var _on_released = variable_struct_get(__header_component__, "on_released");
 				if (!is_callable(_on_released)) return;
@@ -287,6 +324,155 @@ function WWDropdown() : WWCore() constructor {
 					set_open(!is_open);
 				});
 			}
+		}
+		static __bind_item_nav_overrides__ = function(_comp) {
+			if (!is_struct(_comp)) return;
+			_comp.__dropdown_owner__ = self;
+			if (variable_struct_exists(_comp, "text_component")) {
+				var _item_text = _comp.text_component;
+				if (is_struct(_item_text) && is_callable(_item_text.set_focusable)) {
+					_item_text.set_focusable(false);
+				}
+			}
+			_comp.handle_keyboard_submit_override = function(_input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
+				if (!variable_struct_exists(self, "__dropdown_item_index__")) return false;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return false;
+				var _idx = self.__dropdown_item_index__;
+				if (_idx < 0) return false;
+				_owner.set_value(_idx);
+				_owner.__keyboard_focus_header__();
+				return true;
+			}
+			_comp.handle_keyboard_cancel_override = function(_input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return false;
+				return _owner.__keyboard_close_and_focus_header__(_input);
+			}
+			_comp.handle_keyboard_nav_override = function(_direction) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return undefined;
+				var _owner = self.__dropdown_owner__;
+				if (!is_struct(_owner)) return undefined;
+				return _owner.__keyboard_nav_override_from__(self, _direction);
+			}
+		}
+		static __keyboard_focus_header__ = function() {
+			if (!is_struct(__header_component__)) return false;
+			var _root = __root_canvas__;
+			if (!is_struct(_root)) _root = self;
+			var _assigned = _root.__focus_registry_set_target__(__header_component__, false);
+			return is_struct(_assigned);
+		}
+		static __keyboard_find_first_navigable_item__ = function() {
+			for (var _i=0; _i<__items_count__; _i++) {
+				var _comp = __items__[_i];
+				if (!is_struct(_comp)) continue;
+				if (!_comp.__is_focusable__) continue;
+				if (!_comp.__is_enabled__) continue;
+				if (!_comp.__is_active__) continue;
+				if (variable_struct_exists(_comp, "visible") && !_comp.visible) continue;
+				return _comp;
+			}
+			return noone;
+		}
+		static __keyboard_get_nav_scope__ = function() {
+			var _scope = [];
+			for (var _i=0; _i<__items_count__; _i++) {
+				var _comp = __items__[_i];
+				if (!is_struct(_comp)) continue;
+				if (!_comp.__is_focusable__) continue;
+				if (!_comp.__is_enabled__) continue;
+				if (!_comp.__is_active__) continue;
+				if (variable_struct_exists(_comp, "visible") && !_comp.visible) continue;
+				array_push(_scope, _comp);
+			}
+			return _scope;
+		}
+		static __keyboard_scope_index_of__ = function(_scope, _comp_id) {
+			var _count = array_length(_scope);
+			for (var _i=0; _i<_count; _i++) {
+				if (_scope[_i].__comp_id__ == _comp_id) return _i;
+			}
+			return -1;
+		}
+		static __keyboard_nav_override_from__ = function(_from, _direction) {
+			if (!is_open) return undefined;
+			
+			var _scope = __keyboard_get_nav_scope__();
+			var _count = array_length(_scope);
+			if (_count <= 0) return _from;
+			
+			var _idx = __keyboard_scope_index_of__(_scope, _from.__comp_id__);
+			
+			var _step = 0;
+			switch (_direction) {
+				case "next":
+				case "down":
+				case "right": _step = 1; break;
+				case "prev":
+				case "up":
+				case "left": _step = -1; break;
+				default: return (_idx < 0) ? _scope[0] : _scope[_idx];
+			}
+			
+			if (_idx < 0) {
+				if (_step >= 0) return _scope[0];
+				return _scope[_count - 1];
+			}
+			
+			var _next = _idx + _step;
+			if (_next < 0) _next = _count - 1;
+			if (_next >= _count) _next = 0;
+			return _scope[_next];
+		}
+		static __keyboard_get_current_nav_target__ = function() {
+			var _root = __root_canvas__;
+			if (!is_struct(_root)) _root = self;
+			var _registry = _root.__focus_registry_get_entries__();
+			var _entries = _registry.entries;
+			var _count = array_length(_entries);
+			if (_count <= 0) return noone;
+			var _idx = _root.__focus_registry_find_current_index__(_entries, _count);
+			if (_idx < 0) return noone;
+			return _entries[_idx];
+		}
+		static __keyboard_select_current_nav_item__ = function() {
+			var _target = __keyboard_get_current_nav_target__();
+			if (!is_struct(_target)) return false;
+			if (!variable_struct_exists(_target, "__dropdown_owner__")) return false;
+			var _owner = _target.__dropdown_owner__;
+			if (!is_struct(_owner)) return false;
+			if (_owner.__comp_id__ != __comp_id__) return false;
+			if (!variable_struct_exists(_target, "__dropdown_item_index__")) return false;
+			var _idx = _target.__dropdown_item_index__;
+			if ((_idx < 0) || (_idx >= __items_count__)) return false;
+			set_value(_idx);
+			__keyboard_focus_header__();
+			return true;
+		}
+		static __keyboard_open_and_focus_first_item__ = function(_input) {
+			if (!is_open) {
+				set_open(true);
+			}
+			var _first_item = __keyboard_find_first_navigable_item__();
+			if (!is_struct(_first_item)) {
+				return __keyboard_focus_header__();
+			}
+			var _root = __root_canvas__;
+			if (!is_struct(_root)) _root = self;
+			var _assigned = _root.__focus_registry_set_target__(_first_item, false);
+			if (!is_struct(_assigned)) {
+				return __keyboard_focus_header__();
+			}
+			return true;
+		}
+		static __keyboard_close_and_focus_header__ = function(_input) {
+			if (!is_open) return false;
+			set_open(false);
+			__keyboard_focus_header__();
+			return true;
 		}
 		
 		static __header_set_text__ = function(_text) {

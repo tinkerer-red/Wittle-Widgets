@@ -134,7 +134,7 @@ function WWCanvas() : WWCore() constructor {
 				case WW_STATE_HOVER: return "hover";
 				case WW_STATE_ACTIVE: return "active";
 				case WW_STATE_DISABLED: return "disabled";
-				case WW_STATE_FOCUSED: return "focused";
+				case WW_STATE_NAV: return "nav";
 				default: return "idle";
 			}
 		};

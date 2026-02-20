@@ -12,7 +12,7 @@ function __wwThemeBuild05States(_theme, _out) {
 
 		var _hover = is_numeric(_base) ? merge_color(_base, c_white, max(0, _hover_delta)) : _base;
 		var _active = is_numeric(_base) ? merge_color(_base, c_black, max(0, -_active_delta)) : _base;
-		var _focused = _hover;
+		var _nav = _hover;
 		var _disabled_v = _disabled;
 		if (_disabled_v == undefined) {
 			_disabled_v = is_numeric(_base) ? merge_color(_base, c_black, 0.20) : _base;
@@ -21,7 +21,7 @@ function __wwThemeBuild05States(_theme, _out) {
 		__wwThemeSetPath(_dst, _prefix + ".idle", _base);
 		__wwThemeSetPath(_dst, _prefix + ".hover", _hover);
 		__wwThemeSetPath(_dst, _prefix + ".active", _active);
-		__wwThemeSetPath(_dst, _prefix + ".focused", _focused);
+		__wwThemeSetPath(_dst, _prefix + ".nav", _nav);
 		__wwThemeSetPath(_dst, _prefix + ".disabled", _disabled_v);
 	};
 
@@ -30,7 +30,7 @@ function __wwThemeBuild05States(_theme, _out) {
 		__wwThemeSetPath(_dst, _prefix + ".idle", _base);
 		__wwThemeSetPath(_dst, _prefix + ".hover", _base);
 		__wwThemeSetPath(_dst, _prefix + ".active", _base);
-		__wwThemeSetPath(_dst, _prefix + ".focused", _base);
+		__wwThemeSetPath(_dst, _prefix + ".nav", _base);
 		__wwThemeSetPath(_dst, _prefix + ".disabled", _disabled_alpha);
 	};
 
@@ -39,7 +39,7 @@ function __wwThemeBuild05States(_theme, _out) {
 		__wwThemeSetPath(_dst, _prefix + ".idle", _main_sprite);
 		__wwThemeSetPath(_dst, _prefix + ".hover", _main_sprite);
 		__wwThemeSetPath(_dst, _prefix + ".active", _main_sprite);
-		__wwThemeSetPath(_dst, _prefix + ".focused", _main_sprite);
+		__wwThemeSetPath(_dst, _prefix + ".nav", _main_sprite);
 		__wwThemeSetPath(_dst, _prefix + ".disabled", _main_sprite);
 	};
 

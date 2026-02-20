@@ -357,10 +357,6 @@ function __wwThemeDeriveColors(_theme, _mode) {
 	__wwPaintFillMissing(__wwEnsurePaintPath(_theme, "colors.accent.subtle"), accent, 0.20);
 
 	// state (use accent hue shifted from a neutral base for nicer results)
-	var focus_base = __wwEnsurePaintPath(_theme, "colors.outline.normal").color;
-	var focus_col = __wwColorShiftHue(focus_base, accent, _theme.derive.lum_factor);
-	__wwPaintFillMissing(__wwEnsurePaintPath(_theme, "colors.state.focus_ring"), focus_col, (_mode == "light") ? 0.60 : 0.80);
-
 	var sel_base = __wwEnsurePaintPath(_theme, "colors.surface.control_alt").color;
 	var sel_col = __wwColorShiftHue(sel_base, accent, _theme.derive.lum_factor);
 	__wwPaintFillMissing(__wwEnsurePaintPath(_theme, "colors.state.selection_bg"), sel_col, (_mode == "light") ? 0.20 : 0.40);
@@ -550,7 +546,7 @@ function __wwThemeIsStateSegment(_segment) {
 		case "idle":
 		case "hover":
 		case "active":
-		case "focused":
+		case "nav":
 		case "disabled":
 		case "checked":
 		case "unchecked":

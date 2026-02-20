@@ -61,7 +61,6 @@ function wwThemeDefault() {
 				subtle: { color: undefined, alpha: undefined }
 			},
 			state: {
-				focus_ring: { color: undefined, alpha: undefined },
 				selection_bg: { color: undefined, alpha: undefined },
 				selection_text: { color: undefined, alpha: undefined },
 				success_fg: { color: undefined, alpha: undefined },
@@ -232,7 +231,7 @@ function wwThemeDefault() {
 				idle:     "colors.outline.subtle",
 				hover:    "colors.accent.primary",
 				active:   "colors.accent.primary",
-				focused:  "colors.accent.primary",
+				nav:      "colors.accent.primary",
 				disabled: "colors.outline.subtle"
 			},
 			text: {
@@ -259,7 +258,7 @@ function wwThemeDefault() {
 				bg: {
 					idle:     "colors.surface.control",
 					hover:    "colors.surface.control_alt",
-					focused:  "colors.surface.control_alt",
+					nav:      "colors.surface.control_alt",
 					active:   "colors.surface.control_alt",
 					disabled: "colors.surface.panel"
 				},
@@ -267,13 +266,13 @@ function wwThemeDefault() {
 					idle:     "colors.outline.subtle",
 					hover:    "colors.accent.primary",
 					active:   "colors.accent.primary",
-					focused:  "colors.accent.primary",
+					nav:      "colors.accent.primary",
 					disabled: "colors.outline.subtle"
 				},
 				text: {
 					idle:     "colors.text.primary",
 					hover:    "colors.text.primary",
-					focused:  "colors.text.primary",
+					nav:      "colors.text.primary",
 					active:   "colors.text.primary",
 					disabled: "colors.text.disabled"
 				},
@@ -293,7 +292,7 @@ function wwThemeDefault() {
 				},
 				border: {
 					idle:     "colors.outline.subtle",
-					focused:  "colors.accent.primary",
+					nav:      "colors.accent.primary",
 					invalid:  "colors.state.danger_fg"
 				},
 
@@ -311,13 +310,13 @@ function wwThemeDefault() {
 			checkbox: {
 				box_size: 16,
 				radius: "layout.radius.sm",
-				   bg: {
-					   idle: "colors.surface.control",
-					   hover:  "colors.surface.control_alt",
-					   focused: "colors.surface.control_alt",
-					   active: "colors.surface.control_alt",
-					   disabled: "colors.surface.panel"
-				   },
+				bg: {
+					idle: "colors.surface.control",
+					hover:  "colors.surface.control_alt",
+					nav:    "colors.surface.control_alt",
+					active: "colors.surface.control_alt",
+					disabled: "colors.surface.panel"
+				},
 				border: "control_states.border",
 				check: { color: "colors.accent.primary", mark: "colors.accent.on_accent" },
 				text: "control_states.text"
@@ -328,13 +327,13 @@ function wwThemeDefault() {
 				thumb: { size: 14, radius: "layout.radius.lg" },
 				track_bg: "colors.outline.subtle",
 				track_fill: "colors.accent.primary",
-				   thumb_bg: {
-					   idle: "colors.surface.control_alt",
-					   hover:  "colors.surface.control_alt",
-					   focused: "colors.surface.control_alt",
-					   active: "colors.surface.control_alt",
-					   disabled: "colors.surface.panel"
-				   },
+				thumb_bg: {
+					idle: "colors.surface.control_alt",
+					hover:  "colors.surface.control_alt",
+					nav:    "colors.surface.control_alt",
+					active: "colors.surface.control_alt",
+					disabled: "colors.surface.panel"
+				},
 				thumb_border: "control_states.border"
 			},
 

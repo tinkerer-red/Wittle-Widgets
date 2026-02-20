@@ -36,7 +36,7 @@
 #macro WW_STATE_HOVER    1
 #macro WW_STATE_ACTIVE   2
 #macro WW_STATE_DISABLED 3
-#macro WW_STATE_FOCUSED  4
+#macro WW_STATE_NAV      4
 
 // Debug/fallback: bright magenta (Minecraft-style missing texture indicator)
 #macro WW_COLOR_MISSING_THEME c_fuchsia

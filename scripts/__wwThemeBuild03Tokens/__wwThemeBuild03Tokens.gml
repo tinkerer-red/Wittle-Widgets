@@ -101,7 +101,6 @@ function __wwThemeBuild03Tokens(_theme, _out) {
 	__token_set(_theme, _out, "colors.accent.subtle", p.blue, (_mode == "dark") ? 0.30 : 0.20);
 	__token_set(_theme, _out, "colors.text.link", p.blue, 1);
 
-	__token_set(_theme, _out, "colors.state.focus_ring", p.blue, (_mode == "dark") ? 0.80 : 0.60);
 	__token_set(_theme, _out, "colors.state.selection_bg", p.blue, (_mode == "dark") ? 0.40 : 0.20);
 	__token_set(_theme, _out, "colors.state.selection_text", (_mode == "dark") ? p.n100 : p.n0, 1);
 	__token_set(_theme, _out, "colors.state.success_fg", p.green, 1);

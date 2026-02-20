@@ -827,7 +827,7 @@ function WWCore() constructor {
             static navigate_focus = function(_dir) {
 				var _root = __root_canvas__;
 				if (!is_struct(_root)) _root = self;
-				var _target = _root.__focus_registry_navigate__(_dir, self);
+				var _target = _root.__focus_registry_navigate__(_dir, self, __last_input_modality__);
 				if (is_struct(_target)) return _target;
 				return self;
             }
@@ -847,6 +847,13 @@ function WWCore() constructor {
 				if (!is_struct(_input.nav)) return;
 				if (_input.nav.consumed) return;
 				
+				var _nav_modality = "unknown";
+				var _nav_source = string_lower(string(_input.nav.source));
+				switch (_nav_source) {
+					case "keyboard":
+					case "controller": _nav_modality = _nav_source; break;
+				}
+				
 				if (_input.nav.submit.pressed || _input.nav.submit.repeat) {
 					var _registry_submit = _root.__focus_registry_get_entries__();
 					var _entries_submit = _registry_submit.entries;
@@ -856,16 +863,16 @@ function WWCore() constructor {
 						if (_current_index_submit >= 0) {
 							var _current_submit = _entries_submit[_current_index_submit];
 							if (_current_submit.handle_keyboard_submit_override(_input)) {
-								set_last_input_modality("keyboard");
-								_current_submit.set_last_input_modality("keyboard");
+								set_last_input_modality(_nav_modality);
+								_current_submit.set_last_input_modality(_nav_modality);
 								_input.nav.consumed = true;
 								return;
 							}
 							if (!_current_submit.__is_input_consumer__) {
 								var _assigned_submit = _root.__focus_registry_set_target__(_current_submit, true);
 								if (is_struct(_assigned_submit)) {
-									set_last_input_modality("keyboard");
-									_assigned_submit.set_last_input_modality("keyboard");
+									set_last_input_modality(_nav_modality);
+									_assigned_submit.set_last_input_modality(_nav_modality);
 									_input.nav.consumed = true;
 									return;
 								}
@@ -876,22 +883,22 @@ function WWCore() constructor {
 				
 				var _did_navigate = false;
 				if (_input.nav.next.pressed || _input.nav.next.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("next"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("next", undefined, _nav_modality));
 				}
 				else if (_input.nav.prev.pressed || _input.nav.prev.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("prev"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("prev", undefined, _nav_modality));
 				}
 				else if (_input.nav.left.pressed || _input.nav.left.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("left"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("left", undefined, _nav_modality));
 				}
 				else if (_input.nav.right.pressed || _input.nav.right.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("right"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("right", undefined, _nav_modality));
 				}
 				else if (_input.nav.up.pressed || _input.nav.up.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("up"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("up", undefined, _nav_modality));
 				}
 				else if (_input.nav.down.pressed || _input.nav.down.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("down"));
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("down", undefined, _nav_modality));
 				}
 				
 				if (_did_navigate) {
@@ -2213,7 +2220,7 @@ function WWCore() constructor {
 						$"WW_STATE_DISABLED = {WW_STATE_DISABLED};",
 						$"WW_STATE_ACTIVE = {WW_STATE_ACTIVE};",
 						$"WW_STATE_HOVER = {WW_STATE_HOVER};",
-						$"WW_STATE_FOCUSED = {WW_STATE_FOCUSED};",
+						$"WW_STATE_NAV = {WW_STATE_NAV};",
 						$"WW_STATE_NORMAL = {WW_STATE_NORMAL};",
 					))
 				}
@@ -3363,7 +3370,15 @@ function WWCore() constructor {
 				
 				return _best;
 			}
-			static __focus_registry_navigate__ = function(_dir, _from=undefined) {
+			static __focus_registry_navigate__ = function(_dir, _from=undefined, _modality="unknown") {
+				var _nav_modality = string_lower(string(_modality));
+				switch (_nav_modality) {
+					case "keyboard":
+					case "controller":
+					break;
+					default: _nav_modality = "unknown"; break;
+				}
+				
 				var _registry = __focus_registry_get_entries__();
 				var _entries = _registry.entries;
 				var _count = array_length(_entries);
@@ -3387,8 +3402,8 @@ function WWCore() constructor {
 					var _auto_consume_override = __focus_registry_should_auto_consume_on_nav_target__(_override_target);
 					var _assigned_override = __focus_registry_set_target__(_override_target, _auto_consume_override);
 					if (is_struct(_assigned_override)) {
-						set_last_input_modality("keyboard");
-						_assigned_override.set_last_input_modality("keyboard");
+						set_last_input_modality(_nav_modality);
+						_assigned_override.set_last_input_modality(_nav_modality);
 						return _assigned_override;
 					}
 					return undefined;
@@ -3419,8 +3434,8 @@ function WWCore() constructor {
 				var _auto_consume = __focus_registry_should_auto_consume_on_nav_target__(_target);
 				var _assigned = __focus_registry_set_target__(_target, _auto_consume);
 				if (is_struct(_assigned)) {
-					set_last_input_modality("keyboard");
-					_assigned.set_last_input_modality("keyboard");
+					set_last_input_modality(_nav_modality);
+					_assigned.set_last_input_modality(_nav_modality);
 					return _assigned;
 				}
 				
@@ -3436,8 +3451,10 @@ function WWCore() constructor {
 				if (__is_pointer_over__)     { 
 					__visual_state__ = WW_STATE_HOVER; return; 
 					}
-				if (__is_nav_target__ || __is_input_consumer__)     { 
-					__visual_state__ = WW_STATE_FOCUSED; return; 
+				if (__is_nav_target__
+				&& (__last_input_modality__ == "keyboard"
+				|| __last_input_modality__ == "controller")) { 
+					__visual_state__ = WW_STATE_NAV; return; 
 					}
 				//else
 				__visual_state__ = WW_STATE_NORMAL;

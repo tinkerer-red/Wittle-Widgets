@@ -74,7 +74,6 @@ function wwThemeDark() {
 			subtle: { color: #4C8DFF, alpha: 0.20 }
 		},
 		state: {
-			focus_ring: { color: #4C8DFF, alpha: 0.80 },
 			selection_bg: { color: #4C8DFF, alpha: 0.40 },
 			selection_text: { color: #FFFFFF, alpha: 1 },
 			success_fg: { color: #2ECC71, alpha: 1 },
@@ -94,7 +93,7 @@ function wwThemeDark() {
 				idle: #55627A,
 				hover: #8A96AD,
 				active: #B3BDD1,
-				focused: #8A96AD,
+				nav: #8A96AD,
 				disabled: #3B465C
 			},
 			tray: {
@@ -111,28 +110,28 @@ function wwThemeDark() {
 					idle: #2A3345,
 					hover: #3B465C,
 					active: #55627A,
-					focused: #3B465C,
+					nav: #3B465C,
 					disabled: #1C2230
 				},
 				down: {
 					idle: #2A3345,
 					hover: #3B465C,
 					active: #55627A,
-					focused: #3B465C,
+					nav: #3B465C,
 					disabled: #1C2230
 				},
 				left: {
 					idle: #2A3345,
 					hover: #3B465C,
 					active: #55627A,
-					focused: #3B465C,
+					nav: #3B465C,
 					disabled: #1C2230
 				},
 				right: {
 					idle: #2A3345,
 					hover: #3B465C,
 					active: #55627A,
-					focused: #3B465C,
+					nav: #3B465C,
 					disabled: #1C2230
 				}
 			}
@@ -142,7 +141,7 @@ function wwThemeDark() {
 				idle: 0.70,
 				hover: 0.85,
 				active: 1.00,
-				focused: 0.90,
+				nav: 0.90,
 				disabled: 0.45
 			},
 			tray: {
@@ -159,28 +158,28 @@ function wwThemeDark() {
 					idle: 1.00,
 					hover: 1.00,
 					active: 1.00,
-					focused: 1.00,
+					nav: 1.00,
 					disabled: 0.45
 				},
 				down: {
 					idle: 1.00,
 					hover: 1.00,
 					active: 1.00,
-					focused: 1.00,
+					nav: 1.00,
 					disabled: 0.45
 				},
 				left: {
 					idle: 1.00,
 					hover: 1.00,
 					active: 1.00,
-					focused: 1.00,
+					nav: 1.00,
 					disabled: 0.45
 				},
 				right: {
 					idle: 1.00,
 					hover: 1.00,
 					active: 1.00,
-					focused: 1.00,
+					nav: 1.00,
 					disabled: 0.45
 				}
 			}

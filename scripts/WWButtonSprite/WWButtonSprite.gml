@@ -99,7 +99,7 @@ function WWButtonSprite() : WWSprite() constructor {
 					case WW_STATE_HOVER: return "hover";
 					case WW_STATE_ACTIVE: return "active";
 					case WW_STATE_DISABLED: return "disabled";
-					case WW_STATE_FOCUSED: return "focused";
+					case WW_STATE_NAV: return "nav";
 					case WW_STATE_NORMAL: return "idle";
 					default: return "idle";
 				}

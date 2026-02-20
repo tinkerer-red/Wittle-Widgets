@@ -103,7 +103,7 @@ function WWHotkeyManager() constructor {
     /// @param   {Any} deepest : Deepest match so far (internal).
     /// @returns {Struct|Undefined}
     #endregion
-    static step = function(_node = __root, _depth = 0, _deepest = undefined) {
+    static step = function(_input=undefined, _node = __root, _depth = 0, _deepest = undefined) {
         var _keys = struct_get_names(_node);
 	    var _i = 0, _length = array_length(_keys);
 
@@ -119,8 +119,8 @@ function WWHotkeyManager() constructor {
 	        if (_key == "callback") continue;
 
 	        var _key_id = real(_key);
-	        if (keyboard_check(_key_id)) {
-                _deepest = step(_node[$ _key], _depth + 1, _deepest);
+	        if (is_struct(_input) && is_struct(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(_key_id)) {
+                _deepest = step(_input, _node[$ _key], _depth + 1, _deepest);
 	        }
 	    }
 
@@ -132,7 +132,7 @@ function WWHotkeyManager() constructor {
             if (_deepest != undefined) {
                 if (_state.active_node != _deepest.node) {
                     // New combo: trigger immediately and start timing
-                    _deepest.node.callback();
+                    _deepest.node.callback(_input);
                     _state.active_node = _deepest.node;
                     _state.start_time = _now;
                     _state.last_fire = _now;
@@ -142,7 +142,7 @@ function WWHotkeyManager() constructor {
                     var _since_last = _now - _state.last_fire;
 
                     if (_since_start >= WW_TEXTBOX_REPEAT_DELAY && _since_last >= WW_TEXTBOX_REPEAT_INTERVAL) {
-	                    _deepest.node.callback();
+	                    _deepest.node.callback(_input);
                         _state.last_fire = _now;
                     }
                 }
@@ -157,3 +157,4 @@ function WWHotkeyManager() constructor {
 	};
 	
 }
+

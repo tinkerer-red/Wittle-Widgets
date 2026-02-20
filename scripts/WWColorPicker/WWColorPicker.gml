@@ -341,10 +341,10 @@ function WWColorPicker() : WWCore() constructor {
 			draw_circle(_sx, _sy, 4, false);
 		};
 
-		static __wheel_apply_mouse__ = function() {
+		static __wheel_apply_mouse__ = function(_input) {
 			__update_wheel_geometry__();
-			var mx = device_mouse_x_to_gui(0);
-			var my = device_mouse_y_to_gui(0);
+			var mx = _input.pointer.x;
+			var my = _input.pointer.y;
 			var _mode = __wheel_hit_mode__(mx, my);
 			var _did = __wheel_apply_mouse_mode__(_mode, mx, my);
 
@@ -421,9 +421,9 @@ function WWColorPicker() : WWCore() constructor {
 		__draw_wheel__();
 	});
 	wheel.on_pressed(function(_input) {
-		__drag_mode__ = __wheel_hit_mode__(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0));
+		__drag_mode__ = __wheel_hit_mode__(_input.pointer.x, _input.pointer.y);
 		if (__drag_mode__ > 0) {
-			if (__wheel_apply_mouse_mode__(__drag_mode__, device_mouse_x_to_gui(0), device_mouse_y_to_gui(0))) {
+			if (__wheel_apply_mouse_mode__(__drag_mode__, _input.pointer.x, _input.pointer.y)) {
 				__sync_color_from_hsv__();
 				__sync_inputs__();
 				__fire__("wheel");
@@ -432,7 +432,7 @@ function WWColorPicker() : WWCore() constructor {
 	});
 	wheel.on_held(function(_input) {
 		if (__drag_mode__ > 0) {
-			if (__wheel_apply_mouse_mode__(__drag_mode__, device_mouse_x_to_gui(0), device_mouse_y_to_gui(0))) {
+			if (__wheel_apply_mouse_mode__(__drag_mode__, _input.pointer.x, _input.pointer.y)) {
 				__sync_color_from_hsv__();
 				__sync_inputs__();
 				__fire__("wheel");
@@ -476,3 +476,4 @@ function WWColorPicker() : WWCore() constructor {
 		__fire__("alpha");
 	});
 }
+

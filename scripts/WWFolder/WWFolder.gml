@@ -222,6 +222,48 @@ function WWFolder() : WWButtonText() constructor {
 			static get_container = function() {
 				return __container__;
 			}
+			
+			#region jsDoc
+			/// @func    handle_keyboard_nav_override()
+			/// @desc    Tree-style keyboard override:
+			///          - Left on open header collapses and keeps focus on header.
+			///          - Left on closed header moves focus to ancestor folder header if available.
+			/// @self    WWFolder
+			/// @param   {String} direction : Navigation direction.
+			/// @returns {Struct.WWCore|Bool|Undefined}
+			#endregion
+			static handle_keyboard_nav_override = function(_direction) {
+				if (_direction != "left") return undefined;
+				
+				if (is_open) {
+					set_open(false);
+					return self;
+				}
+				
+				var _ancestor_folder = __find_ancestor_folder__();
+				if (is_struct(_ancestor_folder)) {
+					return _ancestor_folder;
+				}
+				
+				return undefined;
+			}
+			#region jsDoc
+			/// @func    handle_keyboard_submit_override()
+			/// @desc    Handles nav submit on the folder header by toggling open/closed.
+			/// @self    WWFolder
+			/// @param   {Struct} input : Current input payload.
+			/// @returns {Bool} True when handled.
+			#endregion
+			static handle_keyboard_submit_override = function(_input) {
+				set_open(!is_open);
+				if (is_open) {
+					trigger_event(events.opened, _input);
+				}
+				else {
+					trigger_event(events.closed, _input);
+				}
+				return true;
+			}
 
 			#region jsDoc
 			/// @func    relayout_children()

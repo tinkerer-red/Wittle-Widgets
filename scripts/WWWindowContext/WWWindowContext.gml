@@ -53,7 +53,7 @@ function WWWindowContext() : WWWindow() constructor {
 			__clamp_to_gui__();
 			set_open(true);
 			bring_to_front();
-			ignore_outside_click_once = mouse_check_button(mb_left) || mouse_check_button(mb_right);
+			ignore_outside_click_once = is_struct(__user_input__) && is_struct(__user_input__.pointer) && (__user_input__.pointer.left.down || __user_input__.pointer.right.down);
 			return self;
 		};
 		
@@ -82,6 +82,7 @@ function WWWindowContext() : WWWindow() constructor {
 		
 		static overlay_step = function(_input=undefined) {
 			__base_overlay_step__(_input);
+			if (!is_struct(_input)) _input = __user_input__;
 			if (!is_open) return;
 			
 			if (keep_on_screen) {
@@ -89,20 +90,20 @@ function WWWindowContext() : WWWindow() constructor {
 			}
 			
 			if (ignore_outside_click_once) {
-				if (!mouse_check_button(mb_left) && !mouse_check_button(mb_right)) {
+				if (!_input.pointer.left.down && !_input.pointer.right.down) {
 					ignore_outside_click_once = false;
 				}
 				return;
 			}
 			
-			if (auto_close_escape && keyboard_check_pressed(vk_escape)) {
+			if (auto_close_escape && _input.keyboard.key_pressed(vk_escape)) {
 				set_open(false);
 				return;
 			}
 			
 			if (auto_close_outside) {
-				var _pressed = mouse_check_button_pressed(mb_left) || mouse_check_button_pressed(mb_right);
-				if (_pressed && !mouse_on_group()) {
+				var _pressed = _input.pointer.left.pressed || _input.pointer.right.pressed;
+				if (_pressed && !mouse_on_group(_input)) {
 					set_open(false);
 				}
 			}
@@ -140,3 +141,4 @@ function WWWindowContext() : WWWindow() constructor {
 	set_scrollbars_enabled(false, false);
 	set_open(false);
 }
+

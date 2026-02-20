@@ -14,7 +14,7 @@ function WWScrollbarVert() : WWScrollbar() constructor {
     /// @returns {Real} mouse_pos
     /// @ignore
     #endregion
-    static __get_mouse_pos__      = function() { return device_mouse_y_to_gui(0); };
+    static __get_mouse_pos__      = function(_input) { return _input.pointer.y; };
     #region jsDoc
     /// @func    __get_available_size__()
     /// @desc    Returns the distance the thumb can travel along the track.
@@ -66,4 +66,5 @@ function WWScrollbarVert() : WWScrollbar() constructor {
     #endregion
     static __set_thumb_size__     = function(_size) { thumb.set_size(width, _size); };
 }
+
 

@@ -206,9 +206,9 @@ function WWDropdown() : WWCore() constructor {
 			
 			on_pre_step(function(_input) {
 				if (!is_open) return;
-				if (!mouse_check_button_pressed(mb_left)) return;
-				if (mouse_on_group()) return;
-				if (__menu_overlay__.mouse_on_group()) return;
+				if (!_input.pointer.left.pressed) return;
+				if (mouse_on_group(_input)) return;
+				if (__menu_overlay__.mouse_on_group(_input)) return;
 				set_open(false);
 			});
 			
@@ -420,3 +420,4 @@ function WWDropdown() : WWCore() constructor {
 	__base_add__([__header_component__, __menu_overlay__]);
 	__bind_header_events__();
 }
+

@@ -374,16 +374,16 @@ function WWTextBase() : WWCore() constructor {
 			}
 			
 			
-			on_pressed(function(_data) {
+			on_pressed(function(_input) {
 				// get focus
-				__mouse_down_x__ = device_mouse_x_to_gui(0);
-				__mouse_down_y__ = device_mouse_y_to_gui(0);
+				__mouse_down_x__ = _input.pointer.x;
+				__mouse_down_y__ = _input.pointer.y;
 				
-				__check_minput__(false);
+				__check_minput__(_input, false);
 			})
-			on_interact(function(_data) {
-				var mx = device_mouse_x_to_gui(0);
-				var my = device_mouse_y_to_gui(0);
+			on_interact(function(_input) {
+				var mx = _input.pointer.x;
+				var my = _input.pointer.y;
 				if (__mouse_down_x__ = mx)
 				&& (__mouse_down_y__ = my) {
 					return;
@@ -391,9 +391,9 @@ function WWTextBase() : WWCore() constructor {
 				
 				// stay focused if mouse is on component
 				if (__word_selection_mode__) {
-			        __update_word_selection_drag__();
+			        __update_word_selection_drag__(_input);
 			    } else {
-			        __check_minput__(true);
+			        __check_minput__(_input, true);
 			    }
 			})
 			on_long_press(function(_data) {
@@ -418,24 +418,24 @@ function WWTextBase() : WWCore() constructor {
 				/*
 			    #region --- Navigation Controls: Arrow Keys ---
 			    // Left arrow
-			    if (keyboard_check_pressed(vk_left)) {
-			        __move_cursor_offset__(-1, keyboard_check(vk_shift), false, keyboard_check(vk_control));
+			    if (_input.keyboard.key_pressed(vk_left)) {
+			        __move_cursor_offset__(-1, _input.keyboard.key_down(vk_shift), false, _input.keyboard.key_down(vk_control));
 			    }
 			    // Right arrow
-			    if (keyboard_check_pressed(vk_right)) {
-			        __move_cursor_offset__(1, keyboard_check(vk_shift), false, keyboard_check(vk_control));
+			    if (_input.keyboard.key_pressed(vk_right)) {
+			        __move_cursor_offset__(1, _input.keyboard.key_down(vk_shift), false, _input.keyboard.key_down(vk_control));
 			    }
 			    // Up arrow
-			    if (keyboard_check_pressed(vk_up)) {
-			        __move_cursor_offset__(-1, keyboard_check(vk_shift), true, keyboard_check(vk_control));
+			    if (_input.keyboard.key_pressed(vk_up)) {
+			        __move_cursor_offset__(-1, _input.keyboard.key_down(vk_shift), true, _input.keyboard.key_down(vk_control));
 			    }
 			    // Down arrow
-			    if (keyboard_check_pressed(vk_down)) {
-			        __move_cursor_offset__(1, keyboard_check(vk_shift), true, keyboard_check(vk_control));
+			    if (_input.keyboard.key_pressed(vk_down)) {
+			        __move_cursor_offset__(1, _input.keyboard.key_down(vk_shift), true, _input.keyboard.key_down(vk_control));
 			    }
 			    #endregion
 				#region --- Home/End Navigation ---
-			    if (keyboard_check_pressed(vk_home)) {
+			    if (_input.keyboard.key_pressed(vk_home)) {
 			        if (!highlight_selected) {
 						highlight_x_pos = cursor_x_pos;
 						highlight_y_pos = cursor_y_pos;
@@ -444,17 +444,17 @@ function WWTextBase() : WWCore() constructor {
 					
 					set_cursor_x_pos(0);
 					
-					if (keyboard_check(vk_control)) {
+					if (_input.keyboard.key_down(vk_control)) {
 			            set_cursor_y_pos(0);
 			        }
 					
-			        if (!keyboard_check(vk_shift)) {
+			        if (!_input.keyboard.key_down(vk_shift)) {
 			            highlight_selected = false;
 			        }
 					
 					cursor_last_width = get_string_width_to_cursor_pos(cursor_y_pos, cursor_x_pos);
 			    }
-			    if (keyboard_check_pressed(vk_end)) {
+			    if (_input.keyboard.key_pressed(vk_end)) {
 			        if (!highlight_selected) {
 						highlight_x_pos = cursor_x_pos;
 						highlight_y_pos = cursor_y_pos;
@@ -463,7 +463,7 @@ function WWTextBase() : WWCore() constructor {
 					
 					
 					
-					if (keyboard_check(vk_control)) {
+					if (_input.keyboard.key_down(vk_control)) {
 			            set_cursor_y_pos(array_length(__lines__)-1);
 			        }
 					
@@ -473,7 +473,7 @@ function WWTextBase() : WWCore() constructor {
 					
 					set_cursor_x_pos(_endPos);
 					
-			        if (!keyboard_check(vk_shift)) {
+			        if (!_input.keyboard.key_down(vk_shift)) {
 			            highlight_selected = false;
 			        }
 					
@@ -482,21 +482,21 @@ function WWTextBase() : WWCore() constructor {
 			    #endregion
 			    #region --- Page Up/Page Down Navigation ---
 			    // Assuming a page is roughly 5 lines.
-			    if (keyboard_check_pressed(vk_pageup)) {
+			    if (_input.keyboard.key_pressed(vk_pageup)) {
 			        var _newLine = cursor_y_pos - 5;
 			        if (_newLine < 0) { _newLine = 0; }
-			        if (keyboard_check(vk_shift)) {
+			        if (_input.keyboard.key_down(vk_shift)) {
 			            set_cursor_y_pos(_newLine);
 			        } else {
 			            highlight_selected = false;
 			            set_cursor_y_pos(_newLine);
 			        }
 			    }
-			    if (keyboard_check_pressed(vk_pagedown)) {
+			    if (_input.keyboard.key_pressed(vk_pagedown)) {
 			        var _maxLine = array_length(__lines__) - 1;
 			        var _newLine = cursor_y_pos + 5;
 			        if (_newLine > _maxLine) { _newLine = _maxLine; }
-			        if (keyboard_check(vk_shift)) {
+			        if (_input.keyboard.key_down(vk_shift)) {
 			            set_cursor_y_pos(_newLine);
 			        } else {
 			            highlight_selected = false;
@@ -505,7 +505,7 @@ function WWTextBase() : WWCore() constructor {
 			    }
 			    #endregion
 				//*/
-			    hotkey_manager.step()
+			    hotkey_manager.step(_input)
 			});
 			
 			// Pre-draw event handler.
@@ -538,23 +538,23 @@ function WWTextBase() : WWCore() constructor {
 			
 			#region No modifier
 			
-			var _arrow_key_handler = function() {
-				var _shift = keyboard_check(vk_shift);
-				var _ctrl = keyboard_check(vk_control);
+			var _arrow_key_handler = function(_input) {
+				var _shift = _input.keyboard.key_down(vk_shift);
+				var _ctrl = _input.keyboard.key_down(vk_control);
 				// Left arrow
-				if (keyboard_check_pressed(vk_left)) {
+				if (_input.keyboard.key_pressed(vk_left)) {
 			        __move_cursor_offset__(-1, _shift, false, _ctrl);
 			    }
 			    // Right arrow
-			    if (keyboard_check_pressed(vk_right)) {
+			    if (_input.keyboard.key_pressed(vk_right)) {
 			        __move_cursor_offset__(1, _shift, false, _ctrl);
 			    }
 			    // Up arrow
-			    if (keyboard_check_pressed(vk_up)) {
+			    if (_input.keyboard.key_pressed(vk_up)) {
 			        __move_cursor_offset__(-1, _shift, true, _ctrl);
 			    }
 			    // Down arrow
-			    if (keyboard_check_pressed(vk_down)) {
+			    if (_input.keyboard.key_pressed(vk_down)) {
 			        __move_cursor_offset__(1, _shift, true, _ctrl);
 			    }
 			}
@@ -1664,7 +1664,7 @@ function WWTextBase() : WWCore() constructor {
 				/// @param   {Bool} select : Whether selection mode is enabled.
 				/// @returns {Undefined}
 				#endregion
-				static __check_minput__ = function(_select) {
+				static __check_minput__ = function(_input, _select) {
 					// If selection mode is enabled and no anchor is set, establish the anchor.
 					if (_select && !highlight_selected) {
 						highlight_x_pos = cursor_x_pos;
@@ -1673,8 +1673,8 @@ function WWTextBase() : WWCore() constructor {
 					}
 					
 					// Get mouse coordinates in GUI space.
-					var mx = device_mouse_x_to_gui(0);
-					var my = device_mouse_y_to_gui(0);
+					var mx = _input.pointer.x;
+					var my = _input.pointer.y;
 					set_cursor_gui_loc(mx, my);
 					
 					// If selecting, check if the new cursor equals the anchor.
@@ -2411,10 +2411,10 @@ function WWTextBase() : WWCore() constructor {
 				/// @self    WWTextBase
 				/// @returns {Undefined}
 				#endregion
-				static __update_word_selection_drag__ = function() {
+				static __update_word_selection_drag__ = function(_input) {
 				    // Get current mouse coordinates.
-				    var mx = device_mouse_x_to_gui(0);
-				    var my = device_mouse_y_to_gui(0);
+				    var mx = _input.pointer.x;
+				    var my = _input.pointer.y;
 					
 				    // Use the unified helper to get the text position from GUI coordinates.
 				    var pos = __get_pos_from_gui__(mx, my, true); // _wordMode false; we only need the raw position.
@@ -2860,9 +2860,9 @@ function WWTextInputMulti() : WWTextBase() constructor {
 			    // DESKTOP: plug-in present -> Direct functions (preferred on desktop)
 			    if (WW_ON_DESKTOP) {
 			        // DESKTOP: vanilla fallback (no plug-in)
-			        var typed_text = keyboard_string;
-			        if (is_string(typed_text) && typed_text != "") {
-			                keyboard_string = "";
+			        var typed_text = _input.text.input_string;
+			        if (is_string(typed_text) && typed_text != "" && !_input.text.consumed) {
+			                consume_text_input();
 			                __insert_text__(typed_text);
 			            }
 			        
@@ -3474,5 +3474,7 @@ function WWTextInputSingle() : WWTextInputMulti() constructor {
     #endregion
 	
 }
+
+
 
 

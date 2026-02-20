@@ -155,16 +155,16 @@ function WWWindow() : WWOverlay() constructor {
 			
 		header.on_interact_enter(function(_input) {
 			if (!draggable) { return; }
-			drag_dx = device_mouse_x_to_gui(0) - x;
-			drag_dy = device_mouse_y_to_gui(0) - y;
+			drag_dx = _input.pointer.x - x;
+			drag_dy = _input.pointer.y - y;
 			bring_to_front();
 			__is_dragging__ = true;
 		});
 		header.on_focus(function(_input) {
 			if (!draggable) { return; }
 			if (__is_dragging__) {
-				var _new_x = device_mouse_x_to_gui(0) - drag_dx;
-				var _new_y = device_mouse_y_to_gui(0) - drag_dy;
+				var _new_x = _input.pointer.x - drag_dx;
+				var _new_y = _input.pointer.y - drag_dy;
 				if (__is_child__) {
 					set_offset(_new_x - __parent__.x, _new_y - __parent__.y);
 				}
@@ -289,3 +289,4 @@ function WWWindow() : WWOverlay() constructor {
 	__refresh_structure__();
 	
 }
+

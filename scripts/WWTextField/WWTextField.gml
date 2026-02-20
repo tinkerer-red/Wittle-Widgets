@@ -556,7 +556,13 @@ function WWTextField() : WWCore() constructor {
 				return self;
 			}
 			
-			on_pressed(function(_data) {
+			on_pressed(function(_input) {
+				// Pointer click should immediately enter text editing.
+				if (!__is_input_consumer__) {
+					trigger_event(events.select, _input);
+					set_focus(true);
+				}
+				
 				// Capture a pre-click selection snapshot so single/double/triple-click can undo as ONE step.
 				// Important: do NOT re-capture on follow-up clicks in a multi-click sequence.
 				if (multi_cursor_enabled) {
@@ -575,27 +581,27 @@ function WWTextField() : WWCore() constructor {
 				if (current_time - __last_click_time_double__ < 1_000/3)
 				//|| (current_time - __last_click_time_single__ < 1_000/3) //leave this here as it's actively preventing us from producing a new cursor on multi click events.
 				{
-					if (multi_cursor_enabled && keyboard_check(vk_control)) {
+					if (multi_cursor_enabled && _input.keyboard.key_down(vk_control)) {
 						return;
 					}
 				}
 				
-				__check_minput__(false);
+				__check_minput__(_input, false);
 			})
-			on_interact(function(_data) {
+			on_interact(function(_input) {
 				// stay focused if mouse is on component
 				if (__selection_mode__ != __WW_Text_Field_Selection_Mode.Regular) {
-					__update_word_selection_drag__();
+					__update_word_selection_drag__(_input);
 				}
 				else {
-					if (multi_cursor_enabled && keyboard_check(vk_control)) {
+					if (multi_cursor_enabled && _input.keyboard.key_down(vk_control)) {
 						// Prevent the immediate post-double/triple-click "next frame drag" while the mouse is still down.
 						if (current_time - __last_click_time_double__ < 1_000/3) {
 							return;
 						}
 					}
 				
-					__check_minput__(true);
+					__check_minput__(_input, true);
 				}
 			})
 			on_long_press(function(_data) {
@@ -607,10 +613,10 @@ function WWTextField() : WWCore() constructor {
 				__drag_mode__ = 0;
 				__drag_started__ = false;
 			})
-			on_double_click(function(_data) {
-				var _ctrl = keyboard_check(vk_control);
-				var _mx = device_mouse_x_to_gui(0);
-				var _my = device_mouse_y_to_gui(0);
+			on_double_click(function(_input) {
+				var _ctrl = _input.keyboard.key_down(vk_control);
+				var _mx = _input.pointer.x;
+				var _my = _input.pointer.y;
 				var _clicked_index = renderer.get_index_from_xy(_mx, _my);
 				
 				// Multi-click grouping: roll back any intermediate click-records and ensure anchor is the last history state.
@@ -664,10 +670,10 @@ function WWTextField() : WWCore() constructor {
 				}
 				
 			});
-			on_triple_click(function(_data) {
-				var _ctrl = keyboard_check(vk_control);
-				var _mx = device_mouse_x_to_gui(0);
-				var _my = device_mouse_y_to_gui(0);
+			on_triple_click(function(_input) {
+				var _ctrl = _input.keyboard.key_down(vk_control);
+				var _mx = _input.pointer.x;
+				var _my = _input.pointer.y;
 				var _clicked_index = renderer.get_index_from_xy(_mx, _my);
 				
 				// Multi-click grouping: roll back any intermediate click-records and ensure anchor is the last history state.
@@ -756,9 +762,9 @@ function WWTextField() : WWCore() constructor {
 				// If a Shift+RMB box-select drag leaves the component, on_mouse_over will stop firing.
 				// Keep the gesture alive (and end it on release) while focused.
 				if (multi_cursor_enabled && __box_select_active__) {
-					if (mouse_check_button(mb_right)) {
-						var _mxu = device_mouse_x_to_gui(0);
-						var _myu = device_mouse_y_to_gui(0);
+					if (_input.pointer.right.down) {
+						var _mxu = _input.pointer.x;
+						var _myu = _input.pointer.y;
 						__box_select_update__(_mxu, _myu);
 					}
 					else {
@@ -766,25 +772,25 @@ function WWTextField() : WWCore() constructor {
 					}
 				}
 
-				var _return = hotkeys.step();
+				var _return = hotkeys.step(_input);
 				if (_return == undefined) {
-					if (keyboard_string != "") {
-						__insert_string_at_cursor__(keyboard_string);
-						keyboard_string = "";
+					var _typed = _input.text.input_string;
+					if (_typed != "" && !_input.text.consumed) {
+						__insert_string_at_cursor__(_typed);
+						consume_text_input();
 					}
 				}
 				else {
-					//empy the keyboard string after the hotkeys are handled to act as a "consume"
-					keyboard_string = "";
+					consume_text_input();
 				}
 			});
 			on_mouse_over(function(_input) {
 				// Shift+RMB box-like selection (RMB does not trigger on_pressed in this system).
 				if (!multi_cursor_enabled) return;
 				if (__box_select_active__) {
-					if (mouse_check_button(mb_right)) {
-						var _mxu = device_mouse_x_to_gui(0);
-						var _myu = device_mouse_y_to_gui(0);
+					if (_input.pointer.right.down) {
+						var _mxu = _input.pointer.x;
+						var _myu = _input.pointer.y;
 						__box_select_update__(_mxu, _myu);
 					}
 					else {
@@ -792,22 +798,22 @@ function WWTextField() : WWCore() constructor {
 					}
 					return;
 				}
-				if (mouse_check_button_pressed(mb_right) && keyboard_check(vk_shift)) {
-					var _mxr = device_mouse_x_to_gui(0);
-					var _myr = device_mouse_y_to_gui(0);
+				if (_input.pointer.right.pressed && _input.keyboard.key_down(vk_shift)) {
+					var _mxr = _input.pointer.x;
+					var _myr = _input.pointer.y;
 					var _mode = 0;
-					if (keyboard_check(vk_control)) _mode = 1;
-					else if (keyboard_check(vk_alt)) _mode = 2;
+					if (_input.keyboard.key_down(vk_control)) _mode = 1;
+					else if (_input.keyboard.key_down(vk_alt)) _mode = 2;
 					// Also grab focus when box-select begins.
 					if (!__is_input_consumer__) {
-						trigger_event(events.select);
+						trigger_event(events.select, _input);
 						set_focus(true);
 					}
 					__box_select_begin__(_mode, _mxr, _myr);
 				}
 			});
-			on_mouse_off(function(){
-				if (mouse_check_button_pressed(mb_left)) {
+			on_mouse_off(function(_input){
+				if (_input.pointer.left.pressed) {
 					set_focus(false);
 				}
 			})
@@ -1657,6 +1663,31 @@ function WWTextField() : WWCore() constructor {
 				return tab_exits_text;
 			};
 			#region jsDoc
+			/// @func    should_yield_keyboard_nav()
+			/// @desc    Returns whether global keyboard navigation should take this key direction.
+			/// @self    WWTextField
+			/// @param   {String} direction : "next"|"prev"|"left"|"right"|"up"|"down"
+			/// @returns {Bool}
+			#endregion
+			static should_yield_keyboard_nav = function(_direction) {
+				if (!__is_input_consumer__) return true;
+				if (is_read_only) return true;
+				switch (_direction) {
+					case "next":
+					case "prev":
+						return tab_exits_text;
+					case "left":
+					case "right":
+					case "up":
+					case "down":
+						return false;
+				}
+				return true;
+			};
+			static should_auto_consume_on_nav_target = function() {
+				return false;
+			};
+			#region jsDoc
 			/// @func    get_cursor_color()
 			/// @desc    Returns the cursor color.
 			/// @self    WWTextField
@@ -2296,10 +2327,10 @@ function WWTextField() : WWCore() constructor {
 				/// @param   {Bool} select : Whether selection mode is enabled.
 				/// @returns {Undefined}
 				#endregion
-				static __check_minput__ = function(_select) {
+				static __check_minput__ = function(_input, _select) {
 					// Get mouse coordinates in GUI space.
-					var mx = device_mouse_x_to_gui(0);
-					var my = device_mouse_y_to_gui(0);
+					var mx = _input.pointer.x;
+					var my = _input.pointer.y;
 					var _index = renderer.get_index_from_xy(mx, my);
 				
 					// New press: reset normal drag tracking.
@@ -2312,13 +2343,13 @@ function WWTextField() : WWCore() constructor {
 					// Drag/update tick: route to the correct drag mode.
 					if (_select) {
 						// Alt is reserved for subtracting a selection/caret (Sublime-style). No Alt-drag selection.
-						if (keyboard_check(vk_alt)) {
+						if (_input.keyboard.key_down(vk_alt)) {
 							return;
 						}
 						// Ctrl-drag extends selection for ONLY the cursor created/targeted by Ctrl+click.
 						if (__drag_mode__ == 1) {
 							// If Ctrl is no longer held, cancel ctrl-drag and fall back to normal drag logic.
-							if (!keyboard_check(vk_control)) {
+							if (!_input.keyboard.key_down(vk_control)) {
 								__drag_mode__ = 0;
 							} else {
 								// Don't start extending until the mouse actually moves.
@@ -2354,8 +2385,8 @@ function WWTextField() : WWCore() constructor {
 					}
 				
 					if (!_select) {
-						var _ctrl = keyboard_check(vk_control);
-						var _alt = keyboard_check(vk_alt);
+						var _ctrl = _input.keyboard.key_down(vk_control);
+						var _alt = _input.keyboard.key_down(vk_alt);
 						// If we're in double-click word selection drag mode, modifier clicks should not extend that selection.
 						// (Ctrl/Alt are used for multi-cursor actions, not word-drag extension.)
 						if (__selection_mode__ != __WW_Text_Field_Selection_Mode.Regular && (_ctrl || _alt)) {
@@ -3252,10 +3283,10 @@ function WWTextField() : WWCore() constructor {
 				/// @self    WWTextField
 				/// @returns {Undefined}
 				#endregion
-				static __update_word_selection_drag__ = function() {
+				static __update_word_selection_drag__ = function(_input) {
 					// Get current mouse coordinates in GUI space.
-					var _mouse_x_gui = device_mouse_x_to_gui(0);
-					var _mouse_y_gui = device_mouse_y_to_gui(0);
+					var _mouse_x_gui = _input.pointer.x;
+					var _mouse_y_gui = _input.pointer.y;
 					var _dz = __drag_deadzone_px__;
 					var _dx = _mouse_x_gui - __drag_start_x__;
 					var _dy = _mouse_y_gui - __drag_start_y__;
@@ -5239,5 +5270,6 @@ enum __WW_Text_Field_Selection_Mode {
 	Word = 1,
 	Line = 2,
 }
+
 
 

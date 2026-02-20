@@ -10,9 +10,9 @@ function WWSliderVert() : WWSliderBase() constructor {
 		if (height == 0) return;
 		var _norm_val;
 		if (is_inverted) {
-            _norm_val = (device_mouse_y_to_gui(0) - y) / height;
+            _norm_val = (_input.pointer.y - y) / height;
         } else {
-            _norm_val = (y + height - device_mouse_y_to_gui(0)) / height;
+            _norm_val = (y + height - _input.pointer.y) / height;
         }
 		
 		_norm_val = clamp(_norm_val, 0, 1);
@@ -28,3 +28,4 @@ function WWSliderVert() : WWSliderBase() constructor {
         }
     });
 }
+

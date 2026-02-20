@@ -87,7 +87,7 @@ function WWView() : WWCore() constructor {
 			/// @self    WWView
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() {
+			static mouse_on_comp = function(_input=undefined) {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_group__) {
@@ -95,9 +95,12 @@ function WWView() : WWCore() constructor {
 					}
 				}
 				
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_comp__ = point_in_rectangle(
-					device_mouse_x_to_gui(0),
-					device_mouse_y_to_gui(0),
+					_mx,
+					_my,
 					x,
 					y,
 					x+width,
@@ -119,7 +122,7 @@ function WWView() : WWCore() constructor {
 			/// @self    WWView
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_group = function() {
+			static mouse_on_group = function(_input=undefined) {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_group__) {
@@ -127,9 +130,12 @@ function WWView() : WWCore() constructor {
 					}
 				}
 				
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_group__ = point_in_rectangle(
-						device_mouse_x_to_gui(0),
-						device_mouse_y_to_gui(0),
+						_mx,
+						_my,
 						x,
 						y,
 						x+width,
@@ -180,3 +186,4 @@ function WWView() : WWCore() constructor {
 	
 	
 }
+

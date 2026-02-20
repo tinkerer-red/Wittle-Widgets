@@ -180,6 +180,7 @@ function WWCore() constructor {
 			#endregion
 			static set_focusable = function(_is_focusable) {
 				__is_focusable__ = _is_focusable;
+				__focus_registry_mark_dirty__();
 				if (!__is_focusable__) {
 					set_focus(false);
 					set_hover(false);
@@ -200,6 +201,7 @@ function WWCore() constructor {
 				if (__is_enabled__ == _is_enabled) return self;
 				
 				__is_enabled__ = _is_enabled;
+				__focus_registry_mark_dirty__();
 				
 				// Propagate the state change to children components.
 				if (!__is_empty__) {
@@ -230,6 +232,7 @@ function WWCore() constructor {
 				if (__is_active__ == _is_active) return self;
 				
 				__is_active__ = _is_active;
+				__focus_registry_mark_dirty__();
 				__overlay_mark_subtree_dirty__();
 				__overlay_sync_subtree__();
 				
@@ -281,6 +284,9 @@ function WWCore() constructor {
 			#endregion
 			static set_nav_target = function(_is_nav_target) {
 				_is_nav_target = !!_is_nav_target;
+				if (_is_nav_target && (!__is_focusable__ || !__is_enabled__ || !__is_active__)) {
+					_is_nav_target = false;
+				}
 				__is_nav_target__ = _is_nav_target;
 				if (_is_nav_target && __overlay_component__) {
 					__overlay_last_focus_time__ = current_time;
@@ -290,14 +296,17 @@ function WWCore() constructor {
 			}
 			static set_input_consumer = function(_is_input_consumer) {
 				_is_input_consumer = !!_is_input_consumer;
+				if (_is_input_consumer && (!__is_focusable__ || !__is_enabled__ || !__is_active__)) {
+					_is_input_consumer = false;
+				}
 				if (_is_input_consumer && !__is_input_consumer__) {
 					__is_input_consumer__ = true;
-					trigger_event(events.focus_enter);
-					trigger_event(events.focus);
+					trigger_event(events.focus_enter, __user_input__);
+					trigger_event(events.focus, __user_input__);
 				}
 				else if (!_is_input_consumer && __is_input_consumer__) {
 					__is_input_consumer__ = false;
-					trigger_event(events.focus_exit);
+					trigger_event(events.focus_exit, __user_input__);
 				}
 				else {
 					__is_input_consumer__ = _is_input_consumer;
@@ -306,8 +315,20 @@ function WWCore() constructor {
 				return self;
 			}
 			static set_focus = function(_focus) {
-				set_nav_target(_focus);
-				set_input_consumer(_focus);
+				_focus = !!_focus;
+				if (_focus) {
+					var _root = __root_canvas__;
+					if (!is_struct(_root)) _root = self;
+					var _target = _root.__focus_registry_set_target__(self, true);
+					if (!is_struct(_target)) {
+						set_nav_target(true);
+						set_input_consumer(true);
+					}
+				}
+				else {
+					set_nav_target(false);
+					set_input_consumer(false);
+				}
 				return self;
 			}
 			#region jsDoc
@@ -321,12 +342,12 @@ function WWCore() constructor {
 				_is_pointer_over = !!_is_pointer_over;
 			    if (_is_pointer_over && !__is_pointer_over__) {
 					__is_pointer_over__ = true;
-					trigger_event(events.hover_enter);
-					trigger_event(events.hover);
+					trigger_event(events.hover_enter, __user_input__);
+					trigger_event(events.hover, __user_input__);
 				}
 			    else if (!_is_pointer_over && __is_pointer_over__) {
 					__is_pointer_over__ = false;
-					trigger_event(events.hover_exit);
+					trigger_event(events.hover_exit, __user_input__);
 				}
 				else {
 					__is_pointer_over__ = _is_pointer_over;
@@ -349,12 +370,12 @@ function WWCore() constructor {
 				_is_engaged = !!_is_engaged;
 			    if (_is_engaged && !__is_engaged__) {
 					__is_engaged__ = true;
-					trigger_event(events.interact_enter);
-					trigger_event(events.interact);
+					trigger_event(events.interact_enter, __user_input__);
+					trigger_event(events.interact, __user_input__);
 				}
 			    else if (!_is_engaged && __is_engaged__) {
 					__is_engaged__ = false;
-					trigger_event(events.interact_exit);
+					trigger_event(events.interact_exit, __user_input__);
 				}
 				else {
 					__is_engaged__ = _is_engaged;
@@ -389,6 +410,30 @@ function WWCore() constructor {
 				}
 				__last_input_modality__ = _last_input_modality;
 			    return self;
+			}
+			static should_yield_keyboard_nav = function(_direction) {
+				return true;
+			}
+			static should_auto_consume_on_nav_target = function() {
+				return true;
+			}
+			static handle_keyboard_nav_override = function(_direction) {
+				if (_direction != "left") return undefined;
+				var _folder = __find_ancestor_folder__();
+				if (!is_struct(_folder)) return undefined;
+				if (_folder.__comp_id__ == __comp_id__) return undefined;
+				
+				if (variable_struct_exists(_folder, "get_open")) {
+					var _get_open = _folder.get_open;
+					if (is_callable(_get_open) && !_folder.get_open()) {
+						return undefined;
+					}
+				}
+				
+				return _folder;
+			}
+			static handle_keyboard_submit_override = function(_input) {
+				return false;
 			}
 			
 		#endregion
@@ -773,97 +818,85 @@ function WWCore() constructor {
             
 			#region jsDoc
 			/// @func    navigate_focus()
-			/// @desc    Attempts to shift focus in the given direction ("next", "prev", "up", "down", etc.).
-			///          This simple algorithm checks the parent's children list and, if needed, escalates upward.
+			/// @desc    Attempts to shift focus in the given direction ("next", "prev", "up", "down", etc.)
+			///          using the root focus registry cache.
 			/// @self    WWCore
 			/// @param   {String} dir : The navigation direction.
 			/// @returns {Struct.WWCore} The component that received focus, or self if none found.
 			#endregion
             static navigate_focus = function(_dir) {
-                // If no parent, we cannot navigate away.
-                if (__parent__ == noone) {
-                    return self;
-                }
-                
-                var siblings = __parent__.get_children();
-                var currentIndex = __find_index_in_parent__();
-                var target = undefined;
-                
-                // For simplicity, treat "next", "right", and "down" the same; similarly "prev", "left", "up"
-                if (_dir == "next" || _dir == "right" || _dir == "down") {
-                    var i = currentIndex + 1;
-                    while (i < array_length(siblings)) {
-                        if (siblings[i].__is_focusable__ && siblings[i].__is_enabled__) {
-                            target = siblings[i];
-                            break;
-                        }
-                        i++;
-                    }
-                }
-                else if (_dir == "prev" || _dir == "left" || _dir == "up") {
-                    var i = currentIndex - 1;
-                    while (i >= 0) {
-                        if (siblings[i].__is_focusable__ && siblings[i].__is_enabled__) {
-                            target = siblings[i];
-                            break;
-                        }
-                        i--;
-                    }
-                }
-                
-                // If no suitable sibling found, optionally escalate up the parent chain.
-                if (target == undefined && __parent__ != noone) {
-                    target = __parent__.navigate_focus(_dir);
-                }
-                
-                // If found, remove focus from self and assign to the target.
-                if (target != undefined && target != self) {
-                    set_focus(false);
-                    target.set_focus(true);
-                }
-                return target != undefined ? target : self;
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				var _target = _root.__focus_registry_navigate__(_dir, self);
+				if (is_struct(_target)) return _target;
+				return self;
             }
 			
 			#region jsDoc
 			/// @func    handle_keyboard_navigation()
-			/// @desc    Checks for tab or arrow key presses and navigates focus accordingly.
-			///          When tab is pressed, if shift is down, it navigates in reverse.
+			/// @desc    Root-only keyboard navigation handler for tab/shift-tab and arrow keys.
 			/// @self    WWCore
 			/// @param   {Struct} input : The input struct (should contain keyboard state).
 			/// @returns {Undefined}
 			#endregion
 			static handle_keyboard_navigation = function(_input) {
-                // Example pseudo-code for key checking; replace with your own input functions.
-                if (keyboard_check_pressed(vk_tab)) {
-					set_last_input_modality("keyboard");
-                    if (keyboard_check(vk_shift)) {
-                        navigate_focus("prev");
-                    }
-                    else {
-                        navigate_focus("next");
-                    }
-                    _input.consumed = true;
-                }
-                if (keyboard_check_pressed(vk_left)) {
-					set_last_input_modality("keyboard");
-                    navigate_focus("left");
-                    _input.consumed = true;
-                }
-                if (keyboard_check_pressed(vk_right)) {
-					set_last_input_modality("keyboard");
-                    navigate_focus("right");
-                    _input.consumed = true;
-                }
-                if (keyboard_check_pressed(vk_up)) {
-					set_last_input_modality("keyboard");
-                    navigate_focus("up");
-                    _input.consumed = true;
-                }
-                if (keyboard_check_pressed(vk_down)) {
-					set_last_input_modality("keyboard");
-                    navigate_focus("down");
-                    _input.consumed = true;
-                }
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				if (_root.__comp_id__ != __comp_id__) return;
+				if (!is_struct(_input)) return;
+				if (!is_struct(_input.nav)) return;
+				if (_input.nav.consumed) return;
+				
+				if (_input.nav.submit.pressed || _input.nav.submit.repeat) {
+					var _registry_submit = _root.__focus_registry_get_entries__();
+					var _entries_submit = _registry_submit.entries;
+					var _count_submit = array_length(_entries_submit);
+					if (_count_submit > 0) {
+						var _current_index_submit = _root.__focus_registry_find_current_index__(_entries_submit, _count_submit);
+						if (_current_index_submit >= 0) {
+							var _current_submit = _entries_submit[_current_index_submit];
+							if (_current_submit.handle_keyboard_submit_override(_input)) {
+								set_last_input_modality("keyboard");
+								_current_submit.set_last_input_modality("keyboard");
+								_input.nav.consumed = true;
+								return;
+							}
+							if (!_current_submit.__is_input_consumer__) {
+								var _assigned_submit = _root.__focus_registry_set_target__(_current_submit, true);
+								if (is_struct(_assigned_submit)) {
+									set_last_input_modality("keyboard");
+									_assigned_submit.set_last_input_modality("keyboard");
+									_input.nav.consumed = true;
+									return;
+								}
+							}
+						}
+					}
+				}
+				
+				var _did_navigate = false;
+				if (_input.nav.next.pressed || _input.nav.next.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("next"));
+				}
+				else if (_input.nav.prev.pressed || _input.nav.prev.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("prev"));
+				}
+				else if (_input.nav.left.pressed || _input.nav.left.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("left"));
+				}
+				else if (_input.nav.right.pressed || _input.nav.right.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("right"));
+				}
+				else if (_input.nav.up.pressed || _input.nav.up.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("up"));
+				}
+				else if (_input.nav.down.pressed || _input.nav.down.repeat) {
+					_did_navigate = is_struct(_root.__focus_registry_navigate__("down"));
+				}
+				
+				if (_did_navigate) {
+					_input.nav.consumed = true;
+				}
             }
 			
         #endregion
@@ -1365,7 +1398,7 @@ function WWCore() constructor {
 			/// @self    WWCore
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_comp = function() {
+			static mouse_on_comp = function(_input=undefined) {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_group__) {
@@ -1373,9 +1406,12 @@ function WWCore() constructor {
 					}
 				}
 				
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_comp__ = point_in_rectangle(
-					device_mouse_x_to_gui(0),
-					device_mouse_y_to_gui(0),
+					_mx,
+					_my,
 					x,
 					y,
 					x+width,
@@ -1390,7 +1426,7 @@ function WWCore() constructor {
 			/// @self    WWCore
 			/// @returns {Bool}
 			#endregion
-			static mouse_on_group = function() {
+			static mouse_on_group = function(_input=undefined) {
 				//check if parent even has a mouse over it
 				if (__is_child__) {
 					if (!__parent__.__mouse_on_group__) {
@@ -1398,9 +1434,12 @@ function WWCore() constructor {
 					}
 				}
 				
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_group__ = point_in_rectangle(
-						device_mouse_x_to_gui(0),
-						device_mouse_y_to_gui(0),
+						_mx,
+						_my,
 						x,
 						y,
 						x+__group__.width,
@@ -1410,14 +1449,315 @@ function WWCore() constructor {
 				return __mouse_on_group__;
 			}
 			#region jsDoc
+			/// @func    build_input_state()
+			/// @desc    Builds the WW input schema. When sampling is enabled, reads current device state.
+			/// @self    WWCore
+			/// @param   {Bool} sample_runtime : True to sample keyboard/mouse state.
+			/// @returns {Struct}
+			#endregion
+			static build_input_state = function(_sample_runtime=true) {
+				return __build_input_state__(_sample_runtime);
+			}
+			static __build_input_action__ = function() {
+				return {
+					pressed:false,
+					down:false,
+					released:false,
+					repeat:false,
+				};
+			}
+			static __build_input_schema__ = function() {
+				return {
+					frame_time_ms : current_time,
+					modality : "none",
+					pointer : {
+						x : device_mouse_x_to_gui(0),
+						y : device_mouse_y_to_gui(0),
+						left : __build_input_action__(),
+						right : __build_input_action__(),
+						middle : __build_input_action__(),
+						wheel_up : false,
+						wheel_down : false,
+						wheel_left : false,
+						wheel_right : false,
+						consumed : false,
+					},
+					keyboard : {
+						key_down : function(_key) { return false; },
+						key_pressed : function(_key) { return false; },
+						key_released : function(_key) { return false; },
+						key_repeat : function(_key) { return false; },
+					},
+					nav : {
+						left : __build_input_action__(),
+						right : __build_input_action__(),
+						up : __build_input_action__(),
+						down : __build_input_action__(),
+						next : __build_input_action__(),
+						prev : __build_input_action__(),
+						submit : __build_input_action__(),
+						cancel : __build_input_action__(),
+						axis_x : 0,
+						axis_y : 0,
+						source : "none",
+						consumed : false,
+					},
+					text : {
+						input_string : "",
+						backspace : __build_input_action__(),
+						del : __build_input_action__(),
+						consumed : false,
+					},
+				};
+			}
+			static __is_valid_input_schema__ = function(_input) {
+				if (!is_struct(_input)) return false;
+				if (!is_struct(_input.pointer) || !is_struct(_input.keyboard) || !is_struct(_input.nav) || !is_struct(_input.text)) return false;
+				if (!is_struct(_input.pointer.left) || !is_struct(_input.pointer.right) || !is_struct(_input.pointer.middle)) return false;
+				if (!is_struct(_input.nav.left) || !is_struct(_input.nav.right) || !is_struct(_input.nav.up) || !is_struct(_input.nav.down)) return false;
+				if (!is_struct(_input.nav.next) || !is_struct(_input.nav.prev) || !is_struct(_input.nav.submit) || !is_struct(_input.nav.cancel)) return false;
+				if (!is_struct(_input.text.backspace) || !is_struct(_input.text.del)) return false;
+				if (!is_callable(_input.keyboard.key_down)) return false;
+				if (!is_callable(_input.keyboard.key_pressed)) return false;
+				if (!is_callable(_input.keyboard.key_released)) return false;
+				if (!is_callable(_input.keyboard.key_repeat)) return false;
+				return true;
+			}
+			static __input_repeat_pulse__ = function(_id, _down, _delay_ms, _interval_ms) {
+				var _state = __input_repeat_state__[$ _id];
+				if (!is_struct(_state)) {
+					_state = {
+						down : false,
+						next_ms : 0,
+					};
+					__input_repeat_state__[$ _id] = _state;
+				}
+				
+				if (!_down) {
+					_state.down = false;
+					_state.next_ms = 0;
+					return false;
+				}
+				
+				if (!_state.down) {
+					_state.down = true;
+					_state.next_ms = current_time + _delay_ms;
+					return false;
+				}
+				
+				if (current_time >= _state.next_ms) {
+					while (current_time >= _state.next_ms) {
+						_state.next_ms += _interval_ms;
+					}
+					return true;
+				}
+				
+				return false;
+			}
+			static __build_input_state__ = function(_sample_runtime=true) {
+				var _input = __build_input_schema__();
+				if (!_sample_runtime) {
+					return _input;
+				}
+				
+				var _pointer = _input.pointer;
+				_pointer.x = device_mouse_x_to_gui(0);
+				_pointer.y = device_mouse_y_to_gui(0);
+				_pointer.left.pressed = mouse_check_button_pressed(mb_left);
+				_pointer.left.down = mouse_check_button(mb_left);
+				_pointer.left.released = mouse_check_button_released(mb_left);
+				_pointer.left.repeat = __input_repeat_pulse__(
+					"pointer.left",
+					_pointer.left.down,
+					__input_repeat_config__.pointer_initial_delay_ms,
+					__input_repeat_config__.pointer_interval_ms
+				);
+				
+				_pointer.right.pressed = mouse_check_button_pressed(mb_right);
+				_pointer.right.down = mouse_check_button(mb_right);
+				_pointer.right.released = mouse_check_button_released(mb_right);
+				_pointer.right.repeat = __input_repeat_pulse__(
+					"pointer.right",
+					_pointer.right.down,
+					__input_repeat_config__.pointer_initial_delay_ms,
+					__input_repeat_config__.pointer_interval_ms
+				);
+				
+				_pointer.middle.pressed = mouse_check_button_pressed(mb_middle);
+				_pointer.middle.down = mouse_check_button(mb_middle);
+				_pointer.middle.released = mouse_check_button_released(mb_middle);
+				_pointer.middle.repeat = __input_repeat_pulse__(
+					"pointer.middle",
+					_pointer.middle.down,
+					__input_repeat_config__.pointer_initial_delay_ms,
+					__input_repeat_config__.pointer_interval_ms
+				);
+				
+				_pointer.wheel_up = mouse_wheel_up();
+				_pointer.wheel_down = mouse_wheel_down();
+				
+				var _keyboard = _input.keyboard;
+				_keyboard.key_down = function(_key) { return keyboard_check(_key); };
+				_keyboard.key_pressed = function(_key) { return keyboard_check_pressed(_key); };
+				_keyboard.key_released = function(_key) { return keyboard_check_released(_key); };
+				_keyboard.key_repeat = function(_key) {
+					return __input_repeat_pulse__(
+						$"key.{_key}",
+						keyboard_check(_key),
+						__input_repeat_config__.text_initial_delay_ms,
+						__input_repeat_config__.text_interval_ms
+					);
+				};
+
+				var _nav = _input.nav;
+				_nav.left.pressed = keyboard_check_pressed(vk_left);
+				_nav.left.down = keyboard_check(vk_left);
+				_nav.left.released = keyboard_check_released(vk_left);
+				_nav.left.repeat = __input_repeat_pulse__(
+					"nav.left",
+					_nav.left.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.right.pressed = keyboard_check_pressed(vk_right);
+				_nav.right.down = keyboard_check(vk_right);
+				_nav.right.released = keyboard_check_released(vk_right);
+				_nav.right.repeat = __input_repeat_pulse__(
+					"nav.right",
+					_nav.right.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.up.pressed = keyboard_check_pressed(vk_up);
+				_nav.up.down = keyboard_check(vk_up);
+				_nav.up.released = keyboard_check_released(vk_up);
+				_nav.up.repeat = __input_repeat_pulse__(
+					"nav.up",
+					_nav.up.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.down.pressed = keyboard_check_pressed(vk_down);
+				_nav.down.down = keyboard_check(vk_down);
+				_nav.down.released = keyboard_check_released(vk_down);
+				_nav.down.repeat = __input_repeat_pulse__(
+					"nav.down",
+					_nav.down.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				var _shift_down = keyboard_check(vk_shift);
+				var _tab_pressed = keyboard_check_pressed(vk_tab);
+				var _tab_down = keyboard_check(vk_tab);
+				var _tab_released = keyboard_check_released(vk_tab);
+				_nav.next.pressed = _tab_pressed && !_shift_down;
+				_nav.next.down = _tab_down && !_shift_down;
+				_nav.next.released = _tab_released;
+				_nav.next.repeat = __input_repeat_pulse__(
+					"nav.next",
+					_nav.next.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.prev.pressed = _tab_pressed && _shift_down;
+				_nav.prev.down = _tab_down && _shift_down;
+				_nav.prev.released = _tab_released;
+				_nav.prev.repeat = __input_repeat_pulse__(
+					"nav.prev",
+					_nav.prev.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.submit.pressed = keyboard_check_pressed(vk_enter);
+				_nav.submit.down = keyboard_check(vk_enter);
+				_nav.submit.released = keyboard_check_released(vk_enter);
+				_nav.submit.repeat = __input_repeat_pulse__(
+					"nav.submit",
+					_nav.submit.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.cancel.pressed = keyboard_check_pressed(vk_escape);
+				_nav.cancel.down = keyboard_check(vk_escape);
+				_nav.cancel.released = keyboard_check_released(vk_escape);
+				_nav.cancel.repeat = __input_repeat_pulse__(
+					"nav.cancel",
+					_nav.cancel.down,
+					__input_repeat_config__.nav_initial_delay_ms,
+					__input_repeat_config__.nav_interval_ms
+				);
+				
+				_nav.axis_x = (_nav.right.down ? 1 : 0) - (_nav.left.down ? 1 : 0);
+				_nav.axis_y = (_nav.down.down ? 1 : 0) - (_nav.up.down ? 1 : 0);
+				if (_nav.left.down || _nav.right.down || _nav.up.down || _nav.down.down
+				|| _nav.next.down || _nav.prev.down || _nav.submit.down || _nav.cancel.down) {
+					_nav.source = "keyboard";
+				}
+				
+				var _text = _input.text;
+				_text.input_string = keyboard_string;
+				keyboard_string = "";
+				_text.backspace.pressed = keyboard_check_pressed(vk_backspace);
+				_text.backspace.down = keyboard_check(vk_backspace);
+				_text.backspace.released = keyboard_check_released(vk_backspace);
+				_text.backspace.repeat = __input_repeat_pulse__(
+					"text.backspace",
+					_text.backspace.down,
+					__input_repeat_config__.text_initial_delay_ms,
+					__input_repeat_config__.text_interval_ms
+				);
+				
+				_text.del.pressed = keyboard_check_pressed(vk_delete);
+				_text.del.down = keyboard_check(vk_delete);
+				_text.del.released = keyboard_check_released(vk_delete);
+				_text.del.repeat = __input_repeat_pulse__(
+					"text.del",
+					_text.del.down,
+					__input_repeat_config__.text_initial_delay_ms,
+					__input_repeat_config__.text_interval_ms
+				);
+				
+				if (_pointer.left.down || _pointer.right.down || _pointer.middle.down
+				|| _pointer.wheel_up || _pointer.wheel_down) {
+					_input.modality = "mouse";
+				}
+				else if (_nav.source != "none"
+				|| _text.input_string != ""
+				|| _text.backspace.down
+				|| _text.del.down) {
+					_input.modality = "keyboard";
+				}
+				
+				return _input;
+			}
+			#region jsDoc
 			/// @func    consume_input()
-			/// @desc    Used to capture the input so no other components try to use an already consumed input.
+			/// @desc    Marks pointer input as consumed so lower-priority components do not process it.
 			/// @self    WWCore
 			/// @returns {Undefined}
 			#endregion
 			static consume_input = function() {
-				__user_input__.consumed = true;
+				if (is_struct(__user_input__.pointer)) {
+					__user_input__.pointer.consumed = true;
+				}
 				__is_pointer_consumer__ = true;
+			}
+			static consume_nav_input = function() {
+				if (is_struct(__user_input__.nav)) {
+					__user_input__.nav.consumed = true;
+				}
+			}
+			static consume_text_input = function() {
+				if (is_struct(__user_input__.text)) {
+					__user_input__.text.consumed = true;
+				}
 			}
 			
 			#region Overlay Functions
@@ -1481,6 +1821,7 @@ function WWCore() constructor {
 				__validate_component_additions__(_arr);
 				
 				__include_children__(_arr, -1);
+				__focus_registry_mark_dirty__();
 				
 				update_component_positions();
 				__update_group_region__();
@@ -1588,6 +1929,7 @@ function WWCore() constructor {
 				__validate_component_additions__(_arr);
 				
 				__include_children__(_comp, _index)
+				__focus_registry_mark_dirty__();
 				
 				__update_group_region__();
 				
@@ -1614,6 +1956,7 @@ function WWCore() constructor {
 			#endregion
 			static remove_index = function(_index) {
 				if ((_index < 0) || (_index >= __children_count__)) return;
+				__focus_registry_mark_dirty__();
 				var _comp = __children__[_index];
 				_comp.__overlay_unregister_subtree__();
 				
@@ -1678,6 +2021,7 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static clear_children = function() {
+				__focus_registry_mark_dirty__();
 				var _i=0; repeat(__children_count__) {
 					var _comp = __children__[_i];
 					_comp.__overlay_unregister_subtree__();
@@ -1708,11 +2052,14 @@ function WWCore() constructor {
 			static step = function(_input=undefined) {
 				if (!__is_active__) return;
 				
-				_input ??= {
-					consumed : false,
-				};
+				if (is_undefined(_input)) {
+					_input = build_input_state(true);
+				}
+				else if (!__is_valid_input_schema__(_input)) {
+					_input = build_input_state(false);
+				}
 				__user_input__ = _input;
-				__mouse_on_group__ = mouse_on_group();
+				__mouse_on_group__ = mouse_on_group(_input);
 				
 				__overlay_step_pass__(_input);
 				
@@ -1742,11 +2089,19 @@ function WWCore() constructor {
 				if (!__is_active__) return;
 				
 				
-				_input ??= {
-					consumed : false,
-				};
+				if (is_undefined(_input)) {
+					if (is_struct(__user_input__)) {
+						_input = __user_input__;
+					}
+					else {
+						_input = build_input_state(false);
+					}
+				}
+				else if (!__is_valid_input_schema__(_input)) {
+					_input = build_input_state(false);
+				}
 				__user_input__ = _input;
-				__mouse_on_group__ = mouse_on_group();
+				__mouse_on_group__ = mouse_on_group(_input);
 				
 				
 				
@@ -1899,10 +2254,16 @@ function WWCore() constructor {
 			__event_listener_uid__ = 0; // a unique identifier for event listeners
 			#endregion
 			#region Input Variables
-			__default_user_input__ = {
-				consumed : false,
-			}
-			__user_input__ = variable_clone(__default_user_input__);
+			__user_input__ = build_input_state(false);
+			__input_repeat_state__ = {};
+			__input_repeat_config__ = {
+				nav_initial_delay_ms : 300,
+				nav_interval_ms : 60,
+				pointer_initial_delay_ms : 300,
+				pointer_interval_ms : 60,
+				text_initial_delay_ms : 350,
+				text_interval_ms : 35,
+			};
 			__mouse_on_comp__  = false;
 			__mouse_on_group__ = false;
 			__click_held_timer__ = 0; //long press timer
@@ -1926,6 +2287,7 @@ function WWCore() constructor {
 			__children__ = [];
 			__is_child__ = false; // if the component is a child of another component
 			__parent__ = noone; // a reference to the parent controller
+			__focus_registry__ = undefined;
 			__group__ = {width : 0, height : 0};
 			__overlay_host_enabled__ = false;
 			__overlay_manager__ = undefined;
@@ -1959,38 +2321,42 @@ function WWCore() constructor {
 				if (!__is_enabled__) {
 					return;
 				}
+
+				if (self == __root_canvas__) {
+					handle_keyboard_navigation(__user_input__);
+				}
 				
-				var _mouse_on_group = mouse_on_group();
+				var _mouse_on_group = mouse_on_group(__user_input__);
 				if (_mouse_on_group) {
-					trigger_event(events.mouse_over_group);
+					trigger_event(events.mouse_over_group, __user_input__);
 				}
 				else {
-					trigger_event(events.mouse_off_group);
+					trigger_event(events.mouse_off_group, __user_input__);
 				}
 				
-				var _mouse_on = mouse_on_comp();
+				var _mouse_on = mouse_on_comp(__user_input__);
 				if (_mouse_on) {
-					trigger_event(events.mouse_over);
+					trigger_event(events.mouse_over, __user_input__);
 				}
 				else {
-					trigger_event(events.mouse_off);
+					trigger_event(events.mouse_off, __user_input__);
 				}
 				
-				if (__is_pointer_over__) trigger_event(events.hover);
-				if (__is_input_consumer__) trigger_event(events.focus);
-				if (__is_engaged__) trigger_event(events.interact);
+				if (__is_pointer_over__) trigger_event(events.hover, __user_input__);
+				if (__is_input_consumer__) trigger_event(events.focus, __user_input__);
+				if (__is_engaged__) trigger_event(events.interact, __user_input__);
 			})
 			on_mouse_over(function(){
 				if (!__is_enabled__) {
 					return;
 				}
 				
-				var _input_captured = __user_input__.consumed;
+				var _input_captured = __user_input__.pointer.consumed;
 				set_hover(!_input_captured);
 			})
 			on_mouse_off(function(){
 				set_hover(false);
-				if (mouse_check_button_pressed(mb_left) || mouse_check_button_released(mb_left)) {
+				if (__user_input__.pointer.left.pressed || __user_input__.pointer.left.released) {
 					set_focus(false);
 				}
 			})
@@ -2001,8 +2367,8 @@ function WWCore() constructor {
 				
 				consume_input();
 				
-				if (mouse_check_button_pressed(mb_left)) {
-					trigger_event(events.pressed);
+				if (__user_input__.pointer.left.pressed) {
+					trigger_event(events.pressed, __user_input__);
 				}
 				
 			})
@@ -2012,13 +2378,13 @@ function WWCore() constructor {
 				set_interact(true);
 				
 				if (current_time - __last_click_time_double__ < 1_000/3) {
-					trigger_event(events.triple_click);
+					trigger_event(events.triple_click, __user_input__);
 					return;
 				}
 				
 				if (current_time - __last_click_time_single__ < 1_000/3) {
 					__last_click_time_double__ = current_time;
-					trigger_event(events.double_click);
+					trigger_event(events.double_click, __user_input__);
 					return;
 				}
 				
@@ -2037,24 +2403,24 @@ function WWCore() constructor {
 					return;
 				}
 				
-				if (mouse_check_button(mb_left)) {
-				    trigger_event(events.held);
+				if (__user_input__.pointer.left.down) {
+				    trigger_event(events.held, __user_input__);
 						
 				    // Handle long press timing
 				    __click_held_timer__ += 1;
 				    if (current_time-__click_held_timer__ > 1_000/3) {
-				        trigger_event(events.long_press);
+				        trigger_event(events.long_press, __user_input__);
 				    }
 				}
 				else {
 					// Always clear interact once the button is no longer held.
 					// This prevents visual "stuck pressed" states if a release edge is missed.
-					var _did_release = mouse_check_button_released(mb_left);
+					var _did_release = __user_input__.pointer.left.released;
 					set_pressed(false);
 				    set_interact(false);
 				    if (_did_release) {
-						if (mouse_on_comp()) {
-				    		trigger_event(events.released);
+						if (mouse_on_comp(__user_input__)) {
+				    		trigger_event(events.released, __user_input__);
 						}
 				    }
 				}
@@ -2143,6 +2509,7 @@ function WWCore() constructor {
 				_i+=1;}//end repeat loop
 				
 				__children_count__ += _size;
+				__focus_registry_mark_dirty__();
 				
 			}
 			#region jsDoc
@@ -2438,16 +2805,21 @@ function WWCore() constructor {
 			}
 			
 			static __propagate_root_canvas__ = function(_new_root) {
+				var _old_root = __root_canvas__;
 				var _stack = [self];
 				while (array_length(_stack) > 0) {
 					var _node = array_pop(_stack);
 					_node.__root_canvas__ = _new_root;
+					_node.__focus_registry_mark_dirty__();
 					if (_node.__overlay_component__) {
 						_node.__overlay_sync_dirty__ = true;
 					}
 					var _i=0; repeat(_node.__children_count__) {
 						array_push(_stack, _node.__children__[_i]);
 					_i+=1;}
+				}
+				if (is_struct(_old_root)) {
+					_old_root.__focus_registry_mark_dirty__();
 				}
 			}
 			
@@ -2700,6 +3072,360 @@ function WWCore() constructor {
 					}
 				}
 			}
+			static __focus_registry_ensure__ = function() {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				if (!is_struct(_root.__focus_registry__)) {
+					_root.__focus_registry__ = {
+						entries : [],
+						count : 0,
+						dirty : true,
+					};
+				}
+				return _root.__focus_registry__;
+			}
+			static __focus_registry_mark_dirty__ = function() {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				if (!is_struct(_root.__focus_registry__)) {
+					_root.__focus_registry__ = {
+						entries : [],
+						count : 0,
+						dirty : true,
+					};
+				}
+				else {
+					_root.__focus_registry__.dirty = true;
+				}
+			}
+			static __find_ancestor_folder__ = function() {
+				var _node = self;
+				while (is_struct(_node) && _node.__is_child__) {
+					var _parent = _node.__parent__;
+					if (!is_struct(_parent)) break;
+					if (variable_struct_exists(_parent, "__is_ww_folder__")) {
+						if (_parent.__is_ww_folder__) {
+							return _parent;
+						}
+					}
+					_node = _parent;
+				}
+				return noone;
+			}
+			static __focus_registry_is_navigable__ = function(_comp) {
+				if (!is_struct(_comp)) return false;
+				if (!_comp.__is_focusable__) return false;
+				if (!_comp.__is_enabled__) return false;
+				if (!_comp.__is_active__) return false;
+				if (variable_struct_exists(_comp, "visible")) {
+					if (!_comp.visible) return false;
+				}
+				return true;
+			}
+			static __focus_registry_rebuild__ = function() {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				var _registry = _root.__focus_registry_ensure__();
+				
+				array_resize(_registry.entries, 0);
+				_registry.count = 0;
+				
+				var _stack = [{ node:_root, ancestor_allows:true }];
+				while (array_length(_stack) > 0) {
+					var _entry = array_pop(_stack);
+					var _node = _entry.node;
+					var _ancestor_allows = _entry.ancestor_allows;
+					
+					var _node_allows = _ancestor_allows && _node.__is_active__;
+					if (_node_allows && variable_struct_exists(_node, "visible")) {
+						if (!_node.visible) _node_allows = false;
+					}
+					
+					if (_node_allows && _root.__focus_registry_is_navigable__(_node)) {
+						array_push(_registry.entries, _node);
+						_registry.count += 1;
+					}
+					
+					var _i = _node.__children_count__;
+					repeat (_node.__children_count__) {
+						_i -= 1;
+						array_push(_stack, {
+							node:_node.__children__[_i],
+							ancestor_allows:_node_allows
+						});
+					}
+				}
+				
+				var _entries = _registry.entries;
+				var _count = array_length(_entries);
+				var _first_nav = noone;
+				var _first_input = noone;
+				var _j = 0;
+				repeat (_count) {
+					var _comp = _entries[_j];
+					if (_comp.__is_nav_target__) {
+						if (!is_struct(_first_nav)) {
+							_first_nav = _comp;
+						}
+						else {
+							_comp.set_nav_target(false);
+						}
+					}
+					if (_comp.__is_input_consumer__) {
+						if (!is_struct(_first_input)) {
+							_first_input = _comp;
+						}
+						else {
+							_comp.set_input_consumer(false);
+						}
+					}
+					_j += 1;
+				}
+				
+				if (is_struct(_first_input) && !is_struct(_first_nav)) {
+					_first_input.set_nav_target(true);
+					_first_nav = _first_input;
+				}
+				
+				_registry.dirty = false;
+				return _registry;
+			}
+			static __focus_registry_get_entries__ = function() {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				var _registry = _root.__focus_registry_ensure__();
+				if (_registry.dirty) {
+					_registry = _root.__focus_registry_rebuild__();
+				}
+				return _registry;
+			}
+			static __focus_registry_find_index_by_id__ = function(_entries, _count, _comp_id) {
+				var _i = 0;
+				repeat (_count) {
+					if (_entries[_i].__comp_id__ == _comp_id) return _i;
+					_i += 1;
+				}
+				return -1;
+			}
+			static __focus_registry_find_current_index__ = function(_entries, _count) {
+				var _i = 0;
+				repeat (_count) {
+					if (_entries[_i].__is_nav_target__) return _i;
+					_i += 1;
+				}
+				_i = 0;
+				repeat (_count) {
+					if (_entries[_i].__is_input_consumer__) return _i;
+					_i += 1;
+				}
+				return -1;
+			}
+			static __focus_registry_component_yields_nav__ = function(_comp, _direction) {
+				if (!is_struct(_comp)) return true;
+				if (variable_struct_exists(_comp, "should_yield_keyboard_nav")) {
+					var _func = _comp.should_yield_keyboard_nav;
+					if (is_callable(_func)) {
+						var _bound = method(_comp, _func);
+						return !!_bound(_direction);
+					}
+				}
+				return true;
+			}
+			static __focus_registry_component_override_target__ = function(_comp, _direction) {
+				if (!is_struct(_comp)) return undefined;
+				if (!variable_struct_exists(_comp, "handle_keyboard_nav_override")) return undefined;
+				
+				var _func = _comp.handle_keyboard_nav_override;
+				if (!is_callable(_func)) return undefined;
+				
+				var _bound = method(_comp, _func);
+				var _result = _bound(_direction);
+				if (is_struct(_result)) return _result;
+				if (is_bool(_result) && _result) return _comp;
+				return undefined;
+			}
+			static __focus_registry_should_auto_consume_on_nav_target__ = function(_comp) {
+				if (!is_struct(_comp)) return true;
+				if (!variable_struct_exists(_comp, "should_auto_consume_on_nav_target")) return true;
+				
+				var _func = _comp.should_auto_consume_on_nav_target;
+				if (!is_callable(_func)) return true;
+				
+				var _bound = method(_comp, _func);
+				return !!_bound();
+			}
+			static __focus_registry_set_target__ = function(_target, _set_input_consumer=true) {
+				if (!is_struct(_target)) return noone;
+				
+				var _registry = __focus_registry_get_entries__();
+				var _entries = _registry.entries;
+				var _count = array_length(_entries);
+				var _target_index = __focus_registry_find_index_by_id__(_entries, _count, _target.__comp_id__);
+				if (_target_index < 0) return noone;
+				
+				var _i = 0;
+				repeat (_count) {
+					var _comp = _entries[_i];
+					if (_i != _target_index) {
+						if (_comp.__is_nav_target__) _comp.set_nav_target(false);
+						if (_comp.__is_input_consumer__) _comp.set_input_consumer(false);
+					}
+					_i += 1;
+				}
+				
+				var _target_comp = _entries[_target_index];
+				if (!_target_comp.__is_nav_target__) _target_comp.set_nav_target(true);
+				if (!_set_input_consumer && _target_comp.__is_input_consumer__) {
+					_target_comp.set_input_consumer(false);
+				}
+				if (_set_input_consumer && !_target_comp.__is_input_consumer__) {
+					_target_comp.set_input_consumer(true);
+				}
+				
+				return _target_comp;
+			}
+			static __focus_registry_find_linear_target__ = function(_entries, _count, _current_index, _dir) {
+				if (_count <= 0) return noone;
+				if (_current_index < 0 || _current_index >= _count) {
+					if (_dir == "prev") return _entries[_count - 1];
+					return _entries[0];
+				}
+				if (_dir == "prev") {
+					var _prev = _current_index - 1;
+					if (_prev < 0) _prev = _count - 1;
+					return _entries[_prev];
+				}
+				var _next = _current_index + 1;
+				if (_next >= _count) _next = 0;
+				return _entries[_next];
+			}
+			static __focus_registry_find_directional_target__ = function(_entries, _count, _current_index, _dir) {
+				if (_count <= 0) return noone;
+				
+				if (_current_index < 0 || _current_index >= _count) {
+					var _fallback = (_dir == "left" || _dir == "up") ? "prev" : "next";
+					return __focus_registry_find_linear_target__(_entries, _count, -1, _fallback);
+				}
+				
+				var _current = _entries[_current_index];
+				var _cx = _current.x + _current.width * 0.5;
+				var _cy = _current.y + _current.height * 0.5;
+				var _best = noone;
+				var _best_score = infinity;
+				
+				var _i = 0;
+				repeat (_count) {
+					if (_i != _current_index) {
+						var _candidate = _entries[_i];
+						var _tx = _candidate.x + _candidate.width * 0.5;
+						var _ty = _candidate.y + _candidate.height * 0.5;
+						var _dx = _tx - _cx;
+						var _dy = _ty - _cy;
+						
+						var _primary = 0;
+						var _secondary = 0;
+						switch (_dir) {
+							case "left": {
+								_primary = -_dx;
+								_secondary = _dy;
+							break;}
+							case "right": {
+								_primary = _dx;
+								_secondary = _dy;
+							break;}
+							case "up": {
+								_primary = -_dy;
+								_secondary = _dx;
+							break;}
+							case "down": {
+								_primary = _dy;
+								_secondary = _dx;
+							break;}
+						}
+						
+						if (_primary > 0) {
+							var _secondary_abs = abs(_secondary);
+							var _score = (_primary * _primary) + (_secondary_abs * _secondary_abs * 4);
+							if (_score < _best_score) {
+								_best_score = _score;
+								_best = _candidate;
+							}
+						}
+					}
+					
+					_i += 1;
+				}
+				
+				if (!is_struct(_best)) {
+					var _fallback_dir = (_dir == "left" || _dir == "up") ? "prev" : "next";
+					return __focus_registry_find_linear_target__(_entries, _count, _current_index, _fallback_dir);
+				}
+				
+				return _best;
+			}
+			static __focus_registry_navigate__ = function(_dir, _from=undefined) {
+				var _registry = __focus_registry_get_entries__();
+				var _entries = _registry.entries;
+				var _count = array_length(_entries);
+				if (_count <= 0) return undefined;
+				
+				var _current_index = -1;
+				if (is_struct(_from)) {
+					_current_index = __focus_registry_find_index_by_id__(_entries, _count, _from.__comp_id__);
+				}
+				if (_current_index < 0) {
+					_current_index = __focus_registry_find_current_index__(_entries, _count);
+				}
+				
+				var _current = (_current_index >= 0) ? _entries[_current_index] : noone;
+				if (!__focus_registry_component_yields_nav__(_current, _dir)) {
+					return undefined;
+				}
+				
+				var _override_target = __focus_registry_component_override_target__(_current, _dir);
+				if (is_struct(_override_target)) {
+					var _auto_consume_override = __focus_registry_should_auto_consume_on_nav_target__(_override_target);
+					var _assigned_override = __focus_registry_set_target__(_override_target, _auto_consume_override);
+					if (is_struct(_assigned_override)) {
+						set_last_input_modality("keyboard");
+						_assigned_override.set_last_input_modality("keyboard");
+						return _assigned_override;
+					}
+					return undefined;
+				}
+				
+				var _target = noone;
+				switch (_dir) {
+					case "next": {
+						_target = __focus_registry_find_linear_target__(_entries, _count, _current_index, "next");
+					break;}
+					case "prev": {
+						_target = __focus_registry_find_linear_target__(_entries, _count, _current_index, "prev");
+					break;}
+					case "left":
+					case "right":
+					case "up":
+					case "down": {
+						_target = __focus_registry_find_directional_target__(_entries, _count, _current_index, _dir);
+					break;}
+					default: {
+						return undefined;
+					}
+				}
+				
+				if (!is_struct(_target)) return undefined;
+				if (is_struct(_current) && _target.__comp_id__ == _current.__comp_id__) return undefined;
+				
+				var _auto_consume = __focus_registry_should_auto_consume_on_nav_target__(_target);
+				var _assigned = __focus_registry_set_target__(_target, _auto_consume);
+				if (is_struct(_assigned)) {
+					set_last_input_modality("keyboard");
+					_assigned.set_last_input_modality("keyboard");
+					return _assigned;
+				}
+				
+				return undefined;
+			}
 			static __recalc_visual_state__ = function() {
 				if (!__is_enabled__)    { 
 					__visual_state__ = WW_STATE_DISABLED; return; 
@@ -2742,3 +3468,4 @@ function WWCore() constructor {
 //	https://github.com/YoYoGames/GameMaker-Bugs/issues/13747
 //	https://github.com/YoYoGames/GameMaker-Bugs/issues/13663
 var _last_resort = new WWCore();
+

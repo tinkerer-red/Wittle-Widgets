@@ -229,6 +229,31 @@ function WWTextBoxV3() : WWCore() constructor {
 				tab_exits_text = _enabled;
 				return self;
 			}
+			#region jsDoc
+			/// @func    should_yield_keyboard_nav()
+			/// @desc    Returns whether global keyboard navigation should take this key direction.
+			/// @self    WWTextBoxV3
+			/// @param   {String} direction : "next"|"prev"|"left"|"right"|"up"|"down"
+			/// @returns {Bool}
+			#endregion
+			static should_yield_keyboard_nav = function(_direction) {
+				if (!__is_input_consumer__) return true;
+				if (is_read_only) return true;
+				switch (_direction) {
+					case "next":
+					case "prev":
+						return tab_exits_text;
+					case "left":
+					case "right":
+					case "up":
+					case "down":
+						return false;
+				}
+				return true;
+			}
+			static should_auto_consume_on_nav_target = function() {
+				return false;
+			}
 			
 			#endregion
 			
@@ -504,17 +529,23 @@ function WWTextBoxV3() : WWCore() constructor {
 				return self;
 			}
 			
-			on_pressed(function(_data) {
+			on_pressed(function(_input) {
+				// Pointer click should immediately enter text editing.
+				if (!__is_input_consumer__) {
+					trigger_event(events.select, _input);
+					set_focus(true);
+				}
+				
 				// get focus
-				__check_minput__(false);
+				__check_minput__(_input, false);
 			})
-			on_interact(function(_data) {
+			on_interact(function(_input) {
 				// stay focused if mouse is on component
 				if (__word_selection_mode__) {
-					__update_word_selection_drag__();
+					__update_word_selection_drag__(_input);
 				}
 				else {
-					__check_minput__(true);
+					__check_minput__(_input, true);
 				}
 			})
 			on_long_press(function(_data) {
@@ -583,20 +614,20 @@ function WWTextBoxV3() : WWCore() constructor {
 			});
 			
 			on_focus(function(_input) {
-				var _return = hotkeys.step();
+				var _return = hotkeys.step(_input);
 				if (_return == undefined) {
-					if (keyboard_string != "") {
-						__insert_string_at_cursor__(keyboard_string);
-						keyboard_string = "";
+					var _typed = _input.text.input_string;
+					if (_typed != "" && !_input.text.consumed) {
+						__insert_string_at_cursor__(_typed);
+						consume_text_input();
 					}
 				}
 				else {
-					//empy the keyboard string after the hotkeys are handled to act as a "consume"
-					keyboard_string = "";
+					consume_text_input();
 				}
 			});
-			on_mouse_off(function(){
-				if (mouse_check_button_pressed(mb_left)) {
+			on_mouse_off(function(_input){
+				if (_input.pointer.left.pressed) {
 					set_focus(false);
 				}
 			})
@@ -1692,10 +1723,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @param   {Bool} select : Whether selection mode is enabled.
 				/// @returns {Undefined}
 				#endregion
-				static __check_minput__ = function(_select) {
+				static __check_minput__ = function(_input, _select) {
 					// Get mouse coordinates in GUI space.
-					var mx = device_mouse_x_to_gui(0);
-					var my = device_mouse_y_to_gui(0);
+					var mx = _input.pointer.x;
+					var my = _input.pointer.y;
 					var _index = renderer.get_index_from_xy(mx, my);
 					__cursor_set_index_synced__(_index, _select);
 				}
@@ -2066,10 +2097,10 @@ function WWTextBoxV3() : WWCore() constructor {
 				/// @self    WWTextBoxV3
 				/// @returns {Undefined}
 				#endregion
-				static __update_word_selection_drag__ = function() {
+				static __update_word_selection_drag__ = function(_input) {
 					// Get current mouse coordinates in GUI space.
-					var _mouse_x_gui = device_mouse_x_to_gui(0);
-					var _mouse_y_gui = device_mouse_y_to_gui(0);
+					var _mouse_x_gui = _input.pointer.x;
+					var _mouse_y_gui = _input.pointer.y;
 	
 					// Convert GUI coordinates to a global buffer index.
 					var _index = renderer.get_index_from_xy(_mouse_x_gui, _mouse_y_gui);
@@ -2369,5 +2400,6 @@ function WWTextBoxV3() : WWCore() constructor {
 	#endregion
 	
 }
+
 
 

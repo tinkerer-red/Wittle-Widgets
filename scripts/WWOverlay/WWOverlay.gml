@@ -67,12 +67,15 @@ function WWOverlay() : WWCore() constructor {
 		#endregion
 		
 		#region Functions
-		static mouse_on_comp = function() {
+		static mouse_on_comp = function(_input=undefined) {
 			// Hoisted overlays should not be blocked by parent group hit-tests.
 			if (__overlay_registered__) {
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_comp__ = point_in_rectangle(
-					device_mouse_x_to_gui(0),
-					device_mouse_y_to_gui(0),
+					_mx,
+					_my,
 					x,
 					y,
 					x + width,
@@ -80,15 +83,18 @@ function WWOverlay() : WWCore() constructor {
 				);
 				return __mouse_on_comp__;
 			}
-			return __overlay_base_mouse_on_comp__();
+			return __overlay_base_mouse_on_comp__(_input);
 		};
 		
-		static mouse_on_group = function() {
+		static mouse_on_group = function(_input=undefined) {
 			// Hoisted overlays should not be blocked by parent group hit-tests.
 			if (__overlay_registered__) {
+				if (!is_struct(_input)) _input = __user_input__;
+				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
+				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
 				__mouse_on_group__ = point_in_rectangle(
-					device_mouse_x_to_gui(0),
-					device_mouse_y_to_gui(0),
+					_mx,
+					_my,
 					x,
 					y,
 					x + __group__.width,
@@ -96,7 +102,7 @@ function WWOverlay() : WWCore() constructor {
 				);
 				return __mouse_on_group__;
 			}
-			return __overlay_base_mouse_on_group__();
+			return __overlay_base_mouse_on_group__(_input);
 		};
 		
 		// Hoisted overlay events. By default they run WWCore behavior.
@@ -152,3 +158,4 @@ function WWOverlay() : WWCore() constructor {
 	#endregion
 	
 }
+

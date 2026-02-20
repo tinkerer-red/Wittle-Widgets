@@ -124,12 +124,13 @@ function WWPathBreadcrumb() : WWViewScrollRegion() constructor {
 	set_scrollbars_auto_hide(true, true);
 	set_wheel_scroll_enabled(false, false);
 	on_mouse_over(method(self, function(_input) {
-		if (mouse_wheel_up()) {
+		if (_input.pointer.wheel_up) {
 			scroll_by(-16, 0);
 		}
-		else if (mouse_wheel_down()) {
+		else if (_input.pointer.wheel_down) {
 			scroll_by(16, 0);
 		}
 	}));
 	set_size(100, 22);
 }
+

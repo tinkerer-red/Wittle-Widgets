@@ -89,8 +89,8 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 				var _btn = new WWButtonText()
 					.set_size(_row_w, row_height)
 					.set_offset(0, _y)
-					.set_callback(method({fn:_click, index:_i}, function() {
-						fn(index);
+					.set_callback(method({fn:_click, index:_i}, function(_input) {
+						fn(index, _input);
 					}));
 				if (__fa_icons_ready__) _btn.set_text_processor("bbcode");
 
@@ -154,9 +154,10 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 			else array_push(selected_paths, _path);
 		};
 
-		static __entry_click__ = function(_index) {
+		static __entry_click__ = function(_index, _input) {
 			if (_index < 0 || _index >= array_length(entries)) return;
 			var _e = entries[_index];
+			var _ctrl = is_struct(_input) && is_struct(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(vk_control);
 
 			if (_e.path == "__PARENT__") {
 				trigger_event(events.parent_requested, __entry_payload__(_e, _index));
@@ -165,7 +166,7 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 
 			if (_e.is_dir) {
 				if (folder_select_enabled) {
-					if (allow_multi_select && keyboard_check(vk_control)) __toggle_selected__(_e.path);
+					if (allow_multi_select && _ctrl) __toggle_selected__(_e.path);
 					else selected_paths = [_e.path];
 					rebuild();
 					trigger_event(events.selection_changed, __selection_payload__());
@@ -174,7 +175,7 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 				return;
 			}
 
-			if (allow_multi_select && keyboard_check(vk_control)) __toggle_selected__(_e.path);
+			if (allow_multi_select && _ctrl) __toggle_selected__(_e.path);
 			else selected_paths = [_e.path];
 			rebuild();
 			trigger_event(events.selection_changed, __selection_payload__());
@@ -189,3 +190,4 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 	set_size(100, 100);
 	__fa_icons_ready__ = __compute_fa_ready__();
 }
+

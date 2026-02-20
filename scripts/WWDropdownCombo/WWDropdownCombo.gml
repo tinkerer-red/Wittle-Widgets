@@ -99,8 +99,8 @@ function WWDropdownCombo() : WWDropdownSelect() constructor {
 	
 	on_pre_step(function(_input) {
 		__apply_theme_header_chrome__();
-		if (!mouse_check_button_pressed(mb_left)) return;
-		if (__input_header__.mouse_on_group()) {
+		if (!_input.pointer.left.pressed) return;
+		if (__input_header__.mouse_on_group(_input)) {
 			set_open(true);
 		}
 	});
@@ -130,3 +130,4 @@ function WWDropdownCombo() : WWDropdownSelect() constructor {
 		__input_header__.set_value(_data.text);
 	});
 }
+

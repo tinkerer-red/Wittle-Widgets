@@ -106,13 +106,13 @@ function WWScrollbar() : WWSliderBase() constructor {
 				
 				// Re-wire thumb interactions
 				thumb.on_pressed(function(_input) {
-					thumb_offset = __get_mouse_pos__() - __get_thumb_pos__();
+					thumb_offset = __get_mouse_pos__(_input) - __get_thumb_pos__();
 				});
 				thumb.on_interact(function(_input) {
 					var _available_size = __get_available_size__();
 					if (_available_size <= 0) return;
 					
-					var _mouse_pos = __get_mouse_pos__() - thumb_offset;
+					var _mouse_pos = __get_mouse_pos__(_input) - thumb_offset;
 					var _thumb_pos = _mouse_pos - __get_scroll_origin__();
 					var _norm_val = _thumb_pos / _available_size;
 					
@@ -149,7 +149,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 
             // Clicking on Bar Moves the Thumb by %
             var __scroll_by_percent = method(self, function(_input) {
-                var _mouse_pos = __get_mouse_pos__();
+                var _mouse_pos = __get_mouse_pos__(_input);
                 var _available_size = __get_available_size__();
                 var _thumb_pos = __get_thumb_pos__();
 
@@ -169,7 +169,7 @@ function WWScrollbar() : WWSliderBase() constructor {
             // Track Mouse Offset when Pressing the Thumb
             thumb_offset = 0;
             thumb.on_pressed(function(_input) {
-                thumb_offset = __get_mouse_pos__() - __get_thumb_pos__();
+                thumb_offset = __get_mouse_pos__(_input) - __get_thumb_pos__();
             });
 
             // Dragging the Thumb (Accounts for Mouse Offset)
@@ -177,7 +177,7 @@ function WWScrollbar() : WWSliderBase() constructor {
                 var _available_size = __get_available_size__();
                 if (_available_size <= 0) return;
 
-                var _mouse_pos = __get_mouse_pos__() - thumb_offset;
+                var _mouse_pos = __get_mouse_pos__(_input) - thumb_offset;
                 var _thumb_pos = _mouse_pos - __get_scroll_origin__();
                 var _norm_val = _thumb_pos / _available_size;
 
@@ -309,7 +309,7 @@ function WWScrollbar() : WWSliderBase() constructor {
 			/// @returns {Real} mouse_position
 			/// @ignore
 			#endregion
-			static __get_mouse_pos__ = function() { return 0; };
+			static __get_mouse_pos__ = function(_input) { return 0; };
 			#region jsDoc
 			/// @func    __get_available_size__()
 			/// @desc    Returns the total distance the thumb is allowed to travel along the track.

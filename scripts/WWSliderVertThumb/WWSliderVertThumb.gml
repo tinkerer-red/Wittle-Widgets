@@ -30,10 +30,11 @@ function WWSliderVertThumb() : WWSliderVert() constructor {
     thumb.on_interact(function(_input) {
 		__ensure_thumb_size__();
 		var _avail = max(1, height - thumb.height);
-		var _rel = device_mouse_y_to_gui(0) - y - (thumb.height * 0.5);
+		var _rel = _input.pointer.y - y - (thumb.height * 0.5);
         var _norm_val = _rel / _avail;
 		if (!is_inverted) _norm_val = 1 - _norm_val;
 		_norm_val = clamp(_norm_val, 0, 1);
 		set_normalized_value(_norm_val);
     });
 }
+

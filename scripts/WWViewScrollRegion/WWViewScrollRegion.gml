@@ -131,21 +131,21 @@ function WWViewScrollRegion() : WWCore() constructor {
 			// Mouse wheel hook: scroll when mouse is over the region (view or scrollbars).
 			on_mouse_over(function(_input) {
 				//horz
-				if (keyboard_check(vk_shift)) {
+				if (_input.keyboard.key_down(vk_shift)) {
 					if (!wheel_scroll_horz_enabled) { return; }
-					if (mouse_wheel_up()) {
+					if (_input.pointer.wheel_up) {
 						scroll_by(-wheel_step, 0);
 					}
-					else if (mouse_wheel_down()) {
+					else if (_input.pointer.wheel_down) {
 						scroll_by(wheel_step, 0);
 					}
 				}
 				else { //vert
 					if (!wheel_scroll_vert_enabled) { return; }
-					if (mouse_wheel_up()) {
+					if (_input.pointer.wheel_up) {
 						scroll_by(0, -wheel_step);
 					}
-					else if (mouse_wheel_down()) {
+					else if (_input.pointer.wheel_down) {
 						scroll_by(0, wheel_step);
 					}
 				}
@@ -945,3 +945,4 @@ function WWViewScrollRegion() : WWCore() constructor {
 	__reflow__();
 
 }
+

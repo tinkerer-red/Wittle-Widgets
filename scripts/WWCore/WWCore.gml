@@ -411,32 +411,34 @@ function WWCore() constructor {
 				__last_input_modality__ = _last_input_modality;
 			    return self;
 			}
-			static should_yield_keyboard_nav = function(_direction) {
-				return true;
+			static handle_nav_action = function(_action, _input) {
+				// Default nav hook: component does not consume nav actions.
+				// Components can consume by setting _input.nav.consumed = true.
 			}
 			static should_auto_consume_on_nav_target = function() {
 				return true;
 			}
-			static handle_keyboard_nav_override = function(_direction) {
-				if (_direction != "left") return undefined;
-				var _folder = __find_ancestor_folder__();
-				if (!is_struct(_folder)) return undefined;
-				if (_folder.__comp_id__ == __comp_id__) return undefined;
-				
-				if (variable_struct_exists(_folder, "get_open")) {
-					var _get_open = _folder.get_open;
-					if (is_callable(_get_open) && !_folder.get_open()) {
-						return undefined;
-					}
-				}
-				
-				return _folder;
+			static nav_get_target = function() {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				var _registry = _root.__focus_registry_get_entries__();
+				var _entries = _registry.entries;
+				var _count = array_length(_entries);
+				if (_count <= 0) return noone;
+				var _idx = _root.__focus_registry_find_current_index__(_entries, _count);
+				if (_idx < 0) return noone;
+				return _entries[_idx];
 			}
-			static handle_keyboard_submit_override = function(_input) {
-				return false;
-			}
-			static handle_keyboard_cancel_override = function(_input) {
-				return false;
+			static nav_set_target = function(_target, _set_input_consumer=true, _modality="unknown") {
+				var _root = __root_canvas__;
+				if (!is_struct(_root)) _root = self;
+				
+				var _assigned = _root.__focus_registry_set_target__(_target, _set_input_consumer);
+				if (!is_struct(_assigned)) return noone;
+				
+				_root.set_last_input_modality(_modality);
+				_assigned.set_last_input_modality(_modality);
+				return _assigned;
 			}
 			
 		#endregion
@@ -850,104 +852,104 @@ function WWCore() constructor {
 				if (!is_struct(_input.nav)) return;
 				if (_input.nav.consumed) return;
 				
+				var _action = __nav_action_from_input__(_input);
+				if (_action == __WW_NAV_ACTION.NONE) return;
+				
+				var _nav_modality = __nav_modality_from_input__(_input);
+				var _current = _root.nav_get_target();
+				if (is_struct(_current)) {
+					var _handler = _root.__dispatch_nav_action__(_current, _action, _input);
+					if (_input.nav.consumed) {
+						set_last_input_modality(_nav_modality);
+						if (is_struct(_handler)) _handler.set_last_input_modality(_nav_modality);
+						var _target_after = _root.nav_get_target();
+						if (is_struct(_target_after)) _target_after.set_last_input_modality(_nav_modality);
+						return;
+					}
+				}
+				
+				var _dir = __nav_action_to_direction__(_action);
+				if (!is_undefined(_dir)) {
+					var _assigned = _root.__focus_registry_navigate__(_dir, undefined, _nav_modality);
+					if (is_struct(_assigned)) {
+						_input.nav.consumed = true;
+						return;
+					}
+				}
+				
+				if ((_action == __WW_NAV_ACTION.SUBMIT)
+				&& is_struct(_current)
+				&& !_current.__is_input_consumer__) {
+					var _assigned_submit = _root.nav_set_target(_current, true, _nav_modality);
+					if (is_struct(_assigned_submit)) {
+						_input.nav.consumed = true;
+					}
+				}
+            }
+			static __nav_modality_from_input__ = function(_input) {
 				var _nav_modality = "unknown";
+				if (!is_struct(_input) || !is_struct(_input.nav)) return _nav_modality;
 				var _nav_source = string_lower(string(_input.nav.source));
 				switch (_nav_source) {
 					case "keyboard":
 					case "controller": _nav_modality = _nav_source; break;
 				}
+				return _nav_modality;
+			}
+			static __nav_action_from_input__ = function(_input) {
+				if (!is_struct(_input) || !is_struct(_input.nav)) return __WW_NAV_ACTION.NONE;
 				
-				if (_input.nav.submit.pressed || _input.nav.submit.repeat) {
-					var _registry_submit = _root.__focus_registry_get_entries__();
-					var _entries_submit = _registry_submit.entries;
-					var _count_submit = array_length(_entries_submit);
-					if (_count_submit > 0) {
-						var _current_index_submit = _root.__focus_registry_find_current_index__(_entries_submit, _count_submit);
-						if (_current_index_submit >= 0) {
-							var _current_submit = _entries_submit[_current_index_submit];
-							var _submit_handled = _current_submit.handle_keyboard_submit_override(_input);
-							var _submit_handler_comp = _current_submit;
-							if (!_submit_handled) {
-								var _submit_owner = __resolve_dropdown_owner_for_nav__(_current_submit);
-								if (is_struct(_submit_owner) && _submit_owner.__comp_id__ != _current_submit.__comp_id__) {
-									_submit_handled = _submit_owner.handle_keyboard_submit_override(_input);
-									if (_submit_handled) {
-										_submit_handler_comp = _submit_owner;
-									}
-								}
-							}
-							if (_submit_handled) {
-								set_last_input_modality(_nav_modality);
-								_submit_handler_comp.set_last_input_modality(_nav_modality);
-								_input.nav.consumed = true;
-								return;
-							}
-							if (!_current_submit.__is_input_consumer__) {
-								var _assigned_submit = _root.__focus_registry_set_target__(_current_submit, true);
-								if (is_struct(_assigned_submit)) {
-									set_last_input_modality(_nav_modality);
-									_assigned_submit.set_last_input_modality(_nav_modality);
-									_input.nav.consumed = true;
-									return;
-								}
+				var _nav = _input.nav;
+				if (_nav.submit.pressed || _nav.submit.repeat) return __WW_NAV_ACTION.SUBMIT;
+				if (_nav.cancel.pressed || _nav.cancel.repeat) return __WW_NAV_ACTION.CANCEL;
+				if (_nav.next.pressed || _nav.next.repeat) return __WW_NAV_ACTION.NEXT;
+				if (_nav.prev.pressed || _nav.prev.repeat) return __WW_NAV_ACTION.PREV;
+				if (_nav.left.pressed || _nav.left.repeat) return __WW_NAV_ACTION.LEFT;
+				if (_nav.right.pressed || _nav.right.repeat) return __WW_NAV_ACTION.RIGHT;
+				if (_nav.up.pressed || _nav.up.repeat) return __WW_NAV_ACTION.UP;
+				if (_nav.down.pressed || _nav.down.repeat) return __WW_NAV_ACTION.DOWN;
+				
+				return __WW_NAV_ACTION.NONE;
+			}
+			static __nav_action_to_direction__ = function(_action) {
+				switch (_action) {
+					case __WW_NAV_ACTION.NEXT: return "next";
+					case __WW_NAV_ACTION.PREV: return "prev";
+					case __WW_NAV_ACTION.LEFT: return "left";
+					case __WW_NAV_ACTION.RIGHT: return "right";
+					case __WW_NAV_ACTION.UP: return "up";
+					case __WW_NAV_ACTION.DOWN: return "down";
+				}
+				return undefined;
+			}
+			static __dispatch_nav_action__ = function(_start, _action, _input) {
+				if (!is_struct(_start)) return noone;
+				
+				var _node = _start;
+				repeat (64) {
+					if (!is_struct(_node)) break;
+					
+					if (variable_struct_exists(_node, "handle_nav_action")) {
+						var _hook = _node.handle_nav_action;
+						if (is_callable(_hook)) {
+							var _bound = method(_node, _hook);
+							_bound(_action, _input);
+							if (is_struct(_input)
+							&& is_struct(_input.nav)
+							&& _input.nav.consumed) {
+								return _node;
 							}
 						}
 					}
+					
+					if (!variable_struct_exists(_node, "__parent__")) break;
+					var _parent = _node.__parent__;
+					if (!is_struct(_parent)) break;
+					_node = _parent;
 				}
 				
-				if (_input.nav.cancel.pressed || _input.nav.cancel.repeat) {
-					var _registry_cancel = _root.__focus_registry_get_entries__();
-					var _entries_cancel = _registry_cancel.entries;
-					var _count_cancel = array_length(_entries_cancel);
-					if (_count_cancel > 0) {
-						var _current_index_cancel = _root.__focus_registry_find_current_index__(_entries_cancel, _count_cancel);
-						if (_current_index_cancel >= 0) {
-							var _current_cancel = _entries_cancel[_current_index_cancel];
-							var _cancel_handled = _current_cancel.handle_keyboard_cancel_override(_input);
-							var _cancel_handler_comp = _current_cancel;
-							if (!_cancel_handled) {
-								var _cancel_owner = __resolve_dropdown_owner_for_nav__(_current_cancel);
-								if (is_struct(_cancel_owner) && _cancel_owner.__comp_id__ != _current_cancel.__comp_id__) {
-									_cancel_handled = _cancel_owner.handle_keyboard_cancel_override(_input);
-									if (_cancel_handled) {
-										_cancel_handler_comp = _cancel_owner;
-									}
-								}
-							}
-							if (_cancel_handled) {
-								set_last_input_modality(_nav_modality);
-								_cancel_handler_comp.set_last_input_modality(_nav_modality);
-								_input.nav.consumed = true;
-								return;
-							}
-						}
-					}
-				}
-				
-				var _did_navigate = false;
-				if (_input.nav.next.pressed || _input.nav.next.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("next", undefined, _nav_modality));
-				}
-				else if (_input.nav.prev.pressed || _input.nav.prev.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("prev", undefined, _nav_modality));
-				}
-				else if (_input.nav.left.pressed || _input.nav.left.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("left", undefined, _nav_modality));
-				}
-				else if (_input.nav.right.pressed || _input.nav.right.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("right", undefined, _nav_modality));
-				}
-				else if (_input.nav.up.pressed || _input.nav.up.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("up", undefined, _nav_modality));
-				}
-				else if (_input.nav.down.pressed || _input.nav.down.repeat) {
-					_did_navigate = is_struct(_root.__focus_registry_navigate__("down", undefined, _nav_modality));
-				}
-				
-				if (_did_navigate) {
-					_input.nav.consumed = true;
-				}
-            }
+				return noone;
+			}
 			
         #endregion
 		
@@ -2260,11 +2262,11 @@ function WWCore() constructor {
 						$"__last_input_modality__ = {__last_input_modality__};",
 						$"__visual_state__ = {__visual_state__};",
 						"",
-						$"WW_STATE_DISABLED = {WW_STATE_DISABLED};",
-						$"WW_STATE_ACTIVE = {WW_STATE_ACTIVE};",
-						$"WW_STATE_HOVER = {WW_STATE_HOVER};",
-						$"WW_STATE_NAV = {WW_STATE_NAV};",
-						$"WW_STATE_NORMAL = {WW_STATE_NORMAL};",
+						$"__WW_STATE.DISABLED = {__WW_STATE.DISABLED};",
+						$"__WW_STATE.ACTIVE = {__WW_STATE.ACTIVE};",
+						$"__WW_STATE.HOVER = {__WW_STATE.HOVER};",
+						$"__WW_STATE.NAV = {__WW_STATE.NAV};",
+						$"__WW_STATE.NORMAL = {__WW_STATE.NORMAL};",
 					))
 				}
 				
@@ -3270,45 +3272,6 @@ function WWCore() constructor {
 				}
 				return -1;
 			}
-			static __focus_registry_component_yields_nav__ = function(_comp, _direction) {
-				if (!is_struct(_comp)) return true;
-				if (variable_struct_exists(_comp, "should_yield_keyboard_nav")) {
-					var _func = _comp.should_yield_keyboard_nav;
-					if (is_callable(_func)) {
-						var _bound = method(_comp, _func);
-						return !!_bound(_direction);
-					}
-				}
-				return true;
-			}
-			static __focus_registry_component_override_target__ = function(_comp, _direction) {
-				if (!is_struct(_comp)) return undefined;
-				if (!variable_struct_exists(_comp, "handle_keyboard_nav_override")) return undefined;
-				
-				var _func = _comp.handle_keyboard_nav_override;
-				if (!is_callable(_func)) return undefined;
-				
-				var _bound = method(_comp, _func);
-				var _result = _bound(_direction);
-				if (is_struct(_result)) return _result;
-				if (is_bool(_result) && _result) return _comp;
-				return undefined;
-			}
-			static __resolve_dropdown_owner_for_nav__ = function(_comp) {
-				if (!is_struct(_comp)) return noone;
-				var _node = _comp;
-				repeat (16) {
-					if (variable_struct_exists(_node, "__dropdown_owner__")) {
-						var _owner = _node.__dropdown_owner__;
-						if (is_struct(_owner)) return _owner;
-					}
-					if (!variable_struct_exists(_node, "__parent__")) break;
-					var _parent = _node.__parent__;
-					if (!is_struct(_parent)) break;
-					_node = _parent;
-				}
-				return noone;
-			}
 			static __focus_registry_should_auto_consume_on_nav_target__ = function(_comp) {
 				if (!is_struct(_comp)) return true;
 				if (!variable_struct_exists(_comp, "should_auto_consume_on_nav_target")) return true;
@@ -3451,21 +3414,6 @@ function WWCore() constructor {
 				}
 				
 				var _current = (_current_index >= 0) ? _entries[_current_index] : noone;
-				if (!__focus_registry_component_yields_nav__(_current, _dir)) {
-					return undefined;
-				}
-				
-				var _override_target = __focus_registry_component_override_target__(_current, _dir);
-				if (is_struct(_override_target)) {
-					var _auto_consume_override = __focus_registry_should_auto_consume_on_nav_target__(_override_target);
-					var _assigned_override = __focus_registry_set_target__(_override_target, _auto_consume_override);
-					if (is_struct(_assigned_override)) {
-						set_last_input_modality(_nav_modality);
-						_assigned_override.set_last_input_modality(_nav_modality);
-						return _assigned_override;
-					}
-					return undefined;
-				}
 				
 				var _target = noone;
 				switch (_dir) {
@@ -3501,21 +3449,21 @@ function WWCore() constructor {
 			}
 			static __recalc_visual_state__ = function() {
 				if (!__is_enabled__)    { 
-					__visual_state__ = WW_STATE_DISABLED; return; 
+					__visual_state__ = __WW_STATE.DISABLED; return; 
 					}
 				if (__is_engaged__) { 
-					__visual_state__ = WW_STATE_ACTIVE; return; 
+					__visual_state__ = __WW_STATE.ACTIVE; return; 
 					}
 				if (__is_pointer_over__)     { 
-					__visual_state__ = WW_STATE_HOVER; return; 
+					__visual_state__ = __WW_STATE.HOVER; return; 
 					}
 				if (__is_nav_target__
 				&& (__last_input_modality__ == "keyboard"
 				|| __last_input_modality__ == "controller")) { 
-					__visual_state__ = WW_STATE_NAV; return; 
+					__visual_state__ = __WW_STATE.NAV; return; 
 					}
 				//else
-				__visual_state__ = WW_STATE_NORMAL;
+				__visual_state__ = __WW_STATE.NORMAL;
 			};
 			static __sync_legacy_input_flags__ = function() {
 				__is_interacting__ = __is_engaged__;

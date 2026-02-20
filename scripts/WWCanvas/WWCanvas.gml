@@ -49,7 +49,7 @@ function WWCanvas() : WWCore() constructor {
 		#endregion
 
 		#region Variables
-		__visual_state__ = 0;
+		__visual_state__ = __WW_STATE.NORMAL;
 		__draw_fill__ = true;
 		__draw_border__ = false;
 		__theme_role__ = "canvas";
@@ -131,10 +131,10 @@ function WWCanvas() : WWCore() constructor {
 		#region Functions
 		static __theme_state_specifier__ = function() {
 			switch (__visual_state__) {
-				case WW_STATE_HOVER: return "hover";
-				case WW_STATE_ACTIVE: return "active";
-				case WW_STATE_DISABLED: return "disabled";
-				case WW_STATE_NAV: return "nav";
+				case __WW_STATE.HOVER: return "hover";
+				case __WW_STATE.ACTIVE: return "active";
+				case __WW_STATE.DISABLED: return "disabled";
+				case __WW_STATE.NAV: return "nav";
 				default: return "idle";
 			}
 		};

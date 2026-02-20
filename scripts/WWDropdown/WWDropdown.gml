@@ -269,16 +269,48 @@ function WWDropdown() : WWCore() constructor {
 				__refresh_dropdown_layout__();
 				__base_update__();
 			}
-			static handle_keyboard_submit_override = function(_input) {
-				if (is_open) {
-					if (__keyboard_select_current_nav_item__()) {
-						return true;
-					}
+			static handle_nav_action = function(_action, _input) {
+				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				
+				switch (_action) {
+					case __WW_NAV_ACTION.SUBMIT: {
+						if (is_open) {
+							if (__keyboard_select_current_nav_item__()) {
+								_input.nav.consumed = true;
+								return;
+							}
+						}
+						if (__keyboard_open_and_focus_first_item__(_input)) {
+							_input.nav.consumed = true;
+						}
+					break;}
+					
+					case __WW_NAV_ACTION.CANCEL: {
+						if (__keyboard_close_and_focus_header__(_input)) {
+							_input.nav.consumed = true;
+						}
+					break;}
+					
+					case __WW_NAV_ACTION.NEXT:
+					case __WW_NAV_ACTION.PREV:
+					case __WW_NAV_ACTION.LEFT:
+					case __WW_NAV_ACTION.RIGHT:
+					case __WW_NAV_ACTION.UP:
+					case __WW_NAV_ACTION.DOWN: {
+						if (!is_open) return;
+						var _target = __keyboard_get_current_nav_target__();
+						if (!is_struct(_target)) _target = __header_component__;
+						var _dir = __nav_action_to_direction__(_action);
+						if (is_undefined(_dir)) return;
+						var _next = __keyboard_nav_override_from__(_target, _dir);
+						if (is_struct(_next)) {
+							var _assigned = nav_set_target(_next, false, _input.nav.source);
+							if (is_struct(_assigned)) {
+								_input.nav.consumed = true;
+							}
+						}
+					break;}
 				}
-				return __keyboard_open_and_focus_first_item__(_input);
-			}
-			static handle_keyboard_cancel_override = function(_input) {
-				return __keyboard_close_and_focus_header__(_input);
 			}
 		#endregion
 	#endregion
@@ -298,23 +330,11 @@ function WWDropdown() : WWCore() constructor {
 					_header_text.set_focusable(false);
 				}
 			}
-			__header_component__.handle_keyboard_submit_override = function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
+			__header_component__.handle_nav_action = function(_action, _input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return;
 				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return false;
-				return _owner.__keyboard_open_and_focus_first_item__(_input);
-			}
-			__header_component__.handle_keyboard_cancel_override = function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return false;
-				return _owner.__keyboard_close_and_focus_header__(_input);
-			}
-			__header_component__.handle_keyboard_nav_override = function(_direction) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return undefined;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return undefined;
-				return _owner.__keyboard_nav_override_from__(self, _direction);
+				if (!is_struct(_owner)) return;
+				_owner.handle_nav_action(_action, _input);
 			}
 			if (variable_struct_exists(__header_component__, "on_released")) {
 				var _on_released = variable_struct_get(__header_component__, "on_released");
@@ -334,35 +354,27 @@ function WWDropdown() : WWCore() constructor {
 					_item_text.set_focusable(false);
 				}
 			}
-			_comp.handle_keyboard_submit_override = function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
-				if (!variable_struct_exists(self, "__dropdown_item_index__")) return false;
+			_comp.handle_nav_action = function(_action, _input) {
+				if (!variable_struct_exists(self, "__dropdown_owner__")) return;
 				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return false;
-				var _idx = self.__dropdown_item_index__;
-				if (_idx < 0) return false;
-				_owner.set_value(_idx);
-				_owner.__keyboard_focus_header__();
-				return true;
+				if (!is_struct(_owner)) return;
+				_owner.handle_nav_action(_action, _input);
 			}
-			_comp.handle_keyboard_cancel_override = function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return false;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return false;
-				return _owner.__keyboard_close_and_focus_header__(_input);
+		}
+		static __nav_action_to_direction__ = function(_action) {
+			switch (_action) {
+				case __WW_NAV_ACTION.NEXT: return "next";
+				case __WW_NAV_ACTION.PREV: return "prev";
+				case __WW_NAV_ACTION.LEFT: return "left";
+				case __WW_NAV_ACTION.RIGHT: return "right";
+				case __WW_NAV_ACTION.UP: return "up";
+				case __WW_NAV_ACTION.DOWN: return "down";
 			}
-			_comp.handle_keyboard_nav_override = function(_direction) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return undefined;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return undefined;
-				return _owner.__keyboard_nav_override_from__(self, _direction);
-			}
+			return undefined;
 		}
 		static __keyboard_focus_header__ = function() {
 			if (!is_struct(__header_component__)) return false;
-			var _root = __root_canvas__;
-			if (!is_struct(_root)) _root = self;
-			var _assigned = _root.__focus_registry_set_target__(__header_component__, false);
+			var _assigned = nav_set_target(__header_component__, false);
 			return is_struct(_assigned);
 		}
 		static __keyboard_find_first_navigable_item__ = function() {
@@ -460,9 +472,11 @@ function WWDropdown() : WWCore() constructor {
 			if (!is_struct(_first_item)) {
 				return __keyboard_focus_header__();
 			}
-			var _root = __root_canvas__;
-			if (!is_struct(_root)) _root = self;
-			var _assigned = _root.__focus_registry_set_target__(_first_item, false);
+			var _modality = "unknown";
+			if (is_struct(_input) && is_struct(_input.nav)) {
+				_modality = _input.nav.source;
+			}
+			var _assigned = nav_set_target(_first_item, false, _modality);
 			if (!is_struct(_assigned)) {
 				return __keyboard_focus_header__();
 			}

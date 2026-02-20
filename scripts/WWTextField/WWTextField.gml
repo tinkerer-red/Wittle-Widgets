@@ -1663,26 +1663,32 @@ function WWTextField() : WWCore() constructor {
 				return tab_exits_text;
 			};
 			#region jsDoc
-			/// @func    should_yield_keyboard_nav()
-			/// @desc    Returns whether global keyboard navigation should take this key direction.
+			/// @func    handle_nav_action()
+			/// @desc    Consumes nav actions while editing text so navigation does not steal caret movement.
 			/// @self    WWTextField
-			/// @param   {String} direction : "next"|"prev"|"left"|"right"|"up"|"down"
-			/// @returns {Bool}
+			/// @param   {Enum.WW_NAV_ACTION} action : Nav action enum.
+			/// @param   {Struct} input : Current input payload.
+			/// @returns {Undefined}
 			#endregion
-			static should_yield_keyboard_nav = function(_direction) {
-				if (!__is_input_consumer__) return true;
-				if (is_read_only) return true;
-				switch (_direction) {
-					case "next":
-					case "prev":
-						return tab_exits_text;
-					case "left":
-					case "right":
-					case "up":
-					case "down":
-						return false;
+			static handle_nav_action = function(_action, _input) {
+				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				if (!__is_input_consumer__) return;
+				if (is_read_only) return;
+				
+				switch (_action) {
+					case __WW_NAV_ACTION.NEXT:
+					case __WW_NAV_ACTION.PREV: {
+						if (!tab_exits_text) {
+							_input.nav.consumed = true;
+						}
+					break;}
+					case __WW_NAV_ACTION.LEFT:
+					case __WW_NAV_ACTION.RIGHT:
+					case __WW_NAV_ACTION.UP:
+					case __WW_NAV_ACTION.DOWN: {
+						_input.nav.consumed = true;
+					break;}
 				}
-				return true;
 			};
 			static should_auto_consume_on_nav_target = function() {
 				return false;

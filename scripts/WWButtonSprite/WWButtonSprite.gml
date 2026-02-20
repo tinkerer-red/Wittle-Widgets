@@ -83,7 +83,7 @@ function WWButtonSprite() : WWSprite() constructor {
 		
 		#region Variables
 			
-			__visual_state__ = 0;
+			__visual_state__ = __WW_STATE.NORMAL;
 			__theme_sprite_key_main__ = "button.sprite.main";
 			__theme_sprite_key_state_prefix__ = "button.sprite.main";
 			__theme_sprite_key_checked__ = undefined;
@@ -96,11 +96,11 @@ function WWButtonSprite() : WWSprite() constructor {
 		#region Functions
 			static __theme_state_specifier__ = function() {
 				switch (__visual_state__) {
-					case WW_STATE_HOVER: return "hover";
-					case WW_STATE_ACTIVE: return "active";
-					case WW_STATE_DISABLED: return "disabled";
-					case WW_STATE_NAV: return "nav";
-					case WW_STATE_NORMAL: return "idle";
+					case __WW_STATE.HOVER: return "hover";
+					case __WW_STATE.ACTIVE: return "active";
+					case __WW_STATE.DISABLED: return "disabled";
+					case __WW_STATE.NAV: return "nav";
+					case __WW_STATE.NORMAL: return "idle";
 					default: return "idle";
 				}
 			};

@@ -25,18 +25,28 @@
 #macro WW_Scribble_Jr_Exists     __WWConstants.Scribble_Jr_Exists
 #macro WW_Emobble_Exists         __WWConstants.Emobble_Exists
 
-#macro GUI_IMAGE_ENABLED 0
-#macro GUI_IMAGE_HOVER 1
-#macro GUI_IMAGE_PRESSED 2
-#macro GUI_IMAGE_DISABLED 3
-
-// Theme-driven visual states (int "enum")
+// Theme-driven visual states.
 // These are intended for choosing paints/colors, not for sprite subimages.
-#macro WW_STATE_NORMAL   0
-#macro WW_STATE_HOVER    1
-#macro WW_STATE_ACTIVE   2
-#macro WW_STATE_DISABLED 3
-#macro WW_STATE_NAV      4
+enum __WW_STATE {
+	NORMAL,
+	HOVER,
+	ACTIVE,
+	DISABLED,
+	NAV,
+}
+
+// Nav action enums (input-driven nav dispatch)
+enum __WW_NAV_ACTION {
+	NONE = -1,
+	SUBMIT = 0,
+	CANCEL,
+	NEXT,
+	PREV,
+	LEFT,
+	RIGHT,
+	UP,
+	DOWN,
+}
 
 // Debug/fallback: bright magenta (Minecraft-style missing texture indicator)
 #macro WW_COLOR_MISSING_THEME c_fuchsia

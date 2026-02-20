@@ -224,45 +224,62 @@ function WWFolder() : WWButtonText() constructor {
 			}
 			
 			#region jsDoc
-			/// @func    handle_keyboard_nav_override()
-			/// @desc    Tree-style keyboard override:
-			///          - Left on open header collapses and keeps focus on header.
-			///          - Left on closed header moves focus to ancestor folder header if available.
+			/// @func    handle_nav_action()
+			/// @desc    Handles folder-specific navigation actions.
+			///          - Submit toggles open/closed.
+			///          - Left from a child targets the folder header first.
+			///          - Left on the header collapses open folders.
+			///          - Left on a closed header targets ancestor folder.
+			///          - Right expands closed folders.
 			/// @self    WWFolder
-			/// @param   {String} direction : Navigation direction.
-			/// @returns {Struct.WWCore|Bool|Undefined}
-			#endregion
-			static handle_keyboard_nav_override = function(_direction) {
-				if (_direction != "left") return undefined;
-				
-				if (is_open) {
-					set_open(false);
-					return self;
-				}
-				
-				var _ancestor_folder = __find_ancestor_folder__();
-				if (is_struct(_ancestor_folder)) {
-					return _ancestor_folder;
-				}
-				
-				return undefined;
-			}
-			#region jsDoc
-			/// @func    handle_keyboard_submit_override()
-			/// @desc    Handles nav submit on the folder header by toggling open/closed.
-			/// @self    WWFolder
+			/// @param   {Enum.WW_NAV_ACTION} action : Nav action enum.
 			/// @param   {Struct} input : Current input payload.
-			/// @returns {Bool} True when handled.
+			/// @returns {Undefined}
 			#endregion
-			static handle_keyboard_submit_override = function(_input) {
-				set_open(!is_open);
-				if (is_open) {
-					trigger_event(events.opened, _input);
+			static handle_nav_action = function(_action, _input) {
+				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				
+				switch (_action) {
+					case __WW_NAV_ACTION.SUBMIT: {
+						set_open(!is_open);
+						if (is_open) trigger_event(events.opened, _input);
+						else trigger_event(events.closed, _input);
+						_input.nav.consumed = true;
+					break;}
+					
+					case __WW_NAV_ACTION.LEFT: {
+						if (is_open) {
+							var _current_target = nav_get_target();
+							if (is_struct(_current_target)
+							&& (_current_target.__comp_id__ != __comp_id__)) {
+								nav_set_target(self, true, _input.nav.source);
+								_input.nav.consumed = true;
+								break;
+							}
+							
+							set_open(false);
+							nav_set_target(self, true, _input.nav.source);
+							_input.nav.consumed = true;
+							break;
+						}
+						
+						var _ancestor_folder = __find_ancestor_folder__();
+						if (is_struct(_ancestor_folder)) {
+							var _assigned = nav_set_target(_ancestor_folder, true, _input.nav.source);
+							if (is_struct(_assigned)) {
+								_input.nav.consumed = true;
+							}
+						}
+					break;}
+					
+					case __WW_NAV_ACTION.RIGHT: {
+						if (!is_open) {
+							set_open(true);
+							trigger_event(events.opened, _input);
+							_input.nav.consumed = true;
+						}
+					break;}
 				}
-				else {
-					trigger_event(events.closed, _input);
-				}
-				return true;
 			}
 
 			#region jsDoc

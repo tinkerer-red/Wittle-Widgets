@@ -166,12 +166,9 @@ function WWIcon() : WWCore() constructor {
 			
 			static __theme_state_specifier__ = function() {
 				var _src = __theme_state_source__;
-				if (!is_struct(_src)) _src = self;
+				if (is_undefined(_src) || _src == noone) _src = self;
 				
-				var _state = __WW_STATE.NORMAL;
-				if (variable_struct_exists(_src, "__visual_state__")) {
-					_state = _src.__visual_state__;
-				}
+				var _state = _src.__visual_state__;
 				
 				switch (_state) {
 					case __WW_STATE.HOVER: return "hover";

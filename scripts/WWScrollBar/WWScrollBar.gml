@@ -17,6 +17,29 @@ function WWScrollbar() : WWSliderBase() constructor {
     #region Public
 
         #region Builder Functions
+            #region jsDoc
+			/// @func    set_debug_thumb_gizmo()
+			/// @desc    Enables a debug thumb overlay and temporarily disables scissor clipping while drawing this scrollbar.
+			/// @self    WWScrollbar
+			/// @param   {Bool} enabled
+			/// @returns {Struct.WWScrollbar}
+			#endregion
+            static set_debug_thumb_gizmo = function(_enabled=true) {
+				__debug_thumb_gizmo__ = !!_enabled;
+				return self;
+            }
+
+            #region jsDoc
+			/// @func    set_callback()
+			/// @desc    Sets callback invoked when scrollbar value changes.
+			/// @self    WWScrollbar
+			/// @param   {Function} callback
+			/// @returns {Struct.WWScrollbar}
+			#endregion
+            static set_callback = function(_callback) {
+				__user_callback__ = _callback;
+				return self;
+            }
 
             #region jsDoc
 			/// @func    set_size()
@@ -94,14 +117,12 @@ function WWScrollbar() : WWSliderBase() constructor {
 				
 				thumb = _thumb;
 				add(thumb);
-				if (variable_struct_exists(thumb, "set_theme_keys")) {
-					thumb.set_theme_keys(
-						__thumb_theme_sprite_main__,
-						__thumb_theme_sprite_state_prefix__,
-						__thumb_theme_color_prefix__,
-						__thumb_theme_alpha_prefix__
-					);
-				}
+				thumb.set_theme_keys(
+					__thumb_theme_sprite_main__,
+					__thumb_theme_sprite_state_prefix__,
+					__thumb_theme_color_prefix__,
+					__thumb_theme_alpha_prefix__
+				);
 				thumb.set_navigable(false);
 				
 				// Keep default sizing behavior: if the bar was sized and the thumb wasn't user-sized,
@@ -154,14 +175,12 @@ function WWScrollbar() : WWSliderBase() constructor {
 				__thumb_theme_color_prefix__ = _color_prefix;
 				__thumb_theme_alpha_prefix__ = _alpha_prefix;
 				
-				if (is_struct(thumb) && variable_struct_exists(thumb, "set_theme_keys")) {
-					thumb.set_theme_keys(
-						__thumb_theme_sprite_main__,
-						__thumb_theme_sprite_state_prefix__,
-						__thumb_theme_color_prefix__,
-						__thumb_theme_alpha_prefix__
-					);
-				}
+				thumb.set_theme_keys(
+					__thumb_theme_sprite_main__,
+					__thumb_theme_sprite_state_prefix__,
+					__thumb_theme_color_prefix__,
+					__thumb_theme_alpha_prefix__
+				);
 				return self;
 			}
 			
@@ -177,6 +196,10 @@ function WWScrollbar() : WWSliderBase() constructor {
 			__thumb_theme_sprite_state_prefix__ = "scrollbar.sprite.thumb";
 			__thumb_theme_color_prefix__ = "scrollbar.color.thumb";
 			__thumb_theme_alpha_prefix__ = "scrollbar.alpha.thumb";
+			__user_callback__ = undefined;
+			__debug_thumb_gizmo__ = false;
+			__debug_prev_scissor__ = undefined;
+			__debug_scissor_lifted__ = false;
 			
 	        // Create Thumb
 	        thumb = new WWButtonSprite();
@@ -193,6 +216,12 @@ function WWScrollbar() : WWSliderBase() constructor {
 	    #endregion
 		
         #region Events
+			on_pre_draw(function(_input) {
+				if (!__debug_thumb_gizmo__) return;
+				__debug_prev_scissor__ = gpu_get_scissor();
+				gpu_set_scissor(0, 0, display_get_gui_width(), display_get_gui_height());
+				__debug_scissor_lifted__ = true;
+			});
 
             // Clicking on Bar Moves the Thumb by %
             var __scroll_by_percent = method(self, function(_input) {
@@ -238,6 +267,31 @@ function WWScrollbar() : WWSliderBase() constructor {
                 var _thumb_pos = _available_size * normalized_value;
                 __set_thumb_offset__(_thumb_pos);
             });
+
+            // Value-change callback path used by scroll regions.
+			on_event(events.value_changed, function(_value) {
+				if (is_callable(__user_callback__)) __user_callback__();
+			});
+
+			on_post_draw(function(_input) {
+				if (__debug_thumb_gizmo__ && !is_undefined(thumb) && thumb != noone) {
+					var _x1 = thumb.x;
+					var _y1 = thumb.y;
+					var _x2 = _x1 + thumb.width;
+					var _y2 = _y1 + thumb.height;
+
+					draw_set_color(c_lime);
+					draw_rectangle(_x1, _y1, _x2, _y2, true);
+					draw_line(_x1, _y1, _x2, _y2);
+					draw_line(_x2, _y1, _x1, _y2);
+				}
+
+				if (__debug_scissor_lifted__) {
+					gpu_set_scissor(__debug_prev_scissor__);
+					__debug_prev_scissor__ = undefined;
+					__debug_scissor_lifted__ = false;
+				}
+			});
 			
         #endregion
 		
@@ -251,6 +305,16 @@ function WWScrollbar() : WWSliderBase() constructor {
 			#endregion
 			static get_thumb = function() {
 				return thumb;
+			};
+
+			#region jsDoc
+			/// @func    get_callback()
+			/// @desc    Returns the callback currently used for value-change updates.
+			/// @self    WWScrollbar
+			/// @returns {Function}
+			#endregion
+			static get_callback = function() {
+				return __user_callback__;
 			};
 			
 			#region jsDoc
@@ -335,15 +399,20 @@ function WWScrollbar() : WWSliderBase() constructor {
 			/// @returns {Undefined}
 			/// @ignore
 			#endregion
-            static __adjust_thumb_size__ = function() {
+			static __adjust_thumb_size__ = function() {
 				if (canvas_size <= 0 || coverage_size <= 0) {
 					__set_thumb_size__(10);
 					return;
 				}
-                var _ratio = coverage_size / canvas_size;
-                var _thumb_size = __get_available_size__() * _ratio;
-                _thumb_size = max(_thumb_size, 10); // Ensure minimum thumb size
-				
+				// IMPORTANT:
+				// Use full track length, not available travel distance.
+				// available = track - thumb, so using available feeds back on itself
+				// and causes thumb-size oscillation across sync calls.
+				var _track_size = max(1, __get_available_size__() + __get_thumb_size__());
+				var _ratio = clamp(coverage_size / canvas_size, 0, 1);
+				var _thumb_min = min(10, _track_size);
+				var _thumb_size = clamp(floor(_track_size * _ratio + 0.5), _thumb_min, _track_size);
+
 				__set_thumb_size__(_thumb_size);
             };
 			

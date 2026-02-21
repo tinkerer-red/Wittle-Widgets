@@ -218,7 +218,13 @@ function WWViewScroll() : WWView() constructor {
 			#endregion
 			static __apply_scroll__ = function() {
 				if (canvas == undefined) { return; }
-				canvas.set_offset(-scroll_x, -scroll_y);
+				var _x = -scroll_x;
+				var _y = -scroll_y;
+				if (variable_struct_exists(canvas, "__set_offset_fast__")) {
+					canvas.__set_offset_fast__(_x, _y);
+				} else {
+					canvas.set_offset(_x, _y);
+				}
 			};
 
 		#endregion

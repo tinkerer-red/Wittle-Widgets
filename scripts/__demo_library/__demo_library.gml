@@ -226,10 +226,7 @@ function __demo_library_array_union_unique__(_a, _b) {
 #endregion
 function __demo_library_name_of_comp__(_comp) {
 	if (is_undefined(_comp)) { return "<undefined>"; }
-	if (variable_struct_exists(_comp, "debug_name")) {
-		return variable_struct_get(_comp, "debug_name");
-	}
-	return "<component>";
+	return _comp.debug_name;
 };
 
 #region jsDoc

@@ -240,7 +240,7 @@ function __ww_inspector_notify_canvas_changed__(_c) {
 			_p.set_canvas_size_from_children();
 			exit;
 		}
-		if (!is_struct(_p) || !variable_struct_exists(_p, "__parent__")) { break; }
+		if (!is_struct(_p)) { break; }
 		_p = _p.__parent__;
 	}
 }

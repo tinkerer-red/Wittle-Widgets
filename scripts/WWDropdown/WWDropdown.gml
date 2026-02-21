@@ -19,10 +19,8 @@ function WWDropdown() : WWCore() constructor {
 			if (!is_instanceof(_header_component, WWCore)) return self;
 			if (_header_component.__comp_id__ == __menu_overlay__.__comp_id__) return self;
 			
-			if (is_struct(__header_component__)) {
-				if (__header_component__.__is_child__ && (__header_component__.__parent__.__comp_id__ == __comp_id__)) {
-					remove(__header_component__);
-				}
+			if (__header_component__.__is_child__ && (__header_component__.__parent__.__comp_id__ == __comp_id__)) {
+				remove(__header_component__);
 			}
 			
 			__header_component__ = _header_component;
@@ -43,7 +41,7 @@ function WWDropdown() : WWCore() constructor {
 		}
 		
 		static set_item_builder = function(_builder_fn=undefined) {
-			if (is_undefined(_builder_fn) || !is_callable(_builder_fn)) {
+			if (!is_callable(_builder_fn)) {
 				__item_builder__ = undefined;
 			}
 			else {
@@ -144,8 +142,6 @@ function WWDropdown() : WWCore() constructor {
 		
 		static set_item_enabled = function(_index, _is_enabled) {
 			if ((_index < 0) || (_index >= __items_count__)) return self;
-			if (!is_struct(__items__[_index])) return self;
-			if (!is_callable(__items__[_index].set_enabled)) return self;
 			__items__[_index].set_enabled(_is_enabled);
 			return self;
 		}
@@ -162,7 +158,7 @@ function WWDropdown() : WWCore() constructor {
 				var _elm = _arr[_i];
 				var _comp = noone;
 				if (is_callable(__item_builder__)) _comp = __item_builder__(_elm, self);
-				if (!is_struct(_comp)) _comp = __make_default_item__(_elm);
+				if (is_undefined(_comp) || _comp == noone) _comp = __make_default_item__(_elm);
 				if (!is_instanceof(_comp, WWCore)) continue;
 				__menu_overlay__.add(_comp);
 				array_push(__items__, _comp);
@@ -270,7 +266,7 @@ function WWDropdown() : WWCore() constructor {
 				__base_update__();
 			}
 			static handle_nav_action = function(_action, _input) {
-				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return;
 				
 				switch (_action) {
 					case __WW_NAV_ACTION.SUBMIT: {
@@ -299,13 +295,13 @@ function WWDropdown() : WWCore() constructor {
 					case __WW_NAV_ACTION.DOWN: {
 						if (!is_open) return;
 						var _target = __keyboard_get_current_nav_target__();
-						if (!is_struct(_target)) _target = __header_component__;
+						if (is_undefined(_target) || _target == noone) _target = __header_component__;
 						var _dir = __nav_action_to_direction__(_action);
 						if (is_undefined(_dir)) return;
 						var _next = __keyboard_nav_override_from__(_target, _dir);
-						if (is_struct(_next)) {
+						if (!is_undefined(_next) && _next != noone) {
 							var _assigned = nav_set_target(_next, false, _input.nav.source);
-							if (is_struct(_assigned)) {
+							if (!is_undefined(_assigned) && _assigned != noone) {
 								_input.nav.consumed = true;
 							}
 						}
@@ -322,43 +318,33 @@ function WWDropdown() : WWCore() constructor {
 		
 		#region Functions
 		static __bind_header_events__ = function() {
-			if (!is_struct(__header_component__)) return;
 			__header_component__.__dropdown_owner__ = self;
 			if (variable_struct_exists(__header_component__, "text_component")) {
 				var _header_text = __header_component__.text_component;
-				if (is_struct(_header_text) && is_callable(_header_text.set_focusable)) {
+				if (!is_undefined(_header_text) && is_callable(_header_text.set_focusable)) {
 					_header_text.set_focusable(false);
 				}
 			}
 			__header_component__.handle_nav_action = function(_action, _input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return;
-				_owner.handle_nav_action(_action, _input);
+				self.__dropdown_owner__.handle_nav_action(_action, _input);
 			}
-			if (variable_struct_exists(__header_component__, "on_released")) {
-				var _on_released = variable_struct_get(__header_component__, "on_released");
-				if (!is_callable(_on_released)) return;
-				__header_component__.on_released(function(_input) {
-					if (!__header_toggle_enabled__) return;
-					set_open(!is_open);
-				});
-			}
+			var _on_released = __header_component__.on_released;
+			if (!is_callable(_on_released)) return;
+			__header_component__.on_released(function(_input) {
+				if (!__header_toggle_enabled__) return;
+				set_open(!is_open);
+			});
 		}
 		static __bind_item_nav_overrides__ = function(_comp) {
-			if (!is_struct(_comp)) return;
 			_comp.__dropdown_owner__ = self;
 			if (variable_struct_exists(_comp, "text_component")) {
 				var _item_text = _comp.text_component;
-				if (is_struct(_item_text) && is_callable(_item_text.set_focusable)) {
+				if (!is_undefined(_item_text) && is_callable(_item_text.set_focusable)) {
 					_item_text.set_focusable(false);
 				}
 			}
 			_comp.handle_nav_action = function(_action, _input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) return;
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) return;
-				_owner.handle_nav_action(_action, _input);
+				self.__dropdown_owner__.handle_nav_action(_action, _input);
 			}
 		}
 		static __nav_action_to_direction__ = function(_action) {
@@ -373,31 +359,28 @@ function WWDropdown() : WWCore() constructor {
 			return undefined;
 		}
 		static __keyboard_focus_header__ = function() {
-			if (!is_struct(__header_component__)) return false;
 			var _assigned = nav_set_target(__header_component__, false);
-			return is_struct(_assigned);
+			return (!is_undefined(_assigned) && _assigned != noone);
 		}
 		static __keyboard_find_first_navigable_item__ = function() {
 			for (var _i=0; _i<__items_count__; _i++) {
 				var _comp = __items__[_i];
-				if (!is_struct(_comp)) continue;
 				if (!_comp.__is_focusable__) continue;
 				if (!_comp.__is_enabled__) continue;
 				if (!_comp.__is_active__) continue;
-				if (variable_struct_exists(_comp, "visible") && !_comp.visible) continue;
+				if (!_comp.visible) continue;
 				return _comp;
 			}
-			return noone;
+			return undefined;
 		}
 		static __keyboard_get_nav_scope__ = function() {
 			var _scope = [];
 			for (var _i=0; _i<__items_count__; _i++) {
 				var _comp = __items__[_i];
-				if (!is_struct(_comp)) continue;
 				if (!_comp.__is_focusable__) continue;
 				if (!_comp.__is_enabled__) continue;
 				if (!_comp.__is_active__) continue;
-				if (variable_struct_exists(_comp, "visible") && !_comp.visible) continue;
+				if (!_comp.visible) continue;
 				array_push(_scope, _comp);
 			}
 			return _scope;
@@ -441,25 +424,27 @@ function WWDropdown() : WWCore() constructor {
 		}
 		static __keyboard_get_current_nav_target__ = function() {
 			var _root = __root_canvas__;
-			if (!is_struct(_root)) _root = self;
+			if (is_undefined(_root) || _root == noone) _root = self;
 			var _registry = _root.__focus_registry_get_entries__();
 			var _entries = _registry.entries;
 			var _count = array_length(_entries);
-			if (_count <= 0) return noone;
+			if (_count <= 0) return undefined;
 			var _idx = _root.__focus_registry_find_current_index__(_entries, _count);
-			if (_idx < 0) return noone;
+			if (_idx < 0) return undefined;
 			return _entries[_idx];
 		}
 		static __keyboard_select_current_nav_item__ = function() {
 			var _target = __keyboard_get_current_nav_target__();
-			if (!is_struct(_target)) return false;
-			if (!variable_struct_exists(_target, "__dropdown_owner__")) return false;
-			var _owner = _target.__dropdown_owner__;
-			if (!is_struct(_owner)) return false;
-			if (_owner.__comp_id__ != __comp_id__) return false;
-			if (!variable_struct_exists(_target, "__dropdown_item_index__")) return false;
-			var _idx = _target.__dropdown_item_index__;
-			if ((_idx < 0) || (_idx >= __items_count__)) return false;
+			if (is_undefined(_target) || _target == noone) return false;
+
+			var _idx = -1;
+			for (var _i=0; _i<__items_count__; _i++) {
+				if (__items__[_i].__comp_id__ == _target.__comp_id__) {
+					_idx = _i;
+					break;
+				}
+			}
+			if (_idx < 0) return false;
 			set_value(_idx);
 			__keyboard_focus_header__();
 			return true;
@@ -469,15 +454,15 @@ function WWDropdown() : WWCore() constructor {
 				set_open(true);
 			}
 			var _first_item = __keyboard_find_first_navigable_item__();
-			if (!is_struct(_first_item)) {
+			if (is_undefined(_first_item) || _first_item == noone) {
 				return __keyboard_focus_header__();
 			}
 			var _modality = "unknown";
-			if (is_struct(_input) && is_struct(_input.nav)) {
+			if (!is_undefined(_input) && !is_undefined(_input.nav)) {
 				_modality = _input.nav.source;
 			}
 			var _assigned = nav_set_target(_first_item, false, _modality);
-			if (!is_struct(_assigned)) {
+			if (is_undefined(_assigned) || _assigned == noone) {
 				return __keyboard_focus_header__();
 			}
 			return true;
@@ -490,7 +475,6 @@ function WWDropdown() : WWCore() constructor {
 		}
 		
 		static __header_set_text__ = function(_text) {
-			if (!is_struct(__header_component__)) return;
 			if (variable_struct_exists(__header_component__, "set_text")) {
 				var _set_text = variable_struct_get(__header_component__, "set_text");
 				if (!is_callable(_set_text)) {
@@ -510,7 +494,6 @@ function WWDropdown() : WWCore() constructor {
 		}
 		
 		static __header_get_text__ = function() {
-			if (!is_struct(__header_component__)) return __default_text__;
 			if (variable_struct_exists(__header_component__, "get_text")) {
 				var _get_text = variable_struct_get(__header_component__, "get_text");
 				if (is_callable(_get_text)) {
@@ -536,7 +519,6 @@ function WWDropdown() : WWCore() constructor {
 		static __item_label_at__ = function(_index) {
 			if ((_index < 0) || (_index >= __items_count__)) return __default_text__;
 			var _comp = __items__[_index];
-			if (!is_struct(_comp)) return __default_text__;
 			if (variable_struct_exists(_comp, "__dropdown_label__") && is_string(_comp.__dropdown_label__)) {
 				return _comp.__dropdown_label__;
 			}
@@ -552,13 +534,9 @@ function WWDropdown() : WWCore() constructor {
 		}
 		
 		static __refresh_dropdown_layout__ = function() {
-			if (!is_struct(__header_component__)) return;
-			
-			if (variable_struct_exists(__header_component__, "set_size")) {
-				var _set_size = variable_struct_get(__header_component__, "set_size");
-				if (is_callable(_set_size)) {
-					__header_component__.set_size(width, height);
-				}
+			var _set_size = __header_component__.set_size;
+			if (is_callable(_set_size)) {
+				__header_component__.set_size(width, height);
 			}
 			__header_component__.set_offset(0, 0);
 			
@@ -593,14 +571,7 @@ function WWDropdown() : WWCore() constructor {
 			_btn.__dropdown_label__ = _item;
 			_btn.__dropdown_owner__ = self;
 			_btn.set_callback(method(_btn, function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) { exit; }
-				if (!variable_struct_exists(self, "__dropdown_item_index__")) { exit; }
-				
 				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) { exit; }
-				if (!variable_struct_exists(_owner, "set_value")) { exit; }
-				if (!is_callable(_owner.set_value)) { exit; }
-				
 				var _idx = self.__dropdown_item_index__;
 				if (_idx >= 0) {
 					_owner.set_value(_idx);

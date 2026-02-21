@@ -52,13 +52,7 @@ function WWDropdownRich() : WWDropdown() constructor {
 			
 			if (is_callable(_comp.on_released)) {
 				_comp.on_released(method(_comp, function(_input) {
-					if (!variable_struct_exists(self, "__dropdown_owner__")) { exit; }
-					if (!variable_struct_exists(self, "__dropdown_rich_index__")) { exit; }
-					var _owner = self.__dropdown_owner__;
-					if (!is_struct(_owner)) { exit; }
-					if (!variable_struct_exists(_owner, "set_value")) { exit; }
-					if (!is_callable(_owner.set_value)) { exit; }
-					_owner.set_value(self.__dropdown_rich_index__);
+					self.__dropdown_owner__.set_value(self.__dropdown_rich_index__);
 				}));
 			}
 			

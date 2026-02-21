@@ -308,7 +308,7 @@ function wwThemeDefault() {
 			},
 
 			checkbox: {
-				box_size: 16,
+				box_size: 14,
 				radius: "layout.radius.sm",
 				bg: {
 					idle: "colors.surface.control",

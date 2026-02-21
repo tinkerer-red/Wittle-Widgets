@@ -1352,7 +1352,7 @@ function WWTextBase() : WWCore() constructor {
 				#endregion
 				static __infer_keyboard_type__ = function(_allowed) {
 				    // Defensive defaults
-				    if (is_undefined(_allowed) || !is_string(_allowed) || _allowed == "") {
+				    if (!is_string(_allowed) || _allowed == "") {
 				        return kbv_type_default;
 				    }
 

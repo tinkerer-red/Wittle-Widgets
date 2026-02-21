@@ -53,12 +53,12 @@ function WWWindowContext() : WWWindow() constructor {
 			__clamp_to_gui__();
 			set_open(true);
 			bring_to_front();
-			ignore_outside_click_once = is_struct(__user_input__) && is_struct(__user_input__.pointer) && (__user_input__.pointer.left.down || __user_input__.pointer.right.down);
+			ignore_outside_click_once = (!is_undefined(__user_input__) && !is_undefined(__user_input__.pointer)) && (__user_input__.pointer.left.down || __user_input__.pointer.right.down);
 			return self;
 		};
 		
 		static open_anchored = function(_host=anchor_host, _xoff=anchor_xoff, _yoff=anchor_yoff) {
-			if (!is_struct(_host)) return self;
+			if (is_undefined(_host) || _host == noone) return self;
 			anchor_host = _host;
 			anchor_xoff = _xoff;
 			anchor_yoff = _yoff;
@@ -82,7 +82,7 @@ function WWWindowContext() : WWWindow() constructor {
 		
 		static overlay_step = function(_input=undefined) {
 			__base_overlay_step__(_input);
-			if (!is_struct(_input)) _input = __user_input__;
+			if (is_undefined(_input)) _input = __user_input__;
 			if (!is_open) return;
 			
 			if (keep_on_screen) {

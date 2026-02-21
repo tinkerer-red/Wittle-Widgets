@@ -35,7 +35,7 @@ function WWSearchInput() : WWCore() constructor {
 					else {
 						input.set_focus(true);
 						var _field = input.get_field();
-						if (is_struct(_field) && is_callable(_field.set_focus)) {
+						if (!is_undefined(_field) && _field != noone && is_callable(_field.set_focus)) {
 							_field.set_focus(true);
 						}
 					}
@@ -43,7 +43,7 @@ function WWSearchInput() : WWCore() constructor {
 				else {
 					input.set_focus(true);
 					var _field2 = input.get_field();
-					if (is_struct(_field2) && is_callable(_field2.set_focus)) {
+					if (!is_undefined(_field2) && _field2 != noone && is_callable(_field2.set_focus)) {
 						_field2.set_focus(true);
 					}
 				}
@@ -68,7 +68,7 @@ function WWSearchInput() : WWCore() constructor {
 
 		static set_placeholder = function(_text="") {
 			var _field = input.get_field();
-			if (is_struct(_field) && is_callable(_field.set_caption)) {
+			if (!is_undefined(_field) && _field != noone && is_callable(_field.set_caption)) {
 				_field.set_caption(string(_text));
 			}
 			return self;

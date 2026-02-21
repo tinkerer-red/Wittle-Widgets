@@ -119,7 +119,7 @@ function WWHotkeyManager() constructor {
 	        if (_key == "callback") continue;
 
 	        var _key_id = real(_key);
-	        if (is_struct(_input) && is_struct(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(_key_id)) {
+	        if (!is_undefined(_input) && !is_undefined(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(_key_id)) {
                 _deepest = step(_input, _node[$ _key], _depth + 1, _deepest);
 	        }
 	    }

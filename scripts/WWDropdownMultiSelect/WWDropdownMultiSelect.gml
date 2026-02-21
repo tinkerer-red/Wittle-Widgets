@@ -28,13 +28,7 @@ function WWDropdownMultiSelect() : WWDropdown() constructor {
 			_row.__dropdown_multi_index__ = _idx;
 			_row.__dropdown_owner__ = self;
 			_row.set_callback(method(_row, function(_input) {
-				if (!variable_struct_exists(self, "__dropdown_owner__")) { exit; }
-				if (!variable_struct_exists(self, "__dropdown_multi_index__")) { exit; }
-				var _owner = self.__dropdown_owner__;
-				if (!is_struct(_owner)) { exit; }
-				if (!variable_struct_exists(_owner, "__toggle_index__")) { exit; }
-				if (!is_callable(_owner.__toggle_index__)) { exit; }
-				_owner.__toggle_index__(self.__dropdown_multi_index__);
+				self.__dropdown_owner__.__toggle_index__(self.__dropdown_multi_index__);
 			}));
 			
 			array_push(__option_rows__, _row);

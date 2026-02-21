@@ -22,14 +22,12 @@ function WWSliderHorzThumb() : WWSliderHorz() constructor {
 		__thumb_theme_color_prefix__ = _color_prefix;
 		__thumb_theme_alpha_prefix__ = _alpha_prefix;
 		
-		if (is_struct(thumb) && variable_struct_exists(thumb, "set_theme_keys")) {
-			thumb.set_theme_keys(
-				__thumb_theme_sprite_main__,
-				__thumb_theme_sprite_state_prefix__,
-				__thumb_theme_color_prefix__,
-				__thumb_theme_alpha_prefix__
-			);
-		}
+		thumb.set_theme_keys(
+			__thumb_theme_sprite_main__,
+			__thumb_theme_sprite_state_prefix__,
+			__thumb_theme_color_prefix__,
+			__thumb_theme_alpha_prefix__
+		);
 		return self;
 	};
 

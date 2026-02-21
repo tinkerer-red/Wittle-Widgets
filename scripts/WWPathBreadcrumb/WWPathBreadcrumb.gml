@@ -51,7 +51,7 @@ function WWPathBreadcrumb() : WWViewScrollRegion() constructor {
 			clear_children();
 
 			var _x = 0;
-			if (is_struct(leading_component)) {
+			if (!is_undefined(leading_component) && leading_component != noone) {
 				leading_component.set_offset(0, 0);
 				add(leading_component);
 				_x = leading_component.width + 4;

@@ -855,7 +855,7 @@ function WWTextRenderer() : WWCore() constructor {
 
                     // Extend left to include any leading inline widget reserved space.
                     var _pl = __layout_widget_placements__;
-                    if (is_array(_pl) && array_length(_pl) > 0) {
+                    if (array_length(_pl) > 0) {
                         var _pi = 0;
                         var _pn = array_length(_pl);
                         repeat (_pn) {
@@ -1607,12 +1607,9 @@ function WWTextRenderer() : WWCore() constructor {
 
             static __theme_state_specifier__ = function() {
                 var _src = __theme_state_source__;
-                if (!is_struct(_src)) _src = self;
+                if (is_undefined(_src) || _src == noone) _src = self;
 
-                var _state = __WW_STATE.NORMAL;
-                if (variable_struct_exists(_src, "__visual_state__")) {
-                    _state = _src.__visual_state__;
-                }
+                var _state = _src.__visual_state__;
 
                 switch (_state) {
                     case __WW_STATE.HOVER: return "hover";
@@ -2170,7 +2167,7 @@ function WWTextRenderer() : WWCore() constructor {
 
 					var _result = __text_processor__(_text_value, _default_state);
 
-					if (is_struct(_result)) {
+					if (!is_undefined(_result) && _result != noone) {
 					    _processed_text = _result.text;
 					    _processed_spans = _result[$ "spans"];
 						_processed_align_runs = _result[$ "align_runs"];
@@ -2183,7 +2180,7 @@ function WWTextRenderer() : WWCore() constructor {
 
                 __display_text__ = _processed_text;
                 
-                if (!is_array(_processed_spans)) {
+                if (is_undefined(_processed_spans)) {
 
                     var _processed_len = string_length(_processed_text);
 
@@ -2205,14 +2202,14 @@ function WWTextRenderer() : WWCore() constructor {
                 __build_layout__(_processed_text, _processed_spans);
 
                 // Store widgets and apply layout reservation (line heights + line widths)
-                __layout_widgets__ = (is_array(_processed_widgets)) ? _processed_widgets : [];
+                __layout_widgets__ = is_undefined(_processed_widgets) ? [] : _processed_widgets;
                 __layout_prepare_widgets__(__layout_widgets__);
 
 				// Apply alignment after layout has finalized line breaks.
 				// If the processor supplies align_runs, we can support multi-align segments
 				// on the same line (left, center, right) by shifting glyph ranges directly.
 				if (!is_undefined(__textbox_parent__)) {
-					if (is_array(_processed_align_runs) && array_length(_processed_align_runs) > 0) {
+					if (!is_undefined(_processed_align_runs) && array_length(_processed_align_runs) > 0) {
 						__layout_apply_inline_align_runs__(_processed_align_runs, __textbox_parent__.width);
 					} else {
 						__layout_apply_line_alignment__(__textbox_parent__.width);
@@ -2268,7 +2265,7 @@ function WWTextRenderer() : WWCore() constructor {
             /// @returns {Undefined}
             #endregion
             static __layout_prepare_widgets__ = function(_widgets) {
-                if (!is_array(_widgets)) { return; }
+                if (is_undefined(_widgets)) { return; }
                 var _widget_count = array_length(_widgets);
                 if (_widget_count <= 0) { return; }
 
@@ -2284,7 +2281,7 @@ function WWTextRenderer() : WWCore() constructor {
                 repeat (_widget_count) {
                     var _w = _widgets[_wi];
                     _wi += 1;
-                    if (!is_struct(_w)) { continue; }
+                    if (is_undefined(_w) || _w == noone) { continue; }
 
                     var _start_index = variable_struct_get(_w, "start_index");
                     if (is_undefined(_start_index)) { continue; }
@@ -2387,7 +2384,7 @@ function WWTextRenderer() : WWCore() constructor {
             #endregion
             static __layout_apply_inline_widgets_and_build_placements__ = function(_widgets) {
                 __layout_widget_placements__ = [];
-                if (!is_array(_widgets)) { return; }
+                if (is_undefined(_widgets)) { return; }
                 var _widget_count = array_length(_widgets);
                 if (_widget_count <= 0) { return; }
 
@@ -2403,7 +2400,7 @@ function WWTextRenderer() : WWCore() constructor {
                     repeat (_widget_count) {
                         var _w0 = _widgets[_wi0];
                         _wi0 += 1;
-                        if (!is_struct(_w0)) { continue; }
+                        if (is_undefined(_w0) || _w0 == noone) { continue; }
                         var _kind0 = (variable_struct_exists(_w0, "kind") ? _w0.kind : "inline");
                         if (_kind0 != "block") { continue; }
                         var _si0 = variable_struct_get(_w0, "start_index");
@@ -2444,7 +2441,7 @@ function WWTextRenderer() : WWCore() constructor {
                 repeat (_widget_count) {
                     var _w = _widgets[_wi];
                     _wi += 1;
-                    if (!is_struct(_w)) { continue; }
+                    if (is_undefined(_w) || _w == noone) { continue; }
                     var _start_index = variable_struct_get(_w, "start_index");
                     if (is_undefined(_start_index)) { continue; }
                     _start_index = real(_start_index);
@@ -2646,7 +2643,7 @@ function WWTextRenderer() : WWCore() constructor {
                 if (!widget_debug_show) { return; }
                 __ensure_layout__();
                 var _pl = __layout_widget_placements__;
-                if (!is_array(_pl) || array_length(_pl) <= 0) { return; }
+                if (array_length(_pl) <= 0) { return; }
 
                 var _pre_col = draw_get_color();
                 var _pre_alp = draw_get_alpha();
@@ -2901,7 +2898,7 @@ function WWTextRenderer() : WWCore() constructor {
             #endregion
             static __layout_apply_inline_align_runs__ = function(_align_runs, _available_width) {
 
-			    if (!is_array(_align_runs)) { return; }
+			    if (is_undefined(_align_runs)) { return; }
 			    if (is_undefined(_available_width) || _available_width <= 0) { return; }
 
 			    var _run_count = array_length(_align_runs);
@@ -2912,8 +2909,8 @@ function WWTextRenderer() : WWCore() constructor {
 			    var _glyphs = __layout_glyphs__;
 			    var _glyph_count = __layout_glyphs_count__;
 
-			    if (!is_array(_lines) || _line_count <= 0) { return; }
-			    if (!is_array(_glyphs) || _glyph_count <= 0) { return; }
+			    if (_line_count <= 0) { return; }
+			    if (_glyph_count <= 0) { return; }
 
 			    // Reusable segment arrays (avoid garbage)
 			    var _seg_start = [];
@@ -3896,7 +3893,7 @@ function WWTextRenderer() : WWCore() constructor {
 
 			    // Fallbacks
 			    var _fallbacks = font_fallbacks;
-			    if (is_array(_fallbacks)) {
+			    if (!is_undefined(_fallbacks)) {
 
 			        var _count = array_length(_fallbacks);
 			        var _index = 0;
@@ -5169,7 +5166,7 @@ function WWTextRenderer() : WWCore() constructor {
                         }
 
                         var _bnd = __vb_current_chunk_bounds__;
-                        if (!is_struct(_bnd)) {
+                        if (is_undefined(_bnd) || _bnd == noone) {
                             _bnd = { x0: 0, y0: 0, x1: 0, y1: 0 };
                             __vb_current_chunk_bounds__ = _bnd;
                         }
@@ -5701,7 +5698,7 @@ function WWTextRenderer() : WWCore() constructor {
                 if (is_undefined(__textbox_parent__)) {
                     return;
                 }
-				if (!is_struct(__textbox_parent__)) {
+				if (__textbox_parent__ == noone) {
 					return;
 				}
 
@@ -5786,7 +5783,7 @@ function WWTextRenderer() : WWCore() constructor {
             #endregion
             static __draw_carets__ = function() {
                 if (is_undefined(__textbox_parent__)) return;
-                if (!is_struct(__textbox_parent__)) return;
+                if (__textbox_parent__ == noone) return;
                 var _cursors = __textbox_parent__.__cursors__;
                 if (is_undefined(_cursors) || array_length(_cursors) <= 0) return;
                 if (!__textbox_parent__.__cursor_visible__) return;

@@ -238,7 +238,7 @@ function WWTextBoxV3() : WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static handle_nav_action = function(_action, _input) {
-				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return;
 				if (!__is_input_consumer__) return;
 				if (is_read_only) return;
 				

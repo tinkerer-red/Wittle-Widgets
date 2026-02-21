@@ -8,9 +8,8 @@ function wwThemeMerge(_base_theme, _overlay_theme) {
 	/// - special-case: meta.tags arrays union (unique)
 	///
 	/// This does NOT mutate inputs.
-	if (!is_struct(_base_theme)) { return variable_clone(_overlay_theme); }
 	var _out = variable_clone(_base_theme);
-	if (is_struct(_overlay_theme)) {
+	if (_overlay_theme != undefined) {
 		__wwThemeMergeInto(_out, _overlay_theme, "");
 	}
 	return _out;
@@ -35,17 +34,15 @@ function wwThemeCompose(_themes) {
 	var _out = variable_clone(_themes[0]);
 	for (var _i = 1; _i < _count; _i++) {
 		var _overlay = _themes[_i];
-		if (is_struct(_overlay)) {
+		if (_overlay != undefined) {
 			__wwThemeMergeInto(_out, _overlay, "");
 		}
 	}
-
+	
 	return _out;
 }
 
 function __wwThemeMergeInto(_dst, _src, _path) {
-	if (!is_struct(_dst) || !is_struct(_src)) { return; }
-
 	var _keys = variable_struct_get_names(_src);
 	var _key_count = array_length(_keys);
 	for (var _i = 0; _i < _key_count; _i++) {
@@ -158,4 +155,3 @@ function wwThemeLayerLight() {
 		scrollbar: _light.scrollbar
 	};
 }
-

@@ -301,7 +301,7 @@ function WWCore() constructor {
 				if (_enabled) {
 					__overlay_ensure_manager__();
 				}
-				else if (is_struct(__overlay_manager__)) {
+				else if (!is_undefined(__overlay_manager__) && __overlay_manager__ != noone) {
 					__overlay_manager__.dirty = true;
 				}
 				__overlay_mark_subtree_dirty__();
@@ -351,9 +351,9 @@ function WWCore() constructor {
 				_focus = !!_focus;
 				if (_focus) {
 					var _root = __root_canvas__;
-					if (!is_struct(_root)) _root = self;
+					if (is_undefined(_root) || _root == noone) _root = self;
 					var _target = _root.__focus_registry_set_target__(self, true);
-					if (!is_struct(_target)) {
+					if (is_undefined(_target) || _target == noone) {
 						set_nav_target(true);
 						set_input_consumer(true);
 					}
@@ -453,7 +453,7 @@ function WWCore() constructor {
 			}
 			static nav_get_target = function() {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				var _registry = _root.__focus_registry_get_entries__();
 				var _entries = _registry.entries;
 				var _count = array_length(_entries);
@@ -464,10 +464,10 @@ function WWCore() constructor {
 			}
 			static nav_set_target = function(_target, _set_input_consumer=true, _modality="unknown") {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				
 				var _assigned = _root.__focus_registry_set_target__(_target, _set_input_consumer);
-				if (!is_struct(_assigned)) return noone;
+				if (is_undefined(_assigned) || _assigned == noone) return noone;
 				
 				_root.set_last_input_modality(_modality);
 				_assigned.set_last_input_modality(_modality);
@@ -864,9 +864,9 @@ function WWCore() constructor {
 			#endregion
             static navigate_focus = function(_dir) {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				var _target = _root.__focus_registry_navigate__(_dir, self, __last_input_modality__);
-				if (is_struct(_target)) return _target;
+				if (!is_undefined(_target) && _target != noone) return _target;
 				return self;
             }
 			
@@ -879,10 +879,9 @@ function WWCore() constructor {
 			#endregion
 			static handle_keyboard_navigation = function(_input) {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				if (_root.__comp_id__ != __comp_id__) return;
-				if (!is_struct(_input)) return;
-				if (!is_struct(_input.nav)) return;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return;
 				if (_input.nav.consumed) return;
 				
 				var _action = __nav_action_from_input__(_input);
@@ -890,13 +889,13 @@ function WWCore() constructor {
 				
 				var _nav_modality = __nav_modality_from_input__(_input);
 				var _current = _root.nav_get_target();
-				if (is_struct(_current)) {
+				if (!is_undefined(_current) && _current != noone) {
 					var _handler = _root.__dispatch_nav_action__(_current, _action, _input);
 					if (_input.nav.consumed) {
 						set_last_input_modality(_nav_modality);
-						if (is_struct(_handler)) _handler.set_last_input_modality(_nav_modality);
+						if (!is_undefined(_handler) && _handler != noone) _handler.set_last_input_modality(_nav_modality);
 						var _target_after = _root.nav_get_target();
-						if (is_struct(_target_after)) _target_after.set_last_input_modality(_nav_modality);
+						if (!is_undefined(_target_after) && _target_after != noone) _target_after.set_last_input_modality(_nav_modality);
 						return;
 					}
 				}
@@ -904,24 +903,25 @@ function WWCore() constructor {
 				var _dir = __nav_action_to_direction__(_action);
 				if (!is_undefined(_dir)) {
 					var _assigned = _root.__focus_registry_navigate__(_dir, undefined, _nav_modality);
-					if (is_struct(_assigned)) {
+					if (!is_undefined(_assigned) && _assigned != noone) {
 						_input.nav.consumed = true;
 						return;
 					}
 				}
 				
 				if ((_action == __WW_NAV_ACTION.SUBMIT)
-				&& is_struct(_current)
+				&& !is_undefined(_current)
+				&& _current != noone
 				&& !_current.__is_input_consumer__) {
 					var _assigned_submit = _root.nav_set_target(_current, true, _nav_modality);
-					if (is_struct(_assigned_submit)) {
+					if (!is_undefined(_assigned_submit) && _assigned_submit != noone) {
 						_input.nav.consumed = true;
 					}
 				}
             }
 			static __nav_modality_from_input__ = function(_input) {
 				var _nav_modality = "unknown";
-				if (!is_struct(_input) || !is_struct(_input.nav)) return _nav_modality;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return _nav_modality;
 				var _nav_source = string_lower(string(_input.nav.source));
 				switch (_nav_source) {
 					case "keyboard":
@@ -930,7 +930,7 @@ function WWCore() constructor {
 				return _nav_modality;
 			}
 			static __nav_action_from_input__ = function(_input) {
-				if (!is_struct(_input) || !is_struct(_input.nav)) return __WW_NAV_ACTION.NONE;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return __WW_NAV_ACTION.NONE;
 				
 				var _nav = _input.nav;
 				if (_nav.submit.pressed || _nav.submit.repeat) return __WW_NAV_ACTION.SUBMIT;
@@ -956,28 +956,25 @@ function WWCore() constructor {
 				return undefined;
 			}
 			static __dispatch_nav_action__ = function(_start, _action, _input) {
-				if (!is_struct(_start)) return noone;
+				if (is_undefined(_start) || _start == noone) return noone;
 				
 				var _node = _start;
 				repeat (64) {
-					if (!is_struct(_node)) break;
+					if (is_undefined(_node) || _node == noone) break;
 					
-					if (variable_struct_exists(_node, "handle_nav_action")) {
-						var _hook = _node.handle_nav_action;
-						if (is_callable(_hook)) {
-							var _bound = method(_node, _hook);
-							_bound(_action, _input);
-							if (is_struct(_input)
-							&& is_struct(_input.nav)
-							&& _input.nav.consumed) {
-								return _node;
-							}
+					var _hook = _node.handle_nav_action;
+					if (is_callable(_hook)) {
+						var _bound = method(_node, _hook);
+						_bound(_action, _input);
+						if (!is_undefined(_input)
+						&& !is_undefined(_input.nav)
+						&& _input.nav.consumed) {
+							return _node;
 						}
 					}
 					
-					if (!variable_struct_exists(_node, "__parent__")) break;
 					var _parent = _node.__parent__;
-					if (!is_struct(_parent)) break;
+					if (is_undefined(_parent) || _parent == noone) break;
 					_node = _parent;
 				}
 				
@@ -1500,9 +1497,9 @@ function WWCore() constructor {
 					}
 				}
 				
-				if (!is_struct(_input)) _input = __user_input__;
-				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
-				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
+				if (is_undefined(_input)) _input = __user_input__;
+				var _mx = (!is_undefined(_input.pointer)) ? _input.pointer.x : 0;
+				var _my = (!is_undefined(_input.pointer)) ? _input.pointer.y : 0;
 				__mouse_on_comp__ = point_in_rectangle(
 					_mx,
 					_my,
@@ -1528,9 +1525,9 @@ function WWCore() constructor {
 					}
 				}
 				
-				if (!is_struct(_input)) _input = __user_input__;
-				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
-				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
+				if (is_undefined(_input)) _input = __user_input__;
+				var _mx = (!is_undefined(_input.pointer)) ? _input.pointer.x : 0;
+				var _my = (!is_undefined(_input.pointer)) ? _input.pointer.y : 0;
 				__mouse_on_group__ = point_in_rectangle(
 						_mx,
 						_my,
@@ -1604,22 +1601,9 @@ function WWCore() constructor {
 					},
 				};
 			}
-			static __is_valid_input_schema__ = function(_input) {
-				if (!is_struct(_input)) return false;
-				if (!is_struct(_input.pointer) || !is_struct(_input.keyboard) || !is_struct(_input.nav) || !is_struct(_input.text)) return false;
-				if (!is_struct(_input.pointer.left) || !is_struct(_input.pointer.right) || !is_struct(_input.pointer.middle)) return false;
-				if (!is_struct(_input.nav.left) || !is_struct(_input.nav.right) || !is_struct(_input.nav.up) || !is_struct(_input.nav.down)) return false;
-				if (!is_struct(_input.nav.next) || !is_struct(_input.nav.prev) || !is_struct(_input.nav.submit) || !is_struct(_input.nav.cancel)) return false;
-				if (!is_struct(_input.text.backspace) || !is_struct(_input.text.del)) return false;
-				if (!is_callable(_input.keyboard.key_down)) return false;
-				if (!is_callable(_input.keyboard.key_pressed)) return false;
-				if (!is_callable(_input.keyboard.key_released)) return false;
-				if (!is_callable(_input.keyboard.key_repeat)) return false;
-				return true;
-			}
 			static __input_repeat_pulse__ = function(_id, _down, _delay_ms, _interval_ms) {
 				var _state = __input_repeat_state__[$ _id];
-				if (!is_struct(_state)) {
+				if (is_undefined(_state) || _state == noone) {
 					_state = {
 						down : false,
 						next_ms : 0,
@@ -1838,18 +1822,18 @@ function WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static consume_input = function() {
-				if (is_struct(__user_input__.pointer)) {
+				if (!is_undefined(__user_input__.pointer) && __user_input__.pointer != noone) {
 					__user_input__.pointer.consumed = true;
 				}
 				__is_pointer_consumer__ = true;
 			}
 			static consume_nav_input = function() {
-				if (is_struct(__user_input__.nav)) {
+				if (!is_undefined(__user_input__.nav) && __user_input__.nav != noone) {
 					__user_input__.nav.consumed = true;
 				}
 			}
 			static consume_text_input = function() {
-				if (is_struct(__user_input__.text)) {
+				if (!is_undefined(__user_input__.text) && __user_input__.text != noone) {
 					__user_input__.text.consumed = true;
 				}
 			}
@@ -1860,7 +1844,7 @@ function WWCore() constructor {
 				if (!__overlay_registered__) {
 					__overlay_sync__();
 				}
-				if (is_struct(__overlay_manager_owner__)) {
+				if (!is_undefined(__overlay_manager_owner__) && __overlay_manager_owner__ != noone) {
 					var _mgr = __overlay_manager_owner__.__overlay_ensure_manager__();
 					_mgr.seq_counter += 1;
 					__overlay_order_seq__ = _mgr.seq_counter;
@@ -1873,7 +1857,7 @@ function WWCore() constructor {
 				if (!__overlay_component__) return self;
 				__overlay_last_focus_time__ = -1;
 				__overlay_order_seq__ = -1;
-				if (is_struct(__overlay_manager_owner__)) {
+				if (!is_undefined(__overlay_manager_owner__) && __overlay_manager_owner__ != noone) {
 					__overlay_manager_owner__.__overlay_ensure_manager__().dirty = true;
 				}
 				return self;
@@ -2149,9 +2133,7 @@ function WWCore() constructor {
 				if (is_undefined(_input)) {
 					_input = build_input_state(true);
 				}
-				else if (!__is_valid_input_schema__(_input)) {
-					_input = build_input_state(false);
-				}
+				
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group(_input);
 				
@@ -2184,20 +2166,16 @@ function WWCore() constructor {
 				
 				
 				if (is_undefined(_input)) {
-					if (is_struct(__user_input__)) {
+					if (!is_undefined(__user_input__) && __user_input__ != noone) {
 						_input = __user_input__;
 					}
 					else {
 						_input = build_input_state(false);
 					}
 				}
-				else if (!__is_valid_input_schema__(_input)) {
-					_input = build_input_state(false);
-				}
+				
 				__user_input__ = _input;
 				__mouse_on_group__ = mouse_on_group(_input);
-				
-				
 				
 				//if __is_focusable__
 				if (__background_color_set__) {
@@ -2370,6 +2348,7 @@ function WWCore() constructor {
 			__is_engaged__ = false; // active interaction in progress (held, dragging, scrubbing, etc)
 			__is_pointer_consumer__ = false; // pointer input was consumed by this component this step
 			__last_input_modality__ = "unknown"; // mouse | keyboard | controller | touch | unknown
+			__visual_state__ = __WW_STATE.NORMAL; // default visual state before first runtime recalculation
 			__is_pressed__ = false; // pointer/button is currently pressed on this component
 			// Legacy private aliases kept for WW migration compatibility.
 			__is_interacting__ = false;
@@ -2721,7 +2700,7 @@ function WWCore() constructor {
 			#endregion
 			#region Overlay Internals
 			static __overlay_ensure_manager__ = function() {
-				if (!is_struct(__overlay_manager__)) {
+				if (is_undefined(__overlay_manager__) || __overlay_manager__ == noone) {
 					__overlay_manager__ = {
 						entries : [],
 						dirty : false,
@@ -2737,7 +2716,7 @@ function WWCore() constructor {
 			
 			static __overlay_is_effectively_active__ = function() {
 				var _node = self;
-				while (is_struct(_node)) {
+				while (!is_undefined(_node) && _node != noone) {
 					if (!_node.__is_active__) return false;
 					if (!_node.__is_child__) break;
 					_node = _node.__parent__;
@@ -2750,7 +2729,7 @@ function WWCore() constructor {
 				
 				// LOCAL_HOST
 				if (__overlay_space__ == 1) {
-					if (is_struct(__overlay_host__)) {
+					if (!is_undefined(__overlay_host__) && __overlay_host__ != noone) {
 						if (__overlay_host__.__comp_id__ != __comp_id__
 						&& __overlay_host__.__overlay_host_enabled__) {
 							return __overlay_host__;
@@ -2758,7 +2737,7 @@ function WWCore() constructor {
 					}
 					
 					var _node = __parent__;
-					while (is_struct(_node)) {
+					while (!is_undefined(_node) && _node != noone) {
 						if (_node.__overlay_host_enabled__) return _node;
 						if (!_node.__is_child__) break;
 						_node = _node.__parent__;
@@ -2774,7 +2753,7 @@ function WWCore() constructor {
 				
 				static __overlay_local_unregister__ = function() {
 					var _mgr_owner = __overlay_manager_owner__;
-					if (is_struct(_mgr_owner) && is_struct(_mgr_owner.__overlay_manager__)) {
+					if (!is_undefined(_mgr_owner) && _mgr_owner != noone && !is_undefined(_mgr_owner.__overlay_manager__) && _mgr_owner.__overlay_manager__ != noone) {
 						var _entries = _mgr_owner.__overlay_manager__.entries;
 						var _j = array_length(_entries);
 						repeat(array_length(_entries)) { _j--;
@@ -2798,13 +2777,13 @@ function WWCore() constructor {
 				}
 				
 				var _target = __resolve_overlay_host__();
-				if (!is_struct(_target)) {
+				if (is_undefined(_target) || _target == noone) {
 					__overlay_local_unregister__();
 					__overlay_sync_dirty__ = false;
 					return;
 				}
 				
-				if (__overlay_registered__ && is_struct(__overlay_manager_owner__)) {
+				if (__overlay_registered__ && !is_undefined(__overlay_manager_owner__) && __overlay_manager_owner__ != noone) {
 					if (__overlay_manager_owner__.__comp_id__ == _target.__comp_id__) {
 						_target.__overlay_ensure_manager__().dirty = true;
 						__overlay_sync_dirty__ = false;
@@ -2858,7 +2837,7 @@ function WWCore() constructor {
 			}
 			
 			static __overlay_rebuild_exec__ = function() {
-				if (!is_struct(__overlay_manager__)) return;
+				if (is_undefined(__overlay_manager__) || __overlay_manager__ == noone) return;
 				if (!__overlay_manager__.dirty) return;
 				array_sort(__overlay_manager__.entries, __overlay_compare_data__);
 				
@@ -2877,7 +2856,7 @@ function WWCore() constructor {
 			}
 			
 			static __overlay_step_pass__ = function(_input) {
-				if (!is_struct(__overlay_manager__)) return;
+				if (is_undefined(__overlay_manager__) || __overlay_manager__ == noone) return;
 				__overlay_rebuild_exec__();
 				var _i=__overlay_manager__.exec_step_count;
 				repeat(__overlay_manager__.exec_step_count) { _i--;
@@ -2886,7 +2865,7 @@ function WWCore() constructor {
 			}
 			
 			static __overlay_draw_pass__ = function(_input, _debug=false) {
-				if (!is_struct(__overlay_manager__)) return;
+				if (is_undefined(__overlay_manager__) || __overlay_manager__ == noone) return;
 				__overlay_rebuild_exec__();
 				
 				var _use_clip = (__overlay_host_enabled__ && __is_child__);
@@ -2913,7 +2892,7 @@ function WWCore() constructor {
 						array_push(_stack, _node.__children__[_i]);
 					_i+=1;}
 				}
-				if (is_struct(_old_root)) {
+				if (!is_undefined(_old_root) && _old_root != noone) {
 					_old_root.__focus_registry_mark_dirty__();
 				}
 			}
@@ -2948,7 +2927,7 @@ function WWCore() constructor {
 					var _node = array_pop(_stack);
 					if (_node.__overlay_component__) {
 						var _mgr_owner = _node.__overlay_manager_owner__;
-						if (is_struct(_mgr_owner) && is_struct(_mgr_owner.__overlay_manager__)) {
+						if (!is_undefined(_mgr_owner) && _mgr_owner != noone && !is_undefined(_mgr_owner.__overlay_manager__) && _mgr_owner.__overlay_manager__ != noone) {
 							var _entries = _mgr_owner.__overlay_manager__.entries;
 							var _j = array_length(_entries);
 							repeat(array_length(_entries)) { _j--;
@@ -3124,6 +3103,65 @@ function WWCore() constructor {
 			    return self;
 			};
 			#region jsDoc
+			/// @func    __translate_subtree__()
+			/// @desc    Internal fast-path for moving this component and all descendants by a delta.
+			///          Does not recompute layout or group bounds.
+			/// @self    WWCore
+			/// @param   {Real} dx : Delta x.
+			/// @param   {Real} dy : Delta y.
+			/// @returns {Struct.WWCore}
+			/// @ignore
+			#endregion
+			static __translate_subtree__ = function(_dx, _dy) {
+				if (_dx == 0 && _dy == 0) return self;
+				
+				var _stack = [self];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					_node.xprevious = _node.x;
+					_node.yprevious = _node.y;
+					_node.x += _dx;
+					_node.y += _dy;
+					
+					var _count = _node.__children_count__;
+					if (_count > 0) {
+						var _stack_len = array_length(_stack);
+						array_copy(_stack, _stack_len, _node.__children__, 0, _count);
+					}
+				}
+				
+				return self;
+			};
+			#region jsDoc
+			/// @func    __set_offset_fast__()
+			/// @desc    Internal fast-path offset update used by high-frequency movement (e.g. scrolling).
+			///          Updates x_offset/y_offset and translates subtree without running full layout updates.
+			/// @self    WWCore
+			/// @param   {Real} x : New x offset.
+			/// @param   {Real} y : New y offset.
+			/// @returns {Struct.WWCore}
+			/// @ignore
+			#endregion
+			static __set_offset_fast__ = function(_x, _y) {
+				if (_x == x_offset && _y == y_offset) return self;
+				
+				x_offset = _x;
+				y_offset = _y;
+				
+				if (!__is_child__) return self;
+				
+				var _new_x = __parent__.x + x_offset;
+				var _new_y = __parent__.y + y_offset;
+				var _dx = _new_x - x;
+				var _dy = _new_y - y;
+				
+				if (_dx != 0 || _dy != 0) {
+					__translate_subtree__(_dx, _dy);
+				}
+				
+				return self;
+			};
+			#region jsDoc
 			/// @func    __get_controller_archor_x__()
 			/// @desc    Gets the anchor's desired x location from the controller region.
 			/// @self    WWCore
@@ -3169,8 +3207,8 @@ function WWCore() constructor {
 			}
 			static __focus_registry_ensure__ = function() {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
-				if (!is_struct(_root.__focus_registry__)) {
+				if (is_undefined(_root) || _root == noone) _root = self;
+				if (is_undefined(_root.__focus_registry__) || _root.__focus_registry__ == noone) {
 					_root.__focus_registry__ = {
 						entries : [],
 						count : 0,
@@ -3181,8 +3219,8 @@ function WWCore() constructor {
 			}
 			static __focus_registry_mark_dirty__ = function() {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
-				if (!is_struct(_root.__focus_registry__)) {
+				if (is_undefined(_root) || _root == noone) _root = self;
+				if (is_undefined(_root.__focus_registry__) || _root.__focus_registry__ == noone) {
 					_root.__focus_registry__ = {
 						entries : [],
 						count : 0,
@@ -3195,9 +3233,9 @@ function WWCore() constructor {
 			}
 			static __find_ancestor_folder__ = function() {
 				var _node = self;
-				while (is_struct(_node) && _node.__is_child__) {
+				while (!is_undefined(_node) && _node != noone && _node.__is_child__) {
 					var _parent = _node.__parent__;
-					if (!is_struct(_parent)) break;
+					if (is_undefined(_parent) || _parent == noone) break;
 					if (variable_struct_exists(_parent, "__is_ww_folder__")) {
 						if (_parent.__is_ww_folder__) {
 							return _parent;
@@ -3208,21 +3246,17 @@ function WWCore() constructor {
 				return noone;
 			}
 			static __focus_registry_is_navigable__ = function(_comp) {
-				if (!is_struct(_comp)) return false;
+				if (is_undefined(_comp) || _comp == noone) return false;
 				if (!_comp.__is_focusable__) return false;
-				if (variable_struct_exists(_comp, "__is_navigable__")) {
-					if (!_comp.__is_navigable__) return false;
-				}
+				if (!_comp.__is_navigable__) return false;
 				if (!_comp.__is_enabled__) return false;
 				if (!_comp.__is_active__) return false;
-				if (variable_struct_exists(_comp, "visible")) {
-					if (!_comp.visible) return false;
-				}
+				if (!_comp.visible) return false;
 				return true;
 			}
 			static __focus_registry_rebuild__ = function() {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				var _registry = _root.__focus_registry_ensure__();
 				
 				array_resize(_registry.entries, 0);
@@ -3235,9 +3269,7 @@ function WWCore() constructor {
 					var _ancestor_allows = _entry.ancestor_allows;
 					
 					var _node_allows = _ancestor_allows && _node.__is_active__;
-					if (_node_allows && variable_struct_exists(_node, "visible")) {
-						if (!_node.visible) _node_allows = false;
-					}
+					if (_node_allows && !_node.visible) _node_allows = false;
 					
 					if (_node_allows && _root.__focus_registry_is_navigable__(_node)) {
 						array_push(_registry.entries, _node);
@@ -3262,7 +3294,7 @@ function WWCore() constructor {
 				repeat (_count) {
 					var _comp = _entries[_j];
 					if (_comp.__is_nav_target__) {
-						if (!is_struct(_first_nav)) {
+						if (is_undefined(_first_nav) || _first_nav == noone) {
 							_first_nav = _comp;
 						}
 						else {
@@ -3270,7 +3302,7 @@ function WWCore() constructor {
 						}
 					}
 					if (_comp.__is_input_consumer__) {
-						if (!is_struct(_first_input)) {
+						if (is_undefined(_first_input) || _first_input == noone) {
 							_first_input = _comp;
 						}
 						else {
@@ -3280,7 +3312,7 @@ function WWCore() constructor {
 					_j += 1;
 				}
 				
-				if (is_struct(_first_input) && !is_struct(_first_nav)) {
+				if (!is_undefined(_first_input) && _first_input != noone && (is_undefined(_first_nav) || _first_nav == noone)) {
 					_first_input.set_nav_target(true);
 					_first_nav = _first_input;
 				}
@@ -3290,7 +3322,7 @@ function WWCore() constructor {
 			}
 			static __focus_registry_get_entries__ = function() {
 				var _root = __root_canvas__;
-				if (!is_struct(_root)) _root = self;
+				if (is_undefined(_root) || _root == noone) _root = self;
 				var _registry = _root.__focus_registry_ensure__();
 				if (_registry.dirty) {
 					_registry = _root.__focus_registry_rebuild__();
@@ -3319,9 +3351,7 @@ function WWCore() constructor {
 				return -1;
 			}
 			static __focus_registry_should_auto_consume_on_nav_target__ = function(_comp) {
-				if (!is_struct(_comp)) return true;
-				if (!variable_struct_exists(_comp, "should_auto_consume_on_nav_target")) return true;
-				
+				if (is_undefined(_comp) || _comp == noone) return true;
 				var _func = _comp.should_auto_consume_on_nav_target;
 				if (!is_callable(_func)) return true;
 				
@@ -3329,7 +3359,7 @@ function WWCore() constructor {
 				return !!_bound();
 			}
 			static __focus_registry_set_target__ = function(_target, _set_input_consumer=true) {
-				if (!is_struct(_target)) return noone;
+				if (is_undefined(_target) || _target == noone) return noone;
 				
 				var _registry = __focus_registry_get_entries__();
 				var _entries = _registry.entries;
@@ -3449,7 +3479,7 @@ function WWCore() constructor {
 					_i += 1;
 				}
 				
-				if (!is_struct(_best)) {
+				if (is_undefined(_best) || _best == noone) {
 					var _fallback_dir = (_dir == "left" || _dir == "up") ? "prev" : "next";
 					return __focus_registry_find_linear_target__(_entries, _count, _current_index, _fallback_dir);
 				}
@@ -3471,7 +3501,7 @@ function WWCore() constructor {
 				if (_count <= 0) return undefined;
 				
 				var _current_index = -1;
-				if (is_struct(_from)) {
+				if (!is_undefined(_from) && _from != noone) {
 					_current_index = __focus_registry_find_index_by_id__(_entries, _count, _from.__comp_id__);
 				}
 				if (_current_index < 0) {
@@ -3499,12 +3529,12 @@ function WWCore() constructor {
 					}
 				}
 				
-				if (!is_struct(_target)) return undefined;
-				if (is_struct(_current) && _target.__comp_id__ == _current.__comp_id__) return undefined;
+				if (is_undefined(_target) || _target == noone) return undefined;
+				if (!is_undefined(_current) && _current != noone && _target.__comp_id__ == _current.__comp_id__) return undefined;
 				
 				var _auto_consume = __focus_registry_should_auto_consume_on_nav_target__(_target);
 				var _assigned = __focus_registry_set_target__(_target, _auto_consume);
-				if (is_struct(_assigned)) {
+				if (!is_undefined(_assigned) && _assigned != noone) {
 					set_last_input_modality(_nav_modality);
 					_assigned.set_last_input_modality(_nav_modality);
 					return _assigned;

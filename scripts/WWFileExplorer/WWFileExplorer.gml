@@ -195,7 +195,7 @@ function WWFileExplorer() : WWCore() constructor {
 
 	list_view.on_entry_activated(method(self, function(_data) {
 		trigger_event(events.entry_activated, __entry_payload__(_data));
-		if (is_struct(_data.entry) && _data.entry.is_dir && !folder_select_enabled) {
+		if (!is_undefined(_data.entry) && _data.entry != noone && _data.entry.is_dir && !folder_select_enabled) {
 			set_path(_data.entry.path);
 		}
 	}));

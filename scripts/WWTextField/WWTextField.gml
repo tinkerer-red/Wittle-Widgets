@@ -1671,7 +1671,7 @@ function WWTextField() : WWCore() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static handle_nav_action = function(_action, _input) {
-				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return;
 				if (!__is_input_consumer__) return;
 				if (is_read_only) return;
 				
@@ -3465,7 +3465,7 @@ function WWTextField() : WWCore() constructor {
 					/// @returns {String}
 					#endregion
 					static __selection_record_signature__ = function(_st) {
-						if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return "";
+						if (is_undefined(_st) || array_length(_st) < 2) return "";
 						var _curs = _st[0];
 						var _sig = string(_st[1]) + ":" + string(array_length(_curs));
 						var _n = array_length(_curs);
@@ -3500,7 +3500,7 @@ function WWTextField() : WWCore() constructor {
 						// De-dupe against the current history state.
 						if (_len > 0 && _pos >= 0) {
 							var _e = __selection_records__[_pos];
-							if (is_struct(_e) && _e.sig == _sig) {
+							if (!is_undefined(_e) && _e != noone && _e.sig == _sig) {
 								__selection_records_loc__ = _pos;
 								return false;
 							}
@@ -3576,9 +3576,9 @@ function WWTextField() : WWCore() constructor {
 						var _target = _pos + _change;
 						if (_target < 0 || _target >= _len) return false;
 						var _e = __selection_records__[_target];
-						if (is_undefined(_e) || !is_struct(_e) || !variable_struct_exists(_e, "st")) return false;
+						if (is_undefined(_e) || _e == noone) return false;
 						var _st = _e.st;
-						if (is_undefined(_st) || !is_array(_st) || array_length(_st) < 2) return false;
+						if (is_undefined(_st) || array_length(_st) < 2) return false;
 						__cursors__ = _st[0];
 						__cursor_active__ = clamp(_st[1], 0, max(0, array_length(__cursors__) - 1));
 						__cursors_sync_sticky_x__();
@@ -3738,7 +3738,7 @@ function WWTextField() : WWCore() constructor {
 						var _c = __cursors__[__cursor_active__];
 						if (_c.highlight_active && _c.highlight_start_index != _c.highlight_end_index) return true;
 						var _loc = __compute_word_boundaries__(_c.index);
-						if (is_undefined(_loc) || !is_struct(_loc)) return false;
+						if (is_undefined(_loc) || _loc == noone) return false;
 						if (_loc.index_start == _loc.index_end) return false;
 						_c.highlight_active = true;
 						_c.highlight_start_index = _loc.index_start;

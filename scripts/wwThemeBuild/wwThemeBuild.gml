@@ -44,7 +44,6 @@ function wwThemeBuild(_theme_or_layers = undefined, _opts = undefined) {
 function wwThemeCompile(_theme) {
 	/// Flattens a built theme into a leaf-only key/value map for runtime fetches.
 	var _flat = {};
-	if (!is_struct(_theme)) return _flat;
 	var _visit_key = "__ww_compile_visit__";
 	var _visit_token = string(current_time) + "_" + string(irandom(1000000000));
 	var _stack = [{ node: _theme, path: "", enter: true }];
@@ -103,7 +102,7 @@ function wwThemeCompile(_theme) {
 	// Ensure temporary marker cleanup even after early cycle break.
 	for (var _m = 0; _m < array_length(_marked); _m++) {
 		var _marked_node = _marked[_m];
-		if (is_struct(_marked_node) && variable_struct_exists(_marked_node, _visit_key)) {
+		if (_marked_node != undefined && variable_struct_exists(_marked_node, _visit_key)) {
 			variable_struct_remove(_marked_node, _visit_key);
 		}
 	}
@@ -143,8 +142,6 @@ function __wwThemeBuildApplyOpts(_opts) {
 }
 
 function __wwThemeEnsureRequiredFallbacks(_theme) {
-	if (!is_struct(_theme)) return;
-
 	__wwEnsureStructPath(_theme, "fallback");
 	var _fallback = _theme.fallback;
 
@@ -182,7 +179,7 @@ function __wwThemeComposeFallback(_layers) {
 }
 
 function __wwThemePathGet(_root, _path) {
-	if (!is_struct(_root) || !is_string(_path) || _path == "") { return __WW_THEME_PATH_NOT_FOUND; }
+	if (!is_string(_path) || _path == "") { return __WW_THEME_PATH_NOT_FOUND; }
 
 	var cur = _root;
 	var start = 1;
@@ -202,7 +199,6 @@ function __wwThemePathGet(_root, _path) {
 }
 
 function __wwThemeDeriveMissing(_theme, _opts) {
-	if (!is_struct(_theme)) { return; }
 	if (!variable_struct_exists(_theme, "colors") || !is_struct(_theme.colors)) {
 		_theme.colors = {};
 	}
@@ -483,7 +479,7 @@ function __wwColorShiftHue(_source_color, _hue_color, _luma_factor) {
 }
 
 function __wwThemeSetPath(_root, _path, _value) {
-	if (!is_struct(_root) || !is_string(_path) || _path == "") return false;
+	if (!is_string(_path) || _path == "") return false;
 
 	var _parts = __wwSplitPath(_path);
 	var _n = array_length(_parts);
@@ -503,8 +499,6 @@ function __wwThemeSetPath(_root, _path, _value) {
 }
 
 function __wwThemeAddIdleAliases(_flat) {
-	if (!is_struct(_flat)) return;
-
 	var _keys = variable_struct_get_names(_flat);
 	var _n = array_length(_keys);
 	for (var _i = 0; _i < _n; _i++) {

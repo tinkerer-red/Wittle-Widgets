@@ -237,7 +237,7 @@ function WWFolder() : WWButtonText() constructor {
 			/// @returns {Undefined}
 			#endregion
 			static handle_nav_action = function(_action, _input) {
-				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				if (is_undefined(_input) || is_undefined(_input.nav)) return;
 				
 				switch (_action) {
 					case __WW_NAV_ACTION.SUBMIT: {
@@ -250,7 +250,8 @@ function WWFolder() : WWButtonText() constructor {
 					case __WW_NAV_ACTION.LEFT: {
 						if (is_open) {
 							var _current_target = nav_get_target();
-							if (is_struct(_current_target)
+							if (!is_undefined(_current_target)
+							&& _current_target != noone
 							&& (_current_target.__comp_id__ != __comp_id__)) {
 								nav_set_target(self, true, _input.nav.source);
 								_input.nav.consumed = true;
@@ -264,9 +265,9 @@ function WWFolder() : WWButtonText() constructor {
 						}
 						
 						var _ancestor_folder = __find_ancestor_folder__();
-						if (is_struct(_ancestor_folder)) {
+						if (!is_undefined(_ancestor_folder) && _ancestor_folder != noone) {
 							var _assigned = nav_set_target(_ancestor_folder, true, _input.nav.source);
-							if (is_struct(_assigned)) {
+							if (!is_undefined(_assigned) && _assigned != noone) {
 								_input.nav.consumed = true;
 							}
 						}
@@ -307,17 +308,17 @@ function WWFolder() : WWButtonText() constructor {
 			#endregion
 			static update_component_positions = function() {
 				static __base_update__ = WWCore.update_component_positions;
-
+				
 				// Ensure header height is never 0, otherwise container will overlap header.
 				if (height <= 0) {
 					set_size(width, __header_height_default__);
 				}
-
+				
 				__container__.set_active(is_open);
-
+				
 				// Container is below the header area.
 				__container__.set_offset(0, height);
-
+				
 				if (is_open) {
 					__layout_container_children__();
 				}

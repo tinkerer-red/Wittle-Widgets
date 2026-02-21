@@ -95,9 +95,9 @@ function WWView() : WWCore() constructor {
 					}
 				}
 				
-				if (!is_struct(_input)) _input = __user_input__;
-				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
-				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
+				if (is_undefined(_input)) _input = __user_input__;
+				var _mx = (!is_undefined(_input.pointer)) ? _input.pointer.x : 0;
+				var _my = (!is_undefined(_input.pointer)) ? _input.pointer.y : 0;
 				__mouse_on_comp__ = point_in_rectangle(
 					_mx,
 					_my,
@@ -130,9 +130,9 @@ function WWView() : WWCore() constructor {
 					}
 				}
 				
-				if (!is_struct(_input)) _input = __user_input__;
-				var _mx = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.x : 0;
-				var _my = is_struct(_input) && is_struct(_input.pointer) ? _input.pointer.y : 0;
+				if (is_undefined(_input)) _input = __user_input__;
+				var _mx = (!is_undefined(_input.pointer)) ? _input.pointer.x : 0;
+				var _my = (!is_undefined(_input.pointer)) ? _input.pointer.y : 0;
 				__mouse_on_group__ = point_in_rectangle(
 						_mx,
 						_my,

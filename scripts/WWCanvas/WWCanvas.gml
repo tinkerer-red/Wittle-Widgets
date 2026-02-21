@@ -74,12 +74,41 @@ function WWCanvas() : WWCore() constructor {
 			__draw_border__ = _enabled;
 			return self;
 		}
+		#region jsDoc
+		/// @func    set_auto_resize()
+		/// @desc    Enables/disables automatic sizing from child bounds.
+		///          Uses internal sizing (`__set_size__`) so it does not mark user size.
+		/// @self    WWCanvas
+		/// @param   {Bool} enabled : True to auto-resize.
+		/// @param   {Bool} resize_width : True to auto-size width from content.
+		/// @param   {Bool} resize_height : True to auto-size height from content.
+		/// @returns {Struct.WWCanvas}
+		#endregion
+		static set_auto_resize = function(_enabled=true, _resize_width=true, _resize_height=true) {
+			__auto_resize__ = !!_enabled;
+			__auto_resize_width__ = !!_resize_width;
+			__auto_resize_height__ = !!_resize_height;
+
+			if (!__auto_resize__) {
+				__auto_resize_last_content_w__ = -1;
+				__auto_resize_last_content_h__ = -1;
+				return self;
+			}
+
+			__apply_auto_resize__();
+			return self;
+		}
 		#endregion
 
 		#region Variables
 		__visual_state__ = __WW_STATE.NORMAL;
 		__draw_fill__ = true;
 		__draw_border__ = false;
+		__auto_resize__ = false;
+		__auto_resize_width__ = true;
+		__auto_resize_height__ = true;
+		__auto_resize_last_content_w__ = -1;
+		__auto_resize_last_content_h__ = -1;
 		__theme_role__ = "canvas";
 		__theme_sprite_prefix__ = "canvas.sprite.main";
 		__theme_color_prefix__ = "canvas.color.main";
@@ -90,6 +119,11 @@ function WWCanvas() : WWCore() constructor {
 		#endregion
 
 		#region Events
+		on_post_step(function(_input) {
+			if (!__auto_resize__) return;
+			__apply_auto_resize__();
+		});
+
 		on_pre_draw(function(_input) {
 			if (!visible) return;
 			__recalc_visual_state__();
@@ -181,6 +215,48 @@ function WWCanvas() : WWCore() constructor {
 			__theme_border_color_prefix__ = __theme_role__ + ".color.border";
 			__theme_border_alpha_prefix__ = __theme_role__ + ".alpha.border";
 			__theme_border_size_prefix__ = __theme_role__ + ".size.border";
+		}
+
+		static __measure_auto_resize_content__ = function() {
+			var _w = 0;
+			var _h = 0;
+
+			var _i = 0; repeat(__children_count__) {
+				var _child = __children__[_i];
+				var _x2 = _child.x_offset + _child.get_group_width();
+				var _y2 = _child.y_offset + _child.get_group_height();
+				_w = max(_w, _x2);
+				_h = max(_h, _y2);
+				_i += 1;
+			}
+
+			return { width: _w, height: _h };
+		}
+
+		static __apply_auto_resize__ = function() {
+			var _content = __measure_auto_resize_content__();
+			var _content_w = variable_struct_get(_content, "width");
+			var _content_h = variable_struct_get(_content, "height");
+
+			if (_content_w == __auto_resize_last_content_w__
+			&& _content_h == __auto_resize_last_content_h__) {
+				return;
+			}
+
+			__auto_resize_last_content_w__ = _content_w;
+			__auto_resize_last_content_h__ = _content_h;
+
+			var _target_w = width;
+			var _target_h = height;
+			if (__auto_resize_width__) _target_w = _content_w;
+			if (__auto_resize_height__) _target_h = _content_h;
+
+			_target_w = max(0, _target_w);
+			_target_h = max(0, _target_h);
+
+			if (_target_w != width || _target_h != height) {
+				__set_size__(_target_w, _target_h);
+			}
 		}
 		#endregion
 

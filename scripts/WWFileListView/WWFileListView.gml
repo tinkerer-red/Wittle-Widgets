@@ -157,7 +157,7 @@ function WWFileListView() : WWViewScrollRegion() constructor {
 		static __entry_click__ = function(_index, _input) {
 			if (_index < 0 || _index >= array_length(entries)) return;
 			var _e = entries[_index];
-			var _ctrl = is_struct(_input) && is_struct(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(vk_control);
+			var _ctrl = !is_undefined(_input) && !is_undefined(_input.keyboard) && is_callable(_input.keyboard.key_down) && _input.keyboard.key_down(vk_control);
 
 			if (_e.path == "__PARENT__") {
 				trigger_event(events.parent_requested, __entry_payload__(_e, _index));

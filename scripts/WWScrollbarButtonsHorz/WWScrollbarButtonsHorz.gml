@@ -45,17 +45,11 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 
 			static set_callback = function(_callback) {
 				__user_callback__ = _callback;
+				return self;
+			}
 
-				leftButton.set_callback(function() {
-					if (is_callable(__default_left_callback__)) __default_left_callback__();
-					if (is_callable(__user_callback__)) __user_callback__();
-				});
-
-				rightButton.set_callback(function() {
-					if (is_callable(__default_right_callback__)) __default_right_callback__();
-					if (is_callable(__user_callback__)) __user_callback__();
-				});
-
+			static set_debug_thumb_gizmo = function(_enabled=true) {
+				__debug_thumb_gizmo__ = !!_enabled;
 				return self;
 			}
 
@@ -82,14 +76,12 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				__track_theme_color_prefix__ = _color_prefix;
 				__track_theme_alpha_prefix__ = _alpha_prefix;
 				
-				if (is_struct(slider) && variable_struct_exists(slider, "set_track_theme_keys")) {
-					slider.set_track_theme_keys(
-						__track_theme_sprite_main__,
-						__track_theme_sprite_state_prefix__,
-						__track_theme_color_prefix__,
-						__track_theme_alpha_prefix__
-					);
-				}
+				slider.set_track_theme_keys(
+					__track_theme_sprite_main__,
+					__track_theme_sprite_state_prefix__,
+					__track_theme_color_prefix__,
+					__track_theme_alpha_prefix__
+				);
 				return self;
 			};
 			
@@ -104,22 +96,12 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				__thumb_theme_color_prefix__ = _color_prefix;
 				__thumb_theme_alpha_prefix__ = _alpha_prefix;
 				
-				if (is_struct(slider) && variable_struct_exists(slider, "set_thumb_theme_keys")) {
-					slider.set_thumb_theme_keys(
-						__thumb_theme_sprite_main__,
-						__thumb_theme_sprite_state_prefix__,
-						__thumb_theme_color_prefix__,
-						__thumb_theme_alpha_prefix__
-					);
-				}
-				else if (is_struct(slider) && is_struct(slider.thumb) && variable_struct_exists(slider.thumb, "set_theme_keys")) {
-					slider.thumb.set_theme_keys(
-						__thumb_theme_sprite_main__,
-						__thumb_theme_sprite_state_prefix__,
-						__thumb_theme_color_prefix__,
-						__thumb_theme_alpha_prefix__
-					);
-				}
+				slider.set_thumb_theme_keys(
+					__thumb_theme_sprite_main__,
+					__thumb_theme_sprite_state_prefix__,
+					__thumb_theme_color_prefix__,
+					__thumb_theme_alpha_prefix__
+				);
 				return self;
 			};
 			
@@ -142,7 +124,7 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				__right_button_theme_color_prefix__ = _right_color_prefix;
 				__right_button_theme_alpha_prefix__ = _right_alpha_prefix;
 				
-				if (is_struct(leftButton) && variable_struct_exists(leftButton, "set_theme_keys")) {
+				if (leftButton != undefined) {
 					leftButton.set_theme_keys(
 						__left_button_theme_sprite_main__,
 						__left_button_theme_sprite_state_prefix__,
@@ -150,7 +132,7 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 						__left_button_theme_alpha_prefix__
 					);
 				}
-				if (is_struct(rightButton) && variable_struct_exists(rightButton, "set_theme_keys")) {
+				if (rightButton != undefined) {
 					rightButton.set_theme_keys(
 						__right_button_theme_sprite_main__,
 						__right_button_theme_sprite_state_prefix__,
@@ -181,25 +163,20 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 			slider = new WWSliderHorzThumb()
 				.set_offset(10, 0)
 				.set_size(108, 16)
-				.set_value(0.0)
-				.set_callback(function() {
-					trigger_event(events.scroll_changed, slider.get_value());
-				});
+				.set_value(0.0);
 			slider.set_track_theme_keys(
 				"scrollbar.sprite.tray.main",
 				"scrollbar.sprite.tray",
 				"scrollbar.color.tray",
 				"scrollbar.alpha.tray"
 			);
-			if (is_struct(slider.thumb)) {
-				slider.thumb.set_theme_keys(
-					"scrollbar.sprite.thumb.main",
-					"scrollbar.sprite.thumb",
-					"scrollbar.color.thumb",
-					"scrollbar.alpha.thumb"
-				);
-				slider.thumb.set_navigable(false);
-			}
+			slider.thumb.set_theme_keys(
+				"scrollbar.sprite.thumb.main",
+				"scrollbar.sprite.thumb",
+				"scrollbar.color.thumb",
+				"scrollbar.alpha.thumb"
+			);
+			slider.thumb.set_navigable(false);
 
 			rightButton = new WWButtonIcon()
 				.set_offset(118, 0)
@@ -227,6 +204,33 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 
 		#region Events
 			events.scroll_changed = variable_get_hash("scroll_changed");
+
+			on_pre_draw(function(_input) {
+				if (!__debug_thumb_gizmo__) return;
+				__debug_prev_scissor__ = gpu_get_scissor();
+				gpu_set_scissor(0, 0, display_get_gui_width(), display_get_gui_height());
+				__debug_scissor_lifted__ = true;
+			});
+
+			on_post_draw(function(_input) {
+				if (__debug_thumb_gizmo__ && !is_undefined(slider) && slider != noone && !is_undefined(slider.thumb) && slider.thumb != noone) {
+					var _x1 = slider.thumb.x;
+					var _y1 = slider.thumb.y;
+					var _x2 = _x1 + slider.thumb.width;
+					var _y2 = _y1 + slider.thumb.height;
+
+					draw_set_color(c_lime);
+					draw_rectangle(_x1, _y1, _x2, _y2, true);
+					draw_line(_x1, _y1, _x2, _y2);
+					draw_line(_x2, _y1, _x1, _y2);
+				}
+
+				if (__debug_scissor_lifted__) {
+					gpu_set_scissor(__debug_prev_scissor__);
+					__debug_prev_scissor__ = undefined;
+					__debug_scissor_lifted__ = false;
+				}
+			});
 		#endregion
 
 		#region Variables
@@ -253,6 +257,13 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 			__user_callback__ = undefined;
 			__default_left_callback__ = leftButton.get_callback();
 			__default_right_callback__ = rightButton.get_callback();
+			__on_slider_changed__ = function() {
+				trigger_event(events.scroll_changed, slider.get_value());
+				if (is_callable(__user_callback__)) __user_callback__();
+			};
+			__debug_thumb_gizmo__ = false;
+			__debug_prev_scissor__ = undefined;
+			__debug_scissor_lifted__ = false;
 		#endregion
 
 		#region Functions
@@ -273,7 +284,19 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 			static get_button_size = function() { return __btn_size__; }
 
 			static update_slider_range = function() {
-				slider.set_value(slider.get_value());
+				var _canvas = max(0, canvasWidth);
+				var _coverage = max(0, coverageWidth);
+				var _max_scroll = max(0, _canvas - _coverage);
+
+				slider.set_clamp_values(0, _max_scroll);
+				slider.set_value(clamp(slider.get_value(), 0, _max_scroll));
+
+				// Default thumb sizing should represent viewport coverage on the track.
+				var _track_w = max(1, slider.width);
+				var _ratio = (_canvas <= 0) ? 1 : clamp(_coverage / _canvas, 0, 1);
+				var _thumb_min = min(10, _track_w);
+				var _thumb_w = clamp(max(_thumb_min, floor(_track_w * _ratio + 0.5)), _thumb_min, _track_w);
+				slider.thumb.set_size(_thumb_w, slider.height);
 			}
 		#endregion
 	#endregion
@@ -295,4 +318,8 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 		__right_button_theme_color_prefix__,
 		__right_button_theme_alpha_prefix__
 	);
+
+	// Drive callback/event output from real value changes so drag and button presses
+	// both move connected viewports reliably.
+	slider.on_event(slider.events.value_changed, __on_slider_changed__);
 }

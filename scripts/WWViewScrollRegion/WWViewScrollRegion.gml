@@ -26,9 +26,9 @@ function WWViewScrollRegion() : WWCore() constructor {
 			viewport_width = 0;
 			viewport_height = 0;
 
-			scrollbar_thickness = 16;
-			wheel_step = 10;
-			smooth_scrolling = false;
+			scrollbar_thickness = 12;
+			wheel_step = 100;
+			smooth_scrolling = true;
 
 			scrollbar_horz_enabled = true;
 			scrollbar_vert_enabled = true;
@@ -54,17 +54,32 @@ function WWViewScrollRegion() : WWCore() constructor {
 			__nav_last_target_id__ = -1;
 			__nav_locked_nodes__ = [];
 			__nav_content_locked__ = false;
+			__scroll_sync_source_axis__ = 0; // 0 none, 1 horz, 2 vert
+			__canvas_auto_resize__ = true;
+			__last_canvas_w__ = -1;
+			__last_canvas_h__ = -1;
+			__smooth_clamp_hold_x__ = false;
+			__smooth_clamp_hold_y__ = false;
+			__smooth_clamp_target_x__ = 0;
+			__smooth_clamp_target_y__ = 0;
+			__smooth_clamp_epsilon__ = 0.5;
 		#endregion
 		
 		#region Components
 			
 			// Internal view + canvas must be created early so events/builders can reference them.
 			__view__ = new WWViewScroll();
-			__canvas__ = new WWCore().set_offset(0, 0);
+			__canvas__ = new WWCanvas()
+				.set_draw_fill(false)
+				.set_draw_border(false)
+				.set_auto_resize(true)
+				.set_offset(0, 0);
 			
 			// Back-compat alias: many callsites expect a `canvas` field.
 			canvas = __canvas__;
 			__view__.set_canvas(__canvas__);
+			__last_canvas_w__ = __canvas__.width;
+			__last_canvas_h__ = __canvas__.height;
 			
 			// Add the internal view as the first wrapper child.
 			// Must call the base add, not our overridden add that forwards into the canvas.
@@ -145,20 +160,58 @@ function WWViewScrollRegion() : WWCore() constructor {
 				if (_input.keyboard.key_down(vk_shift)) {
 					if (!wheel_scroll_horz_enabled) { return; }
 					if (_input.pointer.wheel_up) {
-						scroll_by(-wheel_step, 0);
+						if (smooth_scrolling
+						&& (scrollbar_horz != undefined)) {
+							scrollbar_horz.set_lerp_target(scrollbar_horz.get_lerp_target() - wheel_step);
+						}
+						else {
+							scroll_by(-wheel_step, 0);
+						}
 					}
 					else if (_input.pointer.wheel_down) {
-						scroll_by(wheel_step, 0);
+						if (smooth_scrolling
+						&& (scrollbar_horz != undefined)) {
+							scrollbar_horz.set_lerp_target(scrollbar_horz.get_lerp_target() + wheel_step);
+						}
+						else {
+							scroll_by(wheel_step, 0);
+						}
 					}
 				}
 				else { //vert
 					if (!wheel_scroll_vert_enabled) { return; }
 					if (_input.pointer.wheel_up) {
-						scroll_by(0, -wheel_step);
+						if (smooth_scrolling
+						&& (scrollbar_vert != undefined)) {
+							scrollbar_vert.set_lerp_target(scrollbar_vert.get_lerp_target() - wheel_step);
+						}
+						else {
+							scroll_by(0, -wheel_step);
+						}
 					}
 					else if (_input.pointer.wheel_down) {
-						scroll_by(0, wheel_step);
+						if (smooth_scrolling
+						&& (scrollbar_vert != undefined)) {
+							scrollbar_vert.set_lerp_target(scrollbar_vert.get_lerp_target() + wheel_step);
+						}
+						else {
+							scroll_by(0, wheel_step);
+						}
 					}
+				}
+			});
+
+			// Reflow whenever canvas bounds change (e.g. nested folder collapse/expand).
+			on_post_step(function(_input) {
+				if (__canvas__ == undefined) return;
+
+				var _cw = __canvas__.width;
+				var _ch = __canvas__.height;
+				if (_cw != __last_canvas_w__
+				|| _ch != __last_canvas_h__) {
+					__last_canvas_w__ = _cw;
+					__last_canvas_h__ = _ch;
+					__reflow__();
 				}
 			});
 		#endregion
@@ -351,6 +404,11 @@ function WWViewScrollRegion() : WWCore() constructor {
 				smooth_scrolling = _smooth;
 				if (scrollbar_horz != undefined) scrollbar_horz.set_smooth_scrolling(_smooth);
 				if (scrollbar_vert != undefined) scrollbar_vert.set_smooth_scrolling(_smooth);
+				if (!smooth_scrolling) {
+					__smooth_clamp_hold_x__ = false;
+					__smooth_clamp_hold_y__ = false;
+				}
+				__reflow__();
 				return self;
 			};
 
@@ -364,7 +422,20 @@ function WWViewScrollRegion() : WWCore() constructor {
 			static set_canvas = function(_canvas) {
 				__canvas__ = _canvas;
 				canvas = __canvas__;
+				__canvas_auto_resize__ = false;
+				if (is_struct(__canvas__)
+				&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+					var _set_auto_resize = __canvas__.set_auto_resize;
+					if (is_callable(_set_auto_resize)) {
+						var _bound_set_auto_resize = method(__canvas__, _set_auto_resize);
+						_bound_set_auto_resize(true);
+						__canvas_auto_resize__ = true;
+					}
+				}
+
 				__view__.set_canvas(__canvas__);
+				__last_canvas_w__ = __canvas__.width;
+				__last_canvas_h__ = __canvas__.height;
 				__sync_cached_state_from_view__();
 				__reflow__();
 				return self;
@@ -381,11 +452,21 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#endregion
 			static set_canvas_size = function(_width, _height) {
 				if (_width == -1 || _height == -1) {
+					if (is_struct(__canvas__)
+					&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+						__canvas__.set_auto_resize(true);
+						__canvas_auto_resize__ = true;
+					}
 					__set_content_size_from_canvas_children__();
 					__reflow__();
 					return self;
 				}
 
+				if (is_struct(__canvas__)
+				&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+					__canvas__.set_auto_resize(false);
+					__canvas_auto_resize__ = false;
+				}
 				content_width = _width;
 				content_height = _height;
 
@@ -402,6 +483,11 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_canvas_size_from_children = function() {
+				if (is_struct(__canvas__)
+				&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+					__canvas__.set_auto_resize(true);
+					__canvas_auto_resize__ = true;
+				}
 				__set_content_size_from_canvas_children__();
 				__reflow__();
 				return self;
@@ -494,6 +580,11 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_content_size = function(_width, _height) {
+				if (is_struct(__canvas__)
+				&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+					__canvas__.set_auto_resize(false);
+					__canvas_auto_resize__ = false;
+				}
 				content_width = _width;
 				content_height = _height;
 				__view__.set_content_size(content_width, content_height);
@@ -511,6 +602,11 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @returns {Struct.WWViewScrollRegion}
 			#endregion
 			static set_scroll_max = function(_max_x=0, _max_y=0) {
+				if (is_struct(__canvas__)
+				&& variable_struct_exists(__canvas__, "set_auto_resize")) {
+					__canvas__.set_auto_resize(false);
+					__canvas_auto_resize__ = false;
+				}
 				var _old_x = scroll_x;
 				var _old_y = scroll_y;
 				__view__.set_scroll_max(_max_x, _max_y);
@@ -936,13 +1032,113 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __sync_content_size_from_canvas__ = function() {
+				if (__canvas__ == undefined) {
+					content_width = 0;
+					content_height = 0;
+					__view__.content_width = 0;
+					__view__.content_height = 0;
+					__view__.scroll_x = 0;
+					__view__.scroll_y = 0;
+					__view__.__apply_scroll__();
+					return;
+				}
+
 				var _cw = __canvas__.width;
 				var _ch = __canvas__.height;
-				if (_cw != content_width || _ch != content_height) {
-					content_width = _cw;
-					content_height = _ch;
-					__view__.set_content_size(content_width, content_height);
-					__sync_cached_state_from_view__();
+				var _size_changed = (_cw != content_width || _ch != content_height);
+
+				var _off = __view__.get_scroll_offset();
+				var _sx = variable_struct_get(_off, "x");
+				var _sy = variable_struct_get(_off, "y");
+
+				var _vw = __view__.width;
+				var _vh = __view__.height;
+				var _max_x = max(0, _cw - _vw);
+				var _max_y = max(0, _ch - _vh);
+
+				content_width = _cw;
+				content_height = _ch;
+				__last_canvas_w__ = _cw;
+				__last_canvas_h__ = _ch;
+
+				if (_size_changed) {
+					if (_sx > _max_x) {
+						if (smooth_scrolling && scrollbar_horz != undefined) {
+							__smooth_clamp_hold_x__ = true;
+							__smooth_clamp_target_x__ = _max_x;
+						}
+						else {
+							__smooth_clamp_hold_x__ = false;
+							_sx = _max_x;
+						}
+					}
+					else {
+						__smooth_clamp_hold_x__ = false;
+					}
+
+					if (_sy > _max_y) {
+						if (smooth_scrolling && scrollbar_vert != undefined) {
+							__smooth_clamp_hold_y__ = true;
+							__smooth_clamp_target_y__ = _max_y;
+						}
+						else {
+							__smooth_clamp_hold_y__ = false;
+							_sy = _max_y;
+						}
+					}
+					else {
+						__smooth_clamp_hold_y__ = false;
+					}
+				}
+
+				if (__smooth_clamp_hold_x__) {
+					__smooth_clamp_target_x__ = _max_x;
+					if (_sx <= (_max_x + __smooth_clamp_epsilon__)) {
+						__smooth_clamp_hold_x__ = false;
+						_sx = clamp(_sx, 0, _max_x);
+					}
+				}
+				else {
+					_sx = clamp(_sx, 0, _max_x);
+				}
+
+				if (__smooth_clamp_hold_y__) {
+					__smooth_clamp_target_y__ = _max_y;
+					if (_sy <= (_max_y + __smooth_clamp_epsilon__)) {
+						__smooth_clamp_hold_y__ = false;
+						_sy = clamp(_sy, 0, _max_y);
+					}
+				}
+				else {
+					_sy = clamp(_sy, 0, _max_y);
+				}
+
+				var _effective_max_x = _max_x;
+				var _effective_max_y = _max_y;
+				if (__smooth_clamp_hold_x__) {
+					_effective_max_x = max(_effective_max_x, _sx);
+				}
+				if (__smooth_clamp_hold_y__) {
+					_effective_max_y = max(_effective_max_y, _sy);
+				}
+
+				var _effective_w = _vw + _effective_max_x;
+				var _effective_h = _vh + _effective_max_y;
+
+				__view__.content_width = _effective_w;
+				__view__.content_height = _effective_h;
+				__view__.scroll_x = _sx;
+				__view__.scroll_y = _sy;
+				__view__.__apply_scroll__();
+				__sync_cached_state_from_view__();
+
+				if (smooth_scrolling) {
+					if (__smooth_clamp_hold_x__ && scrollbar_horz != undefined) {
+						scrollbar_horz.set_lerp_target(__smooth_clamp_target_x__);
+					}
+					if (__smooth_clamp_hold_y__ && scrollbar_vert != undefined) {
+						scrollbar_vert.set_lerp_target(__smooth_clamp_target_y__);
+					}
 				}
 			};
 
@@ -957,7 +1153,9 @@ function WWViewScrollRegion() : WWCore() constructor {
 			static __on_scrollbar_horz__ = function() {
 				if (scrollbar_horz == undefined) { return; }
 				if (__syncing_scrollbars__) { return; }
+				__scroll_sync_source_axis__ = 1;
 				set_scroll_offset(scrollbar_horz.get_value(), scroll_y);
+				__scroll_sync_source_axis__ = 0;
 			};
 
 			#region jsDoc
@@ -970,7 +1168,9 @@ function WWViewScrollRegion() : WWCore() constructor {
 			static __on_scrollbar_vert__ = function() {
 				if (scrollbar_vert == undefined) { return; }
 				if (__syncing_scrollbars__) { return; }
+				__scroll_sync_source_axis__ = 2;
 				set_scroll_offset(scroll_x, scrollbar_vert.get_value());
+				__scroll_sync_source_axis__ = 0;
 			};
 
 			#region jsDoc
@@ -982,10 +1182,17 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#endregion
 			static __set_content_size_from_canvas_children__ = function() {
 				__canvas__.__update_group_region__();
-				content_width = __canvas__.__group__.width;
-				content_height = __canvas__.__group__.height;
-				__view__.set_content_size(content_width, content_height);
-				__sync_cached_state_from_view__();
+				var _w = __canvas__.__group__.width;
+				var _h = __canvas__.__group__.height;
+
+				if (__canvas_auto_resize__) {
+					__canvas__.__set_size__(_w, _h);
+				}
+				else {
+					__canvas__.set_size(_w, _h);
+				}
+
+				__sync_content_size_from_canvas__();
 			};
 			
 			#region jsDoc
@@ -996,29 +1203,15 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __set_subtree_navigable__ = function(_root_comp, _is_navigable) {
-				if (!is_struct(_root_comp)) { return; }
-				
 				var _stack = [_root_comp];
 				while (array_length(_stack) > 0) {
 					var _node = array_pop(_stack);
-					if (!is_struct(_node)) { continue; }
+					_node.set_navigable(_is_navigable);
 					
-					if (variable_struct_exists(_node, "set_navigable")) {
-						var _set_nav = _node.set_navigable;
-						if (is_callable(_set_nav)) {
-							var _bound_set_nav = method(_node, _set_nav);
-							_bound_set_nav(_is_navigable);
-						}
-					}
-					
-					if (variable_struct_exists(_node, "__children_count__")
-					&& variable_struct_exists(_node, "__children__")) {
-						var _child_count = _node.__children_count__;
-						var _i = _child_count;
-						repeat (_child_count) {
-							_i -= 1;
-							array_push(_stack, _node.__children__[_i]);
-						}
+					var _child_count = _node.__children_count__;
+					if (_child_count > 0) {
+						var _stack_len = array_length(_stack);
+						array_copy(_stack, _stack_len, _node.__children__, 0, _child_count);
 					}
 				}
 			};
@@ -1047,12 +1240,11 @@ function WWViewScrollRegion() : WWCore() constructor {
 			/// @ignore
 			#endregion
 			static __is_nav_candidate__ = function(_comp, _respect_navigable=true) {
-				if (!is_struct(_comp)) return false;
-				if (!variable_struct_exists(_comp, "__is_focusable__") || !_comp.__is_focusable__) return false;
-				if (!variable_struct_exists(_comp, "__is_enabled__") || !_comp.__is_enabled__) return false;
-				if (!variable_struct_exists(_comp, "__is_active__") || !_comp.__is_active__) return false;
-				if (_respect_navigable && variable_struct_exists(_comp, "__is_navigable__") && !_comp.__is_navigable__) return false;
-				if (variable_struct_exists(_comp, "visible") && !_comp.visible) return false;
+				if (!_comp.__is_focusable__) return false;
+				if (!_comp.__is_enabled__) return false;
+				if (!_comp.__is_active__) return false;
+				if (_respect_navigable && !_comp.__is_navigable__) return false;
+				if (!_comp.visible) return false;
 				return true;
 			};
 			
@@ -1070,7 +1262,6 @@ function WWViewScrollRegion() : WWCore() constructor {
 				var _stack = [__canvas__];
 				while (array_length(_stack) > 0) {
 					var _node = array_pop(_stack);
-					if (!is_struct(_node)) continue;
 					
 					if (_node.__comp_id__ != __canvas__.__comp_id__) {
 						if (__is_nav_candidate__(_node, _respect_navigable)) {
@@ -1078,14 +1269,10 @@ function WWViewScrollRegion() : WWCore() constructor {
 						}
 					}
 					
-					if (variable_struct_exists(_node, "__children_count__")
-					&& variable_struct_exists(_node, "__children__")) {
-						var _count = _node.__children_count__;
-						var _i = _count;
-						repeat (_count) {
-							_i -= 1;
-							array_push(_stack, _node.__children__[_i]);
-						}
+					var _count = _node.__children_count__;
+					if (_count > 0) {
+						var _stack_len = array_length(_stack);
+						array_copy(_stack, _stack_len, _node.__children__, 0, _count);
 					}
 				}
 				
@@ -1463,26 +1650,47 @@ function WWViewScrollRegion() : WWCore() constructor {
 				__sync_content_size_from_canvas__();
 				__sync_cached_state_from_view__();
 
+				var _bar_canvas_w = content_width;
+				var _bar_canvas_h = content_height;
+				if (__smooth_clamp_hold_x__) {
+					_bar_canvas_w = max(_bar_canvas_w, _cov_w + scroll_x);
+				}
+				if (__smooth_clamp_hold_y__) {
+					_bar_canvas_h = max(_bar_canvas_h, _cov_h + scroll_y);
+				}
+
 				// Lazy wire: if you assign scrollbar_horz/scrollbar_vert directly,
 				// they will still drive scrolling without needing a set/get wrapper.
 				if (scrollbar_horz != undefined) {
 					scrollbar_horz.set_callback(method(self, __on_scrollbar_horz__));
+					scrollbar_horz.set_smooth_scrolling(smooth_scrolling);
 				}
 				if (scrollbar_vert != undefined) {
 					scrollbar_vert.set_callback(method(self, __on_scrollbar_vert__));
+					scrollbar_vert.set_smooth_scrolling(smooth_scrolling);
 				}
 				__sync_scrollbar_navigable__();
 
 				__syncing_scrollbars__ = true;
 				if (scrollbar_horz != undefined) {
-					scrollbar_horz.set_canvas_size(content_width);
+					scrollbar_horz.set_canvas_size(_bar_canvas_w);
 					scrollbar_horz.set_coverage_size(_cov_w);
-					scrollbar_horz.set_value(scroll_x);
+					if (!(smooth_scrolling && __scroll_sync_source_axis__ == 1)) {
+						scrollbar_horz.set_value(scroll_x);
+					}
+					if (smooth_scrolling && __smooth_clamp_hold_x__) {
+						scrollbar_horz.set_lerp_target(__smooth_clamp_target_x__);
+					}
 				}
 				if (scrollbar_vert != undefined) {
-					scrollbar_vert.set_canvas_size(content_height);
+					scrollbar_vert.set_canvas_size(_bar_canvas_h);
 					scrollbar_vert.set_coverage_size(_cov_h);
-					scrollbar_vert.set_value(scroll_y);
+					if (!(smooth_scrolling && __scroll_sync_source_axis__ == 2)) {
+						scrollbar_vert.set_value(scroll_y);
+					}
+					if (smooth_scrolling && __smooth_clamp_hold_y__) {
+						scrollbar_vert.set_lerp_target(__smooth_clamp_target_y__);
+					}
 				}
 				__syncing_scrollbars__ = false;
 			};
@@ -1508,8 +1716,15 @@ function WWViewScrollRegion() : WWCore() constructor {
 						var _is_child = scrollbar_horz.__is_child__;
 						var _parent = scrollbar_horz.__parent__;
 						if (_is_child && _parent == self) {
-							scrollbar_horz.set_alignment(fa_left, fa_top);
-							scrollbar_horz.set_offset(0, viewport_height);
+							// Anchor to bottom edge of this region.
+							scrollbar_horz.set_alignment(fa_left, fa_bottom);
+							scrollbar_horz.set_offset(0, -_t);
+							scrollbar_horz.set_size(viewport_width, _t);
+						} else if (_is_child && _parent == __parent__) {
+							// Sibling layout: use this region's anchor space and edge offsets.
+							// Horizontal bar is anchored to the bottom edge of the region.
+							scrollbar_horz.set_alignment(__halign__, __valign__);
+							scrollbar_horz.set_offset(x_offset, y_offset + height - _t);
 							scrollbar_horz.set_size(viewport_width, _t);
 						} else {
 							scrollbar_horz.set_position(x, y + viewport_height);
@@ -1524,8 +1739,15 @@ function WWViewScrollRegion() : WWCore() constructor {
 						var _is_child = scrollbar_vert.__is_child__;
 						var _parent = scrollbar_vert.__parent__;
 						if (_is_child && _parent == self) {
-							scrollbar_vert.set_alignment(fa_left, fa_top);
-							scrollbar_vert.set_offset(viewport_width, 0);
+							// Anchor to right edge of this region.
+							scrollbar_vert.set_alignment(fa_right, fa_top);
+							scrollbar_vert.set_offset(-_t, 0);
+							scrollbar_vert.set_size(_t, viewport_height);
+						} else if (_is_child && _parent == __parent__) {
+							// Sibling layout: use this region's anchor space and edge offsets.
+							// Vertical bar is anchored to the right edge of the region.
+							scrollbar_vert.set_alignment(__halign__, __valign__);
+							scrollbar_vert.set_offset(x_offset + width - _t, y_offset);
 							scrollbar_vert.set_size(_t, viewport_height);
 						} else {
 							scrollbar_vert.set_position(x + viewport_width, y);

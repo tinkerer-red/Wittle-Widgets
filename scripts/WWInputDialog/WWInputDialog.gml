@@ -48,7 +48,7 @@ function WWInputDialog() : WWConfirmDialog() constructor {
 		static set_placeholder = function(_text="") {
 			placeholder_text = string(_text);
 			var _field = input.get_field();
-			if (is_struct(_field) && is_callable(_field.set_caption)) {
+			if (!is_undefined(_field) && _field != noone && is_callable(_field.set_caption)) {
 				_field.set_caption(placeholder_text);
 			}
 			return self;

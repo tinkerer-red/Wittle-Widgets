@@ -92,7 +92,7 @@ function WWFileBrowser() : WWWindow() constructor {
 		};
 
 		static set_extension_filters = function(_filters=["*.*"]) {
-			if (!is_array(_filters) || array_length(_filters) <= 0) {
+			if (is_undefined(_filters) || array_length(_filters) <= 0) {
 				extension_filters = ["*.*"];
 			}
 			else {

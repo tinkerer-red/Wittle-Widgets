@@ -62,7 +62,7 @@ function WWWindow() : WWOverlay() constructor {
 
 		static set_content = function(_comp) {
 			content_region.clear_children();
-			if (is_struct(_comp)) {
+			if (!is_undefined(_comp) && _comp != noone) {
 				content_region.add(_comp);
 				content_region.set_canvas_size_from_children();
 			}
@@ -255,7 +255,7 @@ function WWWindow() : WWOverlay() constructor {
 		};
 		
 		static __refresh_structure__ = function() {
-			if (!is_struct(header) || !is_struct(content_region)) return;
+			if (is_undefined(header) || header == noone || is_undefined(content_region) || content_region == noone) return;
 			header.set_size(width, header_height);
 			//close_button.set_offset(-close_button_margin-close_button.width, -close_button.width/2);
 			//__layout_close_button_text__();
@@ -265,10 +265,10 @@ function WWWindow() : WWOverlay() constructor {
 		}
 		
 		static __layout_close_button_text__ = function() {
-			//if (!is_struct(close_button)) return;
+			//if (is_undefined(close_button) || close_button == noone) return;
 			//if (!variable_struct_exists(close_button, "text_component")) return;
 			//var _txt = close_button.text_component;
-			//if (!is_struct(_txt)) return;
+			//if (is_undefined(_txt) || _txt == noone) return;
 			//
 			//var _x = floor((close_button.width - _txt.width) * 0.5);
 			//var _y = floor((close_button.height - _txt.height) * 0.5);

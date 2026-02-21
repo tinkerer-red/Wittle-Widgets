@@ -170,6 +170,17 @@ function WWCore() constructor {
 			
 			#endregion
 			
+			#region jsDoc
+			/// @func    set_theme_keys()
+			/// @desc    Base no-op theme key hook.
+			///          All components expose this method; themed components override it.
+			/// @self    WWCore
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_theme_keys = function() {
+				return self;
+			};
+			
 			
 			#region jsDoc
 			/// @func    set_focusable()
@@ -188,6 +199,28 @@ function WWCore() constructor {
 					set_pressed(false);
 					set_pointer_consumer(false);
 				}
+				return self;
+			};
+			#region jsDoc
+			/// @func    set_navigable()
+			/// @desc    Sets whether this component participates in keyboard/controller navigation.
+			///          This does not disable pointer interactions.
+			/// @self    WWCore
+			/// @param   {Bool} is_navigable : True to include in navigation target registry.
+			/// @returns {Struct.WWCore}
+			#endregion
+			static set_navigable = function(_is_navigable) {
+				_is_navigable = !!_is_navigable;
+				if (__is_navigable__ == _is_navigable) return self;
+				
+				__is_navigable__ = _is_navigable;
+				__focus_registry_mark_dirty__();
+				
+				if (!__is_navigable__) {
+					set_nav_target(false);
+					set_input_consumer(false);
+				}
+				
 				return self;
 			};
 			#region jsDoc
@@ -284,7 +317,7 @@ function WWCore() constructor {
 			#endregion
 			static set_nav_target = function(_is_nav_target) {
 				_is_nav_target = !!_is_nav_target;
-				if (_is_nav_target && (!__is_focusable__ || !__is_enabled__ || !__is_active__)) {
+				if (_is_nav_target && (!__is_focusable__ || !__is_navigable__ || !__is_enabled__ || !__is_active__)) {
 					_is_nav_target = false;
 				}
 				__is_nav_target__ = _is_nav_target;
@@ -1189,6 +1222,15 @@ function WWCore() constructor {
 				return __is_focusable__;
 			};
 			#region jsDoc
+			/// @func    get_navigable()
+			/// @desc    Returns whether this component participates in keyboard/controller navigation.
+			/// @self    WWCore
+			/// @returns {Bool} is_navigable
+			#endregion
+			static get_navigable = function() {
+				return __is_navigable__;
+			};
+			#region jsDoc
 			/// @func    get_functions()
 			/// @desc    With this function you can retrieve an array populated with the names of the component's functions. Useful for learning what available public functions you have access to.
 			/// @self    WWCore
@@ -1512,10 +1554,10 @@ function WWCore() constructor {
 			}
 			static __build_input_action__ = function() {
 				return {
-					pressed:false,
-					down:false,
-					released:false,
-					repeat:false,
+					"repeat": false,
+					"pressed": false,
+					"down": false,
+					"released": false,
 				};
 			}
 			static __build_input_schema__ = function() {
@@ -2290,6 +2332,7 @@ function WWCore() constructor {
 			__previous_scissor__ = undefined;
 			
 			__is_focusable__ = false; // Mark this component as focusable (set to false if a component should never receive focus)
+			__is_navigable__ = true; // Mark this component as keyboard/controller navigable without affecting pointer interactions
 			
 			__is_enabled__ = true; //if the component is in a enabled/disabled state, typically if you want to grey out a button
 			__is_active__  = true; //is the component's code is being executed
@@ -3167,6 +3210,9 @@ function WWCore() constructor {
 			static __focus_registry_is_navigable__ = function(_comp) {
 				if (!is_struct(_comp)) return false;
 				if (!_comp.__is_focusable__) return false;
+				if (variable_struct_exists(_comp, "__is_navigable__")) {
+					if (!_comp.__is_navigable__) return false;
+				}
 				if (!_comp.__is_enabled__) return false;
 				if (!_comp.__is_active__) return false;
 				if (variable_struct_exists(_comp, "visible")) {
@@ -3340,6 +3386,14 @@ function WWCore() constructor {
 				var _cy = _current.y + _current.height * 0.5;
 				var _best = noone;
 				var _best_score = infinity;
+				var _cone_half_angle = 60; // 120-degree total cone.
+				var _dir_angle = 0;
+				switch (_dir) {
+					case "left": _dir_angle = 180; break;
+					case "right": _dir_angle = 0; break;
+					case "up": _dir_angle = 90; break;
+					case "down": _dir_angle = 270; break;
+				}
 				
 				var _i = 0;
 				repeat (_count) {
@@ -3349,6 +3403,14 @@ function WWCore() constructor {
 						var _ty = _candidate.y + _candidate.height * 0.5;
 						var _dx = _tx - _cx;
 						var _dy = _ty - _cy;
+						var _candidate_angle = point_direction(_cx, _cy, _tx, _ty);
+						var _angle_delta = angle_difference(_dir_angle, _candidate_angle);
+						
+						// Cull any candidate outside a 120-degree cone centered on the input direction.
+						if (abs(_angle_delta) > _cone_half_angle) {
+							_i += 1;
+							continue;
+						}
 						
 						var _primary = 0;
 						var _secondary = 0;
@@ -3373,7 +3435,10 @@ function WWCore() constructor {
 						
 						if (_primary > 0) {
 							var _secondary_abs = abs(_secondary);
-							var _score = (_primary * _primary) + (_secondary_abs * _secondary_abs * 4);
+							// Favor mostly-forward movement and then prefer tighter angular alignment.
+							var _score = (_primary * _primary)
+								+ (_secondary_abs * _secondary_abs * 4)
+								+ (abs(_angle_delta) * abs(_angle_delta) * 4);
 							if (_score < _best_score) {
 								_best_score = _score;
 								_best = _candidate;

@@ -70,6 +70,96 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 			static set_show_track = function(_enabled=true) { slider.set_show_track(_enabled); return self; }
 			static set_show_fill = function(_enabled=true) { slider.set_show_fill(_enabled); return self; }
 			static set_show_bar = function(_enabled=true) { slider.set_show_bar(_enabled); return self; }
+			
+			static set_theme_keys = function(
+				_sprite_main = "scrollbar.sprite.tray.main",
+				_sprite_state_prefix = "scrollbar.sprite.tray",
+				_color_prefix = "scrollbar.color.tray",
+				_alpha_prefix = "scrollbar.alpha.tray"
+			) {
+				__track_theme_sprite_main__ = _sprite_main;
+				__track_theme_sprite_state_prefix__ = _sprite_state_prefix;
+				__track_theme_color_prefix__ = _color_prefix;
+				__track_theme_alpha_prefix__ = _alpha_prefix;
+				
+				if (is_struct(slider) && variable_struct_exists(slider, "set_track_theme_keys")) {
+					slider.set_track_theme_keys(
+						__track_theme_sprite_main__,
+						__track_theme_sprite_state_prefix__,
+						__track_theme_color_prefix__,
+						__track_theme_alpha_prefix__
+					);
+				}
+				return self;
+			};
+			
+			static set_thumb_theme_keys = function(
+				_sprite_main = "scrollbar.sprite.thumb.main",
+				_sprite_state_prefix = "scrollbar.sprite.thumb",
+				_color_prefix = "scrollbar.color.thumb",
+				_alpha_prefix = "scrollbar.alpha.thumb"
+			) {
+				__thumb_theme_sprite_main__ = _sprite_main;
+				__thumb_theme_sprite_state_prefix__ = _sprite_state_prefix;
+				__thumb_theme_color_prefix__ = _color_prefix;
+				__thumb_theme_alpha_prefix__ = _alpha_prefix;
+				
+				if (is_struct(slider) && variable_struct_exists(slider, "set_thumb_theme_keys")) {
+					slider.set_thumb_theme_keys(
+						__thumb_theme_sprite_main__,
+						__thumb_theme_sprite_state_prefix__,
+						__thumb_theme_color_prefix__,
+						__thumb_theme_alpha_prefix__
+					);
+				}
+				else if (is_struct(slider) && is_struct(slider.thumb) && variable_struct_exists(slider.thumb, "set_theme_keys")) {
+					slider.thumb.set_theme_keys(
+						__thumb_theme_sprite_main__,
+						__thumb_theme_sprite_state_prefix__,
+						__thumb_theme_color_prefix__,
+						__thumb_theme_alpha_prefix__
+					);
+				}
+				return self;
+			};
+			
+			static set_button_theme_keys = function(
+				_left_sprite_main = "scrollbar.sprite.button.left.main",
+				_left_sprite_state_prefix = "scrollbar.sprite.button.left",
+				_left_color_prefix = "scrollbar.color.button.left",
+				_left_alpha_prefix = "scrollbar.alpha.button.left",
+				_right_sprite_main = "scrollbar.sprite.button.right.main",
+				_right_sprite_state_prefix = "scrollbar.sprite.button.right",
+				_right_color_prefix = "scrollbar.color.button.right",
+				_right_alpha_prefix = "scrollbar.alpha.button.right"
+			) {
+				__left_button_theme_sprite_main__ = _left_sprite_main;
+				__left_button_theme_sprite_state_prefix__ = _left_sprite_state_prefix;
+				__left_button_theme_color_prefix__ = _left_color_prefix;
+				__left_button_theme_alpha_prefix__ = _left_alpha_prefix;
+				__right_button_theme_sprite_main__ = _right_sprite_main;
+				__right_button_theme_sprite_state_prefix__ = _right_sprite_state_prefix;
+				__right_button_theme_color_prefix__ = _right_color_prefix;
+				__right_button_theme_alpha_prefix__ = _right_alpha_prefix;
+				
+				if (is_struct(leftButton) && variable_struct_exists(leftButton, "set_theme_keys")) {
+					leftButton.set_theme_keys(
+						__left_button_theme_sprite_main__,
+						__left_button_theme_sprite_state_prefix__,
+						__left_button_theme_color_prefix__,
+						__left_button_theme_alpha_prefix__
+					);
+				}
+				if (is_struct(rightButton) && variable_struct_exists(rightButton, "set_theme_keys")) {
+					rightButton.set_theme_keys(
+						__right_button_theme_sprite_main__,
+						__right_button_theme_sprite_state_prefix__,
+						__right_button_theme_color_prefix__,
+						__right_button_theme_alpha_prefix__
+					);
+				}
+				return self;
+			};
 		#endregion
 
 		#region Components
@@ -81,10 +171,12 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				.set_callback(function() {
 					slider.set_value(slider.get_value() - 0.05);
 				});
-			leftButton.__theme_sprite_key_main__ = "scrollbar.sprite.button.left.main";
-			leftButton.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.button.left";
-			leftButton.__theme_color_prefix__ = "scrollbar.color.button.left";
-			leftButton.__theme_alpha_prefix__ = "scrollbar.alpha.button.left";
+			leftButton.set_theme_keys(
+				"scrollbar.sprite.button.left.main",
+				"scrollbar.sprite.button.left",
+				"scrollbar.color.button.left",
+				"scrollbar.alpha.button.left"
+			);
 
 			slider = new WWSliderHorzThumb()
 				.set_offset(10, 0)
@@ -93,15 +185,20 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				.set_callback(function() {
 					trigger_event(events.scroll_changed, slider.get_value());
 				});
-			slider.__theme_sprite_key_main__ = "scrollbar.sprite.tray.main";
-			slider.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.tray";
-			slider.__theme_color_prefix__ = "scrollbar.color.tray";
-			slider.__theme_alpha_prefix__ = "scrollbar.alpha.tray";
+			slider.set_track_theme_keys(
+				"scrollbar.sprite.tray.main",
+				"scrollbar.sprite.tray",
+				"scrollbar.color.tray",
+				"scrollbar.alpha.tray"
+			);
 			if (is_struct(slider.thumb)) {
-				slider.thumb.__theme_sprite_key_main__ = "scrollbar.sprite.thumb.main";
-				slider.thumb.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.thumb";
-				slider.thumb.__theme_color_prefix__ = "scrollbar.color.thumb";
-				slider.thumb.__theme_alpha_prefix__ = "scrollbar.alpha.thumb";
+				slider.thumb.set_theme_keys(
+					"scrollbar.sprite.thumb.main",
+					"scrollbar.sprite.thumb",
+					"scrollbar.color.thumb",
+					"scrollbar.alpha.thumb"
+				);
+				slider.thumb.set_navigable(false);
 			}
 
 			rightButton = new WWButtonIcon()
@@ -112,10 +209,16 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 				.set_callback(function() {
 					slider.set_value(slider.get_value() + 0.05);
 				});
-			rightButton.__theme_sprite_key_main__ = "scrollbar.sprite.button.right.main";
-			rightButton.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.button.right";
-			rightButton.__theme_color_prefix__ = "scrollbar.color.button.right";
-			rightButton.__theme_alpha_prefix__ = "scrollbar.alpha.button.right";
+			rightButton.set_theme_keys(
+				"scrollbar.sprite.button.right.main",
+				"scrollbar.sprite.button.right",
+				"scrollbar.color.button.right",
+				"scrollbar.alpha.button.right"
+			);
+			
+			leftButton.set_navigable(false);
+			slider.set_navigable(false);
+			rightButton.set_navigable(false);
 
 			add(leftButton);
 			add(slider);
@@ -130,6 +233,22 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 			canvasWidth = 128;
 			coverageWidth = 108;
 			__btn_size__ = 10;
+			__track_theme_sprite_main__ = "scrollbar.sprite.tray.main";
+			__track_theme_sprite_state_prefix__ = "scrollbar.sprite.tray";
+			__track_theme_color_prefix__ = "scrollbar.color.tray";
+			__track_theme_alpha_prefix__ = "scrollbar.alpha.tray";
+			__thumb_theme_sprite_main__ = "scrollbar.sprite.thumb.main";
+			__thumb_theme_sprite_state_prefix__ = "scrollbar.sprite.thumb";
+			__thumb_theme_color_prefix__ = "scrollbar.color.thumb";
+			__thumb_theme_alpha_prefix__ = "scrollbar.alpha.thumb";
+			__left_button_theme_sprite_main__ = "scrollbar.sprite.button.left.main";
+			__left_button_theme_sprite_state_prefix__ = "scrollbar.sprite.button.left";
+			__left_button_theme_color_prefix__ = "scrollbar.color.button.left";
+			__left_button_theme_alpha_prefix__ = "scrollbar.alpha.button.left";
+			__right_button_theme_sprite_main__ = "scrollbar.sprite.button.right.main";
+			__right_button_theme_sprite_state_prefix__ = "scrollbar.sprite.button.right";
+			__right_button_theme_color_prefix__ = "scrollbar.color.button.right";
+			__right_button_theme_alpha_prefix__ = "scrollbar.alpha.button.right";
 
 			__user_callback__ = undefined;
 			__default_left_callback__ = leftButton.get_callback();
@@ -164,4 +283,16 @@ function WWScrollbarButtonsHorz() : WWCore() constructor {
 	set_show_fill(false);
 	set_button_size(10);
 	set_inverted(false);
+	set_theme_keys(__track_theme_sprite_main__, __track_theme_sprite_state_prefix__, __track_theme_color_prefix__, __track_theme_alpha_prefix__);
+	set_thumb_theme_keys(__thumb_theme_sprite_main__, __thumb_theme_sprite_state_prefix__, __thumb_theme_color_prefix__, __thumb_theme_alpha_prefix__);
+	set_button_theme_keys(
+		__left_button_theme_sprite_main__,
+		__left_button_theme_sprite_state_prefix__,
+		__left_button_theme_color_prefix__,
+		__left_button_theme_alpha_prefix__,
+		__right_button_theme_sprite_main__,
+		__right_button_theme_sprite_state_prefix__,
+		__right_button_theme_color_prefix__,
+		__right_button_theme_alpha_prefix__
+	);
 }

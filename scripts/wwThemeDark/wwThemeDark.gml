@@ -70,7 +70,7 @@ function wwThemeDark() {
 		},
 		accent: {
 			primary: { color: #4C8DFF, alpha: 1 },
-			on_accent: { color: #0D0F12, alpha: 1 },
+			on_accent: { color: #FFFFFF, alpha: 1 },
 			subtle: { color: #4C8DFF, alpha: 0.20 }
 		},
 		state: {

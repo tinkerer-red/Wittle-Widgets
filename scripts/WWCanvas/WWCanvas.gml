@@ -25,6 +25,34 @@ function WWCanvas() : WWCore() constructor {
 			return self;
 		}
 		#region jsDoc
+		/// @func    set_theme_keys()
+		/// @desc    Sets explicit theme key prefixes for canvas visuals.
+		/// @self    WWCanvas
+		/// @param   {String} sprite_prefix : e.g. "canvas.sprite.main"
+		/// @param   {String} color_prefix : e.g. "canvas.color.main"
+		/// @param   {String} alpha_prefix : e.g. "canvas.alpha.main"
+		/// @param   {String} border_color_prefix : e.g. "canvas.color.border"
+		/// @param   {String} border_alpha_prefix : e.g. "canvas.alpha.border"
+		/// @param   {String} border_size_prefix : e.g. "canvas.size.border"
+		/// @returns {Struct.WWCanvas}
+		#endregion
+		static set_theme_keys = function(
+			_sprite_prefix,
+			_color_prefix,
+			_alpha_prefix,
+			_border_color_prefix,
+			_border_alpha_prefix,
+			_border_size_prefix
+		) {
+			if (!is_undefined(_sprite_prefix)) __theme_sprite_prefix__ = _sprite_prefix;
+			if (!is_undefined(_color_prefix)) __theme_color_prefix__ = _color_prefix;
+			if (!is_undefined(_alpha_prefix)) __theme_alpha_prefix__ = _alpha_prefix;
+			if (!is_undefined(_border_color_prefix)) __theme_border_color_prefix__ = _border_color_prefix;
+			if (!is_undefined(_border_alpha_prefix)) __theme_border_alpha_prefix__ = _border_alpha_prefix;
+			if (!is_undefined(_border_size_prefix)) __theme_border_size_prefix__ = _border_size_prefix;
+			return self;
+		}
+		#region jsDoc
 		/// @func    set_draw_fill()
 		/// @desc    Enables or disables drawing of the themed fill layer.
 		/// @self    WWCanvas

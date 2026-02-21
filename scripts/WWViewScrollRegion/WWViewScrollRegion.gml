@@ -36,6 +36,8 @@ function WWViewScrollRegion() : WWCore() constructor {
 			scrollbar_vert_auto = true;
 			scrollbar_horz_visible = false;
 			scrollbar_vert_visible = false;
+			scrollbar_horz_navigable = false;
+			scrollbar_vert_navigable = false;
 
 				wheel_scroll_horz_enabled = true;
 				wheel_scroll_vert_enabled = true;
@@ -43,6 +45,15 @@ function WWViewScrollRegion() : WWCore() constructor {
 			__syncing_scrollbars__ = false;
 			__reflowing__ = false;
 			__scroll_event_data__ = { x: 0, y: 0, dx: 0, dy: 0 };
+			__nav_entry_mode__ = __WW_SCROLL_NAV_MODE.DIRECT;
+			__nav_trap_when_active__ = true;
+			__nav_enter_action__ = __WW_NAV_ACTION.SUBMIT;
+			__nav_exit_action__ = __WW_NAV_ACTION.CANCEL;
+			__nav_remember_last_target__ = true;
+			__nav_active__ = false;
+			__nav_last_target_id__ = -1;
+			__nav_locked_nodes__ = [];
+			__nav_content_locked__ = false;
 		#endregion
 		
 		#region Components
@@ -194,6 +205,98 @@ function WWViewScrollRegion() : WWCore() constructor {
 				scrollbar_horz_auto = _horz_auto;
 				scrollbar_vert_auto = _vert_auto;
 				__reflow__();
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_scrollbar_navigable()
+			/// @desc    Enables/disables keyboard/controller navigation targeting for scrollbars.
+			///          Pointer interaction still works when disabled.
+			/// @self    WWViewScrollRegion
+			/// @param   {Bool} horz_navigable
+			/// @param   {Bool} vert_navigable
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_scrollbar_navigable = function(_horz_navigable=false, _vert_navigable=false) {
+				scrollbar_horz_navigable = !!_horz_navigable;
+				scrollbar_vert_navigable = !!_vert_navigable;
+				__sync_scrollbar_navigable__();
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_entry_mode()
+			/// @desc    Sets how keyboard/controller navigation enters this scroll region.
+			///          DIRECT   : children are globally navigable, no activation step.
+			///          ACTIVATE : region itself is navigable; submit enters child scope.
+			///          NONE     : region content is excluded from keyboard/controller nav.
+			/// @self    WWViewScrollRegion
+			/// @param   {Real} mode : Value from __WW_SCROLL_NAV_MODE.
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_nav_entry_mode = function(_mode) {
+				switch (_mode) {
+					case __WW_SCROLL_NAV_MODE.NONE:
+					case __WW_SCROLL_NAV_MODE.DIRECT:
+					case __WW_SCROLL_NAV_MODE.ACTIVATE:
+						__nav_entry_mode__ = _mode;
+					break;
+					default:
+						__nav_entry_mode__ = __WW_SCROLL_NAV_MODE.DIRECT;
+					break;
+				}
+				__sync_nav_entry_mode__();
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_trap_when_active()
+			/// @desc    In ACTIVATE mode, traps next/prev/directional nav inside region scope while active.
+			/// @self    WWViewScrollRegion
+			/// @param   {Bool} enabled
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_nav_trap_when_active = function(_enabled=true) {
+				__nav_trap_when_active__ = !!_enabled;
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_enter_action()
+			/// @desc    Sets which nav action enters an ACTIVATE-mode region.
+			/// @self    WWViewScrollRegion
+			/// @param   {Real} action : Value from __WW_NAV_ACTION.
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_nav_enter_action = function(_action=__WW_NAV_ACTION.SUBMIT) {
+				__nav_enter_action__ = _action;
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_exit_action()
+			/// @desc    Sets which nav action exits an active ACTIVATE-mode region.
+			/// @self    WWViewScrollRegion
+			/// @param   {Real} action : Value from __WW_NAV_ACTION.
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_nav_exit_action = function(_action=__WW_NAV_ACTION.CANCEL) {
+				__nav_exit_action__ = _action;
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_remember_last_target()
+			/// @desc    When enabled, ACTIVATE mode re-enters using the last selected child when possible.
+			/// @self    WWViewScrollRegion
+			/// @param   {Bool} enabled
+			/// @returns {Struct.WWViewScrollRegion}
+			#endregion
+			static set_nav_remember_last_target = function(_enabled=true) {
+				__nav_remember_last_target__ = !!_enabled;
+				if (!__nav_remember_last_target__) {
+					__nav_last_target_id__ = -1;
+				}
 				return self;
 			};
 
@@ -498,6 +601,88 @@ function WWViewScrollRegion() : WWCore() constructor {
 				__layout_scrollbars__();
 				__base_update_component_positions__();
 			};
+			
+			#region jsDoc
+			/// @func    should_auto_consume_on_nav_target()
+			/// @desc    Region header nav-target should not auto-consume typed input.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			#endregion
+			static should_auto_consume_on_nav_target = function() {
+				return false;
+			};
+			
+			#region jsDoc
+			/// @func    handle_nav_action()
+			/// @desc    Handles ACTIVATE-mode navigation entry/exit and optional in-region nav trapping.
+			/// @self    WWViewScrollRegion
+			/// @param   {Real} action : __WW_NAV_ACTION.*
+			/// @param   {Struct} input
+			/// @returns {Undefined}
+			#endregion
+			static handle_nav_action = function(_action, _input) {
+				if (!is_struct(_input) || !is_struct(_input.nav)) return;
+				
+				var _source = _input.nav.source;
+				var _current = nav_get_target();
+				var _current_is_content = __is_target_within_content__(_current);
+				
+				switch (__nav_entry_mode__) {
+					case __WW_SCROLL_NAV_MODE.NONE: {
+						return;
+					}
+					
+					case __WW_SCROLL_NAV_MODE.DIRECT: {
+						return;
+					}
+					
+					case __WW_SCROLL_NAV_MODE.ACTIVATE: {
+						if (__nav_active__) {
+							if (_action == __nav_exit_action__) {
+								if (__deactivate_nav_to_header__(_source)) {
+									_input.nav.consumed = true;
+								}
+								return;
+							}
+							
+							if (_action == __nav_enter_action__) {
+								if (!is_struct(_current) || _current.__comp_id__ == __comp_id__) {
+									if (__activate_nav_to_content__(_source)) {
+										_input.nav.consumed = true;
+									}
+								}
+								return;
+							}
+							
+							if (__nav_trap_when_active__ && __is_nav_direction_action__(_action)) {
+								if (__move_nav_within_content__(_action, _source)) {
+									_input.nav.consumed = true;
+								}
+								else {
+									_input.nav.consumed = true;
+								}
+							}
+							return;
+						}
+						
+						if (_action == __nav_enter_action__) {
+							if (is_struct(_current) && _current.__comp_id__ == __comp_id__) {
+								if (__activate_nav_to_content__(_source)) {
+									_input.nav.consumed = true;
+								}
+							}
+							return;
+						}
+						
+						if (_current_is_content) {
+							if (__deactivate_nav_to_header__(_source)) {
+								_input.nav.consumed = true;
+							}
+						}
+						return;
+					}
+				}
+			};
 
 			#region jsDoc
 			/// @func    get_viewport_size()
@@ -537,6 +722,76 @@ function WWViewScrollRegion() : WWCore() constructor {
 			#endregion
 			static get_scrollbars_auto_hide = function() {
 				return { horz: scrollbar_horz_auto, vert: scrollbar_vert_auto };
+			};
+			
+			#region jsDoc
+			/// @func    get_scrollbar_navigable()
+			/// @desc    Returns whether each scrollbar axis is keyboard/controller navigable.
+			/// @self    WWViewScrollRegion
+			/// @returns {Struct}
+			#endregion
+			static get_scrollbar_navigable = function() {
+				return { horz: scrollbar_horz_navigable, vert: scrollbar_vert_navigable };
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_entry_mode()
+			/// @desc    Returns the current scroll region nav entry mode.
+			/// @self    WWViewScrollRegion
+			/// @returns {Real}
+			#endregion
+			static get_nav_entry_mode = function() {
+				return __nav_entry_mode__;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_trap_when_active()
+			/// @desc    Returns whether ACTIVATE mode traps next/prev/directional nav inside this region.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			#endregion
+			static get_nav_trap_when_active = function() {
+				return __nav_trap_when_active__;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_enter_action()
+			/// @desc    Returns the nav action used to enter an ACTIVATE-mode region.
+			/// @self    WWViewScrollRegion
+			/// @returns {Real}
+			#endregion
+			static get_nav_enter_action = function() {
+				return __nav_enter_action__;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_exit_action()
+			/// @desc    Returns the nav action used to exit an ACTIVATE-mode region.
+			/// @self    WWViewScrollRegion
+			/// @returns {Real}
+			#endregion
+			static get_nav_exit_action = function() {
+				return __nav_exit_action__;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_remember_last_target()
+			/// @desc    Returns whether ACTIVATE mode remembers last selected child target.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			#endregion
+			static get_nav_remember_last_target = function() {
+				return __nav_remember_last_target__;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_active()
+			/// @desc    Returns whether ACTIVATE-mode child navigation is currently active.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			#endregion
+			static get_nav_active = function() {
+				return __nav_active__;
 			};
 
 			#region jsDoc
@@ -732,6 +987,452 @@ function WWViewScrollRegion() : WWCore() constructor {
 				__view__.set_content_size(content_width, content_height);
 				__sync_cached_state_from_view__();
 			};
+			
+			#region jsDoc
+			/// @func    __set_subtree_navigable__()
+			/// @desc    Applies keyboard/controller navigable state to a component subtree.
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __set_subtree_navigable__ = function(_root_comp, _is_navigable) {
+				if (!is_struct(_root_comp)) { return; }
+				
+				var _stack = [_root_comp];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					if (!is_struct(_node)) { continue; }
+					
+					if (variable_struct_exists(_node, "set_navigable")) {
+						var _set_nav = _node.set_navigable;
+						if (is_callable(_set_nav)) {
+							var _bound_set_nav = method(_node, _set_nav);
+							_bound_set_nav(_is_navigable);
+						}
+					}
+					
+					if (variable_struct_exists(_node, "__children_count__")
+					&& variable_struct_exists(_node, "__children__")) {
+						var _child_count = _node.__children_count__;
+						var _i = _child_count;
+						repeat (_child_count) {
+							_i -= 1;
+							array_push(_stack, _node.__children__[_i]);
+						}
+					}
+				}
+			};
+			
+			#region jsDoc
+			/// @func    __sync_scrollbar_navigable__()
+			/// @desc    Applies configured navigable state to attached scrollbar trees.
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __sync_scrollbar_navigable__ = function() {
+				if (is_struct(scrollbar_horz)) {
+					__set_subtree_navigable__(scrollbar_horz, scrollbar_horz_navigable);
+				}
+				if (is_struct(scrollbar_vert)) {
+					__set_subtree_navigable__(scrollbar_vert, scrollbar_vert_navigable);
+				}
+			};
+			
+			#region jsDoc
+			/// @func    __is_nav_candidate__()
+			/// @desc    Returns true when a component qualifies as a nav candidate for region content scope.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __is_nav_candidate__ = function(_comp, _respect_navigable=true) {
+				if (!is_struct(_comp)) return false;
+				if (!variable_struct_exists(_comp, "__is_focusable__") || !_comp.__is_focusable__) return false;
+				if (!variable_struct_exists(_comp, "__is_enabled__") || !_comp.__is_enabled__) return false;
+				if (!variable_struct_exists(_comp, "__is_active__") || !_comp.__is_active__) return false;
+				if (_respect_navigable && variable_struct_exists(_comp, "__is_navigable__") && !_comp.__is_navigable__) return false;
+				if (variable_struct_exists(_comp, "visible") && !_comp.visible) return false;
+				return true;
+			};
+			
+			#region jsDoc
+			/// @func    __collect_content_candidates__()
+			/// @desc    Collects navigable candidates from the region canvas subtree.
+			/// @self    WWViewScrollRegion
+			/// @returns {Array<Struct.WWCore>}
+			/// @ignore
+			#endregion
+			static __collect_content_candidates__ = function(_respect_navigable=true) {
+				var _scope = [];
+				if (!is_struct(__canvas__)) return _scope;
+				
+				var _stack = [__canvas__];
+				while (array_length(_stack) > 0) {
+					var _node = array_pop(_stack);
+					if (!is_struct(_node)) continue;
+					
+					if (_node.__comp_id__ != __canvas__.__comp_id__) {
+						if (__is_nav_candidate__(_node, _respect_navigable)) {
+							array_push(_scope, _node);
+						}
+					}
+					
+					if (variable_struct_exists(_node, "__children_count__")
+					&& variable_struct_exists(_node, "__children__")) {
+						var _count = _node.__children_count__;
+						var _i = _count;
+						repeat (_count) {
+							_i -= 1;
+							array_push(_stack, _node.__children__[_i]);
+						}
+					}
+				}
+				
+				return _scope;
+			};
+			
+			#region jsDoc
+			/// @func    __scope_index_of__()
+			/// @desc    Returns the index of a component id in a scope array.
+			/// @self    WWViewScrollRegion
+			/// @returns {Real}
+			/// @ignore
+			#endregion
+			static __scope_index_of__ = function(_scope, _comp_id) {
+				var _count = array_length(_scope);
+				for (var _i=0; _i<_count; _i++) {
+					if (_scope[_i].__comp_id__ == _comp_id) return _i;
+				}
+				return -1;
+			};
+			
+			#region jsDoc
+			/// @func    __is_target_within_content__()
+			/// @desc    Returns true when target exists in this region's canvas subtree.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __is_target_within_content__ = function(_target) {
+				if (!is_struct(_target) || !is_struct(__canvas__)) return false;
+				
+				var _node = _target;
+				repeat (256) {
+					if (!is_struct(_node)) return false;
+					if (_node.__comp_id__ == __canvas__.__comp_id__) return true;
+					if (!variable_struct_exists(_node, "__is_child__") || !_node.__is_child__) return false;
+					if (!variable_struct_exists(_node, "__parent__")) return false;
+					_node = _node.__parent__;
+				}
+				
+				return false;
+			};
+			
+			#region jsDoc
+			/// @func    __remember_current_content_target__()
+			/// @desc    Saves the currently targeted content component id for later re-entry.
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __remember_current_content_target__ = function() {
+				if (!__nav_remember_last_target__) return;
+				var _target = nav_get_target();
+				if (!__is_target_within_content__(_target)) return;
+				__nav_last_target_id__ = _target.__comp_id__;
+			};
+			
+			#region jsDoc
+			/// @func    __set_content_locked__()
+			/// @desc    Locks/unlocks content subtree from keyboard/controller navigation.
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __set_content_locked__ = function(_locked) {
+				_locked = !!_locked;
+				
+				if (_locked) {
+					if (__nav_content_locked__) return;
+					array_resize(__nav_locked_nodes__, 0);
+					
+					var _scope = __collect_content_candidates__(false);
+					var _count = array_length(_scope);
+					for (var _i=0; _i<_count; _i++) {
+						var _comp = _scope[_i];
+						if (!variable_struct_exists(_comp, "set_navigable")) continue;
+						if (variable_struct_exists(_comp, "__is_navigable__") && _comp.__is_navigable__) {
+							array_push(__nav_locked_nodes__, _comp);
+							_comp.set_navigable(false);
+						}
+					}
+					
+					__nav_content_locked__ = true;
+					return;
+				}
+				
+				if (!__nav_content_locked__) return;
+				
+				var _count_nodes = array_length(__nav_locked_nodes__);
+				for (var _j=0; _j<_count_nodes; _j++) {
+					var _node = __nav_locked_nodes__[_j];
+					if (!is_struct(_node)) continue;
+					if (!variable_struct_exists(_node, "set_navigable")) continue;
+					_node.set_navigable(true);
+				}
+				array_resize(__nav_locked_nodes__, 0);
+				__nav_content_locked__ = false;
+			};
+			
+			#region jsDoc
+			/// @func    __set_nav_active__()
+			/// @desc    Sets whether ACTIVATE-mode content scope is currently active.
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __set_nav_active__ = function(_active) {
+				_active = !!_active;
+				if (__nav_entry_mode__ != __WW_SCROLL_NAV_MODE.ACTIVATE) {
+					_active = false;
+				}
+				
+				__nav_active__ = _active;
+				
+				if (__nav_entry_mode__ == __WW_SCROLL_NAV_MODE.ACTIVATE) {
+					__set_content_locked__(!__nav_active__);
+				}
+			};
+			
+			#region jsDoc
+			/// @func    __sync_nav_entry_mode__()
+			/// @desc    Applies nav entry mode behavior (header targeting + content lock state).
+			/// @self    WWViewScrollRegion
+			/// @returns {Undefined}
+			/// @ignore
+			#endregion
+			static __sync_nav_entry_mode__ = function() {
+				switch (__nav_entry_mode__) {
+					case __WW_SCROLL_NAV_MODE.NONE: {
+						__nav_active__ = false;
+						set_focusable(false);
+						set_navigable(false);
+						__set_content_locked__(true);
+					break;}
+					
+					case __WW_SCROLL_NAV_MODE.DIRECT: {
+						__nav_active__ = false;
+						set_focusable(false);
+						set_navigable(false);
+						__set_content_locked__(false);
+					break;}
+					
+					case __WW_SCROLL_NAV_MODE.ACTIVATE: {
+						set_focusable(true);
+						set_navigable(true);
+						__set_nav_active__(__nav_active__);
+					break;}
+				}
+			};
+			
+			#region jsDoc
+			/// @func    __is_nav_direction_action__()
+			/// @desc    Returns true when action is a directional/next-prev navigation action.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __is_nav_direction_action__ = function(_action) {
+				switch (_action) {
+					case __WW_NAV_ACTION.NEXT:
+					case __WW_NAV_ACTION.PREV:
+					case __WW_NAV_ACTION.LEFT:
+					case __WW_NAV_ACTION.RIGHT:
+					case __WW_NAV_ACTION.UP:
+					case __WW_NAV_ACTION.DOWN:
+						return true;
+				}
+				return false;
+			};
+			
+			#region jsDoc
+			/// @func    __action_to_direction__()
+			/// @desc    Converts nav action enum to direction string.
+			/// @self    WWViewScrollRegion
+			/// @returns {String|Undefined}
+			/// @ignore
+			#endregion
+			static __action_to_direction__ = function(_action) {
+				switch (_action) {
+					case __WW_NAV_ACTION.NEXT: return "next";
+					case __WW_NAV_ACTION.PREV: return "prev";
+					case __WW_NAV_ACTION.LEFT: return "left";
+					case __WW_NAV_ACTION.RIGHT: return "right";
+					case __WW_NAV_ACTION.UP: return "up";
+					case __WW_NAV_ACTION.DOWN: return "down";
+				}
+				return undefined;
+			};
+			
+			#region jsDoc
+			/// @func    __scope_target_from_direction__()
+			/// @desc    Returns next target in local scope for direction/next-prev action.
+			/// @self    WWViewScrollRegion
+			/// @returns {Struct.WWCore|Undefined}
+			/// @ignore
+			#endregion
+			static __scope_target_from_direction__ = function(_scope, _current_index, _dir) {
+				var _count = array_length(_scope);
+				if (_count <= 0) return undefined;
+				
+				var _is_prev_like = (_dir == "prev" || _dir == "left" || _dir == "up");
+				if (_current_index < 0 || _current_index >= _count) {
+					return _scope[_is_prev_like ? (_count - 1) : 0];
+				}
+				
+				if (_dir == "next") {
+					var _ni = _current_index + 1;
+					if (_ni >= _count) _ni = 0;
+					return _scope[_ni];
+				}
+				if (_dir == "prev") {
+					var _pi = _current_index - 1;
+					if (_pi < 0) _pi = _count - 1;
+					return _scope[_pi];
+				}
+				
+				var _current = _scope[_current_index];
+				var _cx = _current.x + _current.width * 0.5;
+				var _cy = _current.y + _current.height * 0.5;
+				var _best = noone;
+				var _best_score = infinity;
+				
+				for (var _i=0; _i<_count; _i++) {
+					if (_i == _current_index) continue;
+					var _candidate = _scope[_i];
+					var _tx = _candidate.x + _candidate.width * 0.5;
+					var _ty = _candidate.y + _candidate.height * 0.5;
+					var _dx = _tx - _cx;
+					var _dy = _ty - _cy;
+					
+					var _primary = 0;
+					var _secondary = 0;
+					switch (_dir) {
+						case "left": {
+							_primary = -_dx;
+							_secondary = _dy;
+						break;}
+						case "right": {
+							_primary = _dx;
+							_secondary = _dy;
+						break;}
+						case "up": {
+							_primary = -_dy;
+							_secondary = _dx;
+						break;}
+						case "down": {
+							_primary = _dy;
+							_secondary = _dx;
+						break;}
+					}
+					
+					if (_primary <= 0) continue;
+					var _secondary_abs = abs(_secondary);
+					var _score = (_primary * _primary) + (_secondary_abs * _secondary_abs * 4);
+					if (_score < _best_score) {
+						_best_score = _score;
+						_best = _candidate;
+					}
+				}
+				
+				if (is_struct(_best)) return _best;
+				
+				var _fallback_index = _is_prev_like ? (_current_index - 1) : (_current_index + 1);
+				if (_fallback_index < 0) _fallback_index = _count - 1;
+				if (_fallback_index >= _count) _fallback_index = 0;
+				return _scope[_fallback_index];
+			};
+			
+			#region jsDoc
+			/// @func    __move_nav_within_content__()
+			/// @desc    Moves nav target within content scope for trapped ACTIVATE-mode navigation.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __move_nav_within_content__ = function(_action, _source) {
+				var _dir = __action_to_direction__(_action);
+				if (is_undefined(_dir)) return false;
+				
+				var _scope = __collect_content_candidates__(true);
+				var _count = array_length(_scope);
+				if (_count <= 0) return false;
+				
+				var _current = nav_get_target();
+				var _idx = -1;
+				if (is_struct(_current)) {
+					_idx = __scope_index_of__(_scope, _current.__comp_id__);
+				}
+				
+				var _target = __scope_target_from_direction__(_scope, _idx, _dir);
+				if (!is_struct(_target)) return false;
+				
+				var _assigned = nav_set_target(_target, false, _source);
+				return is_struct(_assigned);
+			};
+			
+			#region jsDoc
+			/// @func    __activate_nav_to_content__()
+			/// @desc    Activates ACTIVATE-mode child scope and moves target to entry component.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __activate_nav_to_content__ = function(_source) {
+				if (__nav_entry_mode__ != __WW_SCROLL_NAV_MODE.ACTIVATE) return false;
+				
+				__set_nav_active__(true);
+				
+				var _scope = __collect_content_candidates__(true);
+				var _count = array_length(_scope);
+				if (_count <= 0) {
+					__set_nav_active__(false);
+					return false;
+				}
+				
+				var _target = noone;
+				if (__nav_remember_last_target__ && __nav_last_target_id__ >= 0) {
+					var _idx = __scope_index_of__(_scope, __nav_last_target_id__);
+					if (_idx >= 0) _target = _scope[_idx];
+				}
+				if (!is_struct(_target)) {
+					_target = _scope[0];
+				}
+				
+				var _assigned = nav_set_target(_target, false, _source);
+				if (is_struct(_assigned)) return true;
+				
+				__set_nav_active__(false);
+				return false;
+			};
+			
+			#region jsDoc
+			/// @func    __deactivate_nav_to_header__()
+			/// @desc    Deactivates ACTIVATE-mode child scope and retargets region header.
+			/// @self    WWViewScrollRegion
+			/// @returns {Bool}
+			/// @ignore
+			#endregion
+			static __deactivate_nav_to_header__ = function(_source) {
+				if (__nav_entry_mode__ != __WW_SCROLL_NAV_MODE.ACTIVATE) return false;
+				
+				__remember_current_content_target__();
+				__set_nav_active__(false);
+				
+				var _assigned = nav_set_target(self, false, _source);
+				return is_struct(_assigned);
+			};
 
 			#region jsDoc
 			/// @func    __get_thickness__()
@@ -770,6 +1471,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 				if (scrollbar_vert != undefined) {
 					scrollbar_vert.set_callback(method(self, __on_scrollbar_vert__));
 				}
+				__sync_scrollbar_navigable__();
 
 				__syncing_scrollbars__ = true;
 				if (scrollbar_horz != undefined) {
@@ -889,6 +1591,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 					__view__.set_scroll_offset(scroll_x, scroll_y);
 					__sync_cached_state_from_view__();
 					__sync_scrollbars__();
+					__sync_nav_entry_mode__();
 					__trigger_scroll_events__(_old_x, _old_y);
 					__reflowing__ = false;
 					return;
@@ -934,6 +1637,7 @@ function WWViewScrollRegion() : WWCore() constructor {
 
 				__layout_scrollbars__();
 				__sync_scrollbars__();
+				__sync_nav_entry_mode__();
 				__trigger_scroll_events__(_old_x, _old_y);
 
 				__reflowing__ = false;

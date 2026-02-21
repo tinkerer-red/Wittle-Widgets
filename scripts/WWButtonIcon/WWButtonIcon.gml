@@ -88,7 +88,17 @@ function WWButtonIcon() : WWButtonSprite() constructor {
 
 			static set_auto_icon_paint = function(_enabled=true) {
 				auto_icon_paint = _enabled;
-				icon.set_auto_icon_paint(false);
+				icon.set_auto_icon_paint(_enabled);
+				return self;
+			};
+			
+			static set_icon_theme_keys = function(
+				_color_prefix = "button.color.text",
+				_alpha_prefix = "button.alpha.text",
+				_state_source = undefined
+			) {
+				if (is_undefined(_state_source)) _state_source = self;
+				icon.set_theme_keys(_color_prefix, _alpha_prefix, _state_source);
 				return self;
 			};
 
@@ -178,6 +188,7 @@ function WWButtonIcon() : WWButtonSprite() constructor {
 	};
 
 	icon.set_auto_icon_paint(true);
+	icon.set_theme_keys("button.color.text", "button.alpha.text", self);
 	add(icon);
 	set_square_size(22);
 }

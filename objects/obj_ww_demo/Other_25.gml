@@ -225,17 +225,71 @@ function __ww_workbench_apply_theme_choice(_theme_id) {
 	var _next = undefined;
 
 	switch (_theme_id) {
+		case "gm_dark":
+			_next = wwThemeGMDark();
+			break;
+		case "gm_light":
+			_next = wwThemeGMLight();
+			break;
+		case "mono_near_black":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMonoNearBlack()]);
+			break;
+		case "mono_mid_grey":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMonoMidGrey()]);
+			break;
+		case "mono_warm_edge":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMonoWarmEdge()]);
+			break;
+		case "mono_cool_edge":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMonoCoolEdge()]);
+			break;
+		case "mono_light":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMonoLight()]);
+			break;
 		case "mono":
 			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeMono()]);
+			break;
+		case "duo_neutral_warm_rare":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuoNeutralWarmRare()]);
+			break;
+		case "duo_neutral_green_rare":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuoNeutralGreenRare()]);
+			break;
+		case "duo_cool_slate":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuoCoolSlate()]);
+			break;
+		case "duo_soft_contrast":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuoSoftContrast()]);
+			break;
+		case "duo_light_grey":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuoLightGrey()]);
+			break;
+		case "retro_crt_amber":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroCRTAmber()]);
+			break;
+		case "retro_gameboy":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroGameBoy()]);
+			break;
+		case "retro_c64":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroC64()]);
+			break;
+		case "retro_nes":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroNES()]);
+			break;
+		case "retro_midcentury_light":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroMidCenturyLight()]);
+			break;
+		case "retro_teal_orange":
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeRetroTealOrange()]);
 			break;
 		case "duo":
 			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeDuo()]);
 			break;
 		case "trio":
-			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeTrio()]);
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemePallet()]);
 			break;
 		case "quad":
-			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeQuad()]);
+			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeTests()]);
 			break;
 		case "light":
 			_next = wwThemeCompose([wwThemeDefault(), wwThemeLayerRoundedRectangles(), wwThemeLayerLight()]);
@@ -915,10 +969,28 @@ function build_ui_folder_demo() {
 		.set_size(150, 24)
 		.set_text("Theme...")
 		.set_options([
+			{ label: "Theme: GM Dark", value: "gm_dark" },
+			{ label: "Theme: GM Light", value: "gm_light" },
 			{ label: "Theme: Dark", value: "dark" },
 			{ label: "Theme: Light", value: "light" },
 			{ label: "Theme: Mono", value: "mono" },
+			{ label: "Theme: Mono Near Black", value: "mono_near_black" },
+			{ label: "Theme: Mono Mid Grey", value: "mono_mid_grey" },
+			{ label: "Theme: Mono Warm Edge", value: "mono_warm_edge" },
+			{ label: "Theme: Mono Cool Edge", value: "mono_cool_edge" },
+			{ label: "Theme: Mono Light", value: "mono_light" },
 			{ label: "Theme: Duo", value: "duo" },
+			{ label: "Theme: Duo Warm Rare", value: "duo_neutral_warm_rare" },
+			{ label: "Theme: Duo Green Rare", value: "duo_neutral_green_rare" },
+			{ label: "Theme: Duo Cool Slate", value: "duo_cool_slate" },
+			{ label: "Theme: Duo Soft Contrast", value: "duo_soft_contrast" },
+			{ label: "Theme: Duo Light Grey", value: "duo_light_grey" },
+			{ label: "Theme: Retro CRT Amber", value: "retro_crt_amber" },
+			{ label: "Theme: Retro Game Boy", value: "retro_gameboy" },
+			{ label: "Theme: Retro C64", value: "retro_c64" },
+			{ label: "Theme: Retro NES", value: "retro_nes" },
+			{ label: "Theme: Retro Mid-Century Light", value: "retro_midcentury_light" },
+			{ label: "Theme: Retro Teal Orange", value: "retro_teal_orange" },
 			{ label: "Theme: Palette", value: "trio" },
 			{ label: "Theme: Components", value: "quad" }
 		])

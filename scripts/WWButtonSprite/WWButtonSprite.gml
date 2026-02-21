@@ -22,6 +22,36 @@ function WWButtonSprite() : WWSprite() constructor {
 				on_released(__callback__);
 				return self;
 			};
+
+			#region jsDoc
+			/// @func    set_theme_keys()
+			/// @desc    Sets theme key prefixes used for sprite/color/alpha lookup.
+			///          For checkbox-style variants, checked/unchecked keys can be provided.
+			/// @self    WWButtonSprite
+			/// @param   {String} sprite_main : Base sprite key (e.g. "button.sprite.main").
+			/// @param   {String} sprite_state_prefix : Stateful sprite prefix (e.g. "button.sprite.main").
+			/// @param   {String} color_prefix : Stateful color prefix (e.g. "button.color.main").
+			/// @param   {String} alpha_prefix : Stateful alpha prefix (e.g. "button.alpha.main").
+			/// @param   {String|Undefined} sprite_checked : Optional checked sprite key.
+			/// @param   {String|Undefined} sprite_unchecked : Optional unchecked sprite key.
+			/// @returns {Struct.WWButtonSprite}
+			#endregion
+			static set_theme_keys = function(
+				_sprite_main,
+				_sprite_state_prefix,
+				_color_prefix,
+				_alpha_prefix,
+				_sprite_checked = undefined,
+				_sprite_unchecked = undefined
+			) {
+				if (!is_undefined(_sprite_main)) __theme_sprite_key_main__ = _sprite_main;
+				if (!is_undefined(_sprite_state_prefix)) __theme_sprite_key_state_prefix__ = _sprite_state_prefix;
+				if (!is_undefined(_color_prefix)) __theme_color_prefix__ = _color_prefix;
+				if (!is_undefined(_alpha_prefix)) __theme_alpha_prefix__ = _alpha_prefix;
+				if (!is_undefined(_sprite_checked)) __theme_sprite_key_checked__ = _sprite_checked;
+				if (!is_undefined(_sprite_unchecked)) __theme_sprite_key_unchecked__ = _sprite_unchecked;
+				return self;
+			};
 			
 		#endregion
 		

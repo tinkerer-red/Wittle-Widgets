@@ -206,6 +206,41 @@ function WWSliderBase() : WWButtonSprite() constructor {
                 set_show_fill(_enabled);
                 return self;
             };
+			
+			#region jsDoc
+			/// @func    set_track_theme_keys()
+			/// @desc    Sets theme key prefixes for the slider track (inherited button-sprite surface).
+			/// @self    WWSliderBase
+			/// @param   {String} sprite_main
+			/// @param   {String} sprite_state_prefix
+			/// @param   {String} color_prefix
+			/// @param   {String} alpha_prefix
+			/// @returns {Struct.WWSliderBase}
+			#endregion
+			static set_track_theme_keys = function(_sprite_main, _sprite_state_prefix, _color_prefix, _alpha_prefix) {
+				set_theme_keys(_sprite_main, _sprite_state_prefix, _color_prefix, _alpha_prefix);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_fill_theme_keys()
+			/// @desc    Sets theme key prefixes used for slider fill (bar) rendering.
+			/// @self    WWSliderBase
+			/// @param   {String} sprite_prefix : e.g. "slider.sprite.fill"
+			/// @param   {String} color_prefix : e.g. "slider.color.fill"
+			/// @param   {String} alpha_prefix : e.g. "slider.alpha.fill"
+			/// @returns {Struct.WWSliderBase}
+			#endregion
+			static set_fill_theme_keys = function(
+				_sprite_prefix = "slider.sprite.fill",
+				_color_prefix = "slider.color.fill",
+				_alpha_prefix = "slider.alpha.fill"
+			) {
+				__theme_fill_sprite_prefix__ = _sprite_prefix;
+				__theme_fill_color_prefix__ = _color_prefix;
+				__theme_fill_alpha_prefix__ = _alpha_prefix;
+				return self;
+			};
         #endregion
 
         #region Events
@@ -256,6 +291,9 @@ function WWSliderBase() : WWButtonSprite() constructor {
             __theme_sprite_key_state_prefix__ = "slider.sprite.track";
             __theme_color_prefix__ = "slider.color.track";
             __theme_alpha_prefix__ = "slider.alpha.track";
+			__theme_fill_sprite_prefix__ = "slider.sprite.fill";
+			__theme_fill_color_prefix__ = "slider.color.fill";
+			__theme_fill_alpha_prefix__ = "slider.alpha.fill";
         #endregion
 
         #region Functions
@@ -306,28 +344,32 @@ function WWSliderBase() : WWButtonSprite() constructor {
                 var _w = __bar_rect__.right - __bar_rect__.left;
                 var _h = __bar_rect__.bottom - __bar_rect__.top;
                 if (_w <= 0 || _h <= 0) return;
+				var _state = __theme_state_specifier__();
 
                 var _spr = __bar_sprite__;
                 if (_spr == undefined || !sprite_exists(_spr)) {
 					_spr = wwThemeGetSprite(
-						"slider.sprite.fill.idle",
-						"slider.sprite.fill.main",
-						"slider.sprite.fill"
+						__theme_fill_sprite_prefix__ + "." + _state,
+						__theme_fill_sprite_prefix__ + ".idle",
+						__theme_fill_sprite_prefix__ + ".main",
+						__theme_fill_sprite_prefix__
 					);
                 }
                 if (_spr == undefined || !sprite_exists(_spr)) return;
 
                 var _col = __bar_color__;
 				if (_col == undefined) _col = wwThemeGetColor(
-					"slider.color.fill.idle",
-					"slider.color.fill.main",
-					"slider.color.fill"
+					__theme_fill_color_prefix__ + "." + _state,
+					__theme_fill_color_prefix__ + ".idle",
+					__theme_fill_color_prefix__ + ".main",
+					__theme_fill_color_prefix__
 				);
 				var _alp = __bar_alpha__;
 				if (_alp == undefined) _alp = wwThemeGetAlpha(
-					"slider.alpha.fill.idle",
-					"slider.alpha.fill.main",
-					"slider.alpha.fill"
+					__theme_fill_alpha_prefix__ + "." + _state,
+					__theme_fill_alpha_prefix__ + ".idle",
+					__theme_fill_alpha_prefix__ + ".main",
+					__theme_fill_alpha_prefix__
 				);
 
                 draw_sprite_stretched_ext(

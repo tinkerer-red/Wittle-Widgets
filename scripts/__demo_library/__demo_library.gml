@@ -1272,8 +1272,10 @@ demo_library_register("Inputs/Scrollbars", WWScrollbar, {
 		_ctx.try_call(_comp, "set_size", [220, 20]);
 		_ctx.try_call(_comp, "set_canvas_size", [900]);
 		_ctx.try_call(_comp, "set_coverage_size", [180]);
-		var _thumb = new WWButtonSprite().set_sprite(spr_ww_slider_thumb).set_size(18, 18);
-		_thumb.__theme_kind__ = __WW_Theme_Kind.Slider;
+		var _thumb = new WWButtonSprite()
+			.set_theme_keys("slider.sprite.thumb.main", "slider.sprite.thumb", "slider.color.thumb", "slider.alpha.thumb")
+			.set_sprite(spr_ww_slider_thumb)
+			.set_size(18, 18);
 		_ctx.try_call(_comp, "set_thumb", [_thumb]);
 		_ctx.try_call(_comp, "set_value", [260]);
 	}

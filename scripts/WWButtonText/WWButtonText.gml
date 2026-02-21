@@ -75,6 +75,32 @@ function WWButtonText() : WWButtonSprite() constructor {
 				}
 				return self;
 			}
+			
+			#region jsDoc
+			/// @func    set_text_theme_keys()
+			/// @desc    Sets theme key prefixes used by the internal label when text color/alpha/font are theme-driven.
+			/// @self    WWButtonText
+			/// @param   {String} font_main_key
+			/// @param   {String} font_code_key
+			/// @param   {String} color_prefix
+			/// @param   {String} alpha_prefix
+			/// @returns {Struct.WWButtonText}
+			#endregion
+			static set_text_theme_keys = function(
+				_font_main_key = "text_renderer.font.main",
+				_font_code_key = "text_renderer.font.code",
+				_color_prefix = "button_text.color.text",
+				_alpha_prefix = "button_text.alpha.text"
+			) {
+				text_component.set_theme_keys(
+					_font_main_key,
+					_font_code_key,
+					_color_prefix,
+					_alpha_prefix,
+					self
+				);
+				return self;
+			}
 			// Child wrapper parity: WWLabel exposes set_color as an alias.
 			static set_color = set_text_color;
 			
@@ -138,12 +164,12 @@ function WWButtonText() : WWButtonSprite() constructor {
 		#region Components
 			
 			text_component = new WWLabel();
+			text_component.set_theme_keys("text_renderer.font.main", "text_renderer.font.code", "button_text.color.text", "button_text.alpha.text", self);
 			add(text_component);
 			
 		#endregion
 		
 		#region Events
-			
 			on_held(function(_input) {
 				if (__is_pointer_over__) {
 					text_component.__set_offset__(text.x_offset, text.click_yoff);

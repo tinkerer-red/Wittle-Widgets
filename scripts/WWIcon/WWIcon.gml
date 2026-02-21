@@ -85,6 +85,26 @@ function WWIcon() : WWCore() constructor {
 				auto_icon_paint = _enabled;
 				return self;
 			};
+			
+			#region jsDoc
+			/// @func    set_theme_keys()
+			/// @desc    Sets theme key prefixes used when auto icon paint is enabled.
+			/// @self    WWIcon
+			/// @param   {String} color_prefix : e.g. "button.color.text"
+			/// @param   {String} alpha_prefix : e.g. "button.alpha.text"
+			/// @param   {Struct|Undefined} state_source : Optional state source struct (defaults to self).
+			/// @returns {Struct.WWIcon}
+			#endregion
+			static set_theme_keys = function(
+				_color_prefix = "button.color.text",
+				_alpha_prefix = "button.alpha.text",
+				_state_source = undefined
+			) {
+				__theme_color_prefix__ = _color_prefix;
+				__theme_alpha_prefix__ = _alpha_prefix;
+				__theme_state_source__ = _state_source;
+				return self;
+			};
 		#endregion
 
 		#region Variables
@@ -104,6 +124,9 @@ function WWIcon() : WWCore() constructor {
 			icon_color = undefined;
 			icon_alpha = undefined;
 			__fa_ready__ = false;
+			__theme_color_prefix__ = "button.color.text";
+			__theme_alpha_prefix__ = "button.alpha.text";
+			__theme_state_source__ = undefined;
 		#endregion
 
 		#region Functions
@@ -140,12 +163,39 @@ function WWIcon() : WWCore() constructor {
 				if (_fa_font_asset == -1 || !font_exists(_fa_font_asset)) return false;
 				return true;
 			};
+			
+			static __theme_state_specifier__ = function() {
+				var _src = __theme_state_source__;
+				if (!is_struct(_src)) _src = self;
+				
+				var _state = __WW_STATE.NORMAL;
+				if (variable_struct_exists(_src, "__visual_state__")) {
+					_state = _src.__visual_state__;
+				}
+				
+				switch (_state) {
+					case __WW_STATE.HOVER: return "hover";
+					case __WW_STATE.ACTIVE: return "active";
+					case __WW_STATE.DISABLED: return "disabled";
+					case __WW_STATE.NAV: return "nav";
+					default: return "idle";
+				}
+			};
 
 			static __resolved_icon_paint__ = function() {
 				if (auto_icon_paint) {
+					var _state = __theme_state_specifier__();
 					return {
-						color: wwThemeGetColor("button.color.text.idle"),
-						alpha: wwThemeGetAlpha("button.alpha.text.idle")
+						color: wwThemeGetColor(
+							__theme_color_prefix__ + "." + _state,
+							__theme_color_prefix__ + ".idle",
+							__theme_color_prefix__
+						),
+						alpha: wwThemeGetAlpha(
+							__theme_alpha_prefix__ + "." + _state,
+							__theme_alpha_prefix__ + ".idle",
+							__theme_alpha_prefix__
+						)
 					};
 				}
 				return { color: icon_color, alpha: icon_alpha };

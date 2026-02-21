@@ -5,12 +5,42 @@
 #endregion
 function WWSliderHorzThumb() : WWSliderHorz() constructor {
     debug_name = "WWSliderHorzThumb";
+	
+	__thumb_theme_sprite_main__ = "slider.sprite.thumb.main";
+	__thumb_theme_sprite_state_prefix__ = "slider.sprite.thumb";
+	__thumb_theme_color_prefix__ = "slider.color.thumb";
+	__thumb_theme_alpha_prefix__ = "slider.alpha.thumb";
+	
+	static set_thumb_theme_keys = function(
+		_sprite_main = "slider.sprite.thumb.main",
+		_sprite_state_prefix = "slider.sprite.thumb",
+		_color_prefix = "slider.color.thumb",
+		_alpha_prefix = "slider.alpha.thumb"
+	) {
+		__thumb_theme_sprite_main__ = _sprite_main;
+		__thumb_theme_sprite_state_prefix__ = _sprite_state_prefix;
+		__thumb_theme_color_prefix__ = _color_prefix;
+		__thumb_theme_alpha_prefix__ = _alpha_prefix;
+		
+		if (is_struct(thumb) && variable_struct_exists(thumb, "set_theme_keys")) {
+			thumb.set_theme_keys(
+				__thumb_theme_sprite_main__,
+				__thumb_theme_sprite_state_prefix__,
+				__thumb_theme_color_prefix__,
+				__thumb_theme_alpha_prefix__
+			);
+		}
+		return self;
+	};
 
     thumb = new WWButtonSprite();
-	thumb.__theme_sprite_key_main__ = "slider.sprite.thumb.main";
-	thumb.__theme_sprite_key_state_prefix__ = "slider.sprite.thumb";
-	thumb.__theme_color_prefix__ = "slider.color.thumb";
-	thumb.__theme_alpha_prefix__ = "slider.alpha.thumb";
+	thumb.set_theme_keys(
+		__thumb_theme_sprite_main__,
+		__thumb_theme_sprite_state_prefix__,
+		__thumb_theme_color_prefix__,
+		__thumb_theme_alpha_prefix__
+	);
+	thumb.set_navigable(false);
 
     add(thumb);
 

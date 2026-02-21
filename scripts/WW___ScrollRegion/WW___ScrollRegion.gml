@@ -34,6 +34,66 @@ function WW___ScrollRegion() : WWCore() constructor {
 				wheel_step = _pixels_per_wheel;
 				return self;
 			};
+			
+			#region jsDoc
+			/// @func    set_nav_entry_mode()
+			/// @desc    Forwards nav-entry mode configuration to internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @param   {Real} mode : __WW_SCROLL_NAV_MODE.*
+			/// @returns {Struct.WW___ScrollRegion}
+			#endregion
+			static set_nav_entry_mode = function(_mode) {
+				view.set_nav_entry_mode(_mode);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_trap_when_active()
+			/// @desc    Forwards active-nav trap setting to internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @param   {Bool} enabled
+			/// @returns {Struct.WW___ScrollRegion}
+			#endregion
+			static set_nav_trap_when_active = function(_enabled=true) {
+				view.set_nav_trap_when_active(_enabled);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_enter_action()
+			/// @desc    Forwards enter action configuration to internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @param   {Real} action : __WW_NAV_ACTION.*
+			/// @returns {Struct.WW___ScrollRegion}
+			#endregion
+			static set_nav_enter_action = function(_action=__WW_NAV_ACTION.SUBMIT) {
+				view.set_nav_enter_action(_action);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_exit_action()
+			/// @desc    Forwards exit action configuration to internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @param   {Real} action : __WW_NAV_ACTION.*
+			/// @returns {Struct.WW___ScrollRegion}
+			#endregion
+			static set_nav_exit_action = function(_action=__WW_NAV_ACTION.CANCEL) {
+				view.set_nav_exit_action(_action);
+				return self;
+			};
+			
+			#region jsDoc
+			/// @func    set_nav_remember_last_target()
+			/// @desc    Forwards remember-last-target setting to internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @param   {Bool} enabled
+			/// @returns {Struct.WW___ScrollRegion}
+			#endregion
+			static set_nav_remember_last_target = function(_enabled=true) {
+				view.set_nav_remember_last_target(_enabled);
+				return self;
+			};
 
 			#region jsDoc
 			/// @func    set_viewport_size()
@@ -163,6 +223,26 @@ function WW___ScrollRegion() : WWCore() constructor {
 			#endregion
 			static get_scrollbar_vert = function() {
 				return scrollbar_vert;
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_entry_mode()
+			/// @desc    Returns nav-entry mode from internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @returns {Real}
+			#endregion
+			static get_nav_entry_mode = function() {
+				return view.get_nav_entry_mode();
+			};
+			
+			#region jsDoc
+			/// @func    get_nav_active()
+			/// @desc    Returns active nav-scope state from internal WWViewScrollRegion.
+			/// @self    WW___ScrollRegion
+			/// @returns {Bool}
+			#endregion
+			static get_nav_active = function() {
+				return view.get_nav_active();
 			};
 
 		#endregion

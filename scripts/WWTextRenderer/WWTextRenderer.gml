@@ -145,6 +145,35 @@ function WWTextRenderer() : WWCore() constructor {
                     return self;
                 };
 
+                #region jsDoc
+                /// @func   set_theme_keys()
+                /// @desc   Sets theme key prefixes used when local font/color/alpha are undefined.
+                /// @self   WWTextRenderer
+                /// @param  {String} font_main_key
+                /// @param  {String} font_code_key
+                /// @param  {String} color_prefix
+                /// @param  {String} alpha_prefix
+                /// @param  {Struct|Undefined} state_source : Optional source struct for visual state (defaults to self).
+                /// @returns {Struct.WWTextRenderer}
+                #endregion
+                static set_theme_keys = function(
+                    _font_main_key = "text_renderer.font.main",
+                    _font_code_key = "text_renderer.font.code",
+                    _color_prefix = "text_renderer.color.main",
+                    _alpha_prefix = "text_renderer.alpha.main",
+                    _state_source = undefined
+                ) {
+                    __theme_font_main_key__ = _font_main_key;
+                    __theme_font_code_key__ = _font_code_key;
+                    __theme_color_prefix__ = _color_prefix;
+                    __theme_alpha_prefix__ = _alpha_prefix;
+                    __theme_state_source__ = _state_source;
+                    __theme_last_resolved_color__ = undefined;
+                    __theme_last_resolved_alpha__ = undefined;
+                    __mark_dirty__();
+                    return self;
+                };
+
             #endregion
 
             #region Layout Config
@@ -451,6 +480,7 @@ function WWTextRenderer() : WWCore() constructor {
             });
 
             on_pre_draw(function(_input) {
+                __theme_sync_dynamic_paint__();
                 __draw_text_vb__(x, y, -1, -1);
                 __draw_selection_highlight__();
             });
@@ -471,6 +501,13 @@ function WWTextRenderer() : WWCore() constructor {
             font_fallbacks = [];
             color = undefined;
             alpha = undefined;
+            __theme_font_main_key__ = "text_renderer.font.main";
+            __theme_font_code_key__ = "text_renderer.font.code";
+            __theme_color_prefix__ = "text_renderer.color.main";
+            __theme_alpha_prefix__ = "text_renderer.alpha.main";
+            __theme_state_source__ = undefined;
+            __theme_last_resolved_color__ = undefined;
+            __theme_last_resolved_alpha__ = undefined;
 
 
             // Formatting / diagnostics (optional)
@@ -1566,6 +1603,83 @@ function WWTextRenderer() : WWCore() constructor {
 
         #endregion
 
+        #region Theme Helpers
+
+            static __theme_state_specifier__ = function() {
+                var _src = __theme_state_source__;
+                if (!is_struct(_src)) _src = self;
+
+                var _state = __WW_STATE.NORMAL;
+                if (variable_struct_exists(_src, "__visual_state__")) {
+                    _state = _src.__visual_state__;
+                }
+
+                switch (_state) {
+                    case __WW_STATE.HOVER: return "hover";
+                    case __WW_STATE.ACTIVE: return "active";
+                    case __WW_STATE.DISABLED: return "disabled";
+                    case __WW_STATE.NAV: return "nav";
+                    case __WW_STATE.NORMAL: return "idle";
+                    default: return "idle";
+                }
+            };
+
+            static __theme_resolve_font_main__ = function() {
+                return wwThemeGetFont(__theme_font_main_key__);
+            };
+
+            static __theme_resolve_font_code__ = function() {
+                return wwThemeGetFont(
+                    __theme_font_code_key__,
+                    __theme_font_main_key__
+                );
+            };
+
+            static __theme_resolve_color__ = function() {
+                var _state = __theme_state_specifier__();
+                return wwThemeGetColor(
+                    __theme_color_prefix__ + "." + _state,
+                    __theme_color_prefix__ + ".idle",
+                    __theme_color_prefix__
+                );
+            };
+
+            static __theme_resolve_alpha__ = function() {
+                var _state = __theme_state_specifier__();
+                return wwThemeGetAlpha(
+                    __theme_alpha_prefix__ + "." + _state,
+                    __theme_alpha_prefix__ + ".idle",
+                    __theme_alpha_prefix__
+                );
+            };
+
+            static __theme_sync_dynamic_paint__ = function() {
+                // Only track theme-driven paint. User-set color/alpha should remain stable.
+                if (color == undefined) {
+                    var _next_color = __theme_resolve_color__();
+                    if (__theme_last_resolved_color__ != _next_color) {
+                        __theme_last_resolved_color__ = _next_color;
+                        __mark_vb_dirty__();
+                    }
+                }
+                else {
+                    __theme_last_resolved_color__ = undefined;
+                }
+
+                if (alpha == undefined) {
+                    var _next_alpha = __theme_resolve_alpha__();
+                    if (__theme_last_resolved_alpha__ != _next_alpha) {
+                        __theme_last_resolved_alpha__ = _next_alpha;
+                        __mark_vb_dirty__();
+                    }
+                }
+                else {
+                    __theme_last_resolved_alpha__ = undefined;
+                }
+            };
+
+        #endregion
+
         #region VB batch helpers
 
             #region jsDoc
@@ -2015,19 +2129,10 @@ function WWTextRenderer() : WWCore() constructor {
                     return;
                 }
 
-				var _font = font ?? wwThemeGetFont(
-					"text_renderer.font.main"
-				);
-				var _code_font = wwThemeGetFont(
-					"text_renderer.font.code",
-					"text_renderer.font.main"
-				);
-				var _color = color ?? wwThemeGetColor(
-					"text_renderer.color.main"
-				);
-				var _alpha = alpha ?? wwThemeGetAlpha(
-					"text_renderer.alpha.main"
-				);
+				var _font = font ?? __theme_resolve_font_main__();
+				var _code_font = __theme_resolve_font_code__();
+				var _color = color ?? __theme_resolve_color__();
+				var _alpha = alpha ?? __theme_resolve_alpha__();
 				
                 var _text_value = "";
                 if (!is_undefined(__textbox_parent__)) {
@@ -3033,15 +3138,9 @@ function WWTextRenderer() : WWCore() constructor {
                     return;
                 }
 				
-				var _font = font ?? wwThemeGetFont(
-					"text_renderer.font.main"
-				);
-				var _color = color ?? wwThemeGetColor(
-					"text_renderer.color.main"
-				);
-				var _alpha = alpha ?? wwThemeGetAlpha(
-					"text_renderer.alpha.main"
-				);
+				var _font = font ?? __theme_resolve_font_main__();
+				var _color = color ?? __theme_resolve_color__();
+				var _alpha = alpha ?? __theme_resolve_alpha__();
 				
                 // Buffer input for fast scanning (UTF-8) + sentinel
                 var _byte_len = string_byte_length(_str);
@@ -4940,15 +5039,9 @@ function WWTextRenderer() : WWCore() constructor {
             /// @returns {Undefined}
             #endregion
 			static __build_vb__ = function() {
-				var _font = font ?? wwThemeGetFont(
-					"text_renderer.font.main"
-				);
-				var _color = color ?? wwThemeGetColor(
-					"text_renderer.color.main"
-				);
-				var _alpha = alpha ?? wwThemeGetAlpha(
-					"text_renderer.alpha.main"
-				);
+				var _font = font ?? __theme_resolve_font_main__();
+				var _color = color ?? __theme_resolve_color__();
+				var _alpha = alpha ?? __theme_resolve_alpha__();
 
 				
 			    var _old_font = draw_get_font();

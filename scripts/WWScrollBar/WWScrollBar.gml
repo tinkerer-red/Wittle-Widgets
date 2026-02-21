@@ -7,10 +7,12 @@ function WWScrollbar() : WWSliderBase() constructor {
     debug_name = "WWScrollbar";
 
 	// Scrollbar surface (track/tray) should resolve from scrollbar keyspace, not slider/button.
-	__theme_sprite_key_main__ = "scrollbar.sprite.tray.main";
-	__theme_sprite_key_state_prefix__ = "scrollbar.sprite.tray";
-	__theme_color_prefix__ = "scrollbar.color.tray";
-	__theme_alpha_prefix__ = "scrollbar.alpha.tray";
+	set_track_theme_keys(
+		"scrollbar.sprite.tray.main",
+		"scrollbar.sprite.tray",
+		"scrollbar.color.tray",
+		"scrollbar.alpha.tray"
+	);
 	
     #region Public
 
@@ -92,10 +94,15 @@ function WWScrollbar() : WWSliderBase() constructor {
 				
 				thumb = _thumb;
 				add(thumb);
-				thumb.__theme_sprite_key_main__ = "scrollbar.sprite.thumb.main";
-				thumb.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.thumb";
-				thumb.__theme_color_prefix__ = "scrollbar.color.thumb";
-				thumb.__theme_alpha_prefix__ = "scrollbar.alpha.thumb";
+				if (variable_struct_exists(thumb, "set_theme_keys")) {
+					thumb.set_theme_keys(
+						__thumb_theme_sprite_main__,
+						__thumb_theme_sprite_state_prefix__,
+						__thumb_theme_color_prefix__,
+						__thumb_theme_alpha_prefix__
+					);
+				}
+				thumb.set_navigable(false);
 				
 				// Keep default sizing behavior: if the bar was sized and the thumb wasn't user-sized,
 				// match the bar thickness.
@@ -126,6 +133,38 @@ function WWScrollbar() : WWSliderBase() constructor {
 				return self;
 			}
 			
+			#region jsDoc
+			/// @func    set_thumb_theme_keys()
+			/// @desc    Sets theme key prefixes used by the internal thumb button.
+			/// @self    WWScrollbar
+			/// @param   {String} sprite_main
+			/// @param   {String} sprite_state_prefix
+			/// @param   {String} color_prefix
+			/// @param   {String} alpha_prefix
+			/// @returns {Struct.WWScrollbar}
+			#endregion
+			static set_thumb_theme_keys = function(
+				_sprite_main = "scrollbar.sprite.thumb.main",
+				_sprite_state_prefix = "scrollbar.sprite.thumb",
+				_color_prefix = "scrollbar.color.thumb",
+				_alpha_prefix = "scrollbar.alpha.thumb"
+			) {
+				__thumb_theme_sprite_main__ = _sprite_main;
+				__thumb_theme_sprite_state_prefix__ = _sprite_state_prefix;
+				__thumb_theme_color_prefix__ = _color_prefix;
+				__thumb_theme_alpha_prefix__ = _alpha_prefix;
+				
+				if (is_struct(thumb) && variable_struct_exists(thumb, "set_theme_keys")) {
+					thumb.set_theme_keys(
+						__thumb_theme_sprite_main__,
+						__thumb_theme_sprite_state_prefix__,
+						__thumb_theme_color_prefix__,
+						__thumb_theme_alpha_prefix__
+					);
+				}
+				return self;
+			}
+			
         #endregion
 		
 		#region Variables
@@ -134,14 +173,22 @@ function WWScrollbar() : WWSliderBase() constructor {
 	        coverage_size = 0;
 	        max_scroll = 0;
 	        smooth_scrolling = false;
+			__thumb_theme_sprite_main__ = "scrollbar.sprite.thumb.main";
+			__thumb_theme_sprite_state_prefix__ = "scrollbar.sprite.thumb";
+			__thumb_theme_color_prefix__ = "scrollbar.color.thumb";
+			__thumb_theme_alpha_prefix__ = "scrollbar.alpha.thumb";
 			
 	        // Create Thumb
 	        thumb = new WWButtonSprite();
-			thumb.__theme_sprite_key_main__ = "scrollbar.sprite.thumb.main";
-			thumb.__theme_sprite_key_state_prefix__ = "scrollbar.sprite.thumb";
-			thumb.__theme_color_prefix__ = "scrollbar.color.thumb";
-			thumb.__theme_alpha_prefix__ = "scrollbar.alpha.thumb";
+			thumb.set_theme_keys(
+				__thumb_theme_sprite_main__,
+				__thumb_theme_sprite_state_prefix__,
+				__thumb_theme_color_prefix__,
+				__thumb_theme_alpha_prefix__
+			);
 	        add(thumb);
+	        thumb.set_navigable(false);
+	        set_navigable(false);
 			
 	    #endregion
 		

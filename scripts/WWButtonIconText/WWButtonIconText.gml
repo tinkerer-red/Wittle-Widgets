@@ -120,6 +120,16 @@ function WWButtonIconText() : WWButtonText() constructor {
 				if (!__size_set__) set_sprite_to_auto_wrap(); else __layout_content__();
 				return self;
 			};
+			
+			static set_icon_theme_keys = function(
+				_color_prefix = "button_text.color.text",
+				_alpha_prefix = "button_text.alpha.text",
+				_state_source = undefined
+			) {
+				if (is_undefined(_state_source)) _state_source = self;
+				icon_component.set_theme_keys(_color_prefix, _alpha_prefix, _state_source);
+				return self;
+			};
 		#endregion
 	#endregion
 
@@ -242,6 +252,7 @@ function WWButtonIconText() : WWButtonText() constructor {
 
 	add(icon_component);
 	icon_component.set_icon_padding(icon_padding);
+	set_icon_theme_keys("button_text.color.text", "button_text.alpha.text", self);
 	icon_component.set_auto_icon_paint(true);
 	icon_component.set_active(false);
 	__layout_content__();

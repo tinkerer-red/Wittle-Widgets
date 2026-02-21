@@ -48,6 +48,13 @@ enum __WW_NAV_ACTION {
 	DOWN,
 }
 
+// Scroll region navigation entry modes
+enum __WW_SCROLL_NAV_MODE {
+	NONE = 0,
+	DIRECT,
+	ACTIVATE,
+}
+
 // Debug/fallback: bright magenta (Minecraft-style missing texture indicator)
 #macro WW_COLOR_MISSING_THEME c_fuchsia
 

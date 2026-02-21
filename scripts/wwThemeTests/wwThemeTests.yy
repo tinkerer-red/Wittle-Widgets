@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"wwThemeDuo",
+  "%Name":"wwThemeTests",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"wwThemeDuo",
+  "name":"wwThemeTests",
   "parent":{
     "name":"Themes",
     "path":"folders/_Libraries/Wittle Widgets/Themes.yy",

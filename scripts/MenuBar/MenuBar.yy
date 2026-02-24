@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MenuBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MenuBar",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

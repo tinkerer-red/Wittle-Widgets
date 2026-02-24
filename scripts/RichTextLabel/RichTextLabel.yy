@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"RichTextLabel",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"RichTextLabel",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

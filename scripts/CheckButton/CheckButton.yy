@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"CheckButton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"CheckButton",
+  "parent":{
+    "name":"Button",
+    "path":"folders/GodotUI/BaseButton/Button.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

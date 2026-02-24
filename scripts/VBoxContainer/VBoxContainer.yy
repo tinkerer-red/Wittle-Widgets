@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"VBoxContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"VBoxContainer",
+  "parent":{
+    "name":"VBoxContainer",
+    "path":"folders/GodotUI/Container/BoxContainer/VBoxContainer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Label",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Label",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

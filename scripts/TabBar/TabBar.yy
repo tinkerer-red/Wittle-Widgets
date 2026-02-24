@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TabBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TabBar",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

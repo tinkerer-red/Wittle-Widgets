@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"LineEdit",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"LineEdit",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

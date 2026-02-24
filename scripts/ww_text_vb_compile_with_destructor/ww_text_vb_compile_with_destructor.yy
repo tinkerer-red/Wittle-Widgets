@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ww_text_vb_compile_with_destructor",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ww_text_vb_compile_with_destructor",
+  "parent":{
+    "name":"TextSingle",
+    "path":"folders/TextSingle.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

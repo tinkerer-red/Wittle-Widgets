@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"OptionButton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"OptionButton",
+  "parent":{
+    "name":"Button",
+    "path":"folders/GodotUI/BaseButton/Button.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

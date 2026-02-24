@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"BoxContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"BoxContainer",
+  "parent":{
+    "name":"BoxContainer",
+    "path":"folders/GodotUI/Container/BoxContainer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

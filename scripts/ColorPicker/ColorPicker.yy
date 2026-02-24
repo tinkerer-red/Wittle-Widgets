@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ColorPicker",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ColorPicker",
+  "parent":{
+    "name":"VBoxContainer",
+    "path":"folders/GodotUI/Container/BoxContainer/VBoxContainer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

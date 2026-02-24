@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"CodeEdit",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"CodeEdit",
+  "parent":{
+    "name":"TextEdit",
+    "path":"folders/GodotUI/TextEdit.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

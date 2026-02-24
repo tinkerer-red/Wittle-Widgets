@@ -7,3 +7,4 @@ wwThemeSet(wwThemeCompose([
 ]));
 
 event_user(15);
+

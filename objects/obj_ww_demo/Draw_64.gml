@@ -1,5 +1,6 @@
 root.draw(undefined, false);
 
+
 /*
 shader_set(__shdMsdf);
 gpu_set_tex_filter(true)

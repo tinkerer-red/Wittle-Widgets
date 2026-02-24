@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"MarginContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"MarginContainer",
+  "parent":{
+    "name":"Container",
+    "path":"folders/GodotUI/Container.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

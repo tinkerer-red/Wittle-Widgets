@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"Tree",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"Tree",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

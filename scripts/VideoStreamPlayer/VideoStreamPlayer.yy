@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"VideoStreamPlayer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"VideoStreamPlayer",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

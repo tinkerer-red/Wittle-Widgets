@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TabContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TabContainer",
+  "parent":{
+    "name":"Container",
+    "path":"folders/GodotUI/Container.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

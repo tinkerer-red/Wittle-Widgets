@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ProgressBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ProgressBar",
+  "parent":{
+    "name":"Range",
+    "path":"folders/GodotUI/Range.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

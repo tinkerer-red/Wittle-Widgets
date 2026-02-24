@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"HSplitContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"HSplitContainer",
+  "parent":{
+    "name":"SplitContainer",
+    "path":"folders/GodotUI/Container/SplitContainer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

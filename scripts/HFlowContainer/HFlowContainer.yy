@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"HFlowContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"HFlowContainer",
+  "parent":{
+    "name":"FlowContainer",
+    "path":"folders/GodotUI/Container/FlowContainer.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

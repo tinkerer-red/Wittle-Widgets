@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TextureProgressBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TextureProgressBar",
+  "parent":{
+    "name":"Range",
+    "path":"folders/GodotUI/Range.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

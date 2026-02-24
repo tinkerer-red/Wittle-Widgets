@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TextureButton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TextureButton",
+  "parent":{
+    "name":"BaseButton",
+    "path":"folders/GodotUI/BaseButton.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

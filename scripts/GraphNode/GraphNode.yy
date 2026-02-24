@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"GraphNode",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"GraphNode",
+  "parent":{
+    "name":"GraphElement",
+    "path":"folders/GodotUI/Container/GraphElement.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

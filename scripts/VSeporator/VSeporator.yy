@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"VSeporator",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"VSeporator",
+  "parent":{
+    "name":"Seporator",
+    "path":"folders/GodotUI/Seporator.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

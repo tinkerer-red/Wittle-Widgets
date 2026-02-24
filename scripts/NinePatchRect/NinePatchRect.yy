@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"NinePatchRect",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"NinePatchRect",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

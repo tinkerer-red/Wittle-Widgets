@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"CenterContainer",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"CenterContainer",
+  "parent":{
+    "name":"Container",
+    "path":"folders/GodotUI/Container.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

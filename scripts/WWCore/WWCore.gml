@@ -344,7 +344,6 @@ function WWCore() constructor {
 				else {
 					__is_input_consumer__ = _is_input_consumer;
 				}
-				__sync_legacy_input_flags__();
 				return self;
 			}
 			static set_focus = function(_focus) {
@@ -385,8 +384,7 @@ function WWCore() constructor {
 				else {
 					__is_pointer_over__ = _is_pointer_over;
 				}
-				__sync_legacy_input_flags__();
-			    return self;
+				return self;
 			}
 			static set_hover = function(_hover) {
 				set_pointer_over(_hover);
@@ -416,8 +414,7 @@ function WWCore() constructor {
 				if (!_is_engaged) {
 					__is_pressed__ = false;
 				}
-				__sync_legacy_input_flags__();
-			    return self;
+				return self;
 			}
 			static set_interact = function(_interact) {
 				set_engaged(_interact);
@@ -2307,6 +2304,7 @@ function WWCore() constructor {
 			
 			static __GLOBAL_ID__ = 100000; // internally used to keep track of component indexes
 			__comp_id__ = __GLOBAL_ID__++; // used to make sure we dont re add the same component to a controller
+			show_debug_message(__comp_id__)
 			__previous_scissor__ = undefined;
 			
 			__is_focusable__ = false; // Mark this component as focusable (set to false if a component should never receive focus)
@@ -3559,11 +3557,6 @@ function WWCore() constructor {
 					}
 				//else
 				__visual_state__ = __WW_STATE.NORMAL;
-			};
-			static __sync_legacy_input_flags__ = function() {
-				__is_interacting__ = __is_engaged__;
-				__is_focused__ = __is_input_consumer__;
-				__is_hovered__ = __is_pointer_over__;
 			};
 			#region jsDoc
 			/// @func    __cleanup__()

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"TextureTect",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TextureTect",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

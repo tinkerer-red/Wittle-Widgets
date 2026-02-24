@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"HScrollBar",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"HScrollBar",
+  "parent":{
+    "name":"ScrollBar",
+    "path":"folders/GodotUI/Range/ScrollBar.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ww_text_vb_build_fast_singleline",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ww_text_vb_build_fast_singleline",
+  "parent":{
+    "name":"TextSingle",
+    "path":"folders/TextSingle.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

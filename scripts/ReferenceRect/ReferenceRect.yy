@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ReferenceRect",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ReferenceRect",
+  "parent":{
+    "name":"GodotUI",
+    "path":"folders/GodotUI.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"ColorPickerButton",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"ColorPickerButton",
+  "parent":{
+    "name":"Button",
+    "path":"folders/GodotUI/BaseButton/Button.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

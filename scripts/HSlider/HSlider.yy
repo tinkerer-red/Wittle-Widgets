@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"HSlider",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"HSlider",
+  "parent":{
+    "name":"Slider",
+    "path":"folders/GodotUI/Range/Slider.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
